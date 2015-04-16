@@ -1,10 +1,10 @@
-#include "StorkApp.h"
+#include "MagpieApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
 template<>
-InputParameters validParams<StorkApp>()
+InputParameters validParams<MagpieApp>()
 {
   InputParameters params = validParams<MooseApp>();
 
@@ -13,37 +13,37 @@ InputParameters validParams<StorkApp>()
   return params;
 }
 
-StorkApp::StorkApp(const std::string & name, InputParameters parameters) :
+MagpieApp::MagpieApp(const std::string & name, InputParameters parameters) :
     MooseApp(name, parameters)
 {
   srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
-  StorkApp::registerObjects(_factory);
+  MagpieApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   ModulesApp::associateSyntax(_syntax, _action_factory);
-  StorkApp::associateSyntax(_syntax, _action_factory);
+  MagpieApp::associateSyntax(_syntax, _action_factory);
 }
 
-StorkApp::~StorkApp()
+MagpieApp::~MagpieApp()
 {
 }
 
-extern "C" void StorkApp__registerApps() { StorkApp::registerApps(); }
+extern "C" void MagpieApp__registerApps() { MagpieApp::registerApps(); }
 void
-StorkApp::registerApps()
+MagpieApp::registerApps()
 {
-  registerApp(StorkApp);
+  registerApp(MagpieApp);
 }
 
 void
-StorkApp::registerObjects(Factory & factory)
+MagpieApp::registerObjects(Factory & factory)
 {
 }
 
 void
-StorkApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+MagpieApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 }
