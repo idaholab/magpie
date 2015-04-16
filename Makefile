@@ -19,8 +19,11 @@ FRAMEWORK_DIR      := $(MOOSE_DIR)/framework
 include $(FRAMEWORK_DIR)/build.mk
 include $(FRAMEWORK_DIR)/moose.mk
 
+# build atomistic codes in contrib
+include contrib/contrib.mk
+
 ################################## MODULES ####################################
-ALL_MODULES := yes
+ALL_MODULES := no
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 

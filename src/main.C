@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
   // Initialize MPI, solvers and MOOSE
   MooseInit init(argc, argv);
 
+  // print ASCII art application logo
+  MagpieApp::printLogo();
+
   // Register this application's MooseApp and any it depends on
   MagpieApp::registerApps();
 
