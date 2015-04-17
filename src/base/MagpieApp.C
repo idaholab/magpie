@@ -1,7 +1,9 @@
 #include "MagpieApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
-// #include "ModulesApp.h"
+
+#include "SPPARKSUserObject.h"
+#include "SPPARKSAux.h"
 
 template<>
 InputParameters validParams<MagpieApp>()
@@ -19,11 +21,9 @@ MagpieApp::MagpieApp(const std::string & name, InputParameters parameters) :
   srand(processor_id());
 
   Moose::registerObjects(_factory);
-  // ModulesApp::registerObjects(_factory);
   MagpieApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
-  // ModulesApp::associateSyntax(_syntax, _action_factory);
   MagpieApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -41,6 +41,8 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
+  registerAux(SPPARKSAux);
+  registerUserObject(SPPARKSUserObject);
 }
 
 void
