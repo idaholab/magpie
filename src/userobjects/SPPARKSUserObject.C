@@ -53,8 +53,8 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
    _init_spparks(getParam<bool>("init_spparks")),
    _time_ratio(getParam<Real>("time_spparks_time_ratio")),
    _initialized(false),
-   _one_time_run(getParam<bool>("one_time_run")), // added by YF 
-   _times_of_run(0), // added by YF 
+   _one_time_run(getParam<bool>("one_time_run")),
+   _times_of_run(0),
    _last_time(std::numeric_limits<Real>::min())
 {
 
@@ -62,44 +62,33 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("int_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-    {
       _int_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
-    }
   }
   if (_int_vars.size() != _to_ivar.size())
-  {
     mooseError("Mismatch with int_vars and to_ivar");
-  }
+
   if (isParamValid("double_vars"))
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("double_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-    {
       _double_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
-    }
   }
   if (_double_vars.size() != _to_dvar.size())
-  {
     mooseError("Mismatch with double_vars and to_dvar");
-  }
 
-  // added by YF
+
   if (isParamValid("sol_vars"))
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("sol_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-    {
       _sol_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
-    }
   }
 
   std::cout << std::endl
             << ">>>> STARTING SPPARKS <<<<" << std::endl;
   spparks_open( 0, NULL, _communicator.get(), &_spparks );
   if (!_spparks)
-  {
     mooseError("Error initializing SPPARKS");
-  }
 
   char * file = new char[_file.length()+1];
   std::strcpy( file, _file.c_str() );
@@ -153,7 +142,17 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
 
 SPPARKSUserObject::~SPPARKSUserObject()
 {
-  spparks_close( _spparks );
+  spparks_close(_spparks);
+}
+
+void
+SPPARKSUserObject::initialize()
+{
+  if (_spparks_only)
+    return;
+
+  // getSPPARKSData();
+  // setSPPARKSData();
 }
 
 int
@@ -178,16 +177,12 @@ SPPARKSUserObject::getDoubleValue( unsigned elk_node_id, unsigned index ) const
   return getValue( _double_data_for_elk, elk_node_id, index );
 }
 
-void
-SPPARKSUserObject::initialize()
+char *
+SPPARKSUserObject::runSPPARKSCommand( const std::string & cmd )
 {
-  if (_spparks_only)
-  {
-    return;
-  }
-
-//   getSPPARKSData();
-//   setSPPARKSData();
+  std::vector<char> strng(cmd.begin(), cmd.end());
+  strng.push_back('\0');
+  return spparks_command(_spparks, &strng[0]);
 }
 
 void
@@ -231,7 +226,7 @@ SPPARKSUserObject::setSPPARKSData()
 void
 SPPARKSUserObject::setELKData()
 {
-  // Update the double solving variables using the data from SPPARKS, added by YF  
+  // Update the double solving variables using the data from SPPARKS, added by YF
   char darray[] = "darray";
   for (unsigned i = 0; i < _sol_vars.size(); ++i)
   {
@@ -244,14 +239,10 @@ void
 SPPARKSUserObject::execute()
 {
   if (_times_of_run > 1) // added by YF, aleady ran SPPARKS once in addition to initialization
-  {
     return;
-  }
 
   if (_spparks_only)
-  {
     return;
-  }
 
   if (_init_spparks)
   {
@@ -273,7 +264,7 @@ SPPARKSUserObject::execute()
     std::stringstream cmd;
     cmd << "run ";
     if ( !_times_of_run ) cmd << "10000000 ";
-    if ( _times_of_run ) cmd << "0 "; 
+    if ( _times_of_run ) cmd << "0 ";
     //cmd << sp_time;
     cmd << " pre no" << std::endl;
     runSPPARKSCommand( cmd.str() );
@@ -283,19 +274,18 @@ SPPARKSUserObject::execute()
 
     getSPPARKSData();
 
-    // Record if SPPARKS has been called before 
+    // Record if SPPARKS has been called before
     if (_one_time_run && _times_of_run )
     {
 
-    std::cout << std::endl
-              << "setSPPARKSData " << std::endl;
+      std::cout << std::endl
+                << "setSPPARKSData " << std::endl;
 
-       setELKData(); //added by YF 
+      setELKData(); //added by YF
     }
-    if (_one_time_run) 
-    {
-       _times_of_run ++; //added by YF 
-    }
+
+    if (_one_time_run)
+      _times_of_run ++;
   }
 }
 
@@ -310,13 +300,10 @@ SPPARKSUserObject::initSPPARKS()
   // Composition for alpha phase is 0.25; for beta phase, 0.75.
 
   if (2 != _from_ivar.size())
-  {
     mooseError("Must have two integer variables from SPPARKS");
-  }
+
   if (1 != _double_vars.size())
-  {
     mooseError("Must have one double variable to send to SPPARKS");
-  }
 
   SystemBase & sys = _double_vars[0]->sys();
   NumericVector<Number> & solution = sys.solution();
@@ -329,11 +316,11 @@ SPPARKSUserObject::initSPPARKS()
     int value = int(100*MooseRandom::rand()) + 1;
     ints[0][(*i)->id()] = value;
     ints[1][(*i)->id()] = value < 51;
+
     Real comp = 0.75;
     if ( value < 51 )
-    {
       comp = 0.25;
-    }
+
     // Set data
     solution.set( (*i)->dof_number(sys.number(), _double_vars[0]->number(), 0), comp );
   }
@@ -345,19 +332,14 @@ SPPARKSUserObject::initSPPARKS()
   {
     getSPPARKSDataPointer( pint, iarray, _from_ivar[i] );
 
+    // Index into data is SPPARKS node id.
     for (std::multimap<ELKID, SPPARKSID>::const_iterator it = _elk_to_spparks.begin(); it != _elk_to_spparks.end(); ++it)
-    {
-      // Index into data is SPPARKS node id.
       pint[it->second.id] = ints[i][it->first.id];
-    }
 
+    // Copy data across processors
     if ( n_processors() > 1 )
-    {
-      // Copy data across processors
       sendRecvELKData( ints[i], pint );
-    }
   }
-
 }
 
 
@@ -365,14 +347,11 @@ void
 SPPARKSUserObject::initialSetup()
 {
   if (_spparks_only || _initialized)
-  {
     return;
-  }
 
   _initialized = true;
 
   // Initialize communication maps
-
   std::cout << std::endl
               << "initialSetup: begin " << std::endl;
 
@@ -405,46 +384,37 @@ SPPARKSUserObject::initialSetup()
   for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
   {
     Point coor( **i );
+
     if (coor(0) == _xmax)
-    {
       coor(0) = _xmin;
-    }
     if (coor(1) == _ymax)
-    {
       coor(1) = _ymin;
-    }
     if (coor(2) == _zmax)
-    {
       coor(2) = _zmin;
-    }
+
     elk_id.insert( ELKID( (*i)->id(), coor ) );
   }
   _num_local_elk_nodes = elk_id.size();
 
-  std::set<SPPARKSID> unmatched_spparks; // SPPARKS nodes not found on this processor
+  // SPPARKS nodes not found on this processor
+  std::set<SPPARKSID> unmatched_spparks;
+
   for (std::set<SPPARKSID>::iterator i = spparks_id.begin(); i != spparks_id.end(); ++i)
   {
     std::multiset<ELKID>::iterator elk_iter = elk_id.find( *i );
     if (elk_iter != elk_id.end() )
-    {
       _spparks_to_elk.insert(std::pair<SPPARKSID, ELKID>(*i, *elk_iter)); // SPPARKSID to ELKID
-    }
     else
-    {
       unmatched_spparks.insert(*i);
-    }
   }
+
   for (std::multiset<ELKID>::iterator i = elk_id.begin(); i != elk_id.end(); ++i)
   {
     std::set<SPPARKSID>::iterator spparks_iter = spparks_id.find( *i );
     if (spparks_iter != spparks_id.end() )
-    {
       _elk_to_spparks.insert(std::pair<ELKID, SPPARKSID>(*i, *spparks_iter)); // ELKID to SPPARKSID
-    }
     // else
-    // {
     //   _spparks_to_proc.insert(std::pair<SPPARKSID, unsigned>(*i, -1));
-    // }
   }
 
   const unsigned num_procs = n_processors();
@@ -457,10 +427,10 @@ SPPARKSUserObject::initialSetup()
       msg << "Did not find ELK node for each SPPARKS node";
       msg << ", " << spparks_id.size()
           << ", " << elk_id.size() << ", " << _spparks_to_elk.size();
-    //  mooseError(msg.str());
+      // mooseError(msg.str());
 
-    std::cout << std::endl
-              << "  spparks size  "<< spparks_id.size() << "  elk size  " << elk_id.size()  << std::endl;
+      std::cout << std::endl
+                << "  spparks size  "<< spparks_id.size() << "  elk size  " << elk_id.size()  << std::endl;
 
     }
     return;
@@ -522,7 +492,6 @@ SPPARKSUserObject::initialSetup()
                                  Point(e_bounds[3], e_bounds[4], e_bounds[5]) );
   _communicator.sum(elk_bounds);
 
-
   std::cout << std::endl
               << "initialSetup: 2B " << std::endl;
 
@@ -535,25 +504,20 @@ SPPARKSUserObject::initialSetup()
   for (unsigned i = 0; i < num_procs; ++i)
   {
     if ( i == proc_id )
-    {
       continue;
-    }
+
     offset = i * 6;
     e_bounds = &elk_bounds[0] + offset;
     MeshTools::BoundingBox e_box( Point(e_bounds[0], e_bounds[1], e_bounds[2]),
                                   Point(e_bounds[3], e_bounds[4], e_bounds[5]) );
     if (spparks_bb.intersect( e_box ))
-    {
       procs_overlapping_spparks_domain.push_back( i );
-    }
 
     s_bounds = &spparks_bounds[0] + offset;
     MeshTools::BoundingBox s_box( Point(s_bounds[0], s_bounds[1], s_bounds[2]),
                                   Point(s_bounds[3], s_bounds[4], s_bounds[5]) );
     if (elk_bb.intersect( s_box ))
-    {
       procs_overlapping_elk_domain.push_back( i );
-    }
   }
 
   std::cout << std::endl
@@ -575,52 +539,44 @@ SPPARKSUserObject::initialSetup()
   int comm_tag = 100;
 
   std::cout << std::endl
-              << "initialSetup: 2D1 " << std::endl;
+            << "initialSetup: 2D1 " << std::endl;
 
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
-  {
     if( num_elk_nodes.size() && procs_overlapping_spparks_domain.size() )
        MPI_Irecv(&num_elk_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
-  }
 
   std::cout << std::endl
-              << "initialSetup: 2D2 " << std::endl;
+            << "initialSetup: 2D2 " << std::endl;
 
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
-  {
-    if( num_spparks_nodes.size() && procs_overlapping_elk_domain.size() ) 
+    if( num_spparks_nodes.size() && procs_overlapping_elk_domain.size() )
        MPI_Irecv(&num_spparks_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
-  }
 
   std::cout << std::endl
-              << "initialSetup: 2D3 " << std::endl;
+            << "initialSetup: 2D3 " << std::endl;
 
 
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
-  {
-    if( procs_overlapping_elk_domain.size() ) MPI_Send(&_num_local_elk_nodes, 1, MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag, _communicator.get());
-  }
+    if (procs_overlapping_elk_domain.size())
+      MPI_Send(&_num_local_elk_nodes, 1, MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag, _communicator.get());
 
   std::cout << std::endl
-              << "initialSetup: 2D4 " << std::endl;
+            << "initialSetup: 2D4 " << std::endl;
 
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
-  {
-    if( procs_overlapping_spparks_domain.size() ) MPI_Send(&_num_local_spparks_nodes, 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get());
-  }
-
+    if (procs_overlapping_spparks_domain.size())
+      MPI_Send(&_num_local_spparks_nodes, 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get());
 
   std::cout << std::endl
-              << "initialSetup: 2D5 " << std::endl;
+            << "initialSetup: 2D5 " << std::endl;
 
   std::vector<MPI_Status> recv_status1( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1 ) );
   std::vector<MPI_Status> recv_status2( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1 ) );
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_elk_domain.size(), &recv_request2[0], &recv_status2[0]);
 
-
   std::cout << std::endl
-              << "initialSetup: 2D " << std::endl;
+            << "initialSetup: 2D " << std::endl;
 
   //
   // E: Communicate ELK nodes, SPPARKS nodes
@@ -814,13 +770,13 @@ SPPARKSUserObject::initialSetup()
   // Send remote ELK ids that match SPPARKS nodes on this processor
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
   {
-    spparks_matches[i].resize( spparks_sizes[i] ); 
+    spparks_matches[i].resize( spparks_sizes[i] );
     if( spparks_matches[i].size()) MPI_Send(&spparks_matches[i][0], spparks_sizes[i], MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get());
   }
   // Send remote SPPARKS ids that match ELK nodes on this processor
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
   {
-    elk_matches[i].resize( elk_sizes[i] ); 
+    elk_matches[i].resize( elk_sizes[i] );
     if( elk_matches[i].size() ) MPI_Send(&elk_matches[i][0], elk_sizes[i], MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag+11, _communicator.get());
   }
 
@@ -850,8 +806,9 @@ SPPARKSUserObject::initialSetup()
     }
   }
 */
+
   std::cout << std::endl
-              << "initialSetup: 2H " << std::endl;
+            << "initialSetup: 2H " << std::endl;
 
   if (_init_spparks)
   {
@@ -859,5 +816,4 @@ SPPARKSUserObject::initialSetup()
     _init_spparks = false;
     setSPPARKSData();
   }
-
 }
