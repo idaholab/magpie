@@ -1,0 +1,3 @@
+[submodule "contrib/spparks"]
+	path = contrib/spparks
+	url = https://hpcgitlab.inl.gov/schwd/spparks.git
