@@ -29,11 +29,6 @@ APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := magpie
 BUILD_EXEC         := yes
 DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
-
-# add in contrib codes
-include            $(CURDIR)/contrib/contrib.mk
-
-# build
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################
