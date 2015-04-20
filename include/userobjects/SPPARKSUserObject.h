@@ -2,7 +2,7 @@
 #define SPPARKSUSEROBJECT_H
 
 #include "GeneralUserObject.h"
-#include "SPPARKS/src/library.h"
+#include "spparks/src/library.h"
 
 // forward declarations
 class SPPARKSUserObject;
