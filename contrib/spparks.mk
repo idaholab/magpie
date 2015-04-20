@@ -3,21 +3,21 @@
 ###############################################################################
 
 # run Make.sh to recreate the stytle_*.h files
-DUMMY := $(shell $(APPLICATION_DIR)/contrib/src/Make.sh style)
+$(shell cd $(CURDIR)/contrib/spparks/src && $(APPLICATION_DIR)/contrib/spparks/src/Make.sh style)
 
 # source files
-SPPARKS_cppsrcfiles := $(shell find $(ELK_DIR)/contrib/SPPARKS/src -maxdepth 1 -name "*.cpp" | grep -v "main.cpp")
-SPPARKS_csrcfiles   := $(shell find $(ELK_DIR)/contrib/SPPARKS -name "*.c")
+spparks_cppsrcfiles := $(shell find $(CURDIR)/contrib/spparks/src -maxdepth 1 -name "*.cpp" -not -name "main.cpp")
+
+# We need to be careful about the mpi STUBS (not including those for now)
+#spparks_csrcfiles   := $(shell find $(CURDIR)/contrib/spparks -name "*.c")
+
+app_HEADERS := $(shell find $(CURDIR)/contrib/spparks/src -maxdepth 1 -name "*.h")
 
 # object files
-MAGPIE_objects     += $(patsubst %.cpp, %.$(obj-suffix), $(SPPARKS_cppsrcfiles))
-MAGPIE_objects     += $(patsubst %.c, %.$(obj-suffix), $(SPPARKS_csrcfiles))
+ADDITIONAL_APP_OBJECTS     += $(patsubst %.cpp, %.$(obj-suffix), $(spparks_cppsrcfiles)) \
+  													  $(patsubst %.c, %.$(obj-suffix), $(spparks_csrcfiles))
 
 # dependencies (C, C++ files only)
-MAGPIE_deps += $(patsubst %.cpp, %.$(obj-suffix).d, $(SPPARKS_cppsrcfiles)) \
-               $(patsubst %.c, %.$(obj-suffix).d, $(SPPARKS_csrcfiles))
+ADDITIONAL_APP_DEPS += $(patsubst %.cpp, %.$(obj-suffix).d, $(spparks_cppsrcfiles)) \
+                       $(patsubst %.c, %.$(obj-suffix).d, $(spparks_csrcfiles))
 
-# header files
-include_dirs   += $(APPLICATION_DIR)/contrib
-app_INCLUDE    := $(foreach i, $(include_dirs), -I$(i)) $(ADDITIONAL_INCLUDES)
-app_INCLUDES   += $(app_INCLUDE)
