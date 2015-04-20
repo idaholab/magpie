@@ -3,7 +3,7 @@
 ###############################################################################
 #
 # Optional Environment variables
-# MOOSE_DIR        - Root directory of the MOOSE project 
+# MOOSE_DIR        - Root directory of the MOOSE project
 #
 ###############################################################################
 # Use the MOOSE submodule if it exists and MOOSE_DIR is not set
@@ -32,6 +32,11 @@ APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := magpie
 BUILD_EXEC         := yes
 DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
+
+# add in contrib codes
+include            $(CURDIR)/contrib/contrib.mk
+
+# build
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################
