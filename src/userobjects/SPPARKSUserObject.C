@@ -1,11 +1,7 @@
 #include "SPPARKSUserObject.h"
-
 #include "MooseRandom.h"
 
 #include "libmesh/mesh_tools.h"
-
-#include <numeric>
-#include <cstring>
 
 template<>
 InputParameters validParams<SPPARKSUserObject>()
@@ -90,42 +86,35 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   if (!_spparks)
     mooseError("Error initializing SPPARKS");
 
-  char * file = new char[_file.length()+1];
-  std::strcpy( file, _file.c_str() );
   std::cout << std::endl
             << ">>>> RUNNING SPPARKS FILE " << _file << " <<<<" << std::endl;
-  spparks_file(_spparks, file);
+  spparks_file(_spparks, _file.c_str());
 
   // Extract and print information about the SPPARKS internals
   int * iptr;
-  char dimension[] = "dimension";
-  getSPPARKSPointer(iptr, dimension);
+  getSPPARKSPointer(iptr, "dimension");
   _dim = *iptr;
   std::cerr << std::endl
             << ">>>> SPPARKS DIMENSION: " << _dim << " <<<<" << std::endl;
 
   double * dptr;
-  char boxxlo[] = "boxxlo";
-  getSPPARKSPointer(dptr, boxxlo);
+  getSPPARKSPointer(dptr, "boxxlo");
   double xlo = *dptr;
   std::cerr << std::endl
             << ">>>> SPPARKS BOXXLO: " << xlo << " <<<<" << std::endl;
 
-  char nlocal[] = "nlocal";
-  getSPPARKSPointer(iptr, nlocal);
+  getSPPARKSPointer(iptr, "nlocal");
   int nlcl = *iptr;
   std::cerr << std::endl
             << ">>>> SPPARKS NLOCAL: " << nlcl << " <<<<" << std::endl;
 
-  char id[] = "id";
-  getSPPARKSPointer(iptr, id);
+  getSPPARKSPointer(iptr, "id");
   int * id_array = iptr;
   std::cerr << std::endl
             << ">>>> SPPARKS ID: " << id_array << " <<<<" << std::endl;
 
   double ** ddptr;
-  char xyz[] = "xyz";
-  getSPPARKSPointer(ddptr, xyz);
+  getSPPARKSPointer(ddptr, "xyz");
   double ** xyz_array = ddptr;
   std::cerr << std::endl
             << ">>>> SPPARKS XYZ: " << xyz_array << " <<<<" << std::endl;
@@ -136,8 +125,6 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   //             << xyz_array[i][1] << " "
   //             << xyz_array[i][2] << std::endl;
   // }
-
-  delete[] file;
 }
 
 SPPARKSUserObject::~SPPARKSUserObject()
@@ -148,101 +135,70 @@ SPPARKSUserObject::~SPPARKSUserObject()
 void
 SPPARKSUserObject::initialize()
 {
-  if (_spparks_only)
-    return;
+  if (_spparks_only) return;
 
   // getSPPARKSData();
   // setSPPARKSData();
 }
 
 int
-SPPARKSUserObject::getIntValue( unsigned elk_node_id, unsigned index ) const
+SPPARKSUserObject::getIntValue(unsigned fem_node_id, unsigned index) const
 {
-  if (_spparks_only)
-  {
-    return 0;
-  }
-
-  return getValue( _int_data_for_elk, elk_node_id, index );
+  return _spparks_only ? 0 : getValue( _int_data_for_elk, fem_node_id, index );
 }
 
 Real
-SPPARKSUserObject::getDoubleValue( unsigned elk_node_id, unsigned index ) const
+SPPARKSUserObject::getDoubleValue(unsigned int fem_node_id, unsigned index) const
 {
-  if (_spparks_only)
-  {
-    return 0;
-  }
-
-  return getValue( _double_data_for_elk, elk_node_id, index );
+  return _spparks_only ? 0.0 : getValue( _double_data_for_elk, fem_node_id, index);
 }
 
 char *
-SPPARKSUserObject::runSPPARKSCommand( const std::string & cmd )
+SPPARKSUserObject::runSPPARKSCommand(const std::string & cmd)
 {
-  std::vector<char> strng(cmd.begin(), cmd.end());
-  strng.push_back('\0');
-  return spparks_command(_spparks, &strng[0]);
+  return spparks_command(_spparks, cmd.c_str());
 }
 
 void
 SPPARKSUserObject::getSPPARKSData()
 {
   // Update the integer data
-  char iarray[] = "iarray";
   for (unsigned i = 0; i < _from_ivar.size(); ++i)
-  {
-    getSPPARKSData( _int_data_for_elk[_from_ivar[i]], iarray, _from_ivar[i] );
-  }
+    getSPPARKSData( _int_data_for_elk[_from_ivar[i]], "iarray", _from_ivar[i] );
 
   // Update the double data
-  char darray[] = "darray";
   for (unsigned i = 0; i < _from_dvar.size(); ++i)
-  {
-    getSPPARKSData( _double_data_for_elk[_from_dvar[i]], darray, _from_dvar[i] );
-  }
+    getSPPARKSData( _double_data_for_elk[_from_dvar[i]], "darray", _from_dvar[i] );
 }
 
 void
 SPPARKSUserObject::setSPPARKSData()
 {
   // Update the integer data
-  char iarray[] = "iarray";
   int * ip = NULL;
   for (unsigned i = 0; i < _to_ivar.size(); ++i)
-  {
-    setSPPARKSData( ip, iarray, _to_ivar[i], *_int_vars[i] );
-  }
+    setSPPARKSData( ip, "iarray", _to_ivar[i], *_int_vars[i] );
 
   // Update the double data
-  char darray[] = "darray";
   double * dp = NULL;
   for (unsigned i = 0; i < _to_dvar.size(); ++i)
-  {
-    setSPPARKSData( dp, darray, _to_dvar[i], *_double_vars[i] );
-  }
+    setSPPARKSData( dp, "darray", _to_dvar[i], *_double_vars[i] );
 }
 
 void
 SPPARKSUserObject::setELKData()
 {
   // Update the double solving variables using the data from SPPARKS, added by YF
-  char darray[] = "darray";
-  for (unsigned i = 0; i < _sol_vars.size(); ++i)
-  {
-    setELKData<double>( darray, _from_dvar[i], *_sol_vars[i] );
-  }
+  for (unsigned int i = 0; i < _sol_vars.size(); ++i)
+    setELKData<double>("darray", _from_dvar[i], *_sol_vars[i] );
 }
-
 
 void
 SPPARKSUserObject::execute()
 {
-  if (_times_of_run > 1) // added by YF, aleady ran SPPARKS once in addition to initialization
-    return;
-
-  if (_spparks_only)
-    return;
+  // added by YF, aleady ran SPPARKS once in addition to initialization
+  if (_times_of_run > 1) return;
+  if (_spparks_only) return;
 
   if (_init_spparks)
   {
@@ -260,7 +216,7 @@ SPPARKSUserObject::execute()
     setSPPARKSData();
 
     // Run SPPARKS over a certain time
-    const Real sp_time = getSPPARKSTime( _dt );
+    const Real sp_time = getSPPARKSTime(_dt);
     std::stringstream cmd;
     cmd << "run ";
     if ( !_times_of_run ) cmd << "10000000 ";
@@ -299,10 +255,10 @@ SPPARKSUserObject::initSPPARKS()
   // Half alpha phase, half beta phase
   // Composition for alpha phase is 0.25; for beta phase, 0.75.
 
-  if (2 != _from_ivar.size())
+  if (_from_ivar.size() != 2)
     mooseError("Must have two integer variables from SPPARKS");
 
-  if (1 != _double_vars.size())
+  if (_double_vars.size() != 1)
     mooseError("Must have one double variable to send to SPPARKS");
 
   SystemBase & sys = _double_vars[0]->sys();
