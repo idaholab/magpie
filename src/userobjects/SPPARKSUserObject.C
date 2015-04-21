@@ -27,7 +27,7 @@ InputParameters validParams<SPPARKSUserObject>()
   params.addParam<Real>("time_spparks_time_ratio", 1, "Ratio of time to SPPARKS time.");
 
   // Hide from input file dump
-  // params.addPrivateParam<std::string>("built_by_action", "" );
+  // params.addPrivateParam<std::string>("built_by_action", "");
   return params;
 }
 
@@ -58,7 +58,7 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("int_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-      _int_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
+      _int_vars.push_back(&_fe_problem.getVariable(0, names[i]));
   }
   if (_int_vars.size() != _to_ivar.size())
     mooseError("Mismatch with int_vars and to_ivar");
@@ -67,7 +67,7 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("double_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-      _double_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
+      _double_vars.push_back(&_fe_problem.getVariable(0, names[i]));
   }
   if (_double_vars.size() != _to_dvar.size())
     mooseError("Mismatch with double_vars and to_dvar");
@@ -77,12 +77,12 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
   {
     const std::vector<std::string> & names = getParam<std::vector<std::string> >("sol_vars");
     for (unsigned i = 0; i < names.size(); ++i)
-      _sol_vars.push_back( &_fe_problem.getVariable( 0, names[i] ) );
+      _sol_vars.push_back(&_fe_problem.getVariable(0, names[i]));
   }
 
   std::cout << std::endl
             << ">>>> STARTING SPPARKS <<<<" << std::endl;
-  spparks_open( 0, NULL, _communicator.get(), &_spparks );
+  spparks_open(0, NULL, _communicator.get(), &_spparks);
   if (!_spparks)
     mooseError("Error initializing SPPARKS");
 
@@ -144,13 +144,13 @@ SPPARKSUserObject::initialize()
 int
 SPPARKSUserObject::getIntValue(unsigned fem_node_id, unsigned index) const
 {
-  return _spparks_only ? 0 : getValue( _int_data_for_elk, fem_node_id, index );
+  return _spparks_only ? 0 : getValue(_int_data_for_elk, fem_node_id, index);
 }
 
 Real
 SPPARKSUserObject::getDoubleValue(unsigned int fem_node_id, unsigned index) const
 {
-  return _spparks_only ? 0.0 : getValue( _double_data_for_elk, fem_node_id, index);
+  return _spparks_only ? 0.0 : getValue(_double_data_for_elk, fem_node_id, index);
 }
 
 char *
@@ -164,11 +164,11 @@ SPPARKSUserObject::getSPPARKSData()
 {
   // Update the integer data
   for (unsigned i = 0; i < _from_ivar.size(); ++i)
-    getSPPARKSData( _int_data_for_elk[_from_ivar[i]], "iarray", _from_ivar[i] );
+    getSPPARKSData(_int_data_for_elk[_from_ivar[i]], "iarray", _from_ivar[i]);
 
   // Update the double data
   for (unsigned i = 0; i < _from_dvar.size(); ++i)
-    getSPPARKSData( _double_data_for_elk[_from_dvar[i]], "darray", _from_dvar[i] );
+    getSPPARKSData(_double_data_for_elk[_from_dvar[i]], "darray", _from_dvar[i]);
 }
 
 void
@@ -177,12 +177,12 @@ SPPARKSUserObject::setSPPARKSData()
   // Update the integer data
   int * ip = NULL;
   for (unsigned i = 0; i < _to_ivar.size(); ++i)
-    setSPPARKSData( ip, "iarray", _to_ivar[i], *_int_vars[i] );
+    setSPPARKSData(ip, "iarray", _to_ivar[i], *_int_vars[i]);
 
   // Update the double data
   double * dp = NULL;
   for (unsigned i = 0; i < _to_dvar.size(); ++i)
-    setSPPARKSData( dp, "darray", _to_dvar[i], *_double_vars[i] );
+    setSPPARKSData(dp, "darray", _to_dvar[i], *_double_vars[i]);
 }
 
 void
@@ -190,7 +190,7 @@ SPPARKSUserObject::setELKData()
 {
   // Update the double solving variables using the data from SPPARKS, added by YF
   for (unsigned int i = 0; i < _sol_vars.size(); ++i)
-    setELKData<double>("darray", _from_dvar[i], *_sol_vars[i] );
+    setELKData<double>("darray", _from_dvar[i], *_sol_vars[i]);
 }
 
 void
@@ -219,11 +219,11 @@ SPPARKSUserObject::execute()
     const Real sp_time = getSPPARKSTime(_dt);
     std::stringstream cmd;
     cmd << "run ";
-    if ( !_times_of_run ) cmd << "10000000 ";
-    if ( _times_of_run ) cmd << "0 ";
+    if (!_times_of_run) cmd << "10000000 ";
+    if (_times_of_run) cmd << "0 ";
     //cmd << sp_time;
     cmd << " pre no" << std::endl;
-    runSPPARKSCommand( cmd.str() );
+    runSPPARKSCommand(cmd.str());
 
     std::cout << std::endl
               << "getSPPARKSData " << std::endl;
@@ -231,7 +231,7 @@ SPPARKSUserObject::execute()
     getSPPARKSData();
 
     // Record if SPPARKS has been called before
-    if (_one_time_run && _times_of_run )
+    if (_one_time_run && _times_of_run)
     {
 
       std::cout << std::endl
@@ -267,18 +267,18 @@ SPPARKSUserObject::initSPPARKS()
   std::map<libMesh::dof_id_type, int> ints[2];
   std::map<libMesh::dof_id_type, Real> comp;
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
-  for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
+  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
   {
     int value = int(100*MooseRandom::rand()) + 1;
     ints[0][(*i)->id()] = value;
     ints[1][(*i)->id()] = value < 51;
 
     Real comp = 0.75;
-    if ( value < 51 )
+    if (value < 51)
       comp = 0.25;
 
     // Set data
-    solution.set( (*i)->dof_number(sys.number(), _double_vars[0]->number(), 0), comp );
+    solution.set((*i)->dof_number(sys.number(), _double_vars[0]->number(), 0), comp);
   }
   solution.close();
 
@@ -286,15 +286,15 @@ SPPARKSUserObject::initSPPARKS()
   char iarray[] = "iarray";
   for (unsigned i(0); i < 2; ++i)
   {
-    getSPPARKSDataPointer( pint, iarray, _from_ivar[i] );
+    getSPPARKSDataPointer(pint, iarray, _from_ivar[i]);
 
     // Index into data is SPPARKS node id.
     for (std::multimap<FEMID, SPPARKSID>::const_iterator it = _elk_to_spparks.begin(); it != _elk_to_spparks.end(); ++it)
       pint[it->second.id] = ints[i][it->first.id];
 
     // Copy data across processors
-    if ( n_processors() > 1 )
-      sendRecvELKData( ints[i], pint );
+    if (n_processors() > 1)
+      sendRecvELKData(ints[i], pint);
   }
 }
 
@@ -328,7 +328,7 @@ SPPARKSUserObject::initialSetup()
     Point p(xyz_array[i][0],
             _dim > 1 ? xyz_array[i][1] : 0,
             _dim > 2 ? xyz_array[i][2] : 0);
-    spparks_id.insert( SPPARKSID( i, p ) );
+    spparks_id.insert(SPPARKSID(i, p));
   }
   _num_local_spparks_nodes = spparks_id.size();
 
@@ -337,9 +337,9 @@ SPPARKSUserObject::initialSetup()
   // node locations.
   std::multiset<FEMID> elk_id; // Local ELK nodes
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
-  for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
+  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
   {
-    Point coor( **i );
+    Point coor(**i);
 
     if (coor(0) == _xmax)
       coor(0) = _xmin;
@@ -348,7 +348,7 @@ SPPARKSUserObject::initialSetup()
     if (coor(2) == _zmax)
       coor(2) = _zmin;
 
-    elk_id.insert( FEMID( (*i)->id(), coor ) );
+    elk_id.insert(FEMID((*i)->id(), coor));
   }
   _num_local_elk_nodes = elk_id.size();
 
@@ -357,8 +357,8 @@ SPPARKSUserObject::initialSetup()
 
   for (std::set<SPPARKSID>::iterator i = spparks_id.begin(); i != spparks_id.end(); ++i)
   {
-    std::multiset<FEMID>::iterator elk_iter = elk_id.find( *i );
-    if (elk_iter != elk_id.end() )
+    std::multiset<FEMID>::iterator elk_iter = elk_id.find(*i);
+    if (elk_iter != elk_id.end())
       _spparks_to_elk.insert(std::pair<SPPARKSID, FEMID>(*i, *elk_iter)); // SPPARKSID to FEMID
     else
       unmatched_spparks.insert(*i);
@@ -366,8 +366,8 @@ SPPARKSUserObject::initialSetup()
 
   for (std::multiset<FEMID>::iterator i = elk_id.begin(); i != elk_id.end(); ++i)
   {
-    std::set<SPPARKSID>::iterator spparks_iter = spparks_id.find( *i );
-    if (spparks_iter != spparks_id.end() )
+    std::set<SPPARKSID>::iterator spparks_iter = spparks_id.find(*i);
+    if (spparks_iter != spparks_id.end())
       _elk_to_spparks.insert(std::pair<FEMID, SPPARKSID>(*i, *spparks_iter)); // FEMID to SPPARKSID
     // else
     //   _spparks_to_proc.insert(std::pair<SPPARKSID, unsigned>(*i, -1));
@@ -417,8 +417,8 @@ SPPARKSUserObject::initialSetup()
     s_bounds[4] = std::max(s_bounds[4], i->coor(1));
     s_bounds[5] = std::max(s_bounds[5], i->coor(2));
   }
-  MeshTools::BoundingBox spparks_bb( Point(s_bounds[0], s_bounds[1], s_bounds[2]),
-                                     Point(s_bounds[3], s_bounds[4], s_bounds[5]) );
+  MeshTools::BoundingBox spparks_bb(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
+                                     Point(s_bounds[3], s_bounds[4], s_bounds[5]));
   _communicator.sum(spparks_bounds);
 
   std::cout << std::endl
@@ -444,8 +444,8 @@ SPPARKSUserObject::initialSetup()
     e_bounds[4] = std::max(e_bounds[4], i->coor(1));
     e_bounds[5] = std::max(e_bounds[5], i->coor(2));
   }
-  MeshTools::BoundingBox elk_bb( Point(e_bounds[0], e_bounds[1], e_bounds[2]),
-                                 Point(e_bounds[3], e_bounds[4], e_bounds[5]) );
+  MeshTools::BoundingBox elk_bb(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
+                                 Point(e_bounds[3], e_bounds[4], e_bounds[5]));
   _communicator.sum(elk_bounds);
 
   std::cout << std::endl
@@ -459,21 +459,21 @@ SPPARKSUserObject::initialSetup()
   std::vector<unsigned> procs_overlapping_elk_domain;
   for (unsigned i = 0; i < num_procs; ++i)
   {
-    if ( i == proc_id )
+    if (i == proc_id)
       continue;
 
     offset = i * 6;
     e_bounds = &elk_bounds[0] + offset;
-    MeshTools::BoundingBox e_box( Point(e_bounds[0], e_bounds[1], e_bounds[2]),
-                                  Point(e_bounds[3], e_bounds[4], e_bounds[5]) );
-    if (spparks_bb.intersect( e_box ))
-      procs_overlapping_spparks_domain.push_back( i );
+    MeshTools::BoundingBox e_box(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
+                                  Point(e_bounds[3], e_bounds[4], e_bounds[5]));
+    if (spparks_bb.intersect(e_box))
+      procs_overlapping_spparks_domain.push_back(i);
 
     s_bounds = &spparks_bounds[0] + offset;
-    MeshTools::BoundingBox s_box( Point(s_bounds[0], s_bounds[1], s_bounds[2]),
-                                  Point(s_bounds[3], s_bounds[4], s_bounds[5]) );
-    if (elk_bb.intersect( s_box ))
-      procs_overlapping_elk_domain.push_back( i );
+    MeshTools::BoundingBox s_box(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
+                                  Point(s_bounds[3], s_bounds[4], s_bounds[5]));
+    if (elk_bb.intersect(s_box))
+      procs_overlapping_elk_domain.push_back(i);
   }
 
   std::cout << std::endl
@@ -490,22 +490,22 @@ SPPARKSUserObject::initialSetup()
   std::vector<unsigned> num_elk_nodes(procs_overlapping_spparks_domain.size(), 0); // Number remote elk nodes for each proc overlapping my spparks
   std::vector<unsigned> num_spparks_nodes(procs_overlapping_elk_domain.size(), 0);
 
-  std::vector<MPI_Request> recv_request1( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1) );
-  std::vector<MPI_Request> recv_request2( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1) );
+  std::vector<MPI_Request> recv_request1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1));
+  std::vector<MPI_Request> recv_request2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1));
   int comm_tag = 100;
 
   std::cout << std::endl
             << "initialSetup: 2D1 " << std::endl;
 
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
-    if( num_elk_nodes.size() && procs_overlapping_spparks_domain.size() )
+    if (num_elk_nodes.size() && procs_overlapping_spparks_domain.size())
        MPI_Irecv(&num_elk_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
 
   std::cout << std::endl
             << "initialSetup: 2D2 " << std::endl;
 
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
-    if( num_spparks_nodes.size() && procs_overlapping_elk_domain.size() )
+    if (num_spparks_nodes.size() && procs_overlapping_elk_domain.size())
        MPI_Irecv(&num_spparks_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
 
   std::cout << std::endl
@@ -526,8 +526,8 @@ SPPARKSUserObject::initialSetup()
   std::cout << std::endl
             << "initialSetup: 2D5 " << std::endl;
 
-  std::vector<MPI_Status> recv_status1( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1 ) );
-  std::vector<MPI_Status> recv_status2( std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1 ) );
+  std::vector<MPI_Status> recv_status1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1));
+  std::vector<MPI_Status> recv_status2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_elk_domain.size() + 1));
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_elk_domain.size(), &recv_request2[0], &recv_status2[0]);
 
@@ -624,13 +624,13 @@ SPPARKSUserObject::initialSetup()
 
   comm_tag = 300;
   // Receive number of ELK nodes on this processor that match SPPARKS nodes on another
-  std::vector<unsigned> num_remote_elk_matches( procs_overlapping_elk_domain.size() );
+  std::vector<unsigned> num_remote_elk_matches(procs_overlapping_elk_domain.size());
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
   {
     MPI_Irecv(&num_remote_elk_matches[i], 1, MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
   }
   // Receive number of SPPARKS nodes on this processor that match ELK nodes on another
-  std::vector<unsigned> num_remote_spparks_matches( procs_overlapping_spparks_domain.size() );
+  std::vector<unsigned> num_remote_spparks_matches(procs_overlapping_spparks_domain.size());
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
   {
     MPI_Irecv(&num_remote_spparks_matches[i], 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
@@ -644,16 +644,16 @@ SPPARKSUserObject::initialSetup()
   {
     for (unsigned j = 0; j < num_elk_nodes[i]; ++j)
     {
-      SPPARKSID tmp( remote_elk_nodes[offset],
+      SPPARKSID tmp(remote_elk_nodes[offset],
                      Point(remote_elk_coords[offset*3+0],
                            remote_elk_coords[offset*3+1],
-                           remote_elk_coords[offset*3+2]) );
-      std::set<SPPARKSID>::iterator iter = spparks_id.find( tmp );
-      if ( iter != spparks_id.end() )
+                           remote_elk_coords[offset*3+2]));
+      std::set<SPPARKSID>::iterator iter = spparks_id.find(tmp);
+      if (iter != spparks_id.end())
       {
-        spparks_matches[i].push_back( tmp.id );
+        spparks_matches[i].push_back(tmp.id);
 
-        _spparks_to_proc[*iter].push_back( procs_overlapping_spparks_domain[i] );
+        _spparks_to_proc[*iter].push_back(procs_overlapping_spparks_domain[i]);
       }
       ++offset;
     }
@@ -666,16 +666,16 @@ SPPARKSUserObject::initialSetup()
   {
     for (unsigned j = 0; j < num_spparks_nodes[i]; ++j)
     {
-      FEMID tmp( remote_spparks_nodes[offset],
+      FEMID tmp(remote_spparks_nodes[offset],
                  Point(remote_spparks_coords[offset*3+0],
                        remote_spparks_coords[offset*3+1],
-                       remote_spparks_coords[offset*3+2]) );
-      std::multiset<FEMID>::iterator iter = elk_id.find( tmp );
-      if ( iter != elk_id.end() )
+                       remote_spparks_coords[offset*3+2]));
+      std::multiset<FEMID>::iterator iter = elk_id.find(tmp);
+      if (iter != elk_id.end())
       {
-        elk_matches[i].push_back( tmp.id );
+        elk_matches[i].push_back(tmp.id);
 
-        _elk_to_proc[*iter].push_back( procs_overlapping_elk_domain[i] );
+        _elk_to_proc[*iter].push_back(procs_overlapping_elk_domain[i]);
       }
       ++offset;
     }
@@ -712,28 +712,28 @@ SPPARKSUserObject::initialSetup()
   std::vector<std::vector<unsigned> > matched_elk_ids(procs_overlapping_elk_domain.size());
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
   {
-    matched_elk_ids[i].resize( num_remote_elk_matches[i] );
-    if( matched_elk_ids[i].size() ) MPI_Irecv(&matched_elk_ids[i][0], num_remote_elk_matches[i], MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
+    matched_elk_ids[i].resize(num_remote_elk_matches[i]);
+    if (matched_elk_ids[i].size()) MPI_Irecv(&matched_elk_ids[i][0], num_remote_elk_matches[i], MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
   }
   // Receive SPPARKS ids that match ELK nodes on another processor
   std::vector<std::vector<unsigned> > matched_spparks_ids(procs_overlapping_spparks_domain.size());
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
   {
-    matched_spparks_ids[i].resize( num_remote_spparks_matches[i] );
-    if( matched_spparks_ids[i].size() ) MPI_Irecv(&matched_spparks_ids[i][0], num_remote_spparks_matches[i], MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
+    matched_spparks_ids[i].resize(num_remote_spparks_matches[i]);
+    if (matched_spparks_ids[i].size()) MPI_Irecv(&matched_spparks_ids[i][0], num_remote_spparks_matches[i], MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
   }
 
   // Send remote ELK ids that match SPPARKS nodes on this processor
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
   {
-    spparks_matches[i].resize( spparks_sizes[i] );
-    if( spparks_matches[i].size()) MPI_Send(&spparks_matches[i][0], spparks_sizes[i], MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get());
+    spparks_matches[i].resize(spparks_sizes[i]);
+    if (spparks_matches[i].size()) MPI_Send(&spparks_matches[i][0], spparks_sizes[i], MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get());
   }
   // Send remote SPPARKS ids that match ELK nodes on this processor
   for (unsigned i = 0; i < procs_overlapping_elk_domain.size(); ++i)
   {
-    elk_matches[i].resize( elk_sizes[i] );
-    if( elk_matches[i].size() ) MPI_Send(&elk_matches[i][0], elk_sizes[i], MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag+11, _communicator.get());
+    elk_matches[i].resize(elk_sizes[i]);
+    if (elk_matches[i].size()) MPI_Send(&elk_matches[i][0], elk_sizes[i], MPI_UNSIGNED, procs_overlapping_elk_domain[i], comm_tag+11, _communicator.get());
   }
 
   MPI_Waitall(procs_overlapping_elk_domain.size(), &recv_request1[0], &recv_status1[0]);
@@ -751,14 +751,14 @@ SPPARKSUserObject::initialSetup()
   {
     for (unsigned j = 0; j < num_remote_elk_matches[i]; ++j)
     {
-      _sending_proc_to_elk_id[procs_overlapping_elk_domain[i]].push_back( matched_elk_ids[i][j] );
+      _sending_proc_to_elk_id[procs_overlapping_elk_domain[i]].push_back(matched_elk_ids[i][j]);
     }
   }
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
   {
     for (unsigned j = 0; j < num_remote_spparks_matches[i]; ++j)
     {
-      _sending_proc_to_spparks_id[procs_overlapping_spparks_domain[i]].push_back( matched_spparks_ids[i][j] );
+      _sending_proc_to_spparks_id[procs_overlapping_spparks_domain[i]].push_back(matched_spparks_ids[i][j]);
     }
   }
 */
