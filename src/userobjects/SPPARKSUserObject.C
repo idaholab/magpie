@@ -289,7 +289,7 @@ SPPARKSUserObject::initSPPARKS()
     getSPPARKSDataPointer( pint, iarray, _from_ivar[i] );
 
     // Index into data is SPPARKS node id.
-    for (std::multimap<ELKID, SPPARKSID>::const_iterator it = _elk_to_spparks.begin(); it != _elk_to_spparks.end(); ++it)
+    for (std::multimap<FEMID, SPPARKSID>::const_iterator it = _elk_to_spparks.begin(); it != _elk_to_spparks.end(); ++it)
       pint[it->second.id] = ints[i][it->first.id];
 
     // Copy data across processors
@@ -335,7 +335,7 @@ SPPARKSUserObject::initialSetup()
   // ELK nodes are set up with periodic bcs (nodes at each end of periodicity),
   // but SPPARKS nodes are not.  We may have two or more ELK nodes at SPPARKS
   // node locations.
-  std::multiset<ELKID> elk_id; // Local ELK nodes
+  std::multiset<FEMID> elk_id; // Local ELK nodes
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
   for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
   {
@@ -348,7 +348,7 @@ SPPARKSUserObject::initialSetup()
     if (coor(2) == _zmax)
       coor(2) = _zmin;
 
-    elk_id.insert( ELKID( (*i)->id(), coor ) );
+    elk_id.insert( FEMID( (*i)->id(), coor ) );
   }
   _num_local_elk_nodes = elk_id.size();
 
@@ -357,18 +357,18 @@ SPPARKSUserObject::initialSetup()
 
   for (std::set<SPPARKSID>::iterator i = spparks_id.begin(); i != spparks_id.end(); ++i)
   {
-    std::multiset<ELKID>::iterator elk_iter = elk_id.find( *i );
+    std::multiset<FEMID>::iterator elk_iter = elk_id.find( *i );
     if (elk_iter != elk_id.end() )
-      _spparks_to_elk.insert(std::pair<SPPARKSID, ELKID>(*i, *elk_iter)); // SPPARKSID to ELKID
+      _spparks_to_elk.insert(std::pair<SPPARKSID, FEMID>(*i, *elk_iter)); // SPPARKSID to FEMID
     else
       unmatched_spparks.insert(*i);
   }
 
-  for (std::multiset<ELKID>::iterator i = elk_id.begin(); i != elk_id.end(); ++i)
+  for (std::multiset<FEMID>::iterator i = elk_id.begin(); i != elk_id.end(); ++i)
   {
     std::set<SPPARKSID>::iterator spparks_iter = spparks_id.find( *i );
     if (spparks_iter != spparks_id.end() )
-      _elk_to_spparks.insert(std::pair<ELKID, SPPARKSID>(*i, *spparks_iter)); // ELKID to SPPARKSID
+      _elk_to_spparks.insert(std::pair<FEMID, SPPARKSID>(*i, *spparks_iter)); // FEMID to SPPARKSID
     // else
     //   _spparks_to_proc.insert(std::pair<SPPARKSID, unsigned>(*i, -1));
   }
@@ -435,7 +435,7 @@ SPPARKSUserObject::initialSetup()
   Real * e_bounds = &elk_bounds[0] + offset;
   e_bounds[0] = e_bounds[1] = e_bounds[2] = std::numeric_limits<Real>::max();
   e_bounds[3] = e_bounds[4] = e_bounds[5] = std::numeric_limits<Real>::min();
-  for (std::multiset<ELKID>::const_iterator i = elk_id.begin(); i != elk_id.end(); ++i)
+  for (std::multiset<FEMID>::const_iterator i = elk_id.begin(); i != elk_id.end(); ++i)
   {
     e_bounds[0] = std::min(e_bounds[0], i->coor(0));
     e_bounds[1] = std::min(e_bounds[1], i->coor(1));
@@ -571,7 +571,7 @@ SPPARKSUserObject::initialSetup()
   std::vector<libMesh::dof_id_type> elk_ids(_num_local_elk_nodes);
   std::vector<Real> elk_coords(3*_num_local_elk_nodes);
   offset = 0;
-  for (std::multiset<ELKID>::const_iterator i = elk_id.begin(); i != elk_id.end(); ++i)
+  for (std::multiset<FEMID>::const_iterator i = elk_id.begin(); i != elk_id.end(); ++i)
   {
     elk_ids[offset] = i->id;
     elk_coords[offset*3+0] = i->coor(0);
@@ -666,11 +666,11 @@ SPPARKSUserObject::initialSetup()
   {
     for (unsigned j = 0; j < num_spparks_nodes[i]; ++j)
     {
-      ELKID tmp( remote_spparks_nodes[offset],
+      FEMID tmp( remote_spparks_nodes[offset],
                  Point(remote_spparks_coords[offset*3+0],
                        remote_spparks_coords[offset*3+1],
                        remote_spparks_coords[offset*3+2]) );
-      std::multiset<ELKID>::iterator iter = elk_id.find( tmp );
+      std::multiset<FEMID>::iterator iter = elk_id.find( tmp );
       if ( iter != elk_id.end() )
       {
         elk_matches[i].push_back( tmp.id );
