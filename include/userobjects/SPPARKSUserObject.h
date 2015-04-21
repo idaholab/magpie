@@ -33,7 +33,7 @@ protected:
 
   void initSPPARKS();
 
-  char * runSPPARKSCommand( const std::string & cmd );
+  char * runSPPARKSCommand(const std::string & cmd);
 
   Real getSPPARKSTime(Real dt) { return dt / _time_ratio; }
 
@@ -41,31 +41,31 @@ protected:
   Real getValue(const std::map<unsigned, std::map<unsigned, T> > & data, unsigned elk_node_id, unsigned index) const;
 
   template <typename T>
-  void getSPPARKSDataPointer(T *& ptr, const char * string, unsigned i);
+  void getSPPARKSDataPointer(T *& ptr, const std::string & name, unsigned index);
 
   template <typename T>
-  void getSPPARKSPointer(T *& ptr, const char * string) const;
+  void getSPPARKSPointer(T *& ptr, const std::string & name) const;
 
   void getSPPARKSData();
   void setSPPARKSData();
 
   template <typename T>
-  void getSPPARKSData(std::map<unsigned, T> & storage, const char * string, unsigned index);
+  void getSPPARKSData(std::map<unsigned, T> & storage, const std::string & name, unsigned index);
 
   template <typename T>
   void sendRecvSPPARKSData(const T * const data, std::map<unsigned, T> & storage);
 
   template <typename T>
-  void setSPPARKSData(T * data, const char * string, unsigned index, MooseVariable & var);
+  void setSPPARKSData(T * data, const std::string & name, unsigned index, MooseVariable & var);
 
   // Initiate ELK based on data from SPPARKS, added by YF.
   void setELKData();
 
   template <typename T>
-  void setELKData(const char * string, unsigned index, MooseVariable & var);
+  void setELKData(const std::string & name, unsigned index, MooseVariable & var);
 
   template <typename T>
-  void sendRecvELKData( const std::map<libMesh::dof_id_type, T> & storage, T * const data );
+  void sendRecvELKData(const std::map<libMesh::dof_id_type, T> & storage, T * const data);
 
   /// SPPARKS instance pointer
   void * _spparks;
@@ -121,7 +121,7 @@ protected:
 
 struct SPPARKSUserObject::FEMID
 {
-  FEMID( libMesh::dof_id_type ident, const Point & p ) :
+  FEMID(libMesh::dof_id_type ident, const Point & p) :
     id(ident), coor(p)
   {}
 
@@ -131,15 +131,15 @@ struct SPPARKSUserObject::FEMID
   {
     // return coor < rhs.coor;
     const Real tol = 1e-12;
-    if ( !equalCoor( coor(0), rhs.coor(0), tol ) )
+    if (!equalCoor(coor(0), rhs.coor(0), tol))
       return (coor(0) + tol) < rhs.coor(0);
-    if ( !equalCoor( coor(1), rhs.coor(1), tol ) )
+    if (!equalCoor(coor(1), rhs.coor(1), tol))
       return (coor(1) + tol) < rhs.coor(1);
     return (coor(2) + tol) < rhs.coor(2);
   }
 
 private:
-  bool equalCoor( Real f, Real s, Real tol ) const
+  bool equalCoor(Real f, Real s, Real tol) const
   {
     return f < (s+tol) && (f > s-tol);
   }
@@ -166,32 +166,30 @@ SPPARKSUserObject::getValue(const std::map<unsigned, std::map<unsigned, T> > & d
 
 template <typename T>
 void
-SPPARKSUserObject::getSPPARKSDataPointer( T *& ptr, const char * string, unsigned i )
+SPPARKSUserObject::getSPPARKSDataPointer(T *& ptr, const std::string & name, unsigned index)
 {
-  std::stringstream name;
-  name << string;
-  name << i;
-  std::string s = name.str();
-  std::vector<char> strng(s.c_str(), s.c_str() + s.size() + 1);
-  getSPPARKSPointer(ptr, &strng[0]);
+  std::stringstream fullname;
+  fullname << name;
+  fullname << index;
+  getSPPARKSPointer(ptr, fullname.str().c_str());
 }
 
 template <typename T>
 void
-SPPARKSUserObject::getSPPARKSPointer( T *& ptr, const char * string ) const
+SPPARKSUserObject::getSPPARKSPointer(T *& ptr, const std::string & name) const
 {
-  void * p = spparks_extract(_spparks, string);
+  void * p = spparks_extract(_spparks, name.c_str());
   if (!p)
-    mooseError("SPPARKS returned NULL pointer for " << string);
+    mooseError("SPPARKS returned NULL pointer for " << name);
   ptr = static_cast<T*>(p);
 }
 
 template <typename T>
 void
-SPPARKSUserObject::getSPPARKSData( std::map<unsigned, T> & storage, const char * string, unsigned index )
+SPPARKSUserObject::getSPPARKSData(std::map<unsigned, T> & storage, const std::string & name, unsigned index)
 {
   T * data;
-  getSPPARKSDataPointer( data, string, index );
+  getSPPARKSDataPointer(data, name.c_str(), index);
 
   // Copy data from local SPPARKS node to local ELK node
   // Index into storage is ELK node id.
@@ -199,13 +197,13 @@ SPPARKSUserObject::getSPPARKSData( std::map<unsigned, T> & storage, const char *
     storage[i->first.id] = data[i->second.id];
 
   // Copy data across processors
-  if ( n_processors() > 1 )
-    sendRecvSPPARKSData( data, storage );
+  if (n_processors() > 1)
+    sendRecvSPPARKSData(data, storage);
 }
 
 template <typename T>
 void
-SPPARKSUserObject::sendRecvSPPARKSData( const T * const data, std::map<unsigned, T> & storage )
+SPPARKSUserObject::sendRecvSPPARKSData(const T * const data, std::map<unsigned, T> & storage)
 {
   Parallel::MessageTag comm_tag(101);
 
@@ -217,7 +215,7 @@ SPPARKSUserObject::sendRecvSPPARKSData( const T * const data, std::map<unsigned,
   for (std::map<unsigned, std::vector<libMesh::dof_id_type> >::const_iterator i = _sending_proc_to_elk_id.begin();
        i != _sending_proc_to_elk_id.end(); ++i)
   {
-    data_to_me[i->first].resize( i->second.size() );
+    data_to_me[i->first].resize(i->second.size());
     _communicator.receive(i->first, data_to_me[i->first], recv_request[offset], comm_tag);
     ++offset;
   }
@@ -227,7 +225,7 @@ SPPARKSUserObject::sendRecvSPPARKSData( const T * const data, std::map<unsigned,
        i != _spparks_to_proc.end(); ++i)
   {
     for (unsigned j = 0; j < i->second.size(); ++j)
-      data_from_me[i->second[j]].push_back( data[i->first.id] );
+      data_from_me[i->second[j]].push_back(data[i->first.id]);
   }
 
   for (typename std::map<unsigned, std::vector<T> >::const_iterator i = data_from_me.begin(); i != data_from_me.end(); ++i)
@@ -250,9 +248,9 @@ SPPARKSUserObject::sendRecvSPPARKSData( const T * const data, std::map<unsigned,
 
 template <typename T>
 void
-SPPARKSUserObject::setSPPARKSData(T * data, const char * string, unsigned index, MooseVariable & var)
+SPPARKSUserObject::setSPPARKSData(T * data, const std::string & name, unsigned index, MooseVariable & var)
 {
-  getSPPARKSDataPointer(data, string, index);
+  getSPPARKSDataPointer(data, name, index);
 
   SystemBase & sys = var.sys();
   NumericVector<Number> & solution = sys.solution();
@@ -260,10 +258,10 @@ SPPARKSUserObject::setSPPARKSData(T * data, const char * string, unsigned index,
   // Extract ELK data
   std::map<libMesh::dof_id_type, T> elk_data;
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
-  for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
+  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
   {
     // Get data
-    const Real value = solution( (*i)->dof_number(sys.number(), var.number(), 0) );
+    const Real value = solution((*i)->dof_number(sys.number(), var.number(), 0));
 
     elk_data[(*i)->id()] = value;
   }
@@ -273,17 +271,17 @@ SPPARKSUserObject::setSPPARKSData(T * data, const char * string, unsigned index,
     data[i->second.id] = elk_data[i->first.id];
 
   // Copy data across processors
-  if ( n_processors() > 1 )
-    sendRecvELKData( elk_data, data );
+  if (n_processors() > 1)
+    sendRecvELKData(elk_data, data);
 }
 
 template <typename T>
 void
-SPPARKSUserObject::setELKData(const char * string, unsigned index, MooseVariable & var)
+SPPARKSUserObject::setELKData(const std::string & name, unsigned index, MooseVariable & var)
 {
   // get SPPARKS data
   std::map<unsigned, T> spparks_data;
-  getSPPARKSData(spparks_data, string, index);
+  getSPPARKSData(spparks_data, name, index);
 
   SystemBase & sys = var.sys();
   NumericVector<Number> & solution = sys.solution();
@@ -292,17 +290,17 @@ SPPARKSUserObject::setELKData(const char * string, unsigned index, MooseVariable
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
 
   // Set data
-  for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
-    solution.set( (*i)->dof_number(sys.number(), var.number(), 0), spparks_data[(*i)->id()] );
+  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
+    solution.set((*i)->dof_number(sys.number(), var.number(), 0), spparks_data[(*i)->id()]);
 
   solution.close();
 }
 
 // template <typename T>
 // void
-// SPPARKSUserObject::setELKData(T * data, const char * string, unsigned index, MooseVariable & var)
+// SPPARKSUserObject::setELKData(T * data, const std::string & name, unsigned index, MooseVariable & var)
 // {
-//   getSPPARKSDataPointer( data, string, index );
+//   getSPPARKSDataPointer(data, name, index);
 //
 //   SystemBase & sys = var.sys();
 //   NumericVector<Number> & solution = sys.solution();
@@ -316,12 +314,12 @@ SPPARKSUserObject::setELKData(const char * string, unsigned index, MooseVariable
 //     spparks_data[i->first.id] = data[i->second.id];
 //
 //   // set data
-//   for ( ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i )
-//     solution.set( (*i)->dof_number(sys.number(), var.number(), 0), spparks_data[(*i)->id()] );
+//   for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
+//     solution.set((*i)->dof_number(sys.number(), var.number(), 0), spparks_data[(*i)->id()]);
 //
 //   // Copy data across processors
-//   if ( n_processors() > 1 )
-//     sendRecvSPPARKSData( data, spparks_data );
+//   if (n_processors() > 1)
+//     sendRecvSPPARKSData(data, spparks_data);
 // }
 
 template <typename T>
@@ -339,7 +337,7 @@ SPPARKSUserObject::sendRecvELKData(const std::map<libMesh::dof_id_type, T> & sto
   for (std::map<unsigned, std::vector<unsigned> >::const_iterator i = _sending_proc_to_spparks_id.begin();
        i != _sending_proc_to_spparks_id.end(); ++i)
   {
-    data_to_me[i->first].resize( i->second.size() );
+    data_to_me[i->first].resize(i->second.size());
     _communicator.receive(i->first, data_to_me[i->first], recv_request[offset], comm_tag);
     ++offset;
   }
@@ -348,7 +346,7 @@ SPPARKSUserObject::sendRecvELKData(const std::map<libMesh::dof_id_type, T> & sto
   for (std::map<FEMID, std::vector<unsigned> >::const_iterator i = _elk_to_proc.begin(); i != _elk_to_proc.end(); ++i)
   {
     for (unsigned j = 0; j < i->second.size(); ++j)
-      data_from_me[i->second[j]].push_back( storage.find(i->first.id)->second );
+      data_from_me[i->second[j]].push_back(storage.find(i->first.id)->second);
   }
 
   for (typename std::map<unsigned, std::vector<T> >::const_iterator i = data_from_me.begin(); i != data_from_me.end(); ++i)
@@ -362,7 +360,7 @@ SPPARKSUserObject::sendRecvELKData(const std::map<libMesh::dof_id_type, T> & sto
   {
     const std::vector<unsigned> & id = i->second;
     const std::vector<T> & v = data_to_me[i->first];
-    if ( id.size() != v.size() )
+    if (id.size() != v.size())
       mooseError("Mismatched communication vectors");
 
     // data is SPPARKS index, value
