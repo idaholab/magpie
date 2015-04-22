@@ -3,4 +3,4 @@
 	url = https://hpcgitlab.inl.gov/schwd/spparks.git
 [submodule "contrib/mytrim"]
 	path = contrib/mytrim
-	url = http://github.com/dschwen/3DTRIM.git
+	url = http://github.com/idaholab/mytrim.git
