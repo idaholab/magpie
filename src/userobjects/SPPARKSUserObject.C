@@ -1,7 +1,7 @@
 #include "SPPARKSUserObject.h"
 #include "MooseRandom.h"
-
 #include "libmesh/mesh_tools.h"
+#include <numeric>
 
 template<>
 InputParameters validParams<SPPARKSUserObject>()
@@ -160,6 +160,7 @@ SPPARKSUserObject::runSPPARKSCommand(const std::string & cmd)
 void
 SPPARKSUserObject::getSPPARKSData()
 {
+  // _console << "\ngetSPPARKSData\n";
   // Update the integer data
   for (unsigned i = 0; i < _from_ivar.size(); ++i)
     getSPPARKSData(_int_data_for_fem[_from_ivar[i]], "iarray", _from_ivar[i]);
@@ -172,6 +173,7 @@ SPPARKSUserObject::getSPPARKSData()
 void
 SPPARKSUserObject::setSPPARKSData()
 {
+  // _console << "\nsetSPPARKSData\n";
   // Update the integer data
   int * ip = NULL;
   for (unsigned i = 0; i < _to_ivar.size(); ++i)
@@ -186,6 +188,7 @@ SPPARKSUserObject::setSPPARKSData()
 void
 SPPARKSUserObject::setFEMData()
 {
+  // _console << "\nsetFEMData\n";
   // Update the double solving variables using the data from SPPARKS, added by YF
   for (unsigned int i = 0; i < _sol_vars.size(); ++i)
     setFEMData<double>("darray", _from_dvar[i], *_sol_vars[i]);
@@ -194,8 +197,7 @@ SPPARKSUserObject::setFEMData()
 void
 SPPARKSUserObject::execute()
 {
-  // added by YF, aleady ran SPPARKS once in addition to initialization
-  if (_times_of_run > 1) return;
+  if (_one_time_run && _times_of_run > 1) return;
   if (_spparks_only) return;
 
   if (_init_spparks)
@@ -208,28 +210,21 @@ SPPARKSUserObject::execute()
   {
     _last_time = _t;
 
-    _console << "\nsetSPPARKSData\n";
     setSPPARKSData();
 
     // Run SPPARKS over a certain time
     const Real sp_time = getSPPARKSTime(_dt);
     std::stringstream cmd;
     cmd << "run ";
-    if (!_times_of_run) cmd << "10000000 ";
-    if (_times_of_run) cmd << "0 ";
-    //cmd << sp_time;
+    cmd << sp_time;
     cmd << " pre no" << std::endl;
     runSPPARKSCommand(cmd.str());
 
-    _console << "\ngetSPPARKSData\n";
     getSPPARKSData();
 
     // Record if SPPARKS has been called before
     if (_one_time_run && _times_of_run)
-    {
-      _console << "\nsetFEMData\n";
       setFEMData(); //added by YF
-    }
 
     if (_one_time_run)
       _times_of_run ++;
@@ -240,12 +235,14 @@ void
 SPPARKSUserObject::initSPPARKS()
 {
   // Set SPPARKS values based on 3.3.2 in Veena's paper
+  // This is needed only to couple POTTS model with MARMOT
 
   // Loop over local FEM nodes
   // For each node, pick a random spin
   // Half alpha phase, half beta phase
   // Composition for alpha phase is 0.25; for beta phase, 0.75.
 
+  // _console << "\ninitSPPARKS\n";
   if (_from_ivar.size() != 2)
     mooseError("Must have two integer variables from SPPARKS");
 
@@ -289,7 +286,6 @@ SPPARKSUserObject::initSPPARKS()
   }
 }
 
-
 void
 SPPARKSUserObject::initialSetup()
 {
@@ -299,7 +295,7 @@ SPPARKSUserObject::initialSetup()
   _initialized = true;
 
   // Initialize communication maps
-  _console << "\ninitialSetup: begin\n";
+  // _console << "\ninitialSetup: begin\n";
 
   // 1. Get on-processor map from SPPARKS ID to FEM ID
   int * iptr;
@@ -366,16 +362,17 @@ SPPARKSUserObject::initialSetup()
   {
     if (spparks_id.size() != _spparks_to_fem.size())
     {
+      // Error skipped to allow unmatched meshes 
       // mooseError("Did not find MOOSE FEM node for each SPPARKS node, " << spparks_id.size()
       //            << ", " << fem_id.size() << ", " << _spparks_to_fem.size());
 
-      _console << "\n  spparks size  "<< spparks_id.size() << "  fem size  " << fem_id.size()  << '\n';
+      _console << "\n  spparks size  "<< spparks_id.size() << "not equal to fem size  " << fem_id.size()  << '\n';
     }
 
     return;
   }
 
-  _console << "\ninitialSetup: 1\n";
+  // _console << "\ninitialSetup: 1\n";
 
   // 2. Get send map (spparks id -> proc id)
 
@@ -403,7 +400,7 @@ SPPARKSUserObject::initialSetup()
                                      Point(s_bounds[3], s_bounds[4], s_bounds[5]));
   _communicator.sum(spparks_bounds);
 
-  _console << "\ninitialSetup: 2A\n";
+  // _console << "\ninitialSetup: 2A\n";
 
   //
   // B: Get MOOSE bounding boxes
@@ -429,7 +426,7 @@ SPPARKSUserObject::initialSetup()
                                  Point(e_bounds[3], e_bounds[4], e_bounds[5]));
   _communicator.sum(fem_bounds);
 
-  _console << "\ninitialSetup: 2B\n";
+  // _console << "\ninitialSetup: 2B\n";
 
   //
   // C: Get number of processors that overlap my SPPARKS and MOOSE domains
@@ -456,57 +453,56 @@ SPPARKSUserObject::initialSetup()
       procs_overlapping_fem_domain.push_back(i);
   }
 
-  _console << "\ninitialSetup: 2C\n";
-
-  _console << "\noverlapping spparks domain:  "<< procs_overlapping_spparks_domain.size() << '\n';
-  _console << "\noverlapping fem domain:  "<< procs_overlapping_fem_domain.size() << '\n';
+  // _console << "\ninitialSetup: 2C\n";
+  // _console << "\noverlapping spparks domain:  "<< procs_overlapping_spparks_domain.size() << '\n';
+  // _console << "\noverlapping fem domain:  "<< procs_overlapping_fem_domain.size() << '\n';
 
   // D: Communicate number of MOOSE FEM nodes, number of SPPARKS nodes
 
   std::vector<unsigned> num_fem_nodes(procs_overlapping_spparks_domain.size(), 0); // Number remote fem nodes for each proc overlapping my spparks
   std::vector<unsigned> num_spparks_nodes(procs_overlapping_fem_domain.size(), 0);
 
-  std::vector<MPI_Request> recv_request1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size() + 1));
-  std::vector<MPI_Request> recv_request2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size() + 1));
+  std::vector<MPI_Request> recv_request1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size()));
+  std::vector<MPI_Request> recv_request2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size()));
   int comm_tag = 100;
 
-  _console << "\ninitialSetup: 2D1\n";
+  // _console << "\ninitialSetup: 2D1\n";
 
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
-    if (num_fem_nodes.size() && procs_overlapping_spparks_domain.size())
+  //  if (num_fem_nodes.size() && procs_overlapping_spparks_domain.size())
        MPI_Irecv(&num_fem_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag, _communicator.get(), &recv_request1[i]);
 
-       _console << "\ninitialSetup: 2D2\n";
+  // _console << "\ninitialSetup: 2D2\n";
 
   for (unsigned i = 0; i < procs_overlapping_fem_domain.size(); ++i)
-    if (num_spparks_nodes.size() && procs_overlapping_fem_domain.size())
+  //  if (num_spparks_nodes.size() && procs_overlapping_fem_domain.size())
        MPI_Irecv(&num_spparks_nodes[i], 1, MPI_UNSIGNED, procs_overlapping_fem_domain[i], comm_tag+11, _communicator.get(), &recv_request2[i]);
 
-   _console << "\ninitialSetup: 2D3\n";
+  // _console << "\ninitialSetup: 2D3\n";
 
   for (unsigned i = 0; i < procs_overlapping_fem_domain.size(); ++i)
-    if (procs_overlapping_fem_domain.size())
+  //  if (procs_overlapping_fem_domain.size())
       MPI_Send(&_num_local_fem_nodes, 1, MPI_UNSIGNED, procs_overlapping_fem_domain[i], comm_tag, _communicator.get());
 
-  _console << "\ninitialSetup: 2D4\n";
+  // _console << "\ninitialSetup: 2D4\n";
 
   for (unsigned i = 0; i < procs_overlapping_spparks_domain.size(); ++i)
-    if (procs_overlapping_spparks_domain.size())
+  //  if (procs_overlapping_spparks_domain.size())
       MPI_Send(&_num_local_spparks_nodes, 1, MPI_UNSIGNED, procs_overlapping_spparks_domain[i], comm_tag+11, _communicator.get());
 
-  _console << "\ninitialSetup: 2D5\n";
+  // _console << "\ninitialSetup: 2D5\n";
 
-  std::vector<MPI_Status> recv_status1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size() + 1));
-  std::vector<MPI_Status> recv_status2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size() + 1));
+  std::vector<MPI_Status> recv_status1(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size()));
+  std::vector<MPI_Status> recv_status2(std::max(procs_overlapping_spparks_domain.size(), procs_overlapping_fem_domain.size()));
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request2[0], &recv_status2[0]);
 
-  _console << "\ninitialSetup: 2D\n";
+  // _console << "\ninitialSetup: 2D\n";
 
   //
   // E: Communicate MOOSE FEM nodes, SPPARKS nodes
   //
-/*
+
   comm_tag = 200;
   int comm_tag_double = comm_tag + 1;
   const unsigned num_fem_nodes_total = std::accumulate(&num_fem_nodes[0], &num_fem_nodes[0]+num_fem_nodes.size(), 0);
@@ -582,10 +578,8 @@ SPPARKSUserObject::initialSetup()
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request_coor1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request2[0], &recv_status2[0]);
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request_coor2[0], &recv_status2[0]);
-
-
-  std::cout << std::endl
-              << "initialSetup: 2E " << std::endl;
+  
+  // _console << "\ninitialSetup: 2E \n";
 
   //
   // F: Count matching nodes for each proc that sent MOOSE FEM nodes, SPPARKS nodes
@@ -668,9 +662,7 @@ SPPARKSUserObject::initialSetup()
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request2[0], &recv_status2[0]);
 
-
-  std::cout << std::endl
-              << "initialSetup: 2F " << std::endl;
+  // _console << "\ninitialSetup: 2F \n";
 
   //
   // G: Communicate matching nodes
@@ -708,9 +700,7 @@ SPPARKSUserObject::initialSetup()
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request2[0], &recv_status2[0]);
 
-
-  std::cout << std::endl
-              << "initialSetup: 2G " << std::endl;
+  // _console << "\ninitialSetup: 2G \n";
 
   //
   // H: Generate final recv communication maps
@@ -730,15 +720,15 @@ SPPARKSUserObject::initialSetup()
       _sending_proc_to_spparks_id[procs_overlapping_spparks_domain[i]].push_back(matched_spparks_ids[i][j]);
     }
   }
-*/
 
-  _console << "\ninitialSetup: 2H\n";
+  //  _console << "\ninitialSetup: 2H\n";
 
+  /* 
   if (_init_spparks)
   {
     initSPPARKS();
     _init_spparks = false;
 
     setSPPARKSData();
-  }
+  } */
 }
