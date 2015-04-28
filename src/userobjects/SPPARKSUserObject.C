@@ -197,7 +197,7 @@ SPPARKSUserObject::setFEMData()
 void
 SPPARKSUserObject::execute()
 {
-  if (_one_time_run && _n_spparks_run) return;
+  if (_one_time_run && _n_spparks_run > 0) return;
   if (_spparks_only) return;
 
   if (_init_spparks)
