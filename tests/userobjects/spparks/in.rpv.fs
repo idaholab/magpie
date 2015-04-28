@@ -32,7 +32,7 @@ temperature     873
 
 diag_style      rpv stats yes list energy vac  
 stats           1000  
-dump            1 text 1000000 *.dump id i2 x y z d5 
+#dump            1 text 1000000 *.dump id i2 x y z d5 
 
 reset_time      0
-run             10 
+#run             10 

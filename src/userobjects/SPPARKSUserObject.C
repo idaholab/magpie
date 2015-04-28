@@ -54,7 +54,7 @@ SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters p
     _time_ratio(getParam<Real>("time_spparks_time_ratio")),
     _initialized(false),
     _one_time_run(getParam<bool>("one_time_run")),
-    _times_of_run(0),
+    _n_spparks_run(0),
     _int_vars(),
     _double_vars(),
     _sol_vars(),
@@ -197,7 +197,7 @@ SPPARKSUserObject::setFEMData()
 void
 SPPARKSUserObject::execute()
 {
-  if (_one_time_run && _times_of_run) return;
+  if (_one_time_run && _n_spparks_run) return;
   if (_spparks_only) return;
 
   if (_init_spparks)
@@ -221,9 +221,8 @@ SPPARKSUserObject::execute()
     cmd << " pre no" << std::endl;
     runSPPARKSCommand(cmd.str());
 
-    // Record if SPPARKS has been called before
-    if (_one_time_run)
-      _times_of_run ++;
+    // times that SPPARKS has been called 
+    _n_spparks_run ++;
 
     // obtain data from SPPARKS
     // getSPPARKSData update the auxvariables defined by from_ivar and from_dvar  

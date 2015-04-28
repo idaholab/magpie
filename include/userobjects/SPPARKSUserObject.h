@@ -88,7 +88,7 @@ protected:
 
   // added by YF, do one time SPPARKS run
   bool _one_time_run;
-  int _times_of_run;
+  int _n_spparks_run;
 
   int _dim;
 
