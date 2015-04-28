@@ -2,17 +2,17 @@
   xmin = 0
   ymin = 0
   zmin = 0 
-  xmax = 5
-  ymax = 5
-  zmax = 5 
+  xmax = 8 
+  ymax = 8
+  zmax = 4 
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 3
-  nx = 5
-  ny = 5
-  nz = 5
+  nx = 8
+  ny = 8 
+  nz = 4
 []
 
 [Functions]
@@ -24,32 +24,6 @@
     type = ParsedFunction
     value = t+7
   [../]
-[]
-
-[AuxVariables]
-  [./q_alpha]
-    initial_condition = 0
-  [../]
-  [./spin]
-    initial_condition = 50
-  [../]
-[]
-
-[AuxKernels]
-#  [./get_spin]
-#    type = SPPARKSAux
-#    variable = spin
-#    ivar = 1
-#    user_object = spparks
-#    execute_on = timestep_begin
-#  [../]
-#  [./get_phase]
-#    type = SPPARKSAux
-#    variable = q_alpha
-#    ivar = 2
-#    user_object = spparks
-#    execute_on = timestep_begin
-#  [../]
 []
 
 [Variables]
@@ -102,13 +76,10 @@
   nl_rel_tol = 1e-8 #1.0e-10
   nl_abs_tol = 1e-10
 
-  dt = 1 #200
-  start_time = 0
-  end_time = 1 #80000 #1600
+  num_steps = 1 
 []
 
 [Outputs]
-  output_initial = true
   exodus = true
   interval = 1
   [./console]
@@ -121,15 +92,12 @@
   [./spparks]
     type = SPPARKSUserObject
     file = in.rpv.fs
-    #spparks_only = true
     one_time_run = true
-    #to_dvar = 1
-    #double_vars = c
     from_ivar = '1 2'
     from_dvar = 5
     sol_vars = c
     init_spparks = false
-    execute_on = timestep_end
-    time_spparks_time_ratio = 10
+    execute_on = 'timestep_end'
+    time_spparks_time_ratio = 0.000001
   [../]
 []

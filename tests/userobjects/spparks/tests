@@ -1,0 +1,7 @@
+[Tests]
+  [./tofrom_spparks]
+    type = 'Exodiff'
+    input = './tofrom_spparks.i'
+    exodiff = './tofrom_spparks_out.e'
+  [../]
+[]
