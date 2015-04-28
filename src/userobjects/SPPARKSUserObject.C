@@ -197,7 +197,7 @@ SPPARKSUserObject::setFEMData()
 void
 SPPARKSUserObject::execute()
 {
-  if (_one_time_run && _times_of_run > 1) return;
+  if (_one_time_run && _times_of_run) return;
   if (_spparks_only) return;
 
   if (_init_spparks)
@@ -210,9 +210,10 @@ SPPARKSUserObject::execute()
   {
     _last_time = _t;
 
+    // set variables in SPPARKS defined by to_ivar and to_dvar    
     setSPPARKSData();
 
-    // Run SPPARKS over a certain time
+    // Run SPPARKS over a certain time defined by sp_time 
     const Real sp_time = getSPPARKSTime(_dt);
     std::stringstream cmd;
     cmd << "run ";
@@ -220,14 +221,15 @@ SPPARKSUserObject::execute()
     cmd << " pre no" << std::endl;
     runSPPARKSCommand(cmd.str());
 
-    getSPPARKSData();
-
     // Record if SPPARKS has been called before
-    if (_one_time_run && _times_of_run)
-      setFEMData(); //added by YF
-
     if (_one_time_run)
       _times_of_run ++;
+
+    // obtain data from SPPARKS
+    // getSPPARKSData update the auxvariables defined by from_ivar and from_dvar  
+    // setFEMData update the MOOSEvariables defined by sol__vars   
+    getSPPARKSData();
+    setFEMData(); 
   }
 }
 
