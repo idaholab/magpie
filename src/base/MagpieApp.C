@@ -15,8 +15,8 @@ InputParameters validParams<MagpieApp>()
   return params;
 }
 
-MagpieApp::MagpieApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+MagpieApp::MagpieApp(const InputParameters & parameters) :
+    MooseApp(parameters)
 {
   srand(processor_id());
 

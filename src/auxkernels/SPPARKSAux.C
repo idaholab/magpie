@@ -11,8 +11,8 @@ InputParameters validParams<SPPARKSAux>()
   return params;
 }
 
-SPPARKSAux::SPPARKSAux(const std::string & name, InputParameters parameters) :
-    AuxKernel(name, parameters),
+SPPARKSAux::SPPARKSAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
     _spparks(getUserObject<SPPARKSUserObject>("user_object")),
     _ivar(isParamValid("ivar") ? getParam<unsigned>("ivar") : -1),
     _dvar(isParamValid("dvar") ? getParam<unsigned>("dvar") : -1)

@@ -35,8 +35,8 @@ InputParameters validParams<SPPARKSUserObject>()
   return params;
 }
 
-SPPARKSUserObject::SPPARKSUserObject(const std::string & name, InputParameters params) :
-    GeneralUserObject(name, params),
+SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
+    GeneralUserObject(params),
     _spparks(NULL),
     _file(getParam<std::string>("file")),
     _spparks_only(getParam<bool>("spparks_only")),
@@ -210,10 +210,10 @@ SPPARKSUserObject::execute()
   {
     _last_time = _t;
 
-    // set variables in SPPARKS defined by to_ivar and to_dvar    
+    // set variables in SPPARKS defined by to_ivar and to_dvar
     setSPPARKSData();
 
-    // Run SPPARKS over a certain time defined by sp_time 
+    // Run SPPARKS over a certain time defined by sp_time
     const Real sp_time = getSPPARKSTime(_dt);
     std::stringstream cmd;
     cmd << "run ";
@@ -221,14 +221,14 @@ SPPARKSUserObject::execute()
     cmd << " pre no" << std::endl;
     runSPPARKSCommand(cmd.str());
 
-    // times that SPPARKS has been called 
+    // times that SPPARKS has been called
     _n_spparks_run ++;
 
     // obtain data from SPPARKS
-    // getSPPARKSData update the auxvariables defined by from_ivar and from_dvar  
-    // setFEMData update the MOOSEvariables defined by sol__vars   
+    // getSPPARKSData update the auxvariables defined by from_ivar and from_dvar
+    // setFEMData update the MOOSEvariables defined by sol__vars
     getSPPARKSData();
-    setFEMData(); 
+    setFEMData();
   }
 }
 
@@ -363,7 +363,7 @@ SPPARKSUserObject::initialSetup()
   {
     if (spparks_id.size() != _spparks_to_fem.size())
     {
-      // Error skipped to allow unmatched meshes 
+      // Error skipped to allow unmatched meshes
       // mooseError("Did not find MOOSE FEM node for each SPPARKS node, " << spparks_id.size()
       //            << ", " << fem_id.size() << ", " << _spparks_to_fem.size());
 
@@ -579,7 +579,7 @@ SPPARKSUserObject::initialSetup()
   MPI_Waitall(procs_overlapping_spparks_domain.size(), &recv_request_coor1[0], &recv_status1[0]);
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request2[0], &recv_status2[0]);
   MPI_Waitall(procs_overlapping_fem_domain.size(), &recv_request_coor2[0], &recv_status2[0]);
-  
+
   // _console << "\ninitialSetup: 2E \n";
 
   //
@@ -724,7 +724,7 @@ SPPARKSUserObject::initialSetup()
 
   //  _console << "\ninitialSetup: 2H\n";
 
-  /* 
+  /*
   if (_init_spparks)
   {
     initSPPARKS();

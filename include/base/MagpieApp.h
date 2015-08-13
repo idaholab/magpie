@@ -11,7 +11,7 @@ InputParameters validParams<MagpieApp>();
 class MagpieApp : public MooseApp
 {
 public:
-  MagpieApp(const std::string & name, InputParameters parameters);
+  MagpieApp(const InputParameters & parameters);
   virtual ~MagpieApp();
 
   static void registerApps();

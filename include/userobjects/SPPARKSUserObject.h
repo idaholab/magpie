@@ -13,7 +13,7 @@ InputParameters validParams<SPPARKSUserObject>();
 class SPPARKSUserObject : public GeneralUserObject
 {
 public:
-  SPPARKSUserObject(const std::string & name, InputParameters parameters);
+  SPPARKSUserObject(const InputParameters & parameters);
   virtual ~SPPARKSUserObject();
 
   virtual void initialSetup();
