@@ -1,0 +1,63 @@
+/****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+#ifndef MYTRIMRASTERIZER_H
+#define MYTRIMRASTERIZER_H
+
+#include "ElementUserObject.h"
+
+#include <map>
+#include <vector>
+
+class MyTRIMRasterizer;
+
+template<>
+InputParameters validParams<MyTRIMRasterizer>();
+
+/**
+ * This UserObject rasterizes a simulation domain for the MyTRIM library
+ */
+class MyTRIMRasterizer : public ElementUserObject
+{
+public:
+  MyTRIMRasterizer(const InputParameters & parameters);
+
+  /// determines if a TRIM run is executed during this timestep
+  virtual bool executeThisTimestep() const;
+
+  virtual void initialize();
+  virtual void execute();
+  virtual void threadJoin(const UserObject & y);
+  virtual void finalize();
+
+  // get the concentration array
+  const std::vector<Real> & material(const Elem *) const;
+
+  // get the variable ID of the first coupled variable (to determine the periodicity)
+  int periodic() const { return _periodic; }
+
+  // get the number of elements in the TRIM simulation
+  unsigned int nVars() const { return _nvars; }
+
+protected:
+  /// number of coupled variables to map
+  unsigned int _nvars;
+
+  /// coupled variable values
+  std::vector<VariableValue *> _var;
+
+  /// material map for the TRIM simulation
+  typedef std::map<dof_id_type, std::vector<Real> > MaterialMap;
+  MaterialMap _material_map;
+
+  /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
+  int _periodic;
+
+private:
+  bool _execute_this_timestep;
+};
+
+#endif //MYTRIMRASTERIZER_H
