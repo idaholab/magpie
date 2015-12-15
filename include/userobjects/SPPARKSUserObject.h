@@ -2,6 +2,8 @@
 #define SPPARKSUSEROBJECT_H
 
 #include "GeneralUserObject.h"
+#include "MooseMesh.h"
+
 #include "spparks/src/library.h"
 
 // forward declarations
