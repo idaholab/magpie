@@ -2,9 +2,11 @@
 #define MOOSEMYTRIMSAMPLE_H
 
 #include "MyTRIMRasterizer.h"
+#include "MooseMyTRIMMaterial.h"
 
 #include "mytrim/sample.h"
-#include "mytrim/material.h"
+#include "mytrim/ion.h"
+#include "mytrim/element.h"
 
 // Forward declarations
 class MooseMesh;
@@ -12,17 +14,21 @@ class MooseMesh;
 /**
  * MyTRIM sample class that uses PointLocator lookups on a MooseMesh to
  * fetch and dynamically prepare material data from a MyTRIMRasterizer.
+ * A new MooseMyTRIMSample class has to be constructed for every timestep the
+ * TRIM simulation is run if the mesh has changed.
  */
 class MooseMyTRIMSample : public MyTRIM_NS::sampleBase
 {
 public:
   MooseMyTRIMSample(const MyTRIMRasterizer &, const MooseMesh &);
 
-  /// run once per MOOSE timestep
-  void initialize();
+  /// average crossections for current ion
+  virtual void averages(const MyTRIM_NS::ionBase  * pka);
 
   /// interface called by MyTRIM to look up material data
   virtual MyTRIM_NS::materialBase* lookupMaterial(double * pos);
+
+  virtual MyTRIM_NS::elementBase * getElement(unsigned int nn);
 
 protected:
 
@@ -44,8 +50,11 @@ protected:
   UniquePtr<PointLocatorBase> _pl;
 
   /// material cache map
-  typedef std::map<const Elem *, MyTRIM_NS::materialBase> MaterialsCache;
+  typedef std::map<const Elem *, MooseMyTRIMMaterial> MaterialsCache;
   MaterialsCache _materials_cache;
+
+  /// current ion (for on-the fly averaging)
+  const MyTRIM_NS::ionBase * _current_ion;
 };
 
 #endif //MOOSEMYTRIMSAMPLE_H
