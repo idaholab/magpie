@@ -3,8 +3,13 @@
 #include "MooseSyntax.h"
 #include "AppFactory.h"
 
-#include "SPPARKSUserObject.h"
+// AuxKernels
 #include "SPPARKSAux.h"
+
+// UserObjects
+#include "MyTRIMRasterizer.h"
+#include "MyTRIMRun.h"
+#include "SPPARKSUserObject.h"
 
 template<>
 InputParameters validParams<MagpieApp>()
@@ -43,6 +48,9 @@ void
 MagpieApp::registerObjects(Factory & factory)
 {
   registerAux(SPPARKSAux);
+
+  registerUserObject(MyTRIMRasterizer);
+  registerUserObject(MyTRIMRun);
   registerUserObject(SPPARKSUserObject);
 }
 
