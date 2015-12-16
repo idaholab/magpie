@@ -157,4 +157,5 @@ peacock_*.e
 *.cpa-*
 *.cpr-*
 
-include/MagpieRevision.h
+include/base/MagpieRevision.h
+tests/userobjects/spparks/log.spparks
