@@ -42,6 +42,9 @@ public:
   /// get the TRIM result data
   const MyTRIMResult & result(const Elem *) const;
 
+  // get the number of elements in the TRIM simulation
+  unsigned int nVars() const { return _nvars; }
+
 protected:
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultMap _result_map;
