@@ -21,6 +21,7 @@ class MooseMyTRIMSample : public MyTRIM_NS::sampleBase
 {
 public:
   MooseMyTRIMSample(const MyTRIMRasterizer &, const MooseMesh &, MyTRIM_NS::simconfType *);
+  virtual ~MooseMyTRIMSample();
 
   /// average crossections for current ion
   virtual void averages(const MyTRIM_NS::ionBase  * pka);
@@ -54,7 +55,7 @@ protected:
   /// current ion (for on-the fly averaging)
   const MyTRIM_NS::ionBase * _current_ion;
 
-  /// internal state object tor teh TRIM simulation
+  /// internal state object for the TRIM simulation
   MyTRIM_NS::simconfType * _simconf;
 };
 
