@@ -20,7 +20,7 @@ public:
 
 protected:
   const MyTRIMRun & _mytrim;
-  const int _ivar;
+  const unsigned int _ivar;
   const unsigned int _defect;
 
 private:

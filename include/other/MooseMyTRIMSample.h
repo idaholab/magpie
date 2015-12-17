@@ -28,8 +28,6 @@ public:
   /// interface called by MyTRIM to look up material data
   virtual MyTRIM_NS::materialBase* lookupMaterial(double * pos);
 
-  virtual MyTRIM_NS::elementBase * getElement(unsigned int nn);
-
 protected:
 
   /// the rasterizer provides average concentrations for each element
