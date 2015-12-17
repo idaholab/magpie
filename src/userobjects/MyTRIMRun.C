@@ -53,13 +53,13 @@ MyTRIMRun::execute()
   _pl = _mesh.getMesh().sub_point_locator();
 
   // create a new sample class to bridge the MOOSE mesh and the MyTRIM domain
-  MooseMyTRIMSample sample(_rasterizer, _mesh);
+  MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
 
   // create a FIFO for recoils
   std::queue<MyTRIM_NS::ionBase *> recoils;
 
   // use the vacancy mapping TRIM module
-  MyTRIM_NS::trimBase TRIM(&sample);
+  MyTRIM_NS::trimBase TRIM(&_simconf, &sample);
 
   // create an ion
   MyTRIM_NS::ionBase * pka = new MyTRIM_NS::ionBase;

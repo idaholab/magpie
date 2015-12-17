@@ -1,14 +1,15 @@
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
 
-MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
+MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::simconfType * simconf) :
     MyTRIM_NS::sampleBase(),
     _rasterizer(rasterizer),
     _nvars(_rasterizer.nVars()),
     _trim_mass(_rasterizer.mass()),
     _trim_charge(_rasterizer.charge()),
     _mesh(mesh),
-    _pl(_mesh.getMesh().sub_point_locator())
+    _pl(_mesh.getMesh().sub_point_locator()),
+    _simconf(simconf)
 {
 }
 
@@ -39,7 +40,7 @@ MooseMyTRIMSample::lookupMaterial(double * pos)
 
   // otherwise prepare the material using data from the rasterizer
   const std::vector<Real> & material_data = _rasterizer.material(elem);
-  MooseMyTRIMMaterial material(1.0);
+  MooseMyTRIMMaterial material(_simconf, 1.0);
 
   // set elements
   for (unsigned int i = 0; i < _nvars; ++i)

@@ -1,7 +1,7 @@
 #include "MooseMyTRIMMaterial.h"
 
-MooseMyTRIMMaterial::MooseMyTRIMMaterial(double rho) :
-    MyTRIM_NS::materialBase(rho)
+MooseMyTRIMMaterial::MooseMyTRIMMaterial(MyTRIM_NS::simconfType * simconf_, double rho_) :
+    MyTRIM_NS::materialBase(simconf_, rho_)
 {
 }
 

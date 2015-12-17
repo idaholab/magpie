@@ -64,6 +64,9 @@ protected:
   /// The Mesh we're using
   MooseMesh & _mesh;
 
+  /// internal TRIM sinulation status object
+  MyTRIM_NS::simconfType _simconf;
+
 private:
   /// zero result to return for elements that have not been touched by the cascades
   MyTRIMResult _zero;

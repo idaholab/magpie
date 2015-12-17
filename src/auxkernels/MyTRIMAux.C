@@ -31,7 +31,7 @@ MyTRIMAux::computeValue()
   if (_qp == 0)
   {
     const MyTRIMRun::MyTRIMResult & result = _mytrim.result(_current_elem);
-    mooseAssert(_ivar < result.size(), "Result set does not contain teh requested element.");
+    mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
 
     switch(_defect)
     {

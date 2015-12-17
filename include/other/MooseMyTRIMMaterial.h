@@ -10,7 +10,7 @@
 class MooseMyTRIMMaterial : public MyTRIM_NS::materialBase
 {
 public:
-  MooseMyTRIMMaterial(double rho);
+  MooseMyTRIMMaterial(MyTRIM_NS::simconfType * simconf_, double rho_);
 
   virtual MyTRIM_NS::elementBase * getElement(unsigned int nn);
 };
