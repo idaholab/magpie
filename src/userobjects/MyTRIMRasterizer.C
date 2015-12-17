@@ -16,6 +16,8 @@ InputParameters validParams<MyTRIMRasterizer>()
 {
   InputParameters params = validParams<ElementUserObject>();
   params.addCoupledVar("var", "Variables to rasterize");
+  params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
+  params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // we run this object once a timestep
   setup_options = "timestep_begin";
@@ -26,6 +28,8 @@ InputParameters validParams<MyTRIMRasterizer>()
 MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
+    _trim_mass(getParam<std::vector<Real> >("M")),
+    _trim_charge(getParam<std::vector<Real> >("Z")),
     _var(_nvars)
 {
   for (unsigned int i = 0; i < _nvars; ++i)
@@ -33,6 +37,11 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
 
   if (_nvars == 0)
     mooseError("Must couple variables to MyTRIMRasterier.");
+
+  if (_trim_mass.size() != _nvars)
+    mooseError("Parameter 'M' must have as many components as coupled variables.");
+  if (_trim_charge.size() != _nvars)
+    mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
   _periodic = coupled("var", 0);
 

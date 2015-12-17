@@ -4,6 +4,7 @@
 #include "AppFactory.h"
 
 // AuxKernels
+#include "MyTRIMAux.h"
 #include "SPPARKSAux.h"
 
 // UserObjects
@@ -47,6 +48,7 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
+  registerAux(MyTRIMAux);
   registerAux(SPPARKSAux);
 
   registerUserObject(MyTRIMRasterizer);
@@ -55,7 +57,7 @@ MagpieApp::registerObjects(Factory & factory)
 }
 
 void
-MagpieApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+MagpieApp::associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/)
 {
 }
 

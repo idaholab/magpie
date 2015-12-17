@@ -36,6 +36,12 @@ public:
   // get the concentration array
   const std::vector<Real> & material(const Elem *) const;
 
+  // get the mass array
+  const std::vector<Real> & mass() const { return _trim_mass; }
+
+  // get the charge array
+  const std::vector<Real> & charge() const { return _trim_charge; }
+
   // get the variable ID of the first coupled variable (to determine the periodicity)
   int periodic() const { return _periodic; }
 
@@ -45,6 +51,11 @@ public:
 protected:
   /// number of coupled variables to map
   unsigned int _nvars;
+
+  ///@{ Element data
+  std::vector<Real> _trim_mass;
+  std::vector<Real> _trim_charge;
+  ///@}
 
   /// coupled variable values
   std::vector<VariableValue *> _var;

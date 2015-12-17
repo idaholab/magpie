@@ -7,10 +7,14 @@
 
 #include "MyTRIMRun.h"
 #include "MooseMesh.h"
+#include "MooseMyTRIMSample.h"
+#include "mytrim/trim.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
 #include "libmesh/parallel_algebra.h"
+
+#include <queue>
 
 template<>
 InputParameters validParams<MyTRIMRun>()
@@ -45,11 +49,77 @@ MyTRIMRun::execute()
   if (!_rasterizer.executeThisTimestep())
     return;
 
-  // Fetch point locator in case it's been destroyed and recreated because of mesh adaptivity.
+  // refresh point locator in case the mesh has changed
   _pl = _mesh.getMesh().sub_point_locator();
 
-  Point p0 = 0;
-  Moose::out << "Element at 0,0: " << (*_pl)(p0) << '\n';
+  // create a new sample class to bridge the MOOSE mesh and the MyTRIM domain
+  MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
+
+  // create a FIFO for recoils
+  std::queue<MyTRIM_NS::ionBase *> recoils;
+
+  // use the vacancy mapping TRIM module
+  MyTRIM_NS::trimBase TRIM(&_simconf, &sample);
+
+  // create a bunch of ions
+  MyTRIM_NS::ionBase * pka;
+  for (unsigned int i = 0; i < 10000; ++i)
+  {
+    pka = new MyTRIM_NS::ionBase;
+    pka->gen = 0;  // generation (0 = PKA)
+    pka->tag = 0; // tag holds the element type
+    pka->z1 = 20;
+    pka->m1 = 40;
+    pka->e  = 1000000;
+
+    pka->dir[0] = 0.0;
+    pka->dir[1] = 1.0;
+    pka->dir[2] = 0.0;
+
+    pka->pos[0] = 0;
+    pka->pos[1] = 0.01;
+    pka->pos[2] = 0;
+
+    pka->set_ef();
+    recoils.push(pka);
+  }
+
+  while (!recoils.empty())
+  {
+    pka = recoils.front();
+    recoils.pop();
+    sample.averages(pka);
+
+    pka->pos[2] = 0.0;
+    pka->dir[2] = 0.0;
+
+    // follow this ion's trajectory and store recoils
+    TRIM.trim(pka, recoils);
+    // Moose::out << "PKA at " << pka->pos[0]<< ' ' << pka->pos[1] << ' ' << pka->pos[2] << '\n';
+
+    // store results
+    if (pka->tag >= 0)
+    {
+      // locate element the interstitial is deposited in
+      Point p(pka->pos[0], pka->pos[1], 0.0);//pka->pos[2]
+      const Elem * elem = (*_pl)(p);
+      if (elem != NULL)
+      {
+        // store into _result_map
+        MyTRIMResultMap::iterator i = _result_map.find(elem->id());
+        if (i == _result_map.end())
+          i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
+
+        // increase the interstitial counter for the tagged element
+        i->second[pka->tag].second += 1.0;
+      }
+      else
+        mooseWarning("Element to store result not found.");
+    }
+
+    // done with this recoil
+    delete pka;
+  }
 }
 
 void
