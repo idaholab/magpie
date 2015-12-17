@@ -20,8 +20,8 @@ public:
 
 protected:
   const SPPARKSUserObject & _spparks;
-  const int _ivar;
-  const int _dvar;
+  const unsigned int _var;
+  const unsigned int _array;
 };
 
-#endif
+#endif //SPPARKSAUX_H

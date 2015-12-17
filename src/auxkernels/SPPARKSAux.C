@@ -6,30 +6,32 @@ InputParameters validParams<SPPARKSAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("user_object", "Name of SPPARKSUserObject");
-  params.addParam<unsigned int>("ivar", "Index into SPPARKS iarray");
-  params.addParam<unsigned int>("dvar", "Index into SPPARKS darray");
+  params.addParam<unsigned int>("var", "Index into SPPARKS array");
+  MooseEnum arrayType("IARRAY DARRAY");
+  params.addParam<MooseEnum>("array", arrayType, "SPPARKS array to read from");
   return params;
 }
 
 SPPARKSAux::SPPARKSAux(const InputParameters & parameters) :
     AuxKernel(parameters),
     _spparks(getUserObject<SPPARKSUserObject>("user_object")),
-    _ivar(isParamValid("ivar") ? getParam<unsigned>("ivar") : -1),
-    _dvar(isParamValid("dvar") ? getParam<unsigned>("dvar") : -1)
+    _var(getParam<unsigned int>("var")),
+    _array(getParam<MooseEnum>("array"))
 {
-  if ((_ivar >= 0 && _dvar >=0) || (_ivar < 0 && _dvar < 0))
-    mooseError("Error in SPPARKSAux, " << _name << ": Either ivar or dvar must be given.");
 }
 
 Real
 SPPARKSAux::computeValue()
 {
-  Real value = 0;
+  switch (_array)
+  {
+    case 0: // Integer Array
+      return  _spparks.getIntValue(_current_node->id(), _var);
 
-  if (_ivar > -1)
-    value = _spparks.getIntValue(_current_node->id(), _ivar);
-  else
-    value = _spparks.getDoubleValue(_current_node->id(), _dvar);
+    case 1: // Double Array
+      return  _spparks.getDoubleValue(_current_node->id(), _var);
 
-  return value;
+    default:
+      mooseError("Internal error.");
+  }
 }
