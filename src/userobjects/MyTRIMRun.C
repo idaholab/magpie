@@ -61,24 +61,28 @@ MyTRIMRun::execute()
   // use the vacancy mapping TRIM module
   MyTRIM_NS::trimBase TRIM(&_simconf, &sample);
 
-  // create an ion
-  MyTRIM_NS::ionBase * pka = new MyTRIM_NS::ionBase;
-  pka->gen = 0;  // generation (0 = PKA)
-  pka->tag = -1; // tag holds the element type
-  pka->z1 = 20;
-  pka->m1 = 40;
-  pka->e  = 1000;
+  // create a bunch of ions
+  MyTRIM_NS::ionBase * pka;
+  for (unsigned int i = 0; i < 10000; ++i)
+  {
+    pka = new MyTRIM_NS::ionBase;
+    pka->gen = 0;  // generation (0 = PKA)
+    pka->tag = 0; // tag holds the element type
+    pka->z1 = 20;
+    pka->m1 = 40;
+    pka->e  = 1000000;
 
-  pka->dir[0] = 0.0;
-  pka->dir[1] = 1.0;
-  pka->dir[2] = 0.0;
+    pka->dir[0] = 0.0;
+    pka->dir[1] = 1.0;
+    pka->dir[2] = 0.0;
 
-  pka->pos[0] = 0;
-  pka->pos[1] = 0.01;
-  pka->pos[2] = 0;
+    pka->pos[0] = 0;
+    pka->pos[1] = 0.01;
+    pka->pos[2] = 0;
 
-  pka->set_ef();
-  recoils.push( pka );
+    pka->set_ef();
+    recoils.push(pka);
+  }
 
   while (!recoils.empty())
   {
@@ -86,14 +90,18 @@ MyTRIMRun::execute()
     recoils.pop();
     sample.averages(pka);
 
+    pka->pos[2] = 0.0;
+    pka->dir[2] = 0.0;
+
     // follow this ion's trajectory and store recoils
     TRIM.trim(pka, recoils);
+    // Moose::out << "PKA at " << pka->pos[0]<< ' ' << pka->pos[1] << ' ' << pka->pos[2] << '\n';
 
     // store results
     if (pka->tag >= 0)
     {
       // locate element the interstitial is deposited in
-      Point p(pka->pos[0], pka->pos[1], pka->pos[2]);
+      Point p(pka->pos[0], pka->pos[1], 0.0);//pka->pos[2]
       const Elem * elem = (*_pl)(p);
       if (elem != NULL)
       {
@@ -105,6 +113,8 @@ MyTRIMRun::execute()
         // increase the interstitial counter for the tagged element
         i->second[pka->tag].second += 1.0;
       }
+      else
+        mooseWarning("Element to store result not found.");
     }
 
     // done with this recoil
