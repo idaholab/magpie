@@ -15,6 +15,7 @@ template<>
 InputParameters validParams<MyTRIMRasterizer>()
 {
   InputParameters params = validParams<ElementUserObject>();
+  params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM binary collision Monte Carlo simulation");
   params.addCoupledVar("var", "Variables to rasterize");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
