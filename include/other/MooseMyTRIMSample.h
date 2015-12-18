@@ -29,6 +29,9 @@ public:
   /// interface called by MyTRIM to look up material data
   virtual MyTRIM_NS::materialBase* lookupMaterial(double * pos);
 
+  /// get the simulation dimension
+  unsigned int getDim() { return _dim; }
+
 protected:
 
   /// the rasterizer provides average concentrations for each element
@@ -44,6 +47,9 @@ protected:
 
   /// mesh of the simulation domain
   const MooseMesh & _mesh;
+
+  // dimension of the mesh
+  const unsigned int _dim;
 
   /// point locator to determine element pointers form locations
   UniquePtr<PointLocatorBase> _pl;

@@ -7,8 +7,8 @@
 
 #include "MyTRIMRun.h"
 #include "MooseMesh.h"
+#include "MooseMyTRIMCore.h"
 #include "MooseMyTRIMSample.h"
-#include "mytrim/trim.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
@@ -20,7 +20,9 @@ template<>
 InputParameters validParams<MyTRIMRun>()
 {
   InputParameters params = validParams<GeneralUserObject>();
+  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample");
   params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
+  params.addParam<unsigned int>("num_pka", 1000, "Number of PKAs (cascades) to sample");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // we run this object once a timestep
   setup_options = "timestep_begin";
@@ -32,7 +34,9 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
     GeneralUserObject(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _nvars(_rasterizer.nVars()),
+    _num_pka(getParam<unsigned int>("num_pka")),
     _mesh(_subproblem.mesh()),
+    _dim(_mesh.dimension()),
     _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
 {
   if (_mesh.isParallelMesh())
@@ -40,6 +44,12 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
 
   if (_app.n_processors() > 1)
     mooseError("Parallel communication is not yet implemented. Waiting on libmesh/#748.");
+
+  if (_dim < 2 || _dim > 3)
+    mooseError("TRIM simulation works in 2D or 3D only.");
+
+  if (_dim == 2 && (_mesh.getMinInDimension(2) < 0.0 || _mesh.getMaxInDimension(2) > 0.0))
+    mooseError("Two dimensional meshes must lie in the z=0 plane.");
 }
 
 void
@@ -58,19 +68,22 @@ MyTRIMRun::execute()
   // create a FIFO for recoils
   std::queue<MyTRIM_NS::ionBase *> recoils;
 
+  // create a list for vacancies created
+  std::vector<std::pair<Point, unsigned int> > vac;
+
   // use the vacancy mapping TRIM module
-  MyTRIM_NS::trimBase TRIM(&_simconf, &sample);
+  MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
 
   // create a bunch of ions
   MyTRIM_NS::ionBase * pka;
-  for (unsigned int i = 0; i < 10000; ++i)
+  for (unsigned int i = 0; i < 1000; ++i)
   {
     pka = new MyTRIM_NS::ionBase;
     pka->gen = 0;  // generation (0 = PKA)
     pka->tag = 0; // tag holds the element type
     pka->z1 = 20;
     pka->m1 = 40;
-    pka->e  = 1000000;
+    pka->e  = 3000;
 
     pka->dir[0] = 0.0;
     pka->dir[1] = 1.0;
@@ -95,27 +108,20 @@ MyTRIMRun::execute()
 
     // follow this ion's trajectory and store recoils
     TRIM.trim(pka, recoils);
-    // Moose::out << "PKA at " << pka->pos[0]<< ' ' << pka->pos[1] << ' ' << pka->pos[2] << '\n';
+    // Moose::out << "PKA at " << pka->pos[0]<< ' ' << pka->pos[1] << ' ' << pka->pos[2] << ' ' << vac.size() << '\n';
 
-    // store results
+    // store interstitials
     if (pka->tag >= 0)
     {
       // locate element the interstitial is deposited in
-      Point p(pka->pos[0], pka->pos[1], 0.0);//pka->pos[2]
-      const Elem * elem = (*_pl)(p);
-      if (elem != NULL)
-      {
-        // store into _result_map
-        MyTRIMResultMap::iterator i = _result_map.find(elem->id());
-        if (i == _result_map.end())
-          i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
-
-        // increase the interstitial counter for the tagged element
-        i->second[pka->tag].second += 1.0;
-      }
-      else
-        mooseWarning("Element to store result not found.");
+      Point p(pka->pos[0], pka->pos[1], _dim == 2 ? 0.0 : pka->pos[2]);
+      addInterstitialToResult(p, pka->tag);
     }
+
+    // store vacancies
+    for (unsigned int i = 0; i < vac.size(); ++i)
+      addVacancyToResult(vac[i].first, vac[i].second);
+    vac.clear();
 
     // done with this recoil
     delete pka;
@@ -165,4 +171,32 @@ MyTRIMRun::result(const Elem * elem) const
     return _zero;
 
   return i->second;
+}
+
+void
+MyTRIMRun::addDefectToResult(const Point & p, unsigned int var, MyTRIMRun::DefectType type)
+{
+  const Elem * elem = (*_pl)(p);
+  if (elem != NULL)
+  {
+    // store into _result_map
+    MyTRIMResultMap::iterator i = _result_map.find(elem->id());
+    if (i == _result_map.end())
+      i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
+
+    // increase the interstitial counter for the tagged element
+    switch (type)
+    {
+      case VACANCY:
+        i->second[var].first += 1.0;
+        break;
+
+      case INTERSTITIAL:
+        i->second[var].second += 1.0;
+        break;
+
+      default:
+        mooseError("Internal error");
+    }
+  }
 }
