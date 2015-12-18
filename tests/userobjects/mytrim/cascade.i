@@ -1,12 +1,13 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 100
-  ny = 100
-  xmin = -15
-  xmax = 15
-  ymin = -5
-  ymax = 25
+  nx = 60
+  ny = 60
+  xmin = -100
+  xmax = 100
+  ymin = 0
+  ymax = 200
+  elem_type = TRI3
 []
 
 [Variables]
@@ -31,6 +32,10 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./vac]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
@@ -40,6 +45,13 @@
     runner = runner
     ivar = 0
     defect = INT
+  [../]
+  [./vac]
+    variable = vac
+    type = MyTRIMAux
+    runner = runner
+    ivar = 0
+    defect = VAC
   [../]
 []
 
