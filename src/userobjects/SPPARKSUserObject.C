@@ -119,7 +119,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
 
   // for (unsigned i = 0; i < nlcl; ++i)
   // {
-  //   std::cout << id_array[i] << "\t"
+  //   _console << id_array[i] << "\t"
   //             << xyz_array[i][0] << " "
   //             << xyz_array[i][1] << " "
   //             << xyz_array[i][2] << std::endl;

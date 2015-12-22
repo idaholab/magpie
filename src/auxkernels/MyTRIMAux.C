@@ -33,7 +33,7 @@ MyTRIMAux::computeValue()
     const MyTRIMRun::MyTRIMResult & result = _mytrim.result(_current_elem);
     mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
 
-    switch(_defect)
+    switch (_defect)
     {
       case 0: // vacancy
         _value_cache = result[_ivar].first;
