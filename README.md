@@ -1,4 +1,4 @@
-Magpie
+Magpie (blah)
 =====
 
 ![Magpie Logo](http://idaholab.github.io/img/magpie/magpie_logo_small.png)
