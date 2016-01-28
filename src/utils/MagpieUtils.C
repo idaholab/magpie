@@ -68,12 +68,8 @@ inline Point randomElementPoint(const Elem & el, const Point & rnd)
 
       // internal tet pair
       {
-        // split in two
-        double nx = ref(0) + ref(1) < 1 ? ref(0) : 1 - ref(0);
-        double ny = ref(0) + ref(1) < 1 ? ref(0) : 1 - ref(1);
-
-        double s = nx + ny + ref(2) - 1;
-        ref = Point(nx - s * 0.5, ny - s * 0.5, ref(2) - s);
+        double s = (ref.size_sq() - 1) / 2.0;
+        ref -= Point(s, s, s);
       }
       break;
 
