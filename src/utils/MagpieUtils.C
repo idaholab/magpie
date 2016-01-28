@@ -34,6 +34,7 @@ inline Point randomElementPoint(const Elem & el, const Point & rnd)
     case EDGE4:
       // one dimensional elements in [-1:1]
       ref = Point(ref(0) * 2 - 1.0, 0.0, 0.0);
+      break;
 
     case TRI3:
     case TRI6:
@@ -42,24 +43,46 @@ inline Point randomElementPoint(const Elem & el, const Point & rnd)
         ref = Point(1.0 - ref(0), 1.0 - ref(1), 0.0);
       else
         ref(2) = 0.0;
+      break;
 
     case QUAD4:
     case QUAD8:
     case QUAD9:
       // two dimensional elements in [-1:1]^2
       ref = Point(ref(0) * 2 - 1.0, ref(1) * 2 - 1.0, 0.0);
+      break;
 
     case TET4:
     case TET10:
-      // flip the upper tet onto the lower tet
-      if (ref(0) + ref(1) + ref(2) > 1)
-        ref = Point(1.0 - ref(0), 1.0 - ref(1), 1.0 - ref(2));
+      // already in the reference volume
+      if (ref(0) + ref(1) + ref(2) < 1)
+        break;
+
+      // three more tets in the corners of the cube
+      else if (ref(0) + 1 - ref(1) + 1- ref(2) < 1)
+        ref = Point(ref(0), 1.0 - ref(1), 1.0 - ref(2));
+      else if (1 - ref(0) + ref(1) + 1- ref(2) < 1)
+        ref = Point(1.0 - ref(0), ref(1), 1.0 - ref(2));
+      else if (1- ref(0) + 1 - ref(1) + ref(2) < 1)
+        ref = Point(1.0 - ref(0), 1.0 - ref(1), ref(2));
+
+      // internal tet pair
+      {
+        // split in two
+        double nx = ref(0) + ref(1) < 1 ? ref(0) : 1 - ref(0);
+        double ny = ref(0) + ref(1) < 1 ? ref(0) : 1 - ref(1);
+
+        double s = nx + ny + ref(2) - 1;
+        ref = Point(nx - s * 0.5, ny - s * 0.5, ref(2) - s);
+      }
+      break;
 
     case HEX8:
     case HEX20:
     case HEX27:
       // three dimensional elements in [-1:1]^3
       ref = Point(ref(0) * 2 - 1.0, ref(1) * 2 - 1.0, ref(2) * 2 - 1.0);
+      break;
 
     case PRISM6:
     case PRISM15:
@@ -69,6 +92,7 @@ inline Point randomElementPoint(const Elem & el, const Point & rnd)
         ref = Point(1.0 - ref(0), 1.0 - ref(1), ref(2) * 2 - 1.0);
       else
         ref(2) = ref(2) * 2 - 1.0;
+      break;
 
     case PYRAMID5:
     case PYRAMID13:
