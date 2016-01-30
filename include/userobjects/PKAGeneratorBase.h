@@ -23,6 +23,18 @@ public:
    * The element volume is passed in as it is computed in the MyTRIMRasterizer anyways.
    */
   virtual void appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_list, Real dt, Real vol) const = 0;
+
+  virtual void initialize() {}
+
+protected:
+  /// helper function to set the ion position to a random location in the current element
+  void setPosition(MyTRIM_NS::ionBase & ion) const;
+
+  /// helper function to set the ion direction to a random direction
+  void setRandomDirection(MyTRIM_NS::ionBase & ion) const;
+
+  /// Return a point with random uniformly distributed coordinates in the unit cube
+  Point getRandomPoint() const { return Point(getRandomReal(), getRandomReal(), getRandomReal()); }
 };
 
 #endif // PKAGENERATORBASE_H
