@@ -1,17 +1,17 @@
 [GlobalParams]
   xmin = 0
   ymin = 0
-  zmin = 0 
-  xmax = 8 
+  zmin = 0
+  xmax = 8
   ymax = 8
-  zmax = 4 
+  zmax = 4
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 3
   nx = 8
-  ny = 8 
+  ny = 8
   nz = 4
 []
 
@@ -76,12 +76,13 @@
   nl_rel_tol = 1e-8 #1.0e-10
   nl_abs_tol = 1e-10
 
-  num_steps = 1 
+  num_steps = 1
 []
 
 [Outputs]
   exodus = true
   interval = 1
+  execute_on = 'TIMESTEP_END'
   [./console]
     type = Console
     output_linear = true
