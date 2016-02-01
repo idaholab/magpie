@@ -1,6 +1,6 @@
 [submodule "contrib/spparks"]
 	path = contrib/spparks
-	url = https://hpcgitlab.inl.gov/schwd/spparks.git
+	url = https://github.com/idaholab/spparks.git
 [submodule "contrib/mytrim"]
 	path = contrib/mytrim
 	url = http://github.com/idaholab/mytrim.git
