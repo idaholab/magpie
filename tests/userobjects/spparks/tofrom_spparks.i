@@ -82,6 +82,7 @@
 [Outputs]
   exodus = true
   interval = 1
+  execute_on = 'TIMESTEP_END'
   [./console]
     type = Console
     output_linear = true
