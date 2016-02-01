@@ -13,7 +13,7 @@
 
 namespace MagpieUtils {
 
-inline Point randomElementPoint(const Elem & el, const Point & rnd)
+Point randomElementPoint(const Elem & el, const Point & rnd)
 {
   FEType fe_type(el.default_order());
 
