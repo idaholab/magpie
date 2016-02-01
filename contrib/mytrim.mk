@@ -3,7 +3,7 @@
 ###############################################################################
 
 # source files
-mytrim_srcfiles := $(shell find $(MYTRIM_DIR) -maxdepth 1 -name "*.C" -not -path */mytrim/apps/*)
+mytrim_srcfiles := $(shell find $(MYTRIM_DIR) -maxdepth 1 -name "*.C" -not -path "*/mytrim/apps/*")
 
 app_HEADERS := $(shell find $(MYTRIM_DIR) -maxdepth 1 -name "*.h")
 
