@@ -81,17 +81,12 @@ MyTRIMRun::execute()
     pka = new MyTRIM_NS::ionBase;
     pka->gen = 0;  // generation (0 = PKA)
     pka->tag = 0; // tag holds the element type
-    pka->z1 = 20;
-    pka->m1 = 40;
+    pka->_Z = 20;
+    pka->_m = 40;
     pka->e  = 3000;
 
-    pka->dir[0] = 0.0;
-    pka->dir[1] = 1.0;
-    pka->dir[2] = 0.0;
-
-    pka->pos[0] = 0;
-    pka->pos[1] = 0.01;
-    pka->pos[2] = 0;
+    pka->pos = Point(0, 0.01, 0);
+    pka->dir = Point(0, 1, 0);
 
     pka->set_ef();
     recoils.push(pka);
@@ -103,18 +98,19 @@ MyTRIMRun::execute()
     recoils.pop();
     sample.averages(pka);
 
-    pka->pos[2] = 0.0;
-    pka->dir[2] = 0.0;
+    // project into xy plane
+    pka->pos(2) = 0.0;
+    pka->dir(2) = 0.0;
 
     // follow this ion's trajectory and store recoils
     TRIM.trim(pka, recoils);
-    // Moose::out << "PKA at " << pka->pos[0]<< ' ' << pka->pos[1] << ' ' << pka->pos[2] << ' ' << vac.size() << '\n';
+    // Moose::out << "PKA at " << pka->pos(0) << ' ' << pka->pos(1) << ' ' << pka->pos(2) << ' ' << vac.size() << '\n';
 
     // store interstitials
     if (pka->tag >= 0)
     {
       // locate element the interstitial is deposited in
-      Point p(pka->pos[0], pka->pos[1], _dim == 2 ? 0.0 : pka->pos[2]);
+      Point p(pka->pos(0), pka->pos(1), _dim == 2 ? 0.0 : pka->pos(2));
       addInterstitialToResult(p, pka->tag);
     }
 
