@@ -19,6 +19,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addCoupledVar("var", "Variables to rasterize");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
+  params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // we run this object once a timestep
   setup_options = "timestep_begin";
@@ -31,10 +32,16 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _nvars(coupledComponents("var")),
     _trim_mass(getParam<std::vector<Real> >("M")),
     _trim_charge(getParam<std::vector<Real> >("Z")),
-    _var(_nvars)
+    _var(_nvars),
+    _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
+    _pka_generators(_pka_generator_names.size()),
+    _periodic(coupled("var", 0))
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
+
+  for (unsigned int i = 0; i < _pka_generator_names.size(); ++i)
+    _pka_generators[i] = &getUserObjectByName<PKAGeneratorBase>(_pka_generator_names[i]);
 
   if (_nvars == 0)
     mooseError("Must couple variables to MyTRIMRasterier.");
@@ -44,10 +51,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   if (_trim_charge.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
-  _periodic = coupled("var", 0);
-
   if (_app.n_processors() > 1)
-    mooseError("Parallel communication is not yet implemented. Waiting on libmesh/#748.");
+    mooseError("Parallel communication is not yet implemented.");
 }
 
 bool
@@ -62,7 +67,10 @@ MyTRIMRasterizer::initialize()
   _execute_this_timestep = executeThisTimestep();
 
   if (_execute_this_timestep)
+  {
     _material_map.clear();
+    _pka_list.clear();
+  }
 }
 
 void
@@ -92,6 +100,10 @@ MyTRIMRasterizer::execute()
 
   // store in map
   _material_map[_current_elem->id()] = elements;
+
+  // add PKAs for current element
+  for (unsigned int i = 0; i < _pka_generators.size(); ++i)
+    _pka_generators[i]->appendPKAs(_pka_list, /* time */ 1.0, vol);
 }
 
 void

@@ -8,6 +8,7 @@
 #define MYTRIMRASTERIZER_H
 
 #include "ElementUserObject.h"
+#include "PKAGeneratorBase.h"
 
 #include <map>
 #include <vector>
@@ -50,7 +51,7 @@ public:
 
 protected:
   /// number of coupled variables to map
-  unsigned int _nvars;
+  const unsigned int _nvars;
 
   ///@{ Element data
   std::vector<Real> _trim_mass;
@@ -58,14 +59,22 @@ protected:
   ///@}
 
   /// coupled variable values
-  std::vector<VariableValue *> _var;
+  std::vector<const VariableValue *> _var;
+
+  /// @{ PKA generators
+  const std::vector<UserObjectName> _pka_generator_names;
+  std::vector<const PKAGeneratorBase *> _pka_generators;
+  /// @}
 
   /// material map for the TRIM simulation
   typedef std::map<dof_id_type, std::vector<Real> > MaterialMap;
   MaterialMap _material_map;
 
   /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
-  int _periodic;
+  const int _periodic;
+
+  /// cumulative PKA list
+  std::vector<MyTRIM_NS::ionBase> _pka_list;
 
 private:
   bool _execute_this_timestep;
