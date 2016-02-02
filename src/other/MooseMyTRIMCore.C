@@ -1,10 +1,10 @@
 #include "MooseMyTRIMCore.h"
 #include "MooseMyTRIMSample.h"
 
-MooseMyTRIMCore::MooseMyTRIMCore(MyTRIM_NS::simconfType * simconf_, MooseMyTRIMSample * sample_, std::vector<std::pair<Point, unsigned int> > & vac) :
-    MyTRIM_NS::trimBase(simconf_, sample_),
+MooseMyTRIMCore::MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample, std::vector<std::pair<Point, unsigned int> > & vac) :
+    MyTRIM_NS::TrimBase(simconf, sample),
     _vac(vac),
-    _dim(sample_->getDim())
+    _dim(sample->getDim())
 {
 }
 

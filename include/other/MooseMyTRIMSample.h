@@ -17,17 +17,17 @@ class MooseMesh;
  * A new MooseMyTRIMSample class has to be constructed for every timestep the
  * TRIM simulation is run if the mesh has changed.
  */
-class MooseMyTRIMSample : public MyTRIM_NS::sampleBase
+class MooseMyTRIMSample : public MyTRIM_NS::SampleBase
 {
 public:
-  MooseMyTRIMSample(const MyTRIMRasterizer &, const MooseMesh &, MyTRIM_NS::simconfType *);
+  MooseMyTRIMSample(const MyTRIMRasterizer &, const MooseMesh &, MyTRIM_NS::SimconfType *);
   virtual ~MooseMyTRIMSample();
 
   /// average crossections for current ion
-  virtual void averages(const MyTRIM_NS::ionBase  * pka);
+  virtual void averages(const MyTRIM_NS::IonBase  * pka);
 
   /// interface called by MyTRIM to look up material data
-  virtual MyTRIM_NS::materialBase* lookupMaterial(Point & pos);
+  virtual MyTRIM_NS::MaterialBase * lookupMaterial(Point & pos);
 
   /// get the simulation dimension
   unsigned int getDim() { return _dim; }
@@ -59,10 +59,10 @@ protected:
   MaterialsCache _materials_cache;
 
   /// current ion (for on-the fly averaging)
-  const MyTRIM_NS::ionBase * _current_ion;
+  const MyTRIM_NS::IonBase * _current_ion;
 
   /// internal state object for the TRIM simulation
-  MyTRIM_NS::simconfType * _simconf;
+  MyTRIM_NS::SimconfType * _simconf;
 };
 
 #endif //MOOSEMYTRIMSAMPLE_H

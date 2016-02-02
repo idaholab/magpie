@@ -17,7 +17,7 @@ PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters &
 }
 
 void
-PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_list, Real dt, Real vol) const
+PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol) const
 {
   mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentEmpirical::appendPKAs");
@@ -30,7 +30,7 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_li
   for (unsigned i = 0; i < num_fission; ++i)
   {
     // each fission event generates a pair of recoils
-    MyTRIM_NS::ionBase ion1, ion2;
+    MyTRIM_NS::IonBase ion1, ion2;
 
     // sample fission fragment masses
     ion1._m = mass_inverter.x(getRandomReal());
@@ -49,8 +49,8 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_li
     ion2._Z = 92 - ion1._Z;
 
     // set stopping criteria
-    ion1.set_ef();
-    ion2.set_ef();
+    ion1.setEf();
+    ion2.setEf();
 
     // set location of the fission event
     setPosition(ion1);

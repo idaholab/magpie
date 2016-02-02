@@ -15,13 +15,13 @@ PKAGeneratorBase::PKAGeneratorBase(const InputParameters & parameters) :
 }
 
 void
-PKAGeneratorBase::setPosition(MyTRIM_NS::ionBase & ion) const
+PKAGeneratorBase::setPosition(MyTRIM_NS::IonBase & ion) const
 {
   ion.pos = MagpieUtils::randomElementPoint(*_current_elem, getRandomPoint());
 }
 
 void
-PKAGeneratorBase::setRandomDirection(MyTRIM_NS::ionBase & ion) const
+PKAGeneratorBase::setRandomDirection(MyTRIM_NS::IonBase & ion) const
 {
   Real size_sq;
 

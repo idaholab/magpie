@@ -74,7 +74,7 @@ protected:
   const int _periodic;
 
   /// cumulative PKA list
-  std::vector<MyTRIM_NS::ionBase> _pka_list;
+  std::vector<MyTRIM_NS::IonBase> _pka_list;
 
 private:
   bool _execute_this_timestep;

@@ -7,12 +7,12 @@
 /**
  * MyTRIM material class that stores element indices as tags
  */
-class MooseMyTRIMMaterial : public MyTRIM_NS::materialBase
+class MooseMyTRIMMaterial : public MyTRIM_NS::MaterialBase
 {
 public:
-  MooseMyTRIMMaterial(MyTRIM_NS::simconfType * simconf_, double rho_);
+  MooseMyTRIMMaterial(MyTRIM_NS::SimconfType * simconf, double rho);
 
-  virtual MyTRIM_NS::elementBase * getElement(unsigned int nn);
+  virtual MyTRIM_NS::ElementBase * getElement(unsigned int nn);
 };
 
 #endif //MOOSEMYTRIMMATERIAL_H

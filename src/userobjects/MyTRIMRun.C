@@ -66,7 +66,7 @@ MyTRIMRun::execute()
   MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
 
   // create a FIFO for recoils
-  std::queue<MyTRIM_NS::ionBase *> recoils;
+  std::queue<MyTRIM_NS::IonBase *> recoils;
 
   // create a list for vacancies created
   std::vector<std::pair<Point, unsigned int> > vac;
@@ -75,10 +75,10 @@ MyTRIMRun::execute()
   MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
 
   // create a bunch of ions
-  MyTRIM_NS::ionBase * pka;
+  MyTRIM_NS::IonBase * pka;
   for (unsigned int i = 0; i < 1000; ++i)
   {
-    pka = new MyTRIM_NS::ionBase;
+    pka = new MyTRIM_NS::IonBase;
     pka->gen = 0;  // generation (0 = PKA)
     pka->tag = 0; // tag holds the element type
     pka->_Z = 20;
@@ -88,7 +88,7 @@ MyTRIMRun::execute()
     pka->pos = Point(0, 0.01, 0);
     pka->dir = Point(0, 1, 0);
 
-    pka->set_ef();
+    pka->setEf();
     recoils.push(pka);
   }
 
