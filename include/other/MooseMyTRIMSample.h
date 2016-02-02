@@ -27,7 +27,7 @@ public:
   virtual void averages(const MyTRIM_NS::ionBase  * pka);
 
   /// interface called by MyTRIM to look up material data
-  virtual MyTRIM_NS::materialBase* lookupMaterial(double * pos);
+  virtual MyTRIM_NS::materialBase* lookupMaterial(Point & pos);
 
   /// get the simulation dimension
   unsigned int getDim() { return _dim; }

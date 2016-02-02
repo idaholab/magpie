@@ -35,10 +35,10 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::ionBase  * pka)
 }
 
 MyTRIM_NS::materialBase *
-MooseMyTRIMSample::lookupMaterial(double * pos)
+MooseMyTRIMSample::lookupMaterial(Point & pos)
 {
   // point to sample the material at
-  Point p(pos[0], pos[1], _dim == 2 ? 0.0 : pos[2]);
+  Point p(pos(0), pos(1), _dim == 2 ? 0.0 : pos(2));
 
   // get element containing the point
   mooseAssert(_pl != NULL, "initialize() must be called on the MooseMyTRIMSample object.");

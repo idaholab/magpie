@@ -12,7 +12,7 @@ void
 MooseMyTRIMCore::vacancyCreation()
 {
   // called if both atoms in the recoil have sufficient energy to leave the site
-  _vac.push_back(std::make_pair(Point(recoil->pos[0], recoil->pos[1], _dim == 2 ? 0.0 :  recoil->pos[2]), recoil->tag));
+  _vac.push_back(std::make_pair(Point(recoil->pos(0), recoil->pos(1), _dim == 2 ? 0.0 :  recoil->pos(2)), recoil->tag));
 }
 
 void
