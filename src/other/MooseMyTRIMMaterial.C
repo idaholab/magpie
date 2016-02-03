@@ -10,5 +10,5 @@ MooseMyTRIMMaterial::getElement(unsigned int nn)
 {
   // store the recoil element index in the tag field
   tag = nn;
-  return element[nn];
+  return _element[nn];
 }

@@ -20,8 +20,8 @@ MooseMyTRIMSample::~MooseMyTRIMSample()
 {
   // delete all elements of the materials in the cache
   for (MaterialsCache::iterator i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
-    for (unsigned int j = 0; j <  i->second.element.size(); ++j)
-      delete i->second.element[j];
+    for (unsigned int j = 0; j <  i->second._element.size(); ++j)
+      delete i->second._element[j];
 }
 
 void
@@ -64,7 +64,7 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
     element->_Z = _trim_mass[i];
     element->_m = _trim_charge[i];
     element->_t = material_data[i];
-    material.element.push_back(element);
+    material._element.push_back(element);
   }
 
   // prepare material
