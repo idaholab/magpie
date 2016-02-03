@@ -61,10 +61,16 @@
     var = c
     M   = 40
     Z   = 20
+    pka_generator = thermal_fission
   [../]
   [./runner]
     type = MyTRIMRun
     rasterizer = rasterizer
+  [../]
+  [./thermal_fission]
+    type = PKAFissionFragmentEmpirical
+    relative_density = 1
+    fission_rate = 0.1
   [../]
 []
 
