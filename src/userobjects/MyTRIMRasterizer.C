@@ -35,7 +35,9 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _var(_nvars),
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
     _pka_generators(_pka_generator_names.size()),
-    _periodic(coupled("var", 0))
+    _periodic(coupled("var", 0)),
+    _last_time(0.0), //TODO: deal with user specified start times!
+    _step_end_time(0.0)
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
@@ -66,10 +68,20 @@ MyTRIMRasterizer::initialize()
 {
   _execute_this_timestep = executeThisTimestep();
 
+  // We reset the time of the last run of the BCMC only if the
+  // preceeding iteration did converge.
+  if (_fe_problem.converged())
+    _last_time = _step_end_time;
+
   if (_execute_this_timestep)
   {
     _material_map.clear();
     _pka_list.clear();
+
+    // Projected time at the end of this step. The total time used to
+    // compute the number of PKAs is the time since the end of the last converged
+    // timestep in which BCMC ran up to the end of the current timestep.
+    _step_end_time = _fe_problem.time() + _fe_problem.dt();
   }
 }
 
@@ -103,7 +115,7 @@ MyTRIMRasterizer::execute()
 
   // add PKAs for current element
   for (unsigned int i = 0; i < _pka_generators.size(); ++i)
-    _pka_generators[i]->appendPKAs(_pka_list, /* time */ 1.0, vol);
+    _pka_generators[i]->appendPKAs(_pka_list, _step_end_time - _last_time, vol);
 }
 
 void
@@ -114,6 +126,7 @@ MyTRIMRasterizer::threadJoin(const UserObject &y)
   {
     const MyTRIMRasterizer & uo = static_cast<const MyTRIMRasterizer &>(y);
     _material_map.insert(uo._material_map.begin(), uo._material_map.end());
+    _pka_list.insert(_pka_list.end(), uo._pka_list.begin(), uo._pka_list.end());
   }
 }
 

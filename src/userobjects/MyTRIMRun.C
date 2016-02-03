@@ -22,11 +22,11 @@ InputParameters validParams<MyTRIMRun>()
   InputParameters params = validParams<GeneralUserObject>();
   params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample");
   params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
-  params.addParam<unsigned int>("num_pka", 1000, "Number of PKAs (cascades) to sample");
-  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
+
   // we run this object once a timestep
-  setup_options = "timestep_begin";
-  params.set<MultiMooseEnum>("execute_on") = setup_options;
+  params.set<MultiMooseEnum>("execute_on") = "timestep_begin";
+  params.suppressParameter<MultiMooseEnum>("execute_on");
+
   return params;
 }
 
@@ -34,7 +34,8 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
     GeneralUserObject(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _nvars(_rasterizer.nVars()),
-    _num_pka(getParam<unsigned int>("num_pka")),
+    _periodic(_rasterizer.periodic()),
+    _pka_list(_rasterizer.getPKAList()),
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
     _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
@@ -74,24 +75,11 @@ MyTRIMRun::execute()
   // use the vacancy mapping TRIM module
   MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
 
-  // create a bunch of ions
+  // copy the pka list into the recoil queue
+  for (unsigned int i = 0; i < _pka_list.size(); ++i)
+    recoils.push(new MyTRIM_NS::IonBase(_pka_list[i]));
+
   MyTRIM_NS::IonBase * pka;
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    pka = new MyTRIM_NS::IonBase;
-    pka->gen = 0;  // generation (0 = PKA)
-    pka->tag = 0; // tag holds the element type
-    pka->_Z = 20;
-    pka->_m = 40;
-    pka->_E  = 3000;
-
-    pka->_pos = Point(0, 0.01, 0);
-    pka->_dir = Point(0, 1, 0);
-
-    pka->setEf();
-    recoils.push(pka);
-  }
-
   while (!recoils.empty())
   {
     pka = recoils.front();
@@ -99,8 +87,11 @@ MyTRIMRun::execute()
     sample.averages(pka);
 
     // project into xy plane
-    pka->_pos(2) = 0.0;
-    pka->_dir(2) = 0.0;
+    if (_dim == 2)
+    {
+      pka->_pos(2) = 0.0;
+      pka->_dir(2) = 0.0;
+    }
 
     // follow this ion's trajectory and store recoils
     TRIM.trim(pka, recoils);

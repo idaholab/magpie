@@ -43,6 +43,9 @@ public:
   // get the charge array
   const std::vector<Real> & charge() const { return _trim_charge; }
 
+  // get the PKA list
+  const std::vector<MyTRIM_NS::IonBase> & getPKAList() const { return _pka_list; }
+
   // get the variable ID of the first coupled variable (to determine the periodicity)
   int periodic() const { return _periodic; }
 
@@ -75,6 +78,12 @@ protected:
 
   /// cumulative PKA list
   std::vector<MyTRIM_NS::IonBase> _pka_list;
+
+  /// last time the BCMC simulation ran
+  Real _last_time;
+
+  /// End time of teh curent step
+  Real _step_end_time;
 
 private:
   bool _execute_this_timestep;
