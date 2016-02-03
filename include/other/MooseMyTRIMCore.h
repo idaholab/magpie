@@ -9,10 +9,10 @@ class MooseMyTRIMSample;
 /**
  * MyTRIM simulation core class
  */
-class MooseMyTRIMCore : public MyTRIM_NS::trimBase
+class MooseMyTRIMCore : public MyTRIM_NS::TrimBase
 {
 public:
-  MooseMyTRIMCore(MyTRIM_NS::simconfType * simconf_, MooseMyTRIMSample * sample_, std::vector<std::pair<Point, unsigned int> > & vac);
+  MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample, std::vector<std::pair<Point, unsigned int> > & vac);
 
   virtual void vacancyCreation();
   virtual void checkPKAState();

@@ -1,8 +1,8 @@
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
 
-MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::simconfType * simconf) :
-    MyTRIM_NS::sampleBase(),
+MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::SimconfType * simconf) :
+    MyTRIM_NS::SampleBase(),
     _rasterizer(rasterizer),
     _nvars(_rasterizer.nVars()),
     _trim_mass(_rasterizer.mass()),
@@ -20,12 +20,12 @@ MooseMyTRIMSample::~MooseMyTRIMSample()
 {
   // delete all elements of the materials in the cache
   for (MaterialsCache::iterator i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
-    for (unsigned int j = 0; j <  i->second.element.size(); ++j)
-      delete i->second.element[j];
+    for (unsigned int j = 0; j <  i->second._element.size(); ++j)
+      delete i->second._element[j];
 }
 
 void
-MooseMyTRIMSample::averages(const MyTRIM_NS::ionBase  * pka)
+MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
 {
   _current_ion = pka;
 
@@ -34,7 +34,7 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::ionBase  * pka)
     i->second.average(pka);
 }
 
-MyTRIM_NS::materialBase *
+MyTRIM_NS::MaterialBase *
 MooseMyTRIMSample::lookupMaterial(Point & pos)
 {
   // point to sample the material at
@@ -60,11 +60,11 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
   // set elements
   for (unsigned int i = 0; i < _nvars; ++i)
   {
-    MyTRIM_NS::elementBase * element = new MyTRIM_NS::elementBase;
-    element->z = _trim_mass[i];
-    element->m = _trim_charge[i];
-    element->t = material_data[i];
-    material.element.push_back(element);
+    MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
+    element->_Z = _trim_mass[i];
+    element->_m = _trim_charge[i];
+    element->_t = material_data[i];
+    material._element.push_back(element);
   }
 
   // prepare material

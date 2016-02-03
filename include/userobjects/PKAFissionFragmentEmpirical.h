@@ -17,7 +17,7 @@ class PKAFissionFragmentEmpirical : public PKAGeneratorBase
 public:
   PKAFissionFragmentEmpirical(const InputParameters & parameters);
 
-  virtual void appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_list, Real dt, Real vol) const;
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol) const;
 
 protected:
   /// Fission rate (per unit volume) assuming pure fully dense UO2
