@@ -17,7 +17,7 @@ PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters &
 }
 
 void
-PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_list, Real dt, Real vol) const
+PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol) const
 {
   mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentEmpirical::appendPKAs");
@@ -30,7 +30,7 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_li
   for (unsigned i = 0; i < num_fission; ++i)
   {
     // each fission event generates a pair of recoils
-    MyTRIM_NS::ionBase ion1, ion2;
+    MyTRIM_NS::IonBase ion1, ion2;
 
     // sample fission fragment masses
     ion1._m = mass_inverter.x(getRandomReal());
@@ -40,8 +40,8 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_li
     MyTRIM_NS::EnergyInverter energy_inverter;
     energy_inverter.setMass(ion1._m);
     Real Etot = energy_inverter.x(getRandomReal()) * 1e6;
-    ion1.e = Etot * ion2._m / (ion1._m + ion2._m);
-    ion2.e = Etot - ion1.e;
+    ion1._E = Etot * ion2._m / (ion1._m + ion2._m);
+    ion2._E = Etot - ion1._E;
 
     // assume p/n ratio like U (Semi-empirical mass formula would be marginally better ~15%,
     // but it is harder to achieve charge neutrality
@@ -49,16 +49,16 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::ionBase> & ion_li
     ion2._Z = 92 - ion1._Z;
 
     // set stopping criteria
-    ion1.set_ef();
-    ion2.set_ef();
+    ion1.setEf();
+    ion2.setEf();
 
     // set location of the fission event
     setPosition(ion1);
-    ion2.pos = ion1.pos;
+    ion2._pos = ion1._pos;
 
     // set random direction for ion 1 and opposite direction for ion 2
     setRandomDirection(ion1);
-    ion2.dir = ion1.dir * -1.0;
+    ion2._dir = -ion1._dir;
 
     // add PKAs to list
     ion_list.push_back(ion1);

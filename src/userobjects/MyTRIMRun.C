@@ -66,7 +66,7 @@ MyTRIMRun::execute()
   MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
 
   // create a FIFO for recoils
-  std::queue<MyTRIM_NS::ionBase *> recoils;
+  std::queue<MyTRIM_NS::IonBase *> recoils;
 
   // create a list for vacancies created
   std::vector<std::pair<Point, unsigned int> > vac;
@@ -75,20 +75,20 @@ MyTRIMRun::execute()
   MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
 
   // create a bunch of ions
-  MyTRIM_NS::ionBase * pka;
+  MyTRIM_NS::IonBase * pka;
   for (unsigned int i = 0; i < 1000; ++i)
   {
-    pka = new MyTRIM_NS::ionBase;
+    pka = new MyTRIM_NS::IonBase;
     pka->gen = 0;  // generation (0 = PKA)
     pka->tag = 0; // tag holds the element type
     pka->_Z = 20;
     pka->_m = 40;
-    pka->e  = 3000;
+    pka->_E  = 3000;
 
-    pka->pos = Point(0, 0.01, 0);
-    pka->dir = Point(0, 1, 0);
+    pka->_pos = Point(0, 0.01, 0);
+    pka->_dir = Point(0, 1, 0);
 
-    pka->set_ef();
+    pka->setEf();
     recoils.push(pka);
   }
 
@@ -99,8 +99,8 @@ MyTRIMRun::execute()
     sample.averages(pka);
 
     // project into xy plane
-    pka->pos(2) = 0.0;
-    pka->dir(2) = 0.0;
+    pka->_pos(2) = 0.0;
+    pka->_dir(2) = 0.0;
 
     // follow this ion's trajectory and store recoils
     TRIM.trim(pka, recoils);
@@ -110,7 +110,7 @@ MyTRIMRun::execute()
     if (pka->tag >= 0)
     {
       // locate element the interstitial is deposited in
-      Point p(pka->pos(0), pka->pos(1), _dim == 2 ? 0.0 : pka->pos(2));
+      Point p(pka->_pos(0), pka->_pos(1), _dim == 2 ? 0.0 : pka->_pos(2));
       addInterstitialToResult(p, pka->tag);
     }
 

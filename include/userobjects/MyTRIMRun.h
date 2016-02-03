@@ -81,7 +81,7 @@ protected:
   const unsigned int _dim;
 
   /// internal TRIM sinulation status object
-  MyTRIM_NS::simconfType _simconf;
+  MyTRIM_NS::SimconfType _simconf;
 
 private:
   /// zero result to return for elements that have not been touched by the cascades
