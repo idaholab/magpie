@@ -101,13 +101,12 @@ MyTRIMRun::execute()
     if (pka->tag >= 0)
     {
       // locate element the interstitial is deposited in
-      Point p(pka->_pos(0), pka->_pos(1), _dim == 2 ? 0.0 : pka->_pos(2));
-      addInterstitialToResult(p, pka->tag);
+      addInterstitialToResult(_rasterizer.periodicPoint(pka->_pos), pka->tag);
     }
 
     // store vacancies
     for (unsigned int i = 0; i < vac.size(); ++i)
-      addVacancyToResult(vac[i].first, vac[i].second);
+      addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
     vac.clear();
 
     // done with this recoil

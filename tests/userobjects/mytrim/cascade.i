@@ -66,6 +66,7 @@
     var = c
     M   = 40
     Z   = 20
+    site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = thermal_fission
   [../]
   [./runner]

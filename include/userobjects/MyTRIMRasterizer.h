@@ -54,6 +54,9 @@ public:
   /// get the variable ID of the first coupled variable (to determine the periodicity)
   int periodic() const { return _periodic; }
 
+  /// returns a point with the periodic boundary conditions applied
+  Point periodicPoint(const Point &) const;
+
   /// get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
 
@@ -68,6 +71,9 @@ public:
 protected:
   /// number of coupled variables to map
   const unsigned int _nvars;
+
+  // dimension of the mesh
+  const unsigned int _dim;
 
   ///@{ Element data
   std::vector<Real> _trim_mass;
@@ -99,8 +105,14 @@ protected:
   /// last time the BCMC simulation ran
   Real _last_time;
 
-  /// End time of teh curent step
+  /// End time of the curent step
   Real _step_end_time;
+
+  /// @{ periodicity data
+  Point _min_dim;
+  Point _max_dim;
+  bool _pbc[LIBMESH_DIM];
+  /// @}
 
 private:
   bool _execute_this_timestep;

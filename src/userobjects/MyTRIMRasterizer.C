@@ -7,6 +7,7 @@
 
 #include "MyTRIMRasterizer.h"
 #include "PKAGeneratorBase.h"
+#include "MooseMesh.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
@@ -32,6 +33,7 @@ InputParameters validParams<MyTRIMRasterizer>()
 MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
+    _dim(_mesh.dimension()),
     _trim_mass(getParam<std::vector<Real> >("M")),
     _trim_charge(getParam<std::vector<Real> >("Z")),
     _var(_nvars),
@@ -58,6 +60,17 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
 
   if (_app.n_processors() > 1)
     mooseError("Parallel communication is not yet implemented.");
+
+  for (unsigned int i = 0; i < _dim; ++i)
+  {
+    _pbc[i] = _mesh.isTranslatedPeriodic(_periodic, i);
+
+    if (_pbc[i])
+    {
+      _min_dim(i) = _mesh.getMinInDimension(i);
+      _max_dim(i) = _mesh.getMaxInDimension(i);
+    }
+  }
 }
 
 bool
@@ -171,4 +184,21 @@ MyTRIMRasterizer::siteVolume(const Elem * elem) const
     mooseError("Element not found in material map.");
 
   return i->second._site_volume;
+}
+
+Point
+MyTRIMRasterizer::periodicPoint(const Point & pos) const
+{
+  // point to sample the material at
+  Point p(pos(0), pos(1), _dim == 2 ? 0.0 : pos(2));
+
+  // apply periodic boundary conditions
+  for (unsigned int i = 0; i < _dim; ++i)
+    if (_pbc[i])
+    {
+      const Real width = _max_dim(i) - _min_dim(i);
+      p(i) -= std::floor((p(i) - _min_dim(i)) / width) * width;
+    }
+
+  return p;
 }

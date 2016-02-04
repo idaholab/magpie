@@ -14,6 +14,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 {
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
+
 }
 
 MooseMyTRIMSample::~MooseMyTRIMSample()
@@ -38,7 +39,7 @@ MyTRIM_NS::MaterialBase *
 MooseMyTRIMSample::lookupMaterial(Point & pos)
 {
   // point to sample the material at
-  Point p(pos(0), pos(1), _dim == 2 ? 0.0 : pos(2));
+  Point p = _rasterizer.periodicPoint(pos);
 
   // get element containing the point
   mooseAssert(_pl != NULL, "initialize() must be called on the MooseMyTRIMSample object.");
