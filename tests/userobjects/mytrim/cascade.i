@@ -56,6 +56,11 @@
 []
 
 [UserObjects]
+  [./thermal_fission]
+    type = PKAFissionFragmentEmpirical
+    relative_density = 1
+    fission_rate = 0.001
+  [../]
   [./rasterizer]
     type = MyTRIMRasterizer
     var = c
@@ -66,11 +71,6 @@
   [./runner]
     type = MyTRIMRun
     rasterizer = rasterizer
-  [../]
-  [./thermal_fission]
-    type = PKAFissionFragmentEmpirical
-    relative_density = 1
-    fission_rate = 0.1
   [../]
 []
 

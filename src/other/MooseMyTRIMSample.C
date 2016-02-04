@@ -55,7 +55,7 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
 
   // otherwise prepare the material using data from the rasterizer
   const std::vector<Real> & material_data = _rasterizer.material(elem);
-  MooseMyTRIMMaterial material(_simconf, 1.0);
+  MooseMyTRIMMaterial material(_simconf);
 
   // set elements
   for (unsigned int i = 0; i < _nvars; ++i)
@@ -66,6 +66,9 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
     element->_t = material_data[i];
     material._element.push_back(element);
   }
+
+  // calculate the density (must happen first!)
+  material.calculateDensity(_rasterizer.siteVolume(elem));
 
   // prepare material
   material.prepare();

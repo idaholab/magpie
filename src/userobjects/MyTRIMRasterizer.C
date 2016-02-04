@@ -6,6 +6,7 @@
 /****************************************************************/
 
 #include "MyTRIMRasterizer.h"
+#include "PKAGeneratorBase.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
@@ -19,6 +20,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addCoupledVar("var", "Variables to rasterize");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
+  params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");
   params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // we run this object once a timestep
@@ -33,6 +35,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _trim_mass(getParam<std::vector<Real> >("M")),
     _trim_charge(getParam<std::vector<Real> >("Z")),
     _var(_nvars),
+    _site_volume_prop(getMaterialProperty<Real>("site_volume")),
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
     _pka_generators(_pka_generator_names.size()),
     _periodic(coupled("var", 0)),
@@ -93,7 +96,8 @@ MyTRIMRasterizer::execute()
     return;
 
   // average element concentrations
-  std::vector<Real> elements(_nvars, 0.0);
+
+  AveragedData average(_nvars);
   Real vol = 0.0;
 
   // average material data over elements
@@ -101,21 +105,30 @@ MyTRIMRasterizer::execute()
   {
     const Real qpvol = _JxW[qp] * _coord[qp];
     vol += qpvol;
+
+    // average compositions on the element
     for (unsigned int i = 0; i < _nvars; ++i)
-      elements[i] += qpvol * (*_var[i])[qp];
+      average._elements[i] += qpvol * (*_var[i])[qp];
+
+    // average site volume property
+    average._site_volume += qpvol * _site_volume_prop[qp];
   }
 
   // divide by total element volume
   if (vol > 0.0)
+  {
     for (unsigned int i = 0; i < _nvars; ++i)
-      elements[i] /= vol;
+      average._elements[i] /= vol;
+
+    average._site_volume /= vol;
+  }
 
   // store in map
-  _material_map[_current_elem->id()] = elements;
+  _material_map[_current_elem->id()] = average;
 
   // add PKAs for current element
   for (unsigned int i = 0; i < _pka_generators.size(); ++i)
-    _pka_generators[i]->appendPKAs(_pka_list, _step_end_time - _last_time, vol);
+    _pka_generators[i]->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
 }
 
 void
@@ -145,5 +158,17 @@ MyTRIMRasterizer::material(const Elem * elem) const
   if (i == _material_map.end())
     mooseError("Element not found in material map.");
 
-  return i->second;
+  return i->second._elements;
+}
+
+Real
+MyTRIMRasterizer::siteVolume(const Elem * elem) const
+{
+  MaterialMap::const_iterator i = _material_map.find(elem->id());
+
+  // there should be data for every element in the mesh
+  if (i == _material_map.end())
+    mooseError("Element not found in material map.");
+
+  return i->second._site_volume;
 }

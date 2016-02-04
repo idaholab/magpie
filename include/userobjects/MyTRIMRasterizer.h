@@ -8,12 +8,14 @@
 #define MYTRIMRASTERIZER_H
 
 #include "ElementUserObject.h"
-#include "PKAGeneratorBase.h"
 
 #include <map>
 #include <vector>
 
+#include "mytrim/ion.h"
+
 class MyTRIMRasterizer;
+class PKAGeneratorBase;
 
 template<>
 InputParameters validParams<MyTRIMRasterizer>();
@@ -34,23 +36,34 @@ public:
   virtual void threadJoin(const UserObject & y);
   virtual void finalize();
 
-  // get the concentration array
+  /// get the concentration array
   const std::vector<Real> & material(const Elem *) const;
 
-  // get the mass array
+  /// get the site volume
+  Real siteVolume(const Elem *) const;
+
+  /// get the mass array
   const std::vector<Real> & mass() const { return _trim_mass; }
 
-  // get the charge array
+  /// get the charge array
   const std::vector<Real> & charge() const { return _trim_charge; }
 
-  // get the PKA list
+  /// get the PKA list
   const std::vector<MyTRIM_NS::IonBase> & getPKAList() const { return _pka_list; }
 
-  // get the variable ID of the first coupled variable (to determine the periodicity)
+  /// get the variable ID of the first coupled variable (to determine the periodicity)
   int periodic() const { return _periodic; }
 
-  // get the number of elements in the TRIM simulation
+  /// get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
+
+  /// element averaged data
+  struct AveragedData {
+    AveragedData(unsigned int nvars = 0) : _elements(nvars, 0.0), _site_volume(0.0) {}
+
+    std::vector<Real> _elements;
+    Real _site_volume;
+  };
 
 protected:
   /// number of coupled variables to map
@@ -64,14 +77,18 @@ protected:
   /// coupled variable values
   std::vector<const VariableValue *> _var;
 
+  /// lattice site volume material property
+  const MaterialProperty<Real> & _site_volume_prop;
+
   /// @{ PKA generators
   const std::vector<UserObjectName> _pka_generator_names;
   std::vector<const PKAGeneratorBase *> _pka_generators;
   /// @}
 
-  /// material map for the TRIM simulation
-  typedef std::map<dof_id_type, std::vector<Real> > MaterialMap;
+  /// @{ material map for the TRIM simulation
+  typedef std::map<dof_id_type, AveragedData> MaterialMap;
   MaterialMap _material_map;
+  /// @}
 
   /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
   const int _periodic;
