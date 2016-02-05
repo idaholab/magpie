@@ -79,6 +79,8 @@ MyTRIMRun::execute()
   for (unsigned int i = 0; i < _pka_list.size(); ++i)
     recoils.push(new MyTRIM_NS::IonBase(_pka_list[i]));
 
+  Moose::out << "Running " << _pka_list.size() << " recoils.\n";
+
   MyTRIM_NS::IonBase * pka;
   while (!recoils.empty())
   {
@@ -94,8 +96,8 @@ MyTRIMRun::execute()
     }
 
     // follow this ion's trajectory and store recoils
+    // Moose::out << "PKA " << ::round(pka->_E) << "eV (" << pka->_Ef << "eV) at " << pka->_pos(0) << ' ' << pka->_pos(1) << ' ' << pka->_pos(2) << ' ' << vac.size() << '\n';
     TRIM.trim(pka, recoils);
-    // Moose::out << "PKA at " << pka->pos(0) << ' ' << pka->pos(1) << ' ' << pka->pos(2) << ' ' << vac.size() << '\n';
 
     // store interstitials
     if (pka->tag >= 0)
@@ -163,7 +165,7 @@ void
 MyTRIMRun::addDefectToResult(const Point & p, unsigned int var, MyTRIMRun::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
-  if (elem != NULL)
+  if (elem != NULL && var < _nvars)
   {
     // store into _result_map
     MyTRIMResultMap::iterator i = _result_map.find(elem->id());
