@@ -6,6 +6,8 @@
 /****************************************************************/
 
 #include "MyTRIMRasterizer.h"
+#include "PKAGeneratorBase.h"
+#include "MooseMesh.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
@@ -19,6 +21,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addCoupledVar("var", "Variables to rasterize");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
+  params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");
   params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // we run this object once a timestep
@@ -30,12 +33,16 @@ InputParameters validParams<MyTRIMRasterizer>()
 MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
+    _dim(_mesh.dimension()),
     _trim_mass(getParam<std::vector<Real> >("M")),
     _trim_charge(getParam<std::vector<Real> >("Z")),
     _var(_nvars),
+    _site_volume_prop(getMaterialProperty<Real>("site_volume")),
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
     _pka_generators(_pka_generator_names.size()),
-    _periodic(coupled("var", 0))
+    _periodic(coupled("var", 0)),
+    _last_time(0.0), //TODO: deal with user specified start times!
+    _step_end_time(0.0)
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
@@ -53,6 +60,17 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
 
   if (_app.n_processors() > 1)
     mooseError("Parallel communication is not yet implemented.");
+
+  for (unsigned int i = 0; i < _dim; ++i)
+  {
+    _pbc[i] = _mesh.isTranslatedPeriodic(_periodic, i);
+
+    if (_pbc[i])
+    {
+      _min_dim(i) = _mesh.getMinInDimension(i);
+      _max_dim(i) = _mesh.getMaxInDimension(i);
+    }
+  }
 }
 
 bool
@@ -66,10 +84,20 @@ MyTRIMRasterizer::initialize()
 {
   _execute_this_timestep = executeThisTimestep();
 
+  // We reset the time of the last run of the BCMC only if the
+  // preceeding iteration did converge.
+  if (_fe_problem.converged())
+    _last_time = _step_end_time;
+
   if (_execute_this_timestep)
   {
     _material_map.clear();
     _pka_list.clear();
+
+    // Projected time at the end of this step. The total time used to
+    // compute the number of PKAs is the time since the end of the last converged
+    // timestep in which BCMC ran up to the end of the current timestep.
+    _step_end_time = _fe_problem.time() + _fe_problem.dt();
   }
 }
 
@@ -81,7 +109,8 @@ MyTRIMRasterizer::execute()
     return;
 
   // average element concentrations
-  std::vector<Real> elements(_nvars, 0.0);
+
+  AveragedData average(_nvars);
   Real vol = 0.0;
 
   // average material data over elements
@@ -89,21 +118,30 @@ MyTRIMRasterizer::execute()
   {
     const Real qpvol = _JxW[qp] * _coord[qp];
     vol += qpvol;
+
+    // average compositions on the element
     for (unsigned int i = 0; i < _nvars; ++i)
-      elements[i] += qpvol * (*_var[i])[qp];
+      average._elements[i] += qpvol * (*_var[i])[qp];
+
+    // average site volume property
+    average._site_volume += qpvol * _site_volume_prop[qp];
   }
 
   // divide by total element volume
   if (vol > 0.0)
+  {
     for (unsigned int i = 0; i < _nvars; ++i)
-      elements[i] /= vol;
+      average._elements[i] /= vol;
+
+    average._site_volume /= vol;
+  }
 
   // store in map
-  _material_map[_current_elem->id()] = elements;
+  _material_map[_current_elem->id()] = average;
 
   // add PKAs for current element
   for (unsigned int i = 0; i < _pka_generators.size(); ++i)
-    _pka_generators[i]->appendPKAs(_pka_list, /* time */ 1.0, vol);
+    _pka_generators[i]->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
 }
 
 void
@@ -114,6 +152,7 @@ MyTRIMRasterizer::threadJoin(const UserObject &y)
   {
     const MyTRIMRasterizer & uo = static_cast<const MyTRIMRasterizer &>(y);
     _material_map.insert(uo._material_map.begin(), uo._material_map.end());
+    _pka_list.insert(_pka_list.end(), uo._pka_list.begin(), uo._pka_list.end());
   }
 }
 
@@ -132,5 +171,34 @@ MyTRIMRasterizer::material(const Elem * elem) const
   if (i == _material_map.end())
     mooseError("Element not found in material map.");
 
-  return i->second;
+  return i->second._elements;
+}
+
+Real
+MyTRIMRasterizer::siteVolume(const Elem * elem) const
+{
+  MaterialMap::const_iterator i = _material_map.find(elem->id());
+
+  // there should be data for every element in the mesh
+  if (i == _material_map.end())
+    mooseError("Element not found in material map.");
+
+  return i->second._site_volume;
+}
+
+Point
+MyTRIMRasterizer::periodicPoint(const Point & pos) const
+{
+  // point to sample the material at
+  Point p(pos(0), pos(1), _dim == 2 ? 0.0 : pos(2));
+
+  // apply periodic boundary conditions
+  for (unsigned int i = 0; i < _dim; ++i)
+    if (_pbc[i])
+    {
+      const Real width = _max_dim(i) - _min_dim(i);
+      p(i) -= std::floor((p(i) - _min_dim(i)) / width) * width;
+    }
+
+  return p;
 }

@@ -14,6 +14,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 {
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
+
 }
 
 MooseMyTRIMSample::~MooseMyTRIMSample()
@@ -38,7 +39,7 @@ MyTRIM_NS::MaterialBase *
 MooseMyTRIMSample::lookupMaterial(Point & pos)
 {
   // point to sample the material at
-  Point p(pos(0), pos(1), _dim == 2 ? 0.0 : pos(2));
+  Point p = _rasterizer.periodicPoint(pos);
 
   // get element containing the point
   mooseAssert(_pl != NULL, "initialize() must be called on the MooseMyTRIMSample object.");
@@ -55,7 +56,7 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
 
   // otherwise prepare the material using data from the rasterizer
   const std::vector<Real> & material_data = _rasterizer.material(elem);
-  MooseMyTRIMMaterial material(_simconf, 1.0);
+  MooseMyTRIMMaterial material(_simconf);
 
   // set elements
   for (unsigned int i = 0; i < _nvars; ++i)
@@ -66,6 +67,9 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
     element->_t = material_data[i];
     material._element.push_back(element);
   }
+
+  // calculate the density (must happen first!)
+  material.calculateDensity(_rasterizer.siteVolume(elem));
 
   // prepare material
   material.prepare();
