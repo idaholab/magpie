@@ -10,6 +10,7 @@
 // UserObjects
 #include "MyTRIMRasterizer.h"
 #include "MyTRIMRun.h"
+#include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
 #include "SPPARKSUserObject.h"
 
@@ -54,6 +55,7 @@ MagpieApp::registerObjects(Factory & factory)
 
   registerUserObject(MyTRIMRasterizer);
   registerUserObject(MyTRIMRun);
+  registerUserObject(PKAConstant);
   registerUserObject(PKAFissionFragmentEmpirical);
   registerUserObject(SPPARKSUserObject);
 }
