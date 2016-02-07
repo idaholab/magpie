@@ -2,6 +2,7 @@
 #define PKAGENERATORBASE_H
 
 #include "DiscreteElementUserObject.h"
+#include "MyTRIMRasterizer.h"
 #include "mytrim/ion.h"
 
 class PKAGeneratorBase;
@@ -22,7 +23,7 @@ public:
    * Append the ions for the current element and time window dt.
    * The element volume is passed in as it is computed in the MyTRIMRasterizer anyways.
    */
-  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol) const = 0;
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const = 0;
 
   virtual void initialize() {}
 

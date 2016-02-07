@@ -1,4 +1,5 @@
 #include "PKAFissionFragmentEmpirical.h"
+#include "MyTRIMRasterizer.h"
 
 template<>
 InputParameters validParams<PKAFissionFragmentEmpirical>()
@@ -17,7 +18,7 @@ PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters &
 }
 
 void
-PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol) const
+PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const
 {
   mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentEmpirical::appendPKAs");

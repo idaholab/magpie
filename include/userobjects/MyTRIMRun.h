@@ -69,7 +69,7 @@ protected:
   int _periodic;
 
   /// number of primary knock-on atoms (PKA) to simulate
-  const unsigned int _num_pka;
+  const std::vector<MyTRIM_NS::IonBase> & _pka_list;
 
   /// The Mesh we're using
   MooseMesh & _mesh;
