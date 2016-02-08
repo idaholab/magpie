@@ -24,6 +24,7 @@ protected:
   const unsigned int _defect;
 
 private:
+  /// calculate values only for qp 0 and cache them here
   Real _value_cache;
 };
 

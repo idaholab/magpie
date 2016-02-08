@@ -1,0 +1,7 @@
+[Tests]
+  [./density]
+    type = 'Exodiff'
+    input = 'density.i'
+    exodiff = 'density_out.e'
+  [../]
+[]
