@@ -62,8 +62,8 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
   for (unsigned int i = 0; i < _nvars; ++i)
   {
     MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
-    element->_Z = _trim_mass[i];
-    element->_m = _trim_charge[i];
+    element->_Z = _trim_charge[i];
+    element->_m = _trim_mass[i];
     element->_t = material_data[i];
     material._element.push_back(element);
   }
