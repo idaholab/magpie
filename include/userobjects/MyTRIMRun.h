@@ -80,7 +80,7 @@ protected:
   /// dimension of the mesh
   const unsigned int _dim;
 
-  /// internal TRIM sinulation status object
+  /// internal TRIM simulation status object
   MyTRIM_NS::SimconfType _simconf;
 
 private:

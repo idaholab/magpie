@@ -5,6 +5,7 @@
 
 // AuxKernels
 #include "MyTRIMAux.h"
+#include "MyTRIMDensityAux.h"
 #include "SPPARKSAux.h"
 
 // UserObjects
@@ -51,6 +52,7 @@ void
 MagpieApp::registerObjects(Factory & factory)
 {
   registerAux(MyTRIMAux);
+  registerAux(MyTRIMDensityAux);
   registerAux(SPPARKSAux);
 
   registerUserObject(MyTRIMRasterizer);
