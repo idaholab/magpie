@@ -9,6 +9,7 @@
 #include "SPPARKSAux.h"
 
 // Kernels
+#include "DefectAnnihilation.h"
 #include "MyTRIMSource.h"
 
 // UserObjects
@@ -58,6 +59,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerAux(MyTRIMResultAux);
   registerAux(SPPARKSAux);
 
+  registerKernel(DefectAnnihilation);
   registerKernel(MyTRIMSource);
 
   registerUserObject(MyTRIMRasterizer);
