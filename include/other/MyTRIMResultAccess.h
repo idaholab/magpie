@@ -29,11 +29,11 @@ private:
 template <class T>
 MyTRIMResultAccess<T>::MyTRIMResultAccess(const InputParameters & parameters) :
     T(parameters),
-    _mytrim(getUserObject<MyTRIMRun>("runner")),
-    _ivar(getParam<unsigned int>("ivar")),
-    _defect(getParam<MooseEnum>("defect"))
+    _mytrim(this->template getUserObject<MyTRIMRun>("runner")),
+    _ivar(this->template getParam<unsigned int>("ivar")),
+    _defect(this->template getParam<MooseEnum>("defect"))
 {
-  if (isNodal())
+  if (this->isNodal())
     mooseError("MyTRIMResultAccess needs to be applied to an elemental AuxVariable.");
 
   if (_ivar >= _mytrim.nVars())
@@ -52,10 +52,11 @@ MyTRIMResultAccess<T>::validParams()
   return params;
 }
 
+template<typename T>
 Real
 MyTRIMResultAccess<T>::getDefectRate()
 {
-  if (_qp == 0)
+  if (this->_qp == 0)
   {
     const MyTRIMRun::MyTRIMResult & result = _mytrim.result(this->_current_elem);
     mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
