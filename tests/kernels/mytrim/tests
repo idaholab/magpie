@@ -1,0 +1,7 @@
+[Tests]
+  [./defectannihilation]
+    type = 'Exodiff'
+    input = 'defectannihilation.i'
+    exodiff = 'defectannihilation_out.e'
+  [../]
+[]
