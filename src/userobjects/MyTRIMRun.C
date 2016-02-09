@@ -7,8 +7,6 @@
 
 #include "MyTRIMRun.h"
 #include "MooseMesh.h"
-#include "MooseMyTRIMCore.h"
-#include "MooseMyTRIMSample.h"
 
 // libmesh includes
 #include "libmesh/quadrature.h"
@@ -34,7 +32,6 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
     GeneralUserObject(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _nvars(_rasterizer.nVars()),
-    _periodic(_rasterizer.periodic()),
     _pka_list(_rasterizer.getPKAList()),
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
@@ -60,60 +57,22 @@ MyTRIMRun::execute()
   if (!_rasterizer.executeThisTimestep())
     return;
 
-  // refresh point locator in case the mesh has changed
-  _pl = _mesh.getMesh().sub_point_locator();
+  // trigger the creation of a master PointLocatior outside the threaded region
+  _mesh.getMesh().sub_point_locator();
 
-  // create a new sample class to bridge the MOOSE mesh and the MyTRIM domain
-  MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
+  // build thread loop functor
+  MooseMyTRIMThreadedRecoilLoop rl(_rasterizer, _mesh);
 
-  // create a FIFO for recoils
-  std::queue<MyTRIM_NS::IonBase *> recoils;
+  // output the number of recoils being launched
+  _console << "\nMyTRIM: Running " << _pka_list.size() << " recoils." << std::endl;
 
-  // create a list for vacancies created
-  std::vector<std::pair<Point, unsigned int> > vac;
+  // run threads
+  Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");
+  Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
+  Moose::perf_log.pop("MyTRIMRecoilLoop", "Solve");
 
-  // use the vacancy mapping TRIM module
-  MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
-
-  // copy the pka list into the recoil queue
-  for (unsigned int i = 0; i < _pka_list.size(); ++i)
-    recoils.push(new MyTRIM_NS::IonBase(_pka_list[i]));
-
-  Moose::out << "Running " << _pka_list.size() << " recoils.\n";
-
-  MyTRIM_NS::IonBase * pka;
-  while (!recoils.empty())
-  {
-    pka = recoils.front();
-    recoils.pop();
-    sample.averages(pka);
-
-    // project into xy plane
-    if (_dim == 2)
-    {
-      pka->_pos(2) = 0.0;
-      pka->_dir(2) = 0.0;
-    }
-
-    // follow this ion's trajectory and store recoils
-    // Moose::out << "PKA " << ::round(pka->_E) << "eV (" << pka->_Ef << "eV) at " << pka->_pos(0) << ' ' << pka->_pos(1) << ' ' << pka->_pos(2) << ' ' << vac.size() << '\n';
-    TRIM.trim(pka, recoils);
-
-    // store interstitials
-    if (pka->tag >= 0)
-    {
-      // locate element the interstitial is deposited in
-      addInterstitialToResult(_rasterizer.periodicPoint(pka->_pos), pka->tag);
-    }
-
-    // store vacancies
-    for (unsigned int i = 0; i < vac.size(); ++i)
-      addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
-    vac.clear();
-
-    // done with this recoil
-    delete pka;
-  }
+  // fetch the joined data from thread 0
+  _result_map = rl.getResultMap();
 }
 
 void
@@ -159,32 +118,4 @@ MyTRIMRun::result(const Elem * elem) const
     return _zero;
 
   return i->second;
-}
-
-void
-MyTRIMRun::addDefectToResult(const Point & p, unsigned int var, MyTRIMRun::DefectType type)
-{
-  const Elem * elem = (*_pl)(p);
-  if (elem != NULL && var < _nvars)
-  {
-    // store into _result_map
-    MyTRIMResultMap::iterator i = _result_map.find(elem->id());
-    if (i == _result_map.end())
-      i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
-
-    // increase the interstitial counter for the tagged element
-    switch (type)
-    {
-      case VACANCY:
-        i->second[var].first += 1.0;
-        break;
-
-      case INTERSTITIAL:
-        i->second[var].second += 1.0;
-        break;
-
-      default:
-        mooseError("Internal error");
-    }
-  }
 }

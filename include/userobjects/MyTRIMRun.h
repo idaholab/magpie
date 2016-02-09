@@ -9,7 +9,7 @@
 
 #include "GeneralUserObject.h"
 #include "MyTRIMRasterizer.h"
-#include "mytrim/material.h"
+#include "MooseMyTRIMThreadedRecoilLoop.h"
 
 #include <map>
 #include <vector>
@@ -32,12 +32,10 @@ public:
   virtual void execute();
   virtual void finalize();
 
-  /**
-   * result data map for the TRIM simulation holding interstitial/vacancy pairs
-   * for each species in the rasterizer.
-   */
-  typedef std::vector<std::pair<Real, Real> > MyTRIMResult;
-  typedef std::map<dof_id_type, MyTRIMResult> MyTRIMResultMap;
+  /// @{ shorthand typedefs
+  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResult MyTRIMResult;
+  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResultMap MyTRIMResultMap;
+  /// @}
 
   /// get the TRIM result data
   const MyTRIMResult & result(const Elem *) const;
@@ -46,16 +44,6 @@ public:
   unsigned int nVars() const { return _nvars; }
 
 protected:
-  /// defect type enum
-  enum DefectType { VACANCY, INTERSTITIAL };
-
-  /// add an interstitial or vacancy to the result list
-  void addDefectToResult(const Point & p, unsigned int var, DefectType type);
-  /// add an interstitial to the result list
-  void addInterstitialToResult(const Point & p, unsigned int var) { addDefectToResult(p, var, INTERSTITIAL); }
-  /// add a vacancy to the result list
-  void addVacancyToResult(const Point & p, unsigned int var) { addDefectToResult(p, var, VACANCY); }
-
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultMap _result_map;
 
@@ -65,23 +53,14 @@ protected:
   /// number of elements in the TRIM simulation
   int _nvars;
 
-  /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
-  int _periodic;
-
   /// number of primary knock-on atoms (PKA) to simulate
   const std::vector<MyTRIM_NS::IonBase> & _pka_list;
 
   /// The Mesh we're using
   MooseMesh & _mesh;
 
-  /// point locator to use
-  UniquePtr<PointLocatorBase> _pl;
-
   /// dimension of the mesh
   const unsigned int _dim;
-
-  /// internal TRIM simulation status object
-  MyTRIM_NS::SimconfType _simconf;
 
 private:
   /// zero result to return for elements that have not been touched by the cascades
