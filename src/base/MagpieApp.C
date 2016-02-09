@@ -4,9 +4,13 @@
 #include "AppFactory.h"
 
 // AuxKernels
-#include "MyTRIMAux.h"
 #include "MyTRIMDensityAux.h"
+#include "MyTRIMResultAux.h"
 #include "SPPARKSAux.h"
+
+// Kernels
+#include "DefectAnnihilation.h"
+#include "MyTRIMSource.h"
 
 // UserObjects
 #include "MyTRIMRasterizer.h"
@@ -51,9 +55,12 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
-  registerAux(MyTRIMAux);
   registerAux(MyTRIMDensityAux);
+  registerAux(MyTRIMResultAux);
   registerAux(SPPARKSAux);
+
+  registerKernel(DefectAnnihilation);
+  registerKernel(MyTRIMSource);
 
   registerUserObject(MyTRIMRasterizer);
   registerUserObject(MyTRIMRun);
