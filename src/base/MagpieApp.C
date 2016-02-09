@@ -4,8 +4,8 @@
 #include "AppFactory.h"
 
 // AuxKernels
-#include "MyTRIMAux.h"
 #include "MyTRIMDensityAux.h"
+#include "MyTRIMResultAux.h"
 #include "SPPARKSAux.h"
 
 // UserObjects
@@ -51,8 +51,8 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
-  registerAux(MyTRIMAux);
   registerAux(MyTRIMDensityAux);
+  registerAux(MyTRIMResultAux);
   registerAux(SPPARKSAux);
 
   registerUserObject(MyTRIMRasterizer);
