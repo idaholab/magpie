@@ -43,7 +43,7 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
 
   // copy the pka list into the recoil queue
   PKARange::const_iterator i = pka_list.begin();
-  for (; i < pka_list.end(); ++i)
+  for (; i != pka_list.end(); ++i)
     recoils.push(new MyTRIM_NS::IonBase(*i));
 
   MyTRIM_NS::IonBase * pka;
@@ -65,7 +65,7 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
     TRIM.trim(pka, recoils);
 
     // store interstitials
-    if (pka->tag >= 0)
+    if (pka->tag >= 0 && pka->state == MyTRIM_NS::IonBase::INTERSTITIAL)
     {
       // locate element the interstitial is deposited in
       addInterstitialToResult(_rasterizer.periodicPoint(pka->_pos), pka->tag);
