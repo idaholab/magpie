@@ -63,7 +63,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
 
   for (unsigned int i = 0; i < _dim; ++i)
   {
-    _pbc[i] = _mesh.isTranslatedPeriodic(_periodic, i);
+    _pbc[i] = _mesh.isRegularOrthogonal() && _mesh.isTranslatedPeriodic(_periodic, i);
 
     if (_pbc[i])
     {
