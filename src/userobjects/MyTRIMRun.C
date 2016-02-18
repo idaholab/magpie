@@ -46,8 +46,14 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
 
-  if (_dim == 2 && (_mesh.getMinInDimension(2) < 0.0 || _mesh.getMaxInDimension(2) > 0.0))
-    mooseError("Two dimensional meshes must lie in the z=0 plane.");
+  if (_dim == 2)
+  {
+    // make sure all nodes lie in the xy-plane
+    const MeshBase::node_iterator nd_end = _mesh.getMesh().nodes_end();
+    for (MeshBase::node_iterator nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
+      if ((**nd)(2) != 0.0)
+        mooseError("Two dimensional meshes must lie in the z=0 plane.");
+  }
 }
 
 void
