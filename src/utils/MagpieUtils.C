@@ -68,7 +68,7 @@ Point randomElementPoint(const Elem & el, const Point & rnd)
 
       // internal tet pair
       {
-        double s = (ref.size_sq() - 1) / 2.0;
+        Real s = (ref.norm_sq() - 1) / 2.0;
         ref -= Point(s, s, s);
       }
       break;
