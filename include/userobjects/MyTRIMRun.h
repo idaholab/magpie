@@ -44,6 +44,11 @@ public:
   unsigned int nVars() const { return _nvars; }
 
 protected:
+  ///@{ pack/unpack the _result_map into a structure suitable for parallel communication
+  void serialize(std::string & serialized_buffer);
+  void deserialize(std::vector<std::string> & serialized_buffers);
+  ///@}
+
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultMap _result_map;
 
@@ -51,7 +56,7 @@ protected:
   const MyTRIMRasterizer & _rasterizer;
 
   /// number of elements in the TRIM simulation
-  int _nvars;
+  const unsigned int _nvars;
 
   /// number of primary knock-on atoms (PKA) to simulate
   const std::vector<MyTRIM_NS::IonBase> & _pka_list;

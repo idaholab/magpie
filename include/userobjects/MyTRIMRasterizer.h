@@ -69,10 +69,15 @@ public:
   };
 
 protected:
+  ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
+  void serialize(std::string & serialized_buffer);
+  void deserialize(std::vector<std::string> & serialized_buffers);
+  ///@}
+
   /// number of coupled variables to map
   const unsigned int _nvars;
 
-  // dimension of the mesh
+  /// dimension of the mesh
   const unsigned int _dim;
 
   ///@{ Element data
