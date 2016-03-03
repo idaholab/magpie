@@ -13,6 +13,56 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/parallel_algebra.h"
 
+// custom data load and data store methods for a struct with an std::vector member
+template<>
+inline void
+dataStore(std::ostream & stream, MyTRIMRasterizer::AveragedData & ad, void * context)
+{
+  dataStore(stream, ad._elements, context);
+  dataStore(stream, ad._site_volume, context);
+}
+template<>
+inline void
+dataLoad(std::istream & stream, MyTRIMRasterizer::AveragedData & ad, void * context)
+{
+  dataLoad(stream, ad._elements, context);
+  dataLoad(stream, ad._site_volume, context);
+}
+
+// custom data load and data store methods for a class with virtual members (vtable pointer must not be (un)serialized)
+template<>
+inline void
+dataStore(std::ostream & stream, MyTRIM_NS::IonBase & pl, void * context)
+{
+  dataStore(stream, pl._Z, context);
+  dataStore(stream, pl._m, context);
+  dataStore(stream, pl._E, context);
+  dataStore(stream, pl._dir, context);
+  dataStore(stream, pl._pos, context);
+  dataStore(stream, pl._time, context);
+  dataStore(stream, pl.gen, context);
+  dataStore(stream, pl.id, context);
+  dataStore(stream, pl.tag, context);
+  dataStore(stream, pl._Ef, context);
+  dataStore(stream, pl.state, context);
+}
+template<>
+inline void
+dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
+{
+  dataLoad(stream, pl._Z, context);
+  dataLoad(stream, pl._m, context);
+  dataLoad(stream, pl._E, context);
+  dataLoad(stream, pl._dir, context);
+  dataLoad(stream, pl._pos, context);
+  dataLoad(stream, pl._time, context);
+  dataLoad(stream, pl.gen, context);
+  dataLoad(stream, pl.id, context);
+  dataLoad(stream, pl.tag, context);
+  dataLoad(stream, pl._Ef, context);
+  dataLoad(stream, pl.state, context);
+}
+
 template<>
 InputParameters validParams<MyTRIMRasterizer>()
 {
@@ -57,9 +107,6 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     mooseError("Parameter 'M' must have as many components as coupled variables.");
   if (_trim_charge.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
-
-  if (_app.n_processors() > 1)
-    mooseError("Parallel communication is not yet implemented.");
 
   for (unsigned int i = 0; i < _dim; ++i)
   {
@@ -159,7 +206,22 @@ MyTRIMRasterizer::threadJoin(const UserObject &y)
 void
 MyTRIMRasterizer::finalize()
 {
-  // _communicator.set_union(_material_map);
+  // create a one send buffer for use with the libMesh packed range routines
+  std::vector<std::string> send_buffers(1);
+
+  // create byte buffers for the streams received from all processors
+  std::vector<std::string> recv_buffers;
+  recv_buffers.reserve(_app.n_processors());
+
+  // pack the comples datastructures into the string stream
+  serialize(send_buffers[0]);
+
+  // broadcast serialized data to and receive from all processors
+  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
+                                       std::back_inserter(recv_buffers));
+
+  // unpack the received data and merge it into the local data structures
+  deserialize(recv_buffers);
 }
 
 const std::vector<Real> &
@@ -201,4 +263,50 @@ MyTRIMRasterizer::periodicPoint(const Point & pos) const
     }
 
   return p;
+}
+
+void
+MyTRIMRasterizer::serialize(std::string & serialized_buffer)
+{
+  // stream for serializing the _material_map and _pka_list data structure to a byte stream
+  std::ostringstream oss;
+  dataStore(oss, _material_map, this);
+  dataStore(oss, _pka_list, this);
+
+  // Populate the passed in string pointer with the string stream's buffer contents
+  serialized_buffer.assign(oss.str());
+}
+
+void
+MyTRIMRasterizer::deserialize(std::vector<std::string> & serialized_buffers)
+{
+  mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
+
+  // The input string stream used for deserialization
+  std::istringstream iss;
+
+  // Loop over all datastructures for all procerssors to perfrom the gather operation
+  for (unsigned int rank = 0; rank < serialized_buffers.size(); ++rank)
+  {
+    // skip the current processor (its data is already in the strutures)
+    if (rank == processor_id())
+      continue;
+
+    // populate the stream with a new buffer and reset stream state
+    iss.str(serialized_buffers[rank]);
+    iss.clear();
+
+    // Load the communicated data into temporary structures
+    MaterialMap other_material_map;
+    dataLoad(iss, other_material_map, this);
+    std::vector<MyTRIM_NS::IonBase> other_pka_list;
+    dataLoad(iss, other_pka_list, this);
+
+    // merge the data in with the current processor's data
+    _material_map.insert(other_material_map.begin(), other_material_map.end());
+
+    // We are not yet merging the PKA lists but let each processor work on its own list.
+    // List combining will be used in the furture to enable better load balancing.
+    // _pka_list.insert(other_pka_list.begin(), other_pka_list.end());
+  }
 }
