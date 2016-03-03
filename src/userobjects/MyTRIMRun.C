@@ -40,9 +40,6 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
   if (_mesh.isParallelMesh())
     mooseError("MyTRIM runs currently require serial meshes.");
 
-  if (_app.n_processors() > 1)
-    mooseError("Parallel communication is not yet implemented. Waiting on libmesh/#748.");
-
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
 
@@ -84,34 +81,22 @@ MyTRIMRun::execute()
 void
 MyTRIMRun::finalize()
 {
-  /*
-  // serialize map into a vector of key,value pairs and allgather it
-  typedef std::vector<std::pair<dof_id_type, MyTRIMResult> > Serialization;
-  Serialization vecdata(_result_map.begin(), _result_map.end());
-  _communicator.allgather(vecdata);
+  // create a one send buffer for use with the libMesh packed range routines
+  std::vector<std::string> send_buffers(1);
 
-  // sum values on the same elements
-  _result_map.clear();
-  for (Serialization::const_iterator vec_iter = vecdata.begin(); vec_iter != vecdata.end(); ++vec_iter)
-  {
-    MyTRIMResultMap::iterator i = _result_map.find(vec_iter->first);
+  // create byte buffers for the streams received from all processors
+  std::vector<std::string> recv_buffers;
+  recv_buffers.reserve(_app.n_processors());
 
-    // if no entry in the map was found then set it, otherwise add value
-    if (i == _result_map.end())
-      _result_map.insert(*vec_iter);
-    else
-    {
-      mooseAssert(i->second.size() == _nvars && vec_iter->second.size() == _nvars, "Inconsistent TRIM result vector sizes across processors.");
+  // pack the comples datastructures into the string stream
+  serialize(send_buffers[0]);
 
-      for (unsigned int j = 0; j < _nvars; ++j)
-      {
-        // sum vacancy and interstitial production
-        i->second[j].first += vec_iter->second[j].first;
-        i->second[j].second += vec_iter->second[j].second;
-      }
-    }
-  }
-  */
+  // broadcast serialized data to and receive from all processors
+  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
+                                       std::back_inserter(recv_buffers));
+
+  // unpack the received data and merge it into the local data structures
+  deserialize(recv_buffers);
 }
 
 const MyTRIMRun::MyTRIMResult &
@@ -124,4 +109,61 @@ MyTRIMRun::result(const Elem * elem) const
     return _zero;
 
   return i->second;
+}
+
+void
+MyTRIMRun::serialize(std::string & serialized_buffer)
+{
+  // stream for serializing the _result_map structure to a byte stream
+  std::ostringstream oss;
+  dataStore(oss, _result_map, this);
+
+  // Populate the passed in string pointer with the string stream's buffer contents
+  serialized_buffer.assign(oss.str());
+}
+
+void
+MyTRIMRun::deserialize(std::vector<std::string> & serialized_buffers)
+{
+  mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
+
+  // The input string stream used for deserialization
+  std::istringstream iss;
+
+  // Loop over all datastructures for all procerssors to perfrom the gather operation
+  for (unsigned int rank = 0; rank < serialized_buffers.size(); ++rank)
+  {
+    // skip the current processor (its data is already in the strutures)
+    if (rank == processor_id())
+      continue;
+
+    // populate the stream with a new buffer and reset stream state
+    iss.str(serialized_buffers[rank]);
+    iss.clear();
+
+    // Load the communicated data into temporary structures
+    MyTRIMResultMap other_result_map;
+    dataLoad(iss, other_result_map, this);
+
+    // merge the data in with the current processor's data
+    for (MyTRIMResultMap::const_iterator i = other_result_map.begin(); i != other_result_map.end(); ++i)
+    {
+      MyTRIMResultMap::iterator j = _result_map.find(i->first);
+
+      // if no entry in the map was found then set it, otherwise add value
+      if (j == _result_map.end())
+        _result_map.insert(*i);
+      else
+      {
+        mooseAssert(i->second.size() == _nvars && j->second.size() == _nvars, "Inconsistent TRIM result vector sizes across processors.");
+
+        for (unsigned int k = 0; k < _nvars; ++k)
+        {
+          // sum vacancy and interstitial production
+          j->second[k].first += i->second[k].first;
+          j->second[k].second += i->second[k].second;
+        }
+      }
+    }
+  }
 }
