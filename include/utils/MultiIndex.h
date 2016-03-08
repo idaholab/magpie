@@ -15,7 +15,6 @@ template<class T>
 class MultiIndex
 {
 public:
-  
   MultiIndex(std::vector<unsigned int> shape)
   {
     _shape = shape;
