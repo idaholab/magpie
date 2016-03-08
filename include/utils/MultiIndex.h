@@ -82,6 +82,9 @@ private:
 
   /// change the container shape and reset meta data
   void reshape(const size_type & shape);
+
+  /// compute the flat index for a size_type index
+  unsigned int flatIndex(const size_type & indices);
 };
 
 /**
@@ -179,20 +182,14 @@ template <class T>
 T &
 MultiIndex<T>::operator() (const size_type & indices)
 {
-  mooseAssert(indices.size() == _dim, "Indices vector has wrong size. size=" << indices.size() << " vs. dim=" << _dim);
-#if DEBUG
-  for (unsigned int j = 0; j < indices.size(); ++j)
-    if (indices[j] >= _shape[j])
-      mooseError("Indices vector at entry " << j << " is " << indices[j] << " vs. shape " << _shape[j]);
-#endif
+  return _data[flatIndex(indices)];
+}
 
-  // implement the index
-  // index = i_M + i_{M-1} * I_M + i_{M-1} * I_M * I_{M-1} ...
-  unsigned int index = 0;
-  for (unsigned int d = 0; d < _dim; ++d)
-    index += indices[d] * _accumulated_shape[d];
-
-  return _data[index];
+template <class T>
+const T &
+MultiIndex<T>::operator() (const size_type & indices) const
+{
+  return _data[flatIndex(indices)];
 }
 
 template <class T>
@@ -311,6 +308,26 @@ MultiIndex<T>::reshape(const size_type & shape)
   buildAccumulatedShape();
 }
 
+template <class T>
+unsigned int
+MultiIndex<T>::flatIndex(const size_type & indices)
+{
+  mooseAssert(indices.size() == _dim, "Indices vector has wrong size. size=" << indices.size() << " vs. dim=" << _dim);
+  #if DEBUG
+  for (unsigned int j = 0; j < indices.size(); ++j)
+    if (indices[j] >= _shape[j])
+      mooseError("Indices vector at entry " << j << " is " << indices[j] << " vs. shape " << _shape[j]);
+  #endif
+
+  // implement the index
+  // index = i_M + i_{M-1} * I_M + i_{M-1} * I_M * I_{M-1} ...
+  unsigned int index = 0;
+  for (unsigned int d = 0; d < _dim; ++d)
+    index += indices[d] * _accumulated_shape[d];
+
+  return index;
+}
+
 
 template <class T>
 typename MultiIndex<T>::size_type
@@ -325,7 +342,7 @@ template <class T>
 unsigned int
 MultiIndex<T>::iterator::index(unsigned int d) const
 {
-  mooseAssert(d < _multi_index.dimension(), "Dimension d= " << d << " exceeds dim=" << _multi_index.dimension());
+  mooseAssert(d < _multi_index.dimension(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dimension());
   return indices()[d];
 }
 
