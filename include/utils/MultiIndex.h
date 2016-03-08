@@ -13,69 +13,53 @@ template<class T>
 class MultiIndex
 {
 public:
+  ///@{ container related types and categories
   typedef T value_type;
   typedef std::vector<unsigned int> size_type;
+  ///@}
 
-  MultiIndex(const size_type & shape);
-  MultiIndex(const size_type & shape, const std::vector<T> & data);
-
-  T & operator() (const size_type & indices);
-  const T & operator() (const size_type & indices) const;
-
-  // return the container size as dim dimensional vector
-  const size_type & size() const { return _shape; }
-
-  unsigned int dim() const { return _shape.size(); }
-  unsigned int nEntries() const { return _nentries; }
-
-  // NOTE: resize cannot change the dimensionality of the data.
-  // Could possibly implement a reshape function.
-  void resize(const size_type & shape);
-
-  // NOTE: assign allows changing the dimensionality of the data.
-  void assign(const size_type & shape, T value);
-
-  /**
-   * Implement loadHelper and storeHelper for easier data (de)serialization
-   */
-  void storeMultiIndex(std::ostream & stream, void * context)
-  {
-    ::dataStore(stream, _shape, context);
-    ::dataStore(stream, _data, context);
-  }
-
-  void loadMultiIndex(std::istream & stream, void * context)
-  {
-    ::dataLoad(stream, _shape, context);
-    ::dataLoad(stream, _data, context);
-    _dim = _shape.size();
-    _nentries = _data.size();
-    buildAccumulatedShape();
-  }
-
-  /**
-   * Nested class iterators
-   */
+  /// MultiIndex container iterator
   class iterator;
 
-  /**
-   * Return iterators for begin and end of this container
-   */
+  /// construct zero initialized container of a given shape
+  MultiIndex(const size_type & shape);
+
+  /// construct container of a given shape initialized from a flat data blob
+  MultiIndex(const size_type & shape, const std::vector<T> & data);
+
+  ///@{ element access operators
+  T & operator() (const size_type & indices);
+  const T & operator() (const size_type & indices) const;
+  ///@}
+
+  /// container size as dim dimensional vector
+  const size_type & size() const { return _shape; }
+
+  /// dimension of the container
+  unsigned int dim() const { return _shape.size(); }
+
+  /// total number of values stored in the container
+  unsigned int nEntries() const { return _nentries; }
+
+  /// Resize container. Must keep dimensionality constant.
+  void resize(const size_type & shape);
+
+  /// Reshape container arbitrarily and initialize with value
+  void assign(const size_type & shape, T value);
+
+  ///@{ Implement loadHelper and storeHelper for easier data (de)serialization
+  void dataStore(std::ostream & stream, void * context);
+  void dataLoad(std::istream & stream, void * context);
+  ///@}
+
+  ///@{ iterators for begin and end of this container
   iterator begin() { return iterator(*this, 0); }
   iterator end() { return iterator(*this, _nentries); }
+  ///@}
 
 protected:
   /// given a flat index computes the vector of indices i0, i1, i2, ...
-  void findIndexVector(unsigned int flat_index, size_type & indices) const
-  {
-    indices.resize(_dim);
-    for (unsigned int d = 0; d < _dim; ++d)
-    {
-      unsigned int i = flat_index / _accumulated_shape[d];
-      indices[d] = i;
-      flat_index -= i * _accumulated_shape[d];
-    }
-  }
+  void findIndexVector(unsigned int flat_index, size_type & indices) const;
 
   /// the size along each index
   size_type _shape;
@@ -93,8 +77,84 @@ protected:
   std::vector<T> _data;
 
 private:
+  /// build accumulated shape vector for flat index calculation
   void buildAccumulatedShape();
+
+  /// change the container shape and reset meta data
   void reshape(const size_type & shape);
+};
+
+/**
+ * Nested iterator class for MultiIndex containers
+ */
+template <class T>
+class MultiIndex<T>::iterator
+{
+public:
+  iterator(MultiIndex<T> & multi_index, unsigned int position) :
+      _multi_index(multi_index),
+      _flat_index(position)
+  {
+  }
+
+  // Simple data getters
+  unsigned int flatIndex() const {return _flat_index;}
+  MultiIndex<T> & getMultiIndexObject() const {return _multi_index;}
+
+  /// Allow retrieving indices vector from position and single index
+  size_type indices() const;
+
+  /// return index component
+  unsigned int index(unsigned int d) const;
+
+  // assignment =
+  iterator & operator= (const iterator & other)
+  {
+    _multi_index = other.getMultiIndexObject();
+    _flat_index = other.flatIndex();
+    return *this;
+  }
+
+  // prefix ++
+  iterator & operator++ ()
+  {
+    ++_flat_index;
+    return *this;
+  }
+
+  // postfix ++
+  iterator & operator++ (int)
+  {
+    iterator clone(*this);
+    ++_flat_index;
+    return clone;
+  }
+
+  // prefix --
+  iterator & operator-- ()
+  {
+    --_flat_index;
+    return *this;
+  }
+
+  // postfix --
+  iterator & operator-- (int)
+  {
+    iterator clone(*this);
+    --_flat_index;
+    return clone;
+  }
+
+  /// to be equal both iterators must hold a reference to teh same MultiIndexObject and be at the same _flat_index
+  bool operator== (const iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
+  bool operator!= (const iterator & other) const { return !(*this == other); }
+
+  /// dereferencing operator
+  T & operator* () { return _multi_index._data[_flat_index]; }
+
+protected:
+  MultiIndex<T> & _multi_index;
+  unsigned int _flat_index;
 };
 
 
@@ -187,6 +247,38 @@ MultiIndex<T>::assign(const size_type & shape, T value)
   _data.assign(_nentries, value);
 }
 
+template <class T>
+void
+MultiIndex<T>::dataStore(std::ostream & stream, void * context)
+{
+  ::dataStore(stream, _shape, context);
+  ::dataStore(stream, _data, context);
+}
+
+template <class T>
+void
+MultiIndex<T>::dataLoad(std::istream & stream, void * context)
+{
+  ::dataLoad(stream, _shape, context);
+  ::dataLoad(stream, _data, context);
+  _dim = _shape.size();
+  _nentries = _data.size();
+  buildAccumulatedShape();
+}
+
+template <class T>
+void
+MultiIndex<T>::findIndexVector(unsigned int flat_index, MultiIndex<T>::size_type & indices) const
+{
+  indices.resize(_dim);
+  for (unsigned int d = 0; d < _dim; ++d)
+  {
+    unsigned int i = flat_index / _accumulated_shape[d];
+    indices[d] = i;
+    flat_index -= i * _accumulated_shape[d];
+  }
+}
+
 // compute the accumulated shapes as:
 // as[0] = I_1 * I_2 ...* I_{M}, as[1] = I_2 * I_3 ...* I_{M} ...
 template <class T>
@@ -219,94 +311,37 @@ MultiIndex<T>::reshape(const size_type & shape)
   buildAccumulatedShape();
 }
 
+
 template <class T>
-class MultiIndex<T>::iterator
+typename MultiIndex<T>::size_type
+MultiIndex<T>::iterator::indices() const
 {
-public:
-  iterator(MultiIndex<T> & multi_index, unsigned int position) :
-      _multi_index(multi_index),
-      _flat_index(position)
-  {
-  }
+  size_type indices;
+  _multi_index.findIndexVector(_flat_index, indices);
+  return indices;
+}
 
-  // Simple data getters
-  unsigned int flatIndex() const {return _flat_index;}
-  MultiIndex<T> & getMultiIndexObject() const {return _multi_index;}
+template <class T>
+unsigned int
+MultiIndex<T>::iterator::index(unsigned int d) const
+{
+  mooseAssert(d < _multi_index.dimension(), "Dimension d= " << d << " exceeds dim=" << _multi_index.dimension());
+  return indices()[d];
+}
 
-  // Allow retrieving indices vector from position and single index
-  size_type indices() const
-  {
-    size_type indices;
-    _multi_index.findIndexVector(_flat_index, indices);
-    return indices;
-  }
-
-  unsigned int index(unsigned int d) const
-  {
-    mooseAssert(d < _multi_index.dimension(), "Dimension d= " << d << " exceeds dim=" << _multi_index.dimension());
-    return indices()[d];
-  }
-
-  // assignment =
-  iterator & operator= (const iterator & other)
-  {
-    _multi_index = other.getMultiIndexObject();
-    _flat_index = other.flatIndex();
-    return *this;
-  }
-
-  // prefix ++
-  iterator & operator++ ()
-  {
-    ++_flat_index;
-    return *this;
-  }
-
-  // postfix ++
-  iterator & operator++ (int /*k*/)
-  {
-    iterator clone(*this);
-    ++_flat_index;
-    return clone;
-  }
-
-  // prefix --
-  iterator & operator-- ()
-  {
-    --_flat_index;
-    return *this;
-  }
-
-  // postfix --
-  iterator & operator-- (int /*k*/)
-  {
-    iterator clone(*this);
-    --_flat_index;
-    return clone;
-  }
-
-  // ==
-  // MultiIndexObjects must be exactly the same (pointers to same address)
-  // and _flat_index must be the same value
-  bool operator== (const iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
-
-  // !=
-  bool operator!= (const iterator & other) const { return !(*this == other); }
-
-  // overload the dereferencing operator
-  T & operator* () { return _multi_index._data[_flat_index]; }
-
-protected:
-  MultiIndex<T> & _multi_index;
-  unsigned int _flat_index;
-};
 
 template<class T>
-inline void
-dataStore(std::ostream & stream, MultiIndex<T> & ad, void * context) { ad.storeMultiIndex(stream, context); }
+void
+dataStore(std::ostream & stream, MultiIndex<T> & mi, void * context)
+{
+  mi.dataStore(stream, context);
+}
 
 template<class T>
-inline void
-dataLoad(std::istream & stream, MultiIndex<T> & ad, void * context) { ad.loadMultiIndex(stream, context); }
+void
+dataLoad(std::istream & stream, MultiIndex<T> & mi, void * context)
+{
+  mi.dataLoad(stream, context);
+}
 
 #endif //MULTIINDEX_H
