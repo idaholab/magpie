@@ -35,23 +35,18 @@ MultiIndexTest::setUp()
   MultiIndex<Real> mindex1 = MultiIndex<Real>(shape);
 
   // check dimension
-  CPPUNIT_ASSERT( mindex1.dimension() == 3 );
-
-  // check shape
-  std::vector<unsigned int> shape2 = mindex1.shape();
-  for (unsigned int j = 0; j < 3; ++j)
-    CPPUNIT_ASSERT( shape2[j] == shape[j] );
+  CPPUNIT_ASSERT( mindex1.dim() == 3 );
 
   // check size operator
   for (unsigned int j = 0; j < 3; ++j)
-    CPPUNIT_ASSERT( mindex1.size(j) == shape[j] );
+    CPPUNIT_ASSERT( mindex1.size()[j] == shape[j] );
 
   // parenthesis operator
   std::vector<unsigned int> index;
   index.resize(3);
-  for (unsigned int j0 = 0; j0 < shape2[0]; ++j0)
-    for (unsigned int j1 = 0; j1 < shape2[1]; ++j1)
-      for (unsigned int j2 = 0; j2 < shape2[2]; ++j2)
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
         index[0] = j0;
         index[1] = j1;
@@ -60,9 +55,9 @@ MultiIndexTest::setUp()
       }
 
   // check the parenthesis operator but this time reverse loop order
-  for (unsigned int j2 = 0; j2 < shape2[2]; ++j2)
-    for (unsigned int j0 = 0; j0 < shape2[0]; ++j0)
-      for (unsigned int j1 = 0; j1 < shape2[1]; ++j1)
+  for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
+    for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+      for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
       {
         index[0] = j0;
         index[1] = j1;
@@ -74,18 +69,18 @@ MultiIndexTest::setUp()
   std::vector<Real> data;
   data.resize(mindex1.nEntries());
   unsigned int p = 0;
-  for (unsigned int j0 = 0; j0 < shape2[0]; ++j0)
-    for (unsigned int j1 = 0; j1 < shape2[1]; ++j1)
-      for (unsigned int j2 = 0; j2 < shape2[2]; ++j2)
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
         data[p] = j0 - 3.0 * j1 + 100.0 * j2;
         p++;
       }
 
   MultiIndex<Real> mindex2 = MultiIndex<Real>(shape, data);
-  for (unsigned int j0 = 0; j0 < shape2[0]; ++j0)
-    for (unsigned int j1 = 0; j1 < shape2[1]; ++j1)
-      for (unsigned int j2 = 0; j2 < shape2[2]; ++j2)
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
         index[0] = j0;
         index[1] = j1;
@@ -160,7 +155,7 @@ MultiIndexTest::testIterators()
     for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
       for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
-        std::vector<unsigned int> index(3);
+        std::vector<unsigned int> index(mindex.dim());
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
@@ -173,7 +168,7 @@ MultiIndexTest::testIterators()
     for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
       for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
-        std::vector<unsigned int> index(3);
+        MultiIndex<Real>::size_type index(mindex.dim());
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
@@ -186,8 +181,7 @@ void
 MultiIndexTest::dataStoreLoad()
 {
   // Create empty MultiIndex object
-  std::vector<unsigned int> shape;
-  shape.resize(3);
+  MultiIndex<Real>::size_type shape(3);
   shape[0] = 3;
   shape[1] = 2;
   shape[2] = 4;
@@ -198,7 +192,7 @@ MultiIndexTest::dataStoreLoad()
   MultiIndex<Real>::iterator it_end = mindex.end();
   for (; it != it_end ; ++it)
   {
-    std::vector<unsigned int> indices = it.indices();
+    MultiIndex<Real>::size_type indices = it.indices();
     *it = indices[0] - 3.0 * indices[1] + 100.0 * indices[2];
   }
 
@@ -222,7 +216,7 @@ MultiIndexTest::dataStoreLoad()
     for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
       for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
       {
-        std::vector<unsigned int> index(3);
+        MultiIndex<Real>::size_type index(mindex.dim());
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
