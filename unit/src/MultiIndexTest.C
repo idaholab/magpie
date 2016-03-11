@@ -223,3 +223,88 @@ MultiIndexTest::dataStoreLoad()
         CPPUNIT_ASSERT( mindex(index) == j0 - 3.0 * j1 + 100.0 * j2 );
       }
 }
+
+void
+MultiIndexTest::slice()
+{
+  // Create empty MultiIndex object
+  MultiIndex<unsigned int>::size_type shape(4);
+  shape[0] = 3;
+  shape[1] = 5;
+  shape[2] = 4;
+  shape[3] = 6;
+  MultiIndex<unsigned int> mindex = MultiIndex<unsigned int>(shape);
+
+  // set the data by using an iterator
+  MultiIndex<unsigned int>::iterator it = mindex.begin();
+  MultiIndex<unsigned int>::iterator it_end = mindex.end();
+  for (; it != it_end ; ++it)
+  {
+    MultiIndex<unsigned int>::size_type indices = it.indices();
+    *it = indices[0] + 10 * indices[1] + 100 * indices[2] + 1000 * indices[3];
+  }
+
+  // slice multi index at dim = 1, index = 3
+  MultiIndex<unsigned int> sliced_mindex = mindex.slice(1, 3);
+
+  // check the values
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
+        for (unsigned int j3 = 0; j3 < shape[3]; ++j3)
+        {
+          if (j1 == 3)
+          {
+            MultiIndex<unsigned int>::size_type index(sliced_mindex.dim());
+            index[0] = j0;
+            index[1] = j2;
+            index[2] = j3;
+            CPPUNIT_ASSERT( sliced_mindex(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+          }
+        }
+
+  // test the vector version of this functions
+  std::vector<unsigned int> vec_dim(1);
+  std::vector<unsigned int> vec_ind(1);
+  vec_dim[0] = 1;
+  vec_ind[0] = 3;
+  MultiIndex<unsigned int> sliced_mindex_vec = mindex.slice(vec_dim, vec_ind);
+  // check the values
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
+        for (unsigned int j3 = 0; j3 < shape[3]; ++j3)
+        {
+          if (j1 == 3)
+          {
+            MultiIndex<unsigned int>::size_type index(sliced_mindex_vec.dim());
+            index[0] = j0;
+            index[1] = j2;
+            index[2] = j3;
+            CPPUNIT_ASSERT( sliced_mindex_vec(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+          }
+        }
+
+  // test the vector version of this functions and slice for two indices
+  vec_dim.resize(2);
+  vec_ind.resize(2);
+  vec_dim[0] = 1;
+  vec_dim[1] = 3;
+  vec_ind[0] = 3;
+  vec_ind[1] = 2;
+  MultiIndex<unsigned int> sliced_mindex_vec2 = mindex.slice(vec_dim, vec_ind);
+  // check the values
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
+        for (unsigned int j3 = 0; j3 < shape[3]; ++j3)
+        {
+          if (j1 == 3 && j3 == 2)
+          {
+            MultiIndex<unsigned int>::size_type index(sliced_mindex_vec2.dim());
+            index[0] = j0;
+            index[1] = j2;
+            CPPUNIT_ASSERT( sliced_mindex_vec2(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+          }
+        }
+}
