@@ -227,7 +227,7 @@ MyTRIMRasterizer::finalize()
 const std::vector<Real> &
 MyTRIMRasterizer::material(const Elem * elem) const
 {
-  MaterialMap::const_iterator i = _material_map.find(elem->id());
+  auto i = _material_map.find(elem->id());
 
   // there should be data for every element in the mesh
   if (i == _material_map.end())
@@ -239,7 +239,7 @@ MyTRIMRasterizer::material(const Elem * elem) const
 Real
 MyTRIMRasterizer::siteVolume(const Elem * elem) const
 {
-  MaterialMap::const_iterator i = _material_map.find(elem->id());
+  auto i = _material_map.find(elem->id());
 
   // there should be data for every element in the mesh
   if (i == _material_map.end())

@@ -20,7 +20,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 MooseMyTRIMSample::~MooseMyTRIMSample()
 {
   // delete all elements of the materials in the cache
-  for (MaterialsCache::iterator i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
+  for (auto i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
     for (unsigned int j = 0; j <  i->second._element.size(); ++j)
       delete i->second._element[j];
 }
@@ -31,7 +31,7 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
   _current_ion = pka;
 
   // apply averages for all cached materials
-  for (MaterialsCache::iterator i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
+  for (auto i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
     i->second.average(pka);
 }
 
@@ -50,7 +50,7 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
     return NULL;
 
   // try to find the element in the cache
-  MaterialsCache::iterator i = _materials_cache.find(elem);
+  auto i = _materials_cache.find(elem);
   if (i != _materials_cache.end())
     return &i->second;
 
@@ -76,6 +76,6 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
   material.average(_current_ion);
 
   // add the material to the cache and return pointer
-  MaterialsCache::iterator mi = _materials_cache.insert(_materials_cache.begin(), std::make_pair(elem, material));
+  auto mi = _materials_cache.insert(_materials_cache.begin(), std::make_pair(elem, material));
   return &mi->second;
 }
