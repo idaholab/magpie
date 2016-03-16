@@ -92,7 +92,7 @@ MyTRIMRun::finalize()
   serialize(send_buffers[0]);
 
   // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
+  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
                                        std::back_inserter(recv_buffers));
 
   // unpack the received data and merge it into the local data structures

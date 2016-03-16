@@ -38,7 +38,7 @@ InputParameters validParams<SPPARKSUserObject>()
 
 SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
     GeneralUserObject(params),
-    _spparks(NULL),
+    _spparks(nullptr),
     _file(getParam<std::string>("file")),
     _spparks_only(getParam<bool>("spparks_only")),
     _from_ivar(getParam<std::vector<unsigned> >("from_ivar")),
@@ -87,7 +87,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
   }
 
   _console << "\n>>>> STARTING SPPARKS <<<<\n";
-  spparks_open(0, NULL, _communicator.get(), &_spparks);
+  spparks_open(0, nullptr, _communicator.get(), &_spparks);
   if (!_spparks)
     mooseError("Error initializing SPPARKS");
 
@@ -176,12 +176,12 @@ SPPARKSUserObject::setSPPARKSData()
 {
   // _console << "\nsetSPPARKSData\n";
   // Update the integer data
-  int * ip = NULL;
+  int * ip = nullptr;
   for (unsigned i = 0; i < _to_ivar.size(); ++i)
     setSPPARKSData(ip, "iarray", _to_ivar[i], *_int_vars[i]);
 
   // Update the double data
-  double * dp = NULL;
+  double * dp = nullptr;
   for (unsigned i = 0; i < _to_dvar.size(); ++i)
     setSPPARKSData(dp, "darray", _to_dvar[i], *_double_vars[i]);
 }
@@ -272,7 +272,7 @@ SPPARKSUserObject::initSPPARKS()
   }
   solution.close();
 
-  int * pint = NULL;
+  int * pint = nullptr;
   char iarray[] = "iarray";
   for (unsigned i(0); i < 2; ++i)
   {

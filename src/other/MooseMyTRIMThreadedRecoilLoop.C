@@ -42,8 +42,8 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
   MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
 
   // copy the pka list into the recoil queue
-  for (auto i = pka_list.begin(); i != pka_list.end(); ++i)
-    recoils.push(new MyTRIM_NS::IonBase(*i));
+  for (auto && i : pka_list)
+    recoils.push(new MyTRIM_NS::IonBase(i));
 
   MyTRIM_NS::IonBase * pka;
   while (!recoils.empty())
@@ -71,8 +71,8 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
     }
 
     // store vacancies
-    for (unsigned int i = 0; i < vac.size(); ++i)
-      addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
+    for (auto && v : vac)
+      addVacancyToResult(_rasterizer.periodicPoint(v.first), v.second);
     vac.clear();
 
     // done with this recoil
@@ -83,13 +83,13 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
 void
 MooseMyTRIMThreadedRecoilLoop::join(const MooseMyTRIMThreadedRecoilLoop & rl)
 {
-  for (auto i = rl._result_map.begin(); i != rl._result_map.end(); ++i)
+  for (auto && i : _result_map)
   {
-    auto j = _result_map.find(i->first);
+    auto j = _result_map.find(i.first);
     if (j == _result_map.end())
-      j = _result_map.insert(_result_map.begin(), std::make_pair(i->first, MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
+      j = _result_map.insert(_result_map.begin(), std::make_pair(i.first, MyTRIMResult(_nvars, std::make_pair(0.0, 0.0))));
 
-    const MyTRIMResult & src = i->second;
+    const MyTRIMResult & src = i.second;
     MyTRIMResult & dst = j->second;
 
     for (unsigned int k = 0; k < _nvars; ++k)
@@ -105,7 +105,7 @@ void
 MooseMyTRIMThreadedRecoilLoop::addDefectToResult(const Point & p, unsigned int var, MooseMyTRIMThreadedRecoilLoop::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
-  if (elem != NULL && var < _nvars)
+  if (elem != nullptr && var < _nvars)
   {
     // store into _result_map
     auto i = _result_map.find(elem->id());

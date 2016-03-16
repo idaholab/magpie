@@ -89,7 +89,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _var(_nvars),
     _site_volume_prop(getMaterialProperty<Real>("site_volume")),
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
-    _pka_generators(_pka_generator_names.size()),
+    _pka_generators(),
     _periodic(coupled("var", 0)),
     _last_time(0.0), //TODO: deal with user specified start times!
     _step_end_time(0.0)
@@ -97,8 +97,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
 
-  for (unsigned int i = 0; i < _pka_generator_names.size(); ++i)
-    _pka_generators[i] = &getUserObjectByName<PKAGeneratorBase>(_pka_generator_names[i]);
+  for (auto && name : _pka_generator_names)
+    _pka_generators.push_back(&getUserObjectByName<PKAGeneratorBase>(name));
 
   if (_nvars == 0)
     mooseError("Must couple variables to MyTRIMRasterier.");
@@ -187,8 +187,8 @@ MyTRIMRasterizer::execute()
   _material_map[_current_elem->id()] = average;
 
   // add PKAs for current element
-  for (unsigned int i = 0; i < _pka_generators.size(); ++i)
-    _pka_generators[i]->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
+  for (auto && gen : _pka_generators)
+    gen->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
 }
 
 void
@@ -217,7 +217,7 @@ MyTRIMRasterizer::finalize()
   serialize(send_buffers[0]);
 
   // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
+  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
                                        std::back_inserter(recv_buffers));
 
   // unpack the received data and merge it into the local data structures

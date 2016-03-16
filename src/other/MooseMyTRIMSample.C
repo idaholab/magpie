@@ -20,9 +20,9 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 MooseMyTRIMSample::~MooseMyTRIMSample()
 {
   // delete all elements of the materials in the cache
-  for (auto i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
-    for (unsigned int j = 0; j <  i->second._element.size(); ++j)
-      delete i->second._element[j];
+  for (auto && i : _materials_cache)
+    for (auto && j : i.second._element)
+      delete j;
 }
 
 void
@@ -31,8 +31,8 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
   _current_ion = pka;
 
   // apply averages for all cached materials
-  for (auto i = _materials_cache.begin(); i != _materials_cache.end(); ++i)
-    i->second.average(pka);
+  for (auto  && i : _materials_cache)
+    i.second.average(pka);
 }
 
 MyTRIM_NS::MaterialBase *
@@ -42,12 +42,12 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
   Point p = _rasterizer.periodicPoint(pos);
 
   // get element containing the point
-  mooseAssert(_pl != NULL, "initialize() must be called on the MooseMyTRIMSample object.");
+  mooseAssert(_pl != nullptr, "initialize() must be called on the MooseMyTRIMSample object.");
   const Elem * elem = (*_pl)(p);
 
   // no element found means we have left the mesh
-  if (elem == NULL)
-    return NULL;
+  if (elem == nullptr)
+    return nullptr;
 
   // try to find the element in the cache
   auto i = _materials_cache.find(elem);

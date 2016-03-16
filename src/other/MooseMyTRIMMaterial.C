@@ -18,8 +18,8 @@ MooseMyTRIMMaterial::calculateDensity(Real site_volume)
 {
   // sum up mass per lattice site
   _rho = 0.0;
-  for (unsigned int i = 0; i < _element.size(); ++i)
-    _rho += _element[i]->_t * _element[i]->_m;
+  for (auto && el : _element)
+    _rho += el->_t * el->_m;
 
   // compute density in amu/nm^3
   _rho /= site_volume;
