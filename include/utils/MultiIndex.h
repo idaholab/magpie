@@ -4,6 +4,7 @@
 #include "Moose.h"
 #include "MooseError.h"
 #include "DataIO.h"
+#include <algorithm>
 
 /**
  * Implements a container class for multi-indexed objects
@@ -30,6 +31,11 @@ public:
   ///@{ element access operators
   T & operator() (const size_type & indices);
   const T & operator() (const size_type & indices) const;
+  ///@}
+
+  ///@{ accesses a slice of the multi index object
+  MultiIndex<T> slice(unsigned int dimension, unsigned int index) const;
+  MultiIndex<T> slice(size_type dimension, size_type index) const;
   ///@}
 
   /// container size as dim dimensional vector
@@ -84,7 +90,7 @@ private:
   void reshape(const size_type & shape);
 
   /// compute the flat index for a size_type index
-  unsigned int flatIndex(const size_type & indices);
+  unsigned int flatIndex(const size_type & indices) const;
 };
 
 /**
@@ -190,6 +196,65 @@ const T &
 MultiIndex<T>::operator() (const size_type & indices) const
 {
   return _data[flatIndex(indices)];
+}
+
+template <class T>
+MultiIndex<T>
+MultiIndex<T>::slice(unsigned int dimension, unsigned int index) const
+{
+  size_type dim(1, dimension);
+  size_type ind(1, index);
+  return slice(dim, ind);
+}
+
+template <class T>
+MultiIndex<T>
+MultiIndex<T>::slice(size_type dimension, size_type index) const
+{
+  // input checks
+  if (dimension.size() != index.size())
+    mooseError("dimension and index must have the same size.");
+  if (dimension.size() > _dim - 1)
+    mooseError("The result of slice must be at least of dimension 1.");
+
+#if DEBUG
+  for (unsigned int d = 0; d < dimension.size(); ++d)
+  {
+    if (dimension[d] >= _dim)
+      mooseError("dimension is set to " << dimension[d] << " which is larger than _dim " << _dim);
+    if (index[d] >= _shape[dimension[d]])
+      mooseError("index= " << index[d] << " at dimension=" << dimension[d] << " is larger than " << _shape[dimension[d]]);
+  }
+#endif
+
+  // create a MultiIndex object with new dim = dim - dimension.size()
+  size_type new_shape;
+  for (unsigned int j = 0; j < _dim; ++j)
+    if (std::find(dimension.begin(), dimension.end(), j) == dimension.end())
+      new_shape.push_back(_shape[j]);
+  MultiIndex<T> multi_index = MultiIndex(new_shape);
+
+  // copy the data
+  MultiIndex<T>::iterator it = multi_index.begin();
+  for (unsigned int n = 0; n < _nentries; ++n)
+  {
+    size_type indices;
+    findIndexVector(n, indices);
+    bool addTo = true;
+    for (unsigned int d = 0; d < dimension.size(); ++d)
+      if (indices[dimension[d]] != index[d])
+      {
+        addTo = false;
+        break;
+      }
+
+    if (addTo)
+    {
+      *it = _data[n];
+      ++it;
+    }
+  }
+  return multi_index;
 }
 
 template <class T>
@@ -310,7 +375,7 @@ MultiIndex<T>::reshape(const size_type & shape)
 
 template <class T>
 unsigned int
-MultiIndex<T>::flatIndex(const size_type & indices)
+MultiIndex<T>::flatIndex(const size_type & indices) const
 {
   mooseAssert(indices.size() == _dim, "Indices vector has wrong size. size=" << indices.size() << " vs. dim=" << _dim);
   #if DEBUG
@@ -342,7 +407,7 @@ template <class T>
 unsigned int
 MultiIndex<T>::iterator::index(unsigned int d) const
 {
-  mooseAssert(d < _multi_index.dimension(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dimension());
+  mooseAssert(d < _multi_index.dim(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dim());
   return indices()[d];
 }
 

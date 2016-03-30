@@ -27,12 +27,14 @@ class MultiIndexTest : public CppUnit::TestFixture
   CPPUNIT_TEST( setUp );
   CPPUNIT_TEST( testIterators );
   CPPUNIT_TEST( dataStoreLoad );
+  CPPUNIT_TEST( slice );
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void setUp();
   void testIterators();
   void dataStoreLoad();
+  void slice();
 };
 
 #endif  // MULTIINDEXTEST_H
