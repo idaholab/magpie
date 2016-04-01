@@ -127,7 +127,7 @@ public:
   // prefix ++
   iterator & operator++ ()
   {
-    ++_flat_index;
+    ++_flat_index;    
     return *this;
   }
 

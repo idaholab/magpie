@@ -11,6 +11,8 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
 
+#include <sstream>
+
 namespace MagpieUtils {
 
 Point randomElementPoint(const Elem & el, const Point & rnd)
@@ -100,6 +102,33 @@ Point randomElementPoint(const Elem & el, const Point & rnd)
   }
 
   return FEInterface::map(el.dim(), fe_type, &el, ref);
+}
+
+/**
+ * ZAID is an identifier of an isotope of the form
+ * ZZAAAm, where m is the state.
+ */
+unsigned int
+getZFromZAID(unsigned int zaid)
+{
+  mooseAssert(zaid <= 999999 && zaid > 9999, "ZAID " << zaid << " is invalid.");
+
+  // eps ensures that ZAID = 1000 would give Z = 1 and not 0
+  Real eps = 1.0e-6;
+  Real r = zaid;
+  return std::floor(r / 10000.0 + eps);
+}
+
+unsigned int
+getAFromZAID(unsigned int zaid)
+{
+  // check that ZAID is not too short or too long
+  mooseAssert(zaid <= 999999 && zaid > 9999, "ZAID " << zaid << " is invalid.");
+
+  // eps ensures that ZAID = 1000 would give Z = 1 and not 0
+  Real eps = 1.0e-6;
+  Real r = zaid % 10000;
+  return std::floor(r / 10.0 + eps);
 }
 
 } // namespace MagpieUtils
