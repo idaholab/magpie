@@ -175,6 +175,28 @@ MultiIndexTest::testIterators()
         CPPUNIT_ASSERT( index[0] == it.index(0) && index[1] == it.index(1) && index[2] == it.index(2));
         ++it;
       }
+
+  // test the decrement operator
+  it = mindex.begin();
+  it_end = mindex.end();
+  while (it != it_end)
+  {
+    std::vector<unsigned int> indices = it.indices();
+    *it = indices[0] - 7.0 * indices[1] + 100.0 * indices[2];
+    ++it;++it;--it;
+  }
+
+  // check the values
+  for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
+    for (unsigned int j1 = 0; j1 < shape[1]; ++j1)
+      for (unsigned int j2 = 0; j2 < shape[2]; ++j2)
+      {
+        std::vector<unsigned int> index(mindex.dim());
+        index[0] = j0;
+        index[1] = j1;
+        index[2] = j2;
+        CPPUNIT_ASSERT( mindex(index) == j0 - 7.0 * j1 + 100.0 * j2 );
+      }
 }
 
 void
