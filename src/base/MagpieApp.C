@@ -5,16 +5,16 @@
 
 // AuxKernels
 #include "MyTRIMDensityAux.h"
-#include "MyTRIMResultAux.h"
+#include "MyTRIMElementResultAux.h"
 #include "SPPARKSAux.h"
 
 // Kernels
 #include "DefectAnnihilation.h"
-#include "MyTRIMSource.h"
+#include "MyTRIMElementSource.h"
 
 // UserObjects
 #include "MyTRIMRasterizer.h"
-#include "MyTRIMRun.h"
+#include "MyTRIMElementRun.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
 #include "SPPARKSUserObject.h"
@@ -56,14 +56,14 @@ void
 MagpieApp::registerObjects(Factory & factory)
 {
   registerAux(MyTRIMDensityAux);
-  registerAux(MyTRIMResultAux);
+  registerAux(MyTRIMElementResultAux);
   registerAux(SPPARKSAux);
 
   registerKernel(DefectAnnihilation);
-  registerKernel(MyTRIMSource);
+  registerKernel(MyTRIMElementSource);
 
   registerUserObject(MyTRIMRasterizer);
-  registerUserObject(MyTRIMRun);
+  registerUserObject(MyTRIMElementRun);
   registerUserObject(PKAConstant);
   registerUserObject(PKAFissionFragmentEmpirical);
   registerUserObject(SPPARKSUserObject);

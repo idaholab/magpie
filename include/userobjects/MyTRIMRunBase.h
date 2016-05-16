@@ -28,10 +28,6 @@ class MyTRIMRunBase : public GeneralUserObject
 public:
   MyTRIMRunBase(const InputParameters & parameters);
 
-  virtual void initialize() {}
-  virtual void execute();
-  virtual void finalize();
-
   // get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
 

@@ -9,18 +9,18 @@
 
 #include "MyTRIMRunBase.h"
 
-class MyTRIMRun;
+class MyTRIMElementRun;
 
 template<>
-InputParameters validParams<MyTRIMRun>();
+InputParameters validParams<MyTRIMElementRun>();
 
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
  */
-class MyTRIMRun : public MyTRIMRunBase
+class MyTRIMElementRun : public MyTRIMRunBase
 {
 public:
-  MyTRIMRun(const InputParameters & parameters);
+  MyTRIMElementRun(const InputParameters & parameters);
 
   virtual void initialize() {}
   virtual void execute();

@@ -70,7 +70,7 @@
     pka_generator = thermal_fission
   [../]
   [./runner]
-    type = MyTRIMRun
+    type = MyTRIMElementRun
     rasterizer = rasterizer
   [../]
 []

@@ -5,16 +5,16 @@
 #include "Kernel.h"
 
 // forward declarations
-class MyTRIMRun;
-class MyTRIMSource;
+class MyTRIMElementRun;
+class MyTRIMElementSource;
 
 template<>
-InputParameters validParams<MyTRIMSource>();
+InputParameters validParams<MyTRIMElementSource>();
 
-class MyTRIMSource : public MyTRIMResultAccess<Kernel>
+class MyTRIMElementSource : public MyTRIMResultAccess<Kernel>
 {
 public:
-  MyTRIMSource(const InputParameters & params);
+  MyTRIMElementSource(const InputParameters & params);
 
 protected:
   virtual Real computeQpResidual();

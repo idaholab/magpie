@@ -1,11 +1,11 @@
 #ifndef MYTRIMRESULTACCESS_H
 #define MYTRIMRESULTACCESS_H
 
-#include "MyTRIMRun.h"
+#include "MyTRIMElementRun.h"
 
 /**
  * Interface class ("Veneer") to provide encapsulate fetching defect production
- * rates from a MyTRIMRun class
+ * rates from a MyTRIMElementRun class
  */
 template <class T>
 class MyTRIMResultAccess : public T
@@ -17,7 +17,7 @@ public:
   Real getDefectRate();
 
 private:
-  const MyTRIMRun & _mytrim;
+  const MyTRIMElementRun & _mytrim;
   const unsigned int _ivar;
   const unsigned int _defect;
 
@@ -29,7 +29,7 @@ private:
 template <class T>
 MyTRIMResultAccess<T>::MyTRIMResultAccess(const InputParameters & parameters) :
     T(parameters),
-    _mytrim(this->template getUserObject<MyTRIMRun>("runner")),
+    _mytrim(this->template getUserObject<MyTRIMElementRun>("runner")),
     _ivar(this->template getParam<unsigned int>("ivar")),
     _defect(this->template getParam<MooseEnum>("defect"))
 {
@@ -45,7 +45,7 @@ InputParameters
 MyTRIMResultAccess<T>::validParams()
 {
   InputParameters params = ::validParams<T>();
-  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMRun userobject to pull data from.");
+  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
   MooseEnum defectType("VAC INT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
@@ -58,7 +58,7 @@ MyTRIMResultAccess<T>::getDefectRate()
 {
   if (this->_qp == 0)
   {
-    const MyTRIMRun::MyTRIMResult & result = _mytrim.result(this->_current_elem);
+    const MyTRIMElementRun::MyTRIMResult & result = _mytrim.result(this->_current_elem);
     mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
 
     const Real volume = this->_current_elem->volume();

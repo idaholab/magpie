@@ -5,7 +5,7 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-#include "MyTRIMRun.h"
+#include "MyTRIMElementRun.h"
 #include "MooseMesh.h"
 
 // libmesh includes
@@ -15,20 +15,20 @@
 #include <queue>
 
 template<>
-InputParameters validParams<MyTRIMRun>()
+InputParameters validParams<MyTRIMElementRun>()
 {
   InputParameters params = validParams<MyTRIMRunBase>();
   return params;
 }
 
-MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
+MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters) :
     MyTRIMRunBase(parameters),
     _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
 {
 }
 
 void
-MyTRIMRun::execute()
+MyTRIMElementRun::execute()
 {
   // bail out early if no run is requested for this timestep
   if (!_rasterizer.executeThisTimestep())
@@ -53,7 +53,7 @@ MyTRIMRun::execute()
 }
 
 void
-MyTRIMRun::finalize()
+MyTRIMElementRun::finalize()
 {
   // create a one send buffer for use with the libMesh packed range routines
   std::vector<std::string> send_buffers(1);
@@ -73,8 +73,8 @@ MyTRIMRun::finalize()
   deserialize(recv_buffers);
 }
 
-const MyTRIMRun::MyTRIMResult &
-MyTRIMRun::result(const Elem * elem) const
+const MyTRIMElementRun::MyTRIMResult &
+MyTRIMElementRun::result(const Elem * elem) const
 {
   auto i = _result_map.find(elem->id());
 
@@ -86,7 +86,7 @@ MyTRIMRun::result(const Elem * elem) const
 }
 
 void
-MyTRIMRun::serialize(std::string & serialized_buffer)
+MyTRIMElementRun::serialize(std::string & serialized_buffer)
 {
   // stream for serializing the _result_map structure to a byte stream
   std::ostringstream oss;
@@ -97,7 +97,7 @@ MyTRIMRun::serialize(std::string & serialized_buffer)
 }
 
 void
-MyTRIMRun::deserialize(std::vector<std::string> & serialized_buffers)
+MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
 {
   mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
 
