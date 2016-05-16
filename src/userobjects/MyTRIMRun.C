@@ -17,40 +17,14 @@
 template<>
 InputParameters validParams<MyTRIMRun>()
 {
-  InputParameters params = validParams<GeneralUserObject>();
-  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample");
-  params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
-
-  // we run this object once a timestep
-  params.set<MultiMooseEnum>("execute_on") = "timestep_begin";
-  params.suppressParameter<MultiMooseEnum>("execute_on");
-
+  InputParameters params = validParams<MyTRIMRunBase>();
   return params;
 }
 
 MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
-    GeneralUserObject(parameters),
-    _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
-    _nvars(_rasterizer.nVars()),
-    _pka_list(_rasterizer.getPKAList()),
-    _mesh(_subproblem.mesh()),
-    _dim(_mesh.dimension()),
+    MyTRIMRunBase(parameters),
     _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
 {
-  if (_mesh.isParallelMesh())
-    mooseError("MyTRIM runs currently require serial meshes.");
-
-  if (_dim < 2 || _dim > 3)
-    mooseError("TRIM simulation works in 2D or 3D only.");
-
-  if (_dim == 2)
-  {
-    // make sure all nodes lie in the xy-plane
-    const auto nd_end = _mesh.getMesh().nodes_end();
-    for (auto nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
-      if ((**nd)(2) != 0.0)
-        mooseError("Two dimensional meshes must lie in the z=0 plane.");
-  }
 }
 
 void

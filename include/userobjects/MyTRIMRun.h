@@ -7,15 +7,9 @@
 #ifndef MYTRIMRUN_H
 #define MYTRIMRUN_H
 
-#include "GeneralUserObject.h"
-#include "MyTRIMRasterizer.h"
-#include "MooseMyTRIMThreadedRecoilLoop.h"
-
-#include <map>
-#include <vector>
+#include "MyTRIMRunBase.h"
 
 class MyTRIMRun;
-class MooseMesh;
 
 template<>
 InputParameters validParams<MyTRIMRun>();
@@ -23,7 +17,7 @@ InputParameters validParams<MyTRIMRun>();
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
  */
-class MyTRIMRun : public GeneralUserObject
+class MyTRIMRun : public MyTRIMRunBase
 {
 public:
   MyTRIMRun(const InputParameters & parameters);
@@ -40,9 +34,6 @@ public:
   /// get the TRIM result data
   const MyTRIMResult & result(const Elem *) const;
 
-  // get the number of elements in the TRIM simulation
-  unsigned int nVars() const { return _nvars; }
-
 protected:
   ///@{ pack/unpack the _result_map into a structure suitable for parallel communication
   void serialize(std::string & serialized_buffer);
@@ -51,21 +42,6 @@ protected:
 
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultMap _result_map;
-
-  /// Rasterizer object to provide the material data
-  const MyTRIMRasterizer & _rasterizer;
-
-  /// number of elements in the TRIM simulation
-  const unsigned int _nvars;
-
-  /// number of primary knock-on atoms (PKA) to simulate
-  const std::vector<MyTRIM_NS::IonBase> & _pka_list;
-
-  /// The Mesh we're using
-  MooseMesh & _mesh;
-
-  /// dimension of the mesh
-  const unsigned int _dim;
 
 private:
   /// zero result to return for elements that have not been touched by the cascades
