@@ -5,7 +5,7 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-#include "MyTRIMElementRun.h"
+#include "MyTRIMDiracRun.h"
 #include "MooseMesh.h"
 
 // libmesh includes
@@ -15,21 +15,20 @@
 #include <queue>
 
 template<>
-InputParameters validParams<MyTRIMElementRun>()
+InputParameters validParams<MyTRIMDiracRun>()
 {
   InputParameters params = validParams<MyTRIMRunBase>();
-  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample and gather the results for use with an element averaged source Kernel.");
+  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample and gather the results for use with a source DiracKernel.");
   return params;
 }
 
-MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters) :
-    MyTRIMRunBase(parameters),
-    _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
+MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) :
+    MyTRIMRunBase(parameters)
 {
 }
 
 void
-MyTRIMElementRun::execute()
+MyTRIMDiracRun::execute()
 {
   // bail out early if no run is requested for this timestep
   if (!_rasterizer.executeThisTimestep())
@@ -39,7 +38,7 @@ MyTRIMElementRun::execute()
   _mesh.getMesh().sub_point_locator();
 
   // build thread loop functor
-  ThreadedRecoilElementAveragedLoop rl(_rasterizer, _mesh);
+  ThreadedRecoilDiracSourceLoop rl(_rasterizer, _mesh);
 
   // output the number of recoils being launched
   _console << "\nMyTRIM: Running " << _pka_list.size() << " recoils." << std::endl;
@@ -50,11 +49,11 @@ MyTRIMElementRun::execute()
   Moose::perf_log.pop("MyTRIMRecoilLoop", "Solve");
 
   // fetch the joined data from thread 0
-  _result_map = rl.getResultMap();
+  _result_list = rl.getResultList();
 }
 
 void
-MyTRIMElementRun::finalize()
+MyTRIMDiracRun::finalize()
 {
   // create a one send buffer for use with the libMesh packed range routines
   std::vector<std::string> send_buffers(1);
@@ -67,38 +66,32 @@ MyTRIMElementRun::finalize()
   serialize(send_buffers[0]);
 
   // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
+  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
                                        std::back_inserter(recv_buffers));
 
   // unpack the received data and merge it into the local data structures
   deserialize(recv_buffers);
 }
 
-const MyTRIMElementRun::MyTRIMResult &
-MyTRIMElementRun::result(const Elem * elem) const
+const MyTRIMDiracRun::MyTRIMResultList &
+MyTRIMDiracRun::result() const
 {
-  auto i = _result_map.find(elem->id());
-
-  // if no entry in the map was found no collision event happened in the element
-  if (i == _result_map.end())
-    return _zero;
-
-  return i->second;
+  return _result_list;
 }
 
 void
-MyTRIMElementRun::serialize(std::string & serialized_buffer)
+MyTRIMDiracRun::serialize(std::string & serialized_buffer)
 {
   // stream for serializing the _result_map structure to a byte stream
   std::ostringstream oss;
-  dataStore(oss, _result_map, this);
+  dataStore(oss, _result_list, this);
 
   // Populate the passed in string pointer with the string stream's buffer contents
   serialized_buffer.assign(oss.str());
 }
 
 void
-MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
+MyTRIMDiracRun::deserialize(std::vector<std::string> & serialized_buffers)
 {
   mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
 
@@ -117,28 +110,9 @@ MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
     iss.clear();
 
     // Load the communicated data into temporary structures
-    MyTRIMResultMap other_result_map;
-    dataLoad(iss, other_result_map, this);
+    MyTRIMResultList other_result_list;
+    dataLoad(iss, other_result_list, this);
 
-    // merge the data in with the current processor's data
-    for (auto & other_result : other_result_map)
-    {
-      auto j = _result_map.find(other_result.first);
-
-      // if no entry in the map was found then set it, otherwise add value
-      if (j == _result_map.end())
-        _result_map.insert(other_result);
-      else
-      {
-        mooseAssert(other_result.second.size() == _nvars && j->second.size() == _nvars, "Inconsistent TRIM result vector sizes across processors.");
-
-        for (unsigned int k = 0; k < _nvars; ++k)
-        {
-          // sum vacancy and interstitial production
-          j->second[k].first += other_result.second[k].first;
-          j->second[k].second += other_result.second[k].second;
-        }
-      }
-    }
+    _result_list.insert(_result_list.end(), other_result_list.begin(), other_result_list.end());
   }
 }

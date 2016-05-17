@@ -12,7 +12,6 @@ template<>
 InputParameters validParams<MyTRIMRunBase>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample");
   params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
 
   // we run this object once a timestep
@@ -39,8 +38,8 @@ MyTRIMRunBase::MyTRIMRunBase(const InputParameters & parameters) :
   if (_dim == 2)
   {
     // make sure all nodes lie in the xy-plane
-    const MeshBase::node_iterator nd_end = _mesh.getMesh().nodes_end();
-    for (MeshBase::node_iterator nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
+    const auto nd_end = _mesh.getMesh().nodes_end();
+    for (auto nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
       if ((**nd)(2) != 0.0)
         mooseError("Two dimensional meshes must lie in the z=0 plane.");
   }

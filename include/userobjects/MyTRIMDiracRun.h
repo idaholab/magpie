@@ -4,36 +4,37 @@
 /*          All contents are licensed under LGPL V2.1           */
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
-#ifndef MYTRIMELEMENTRUN_H
-#define MYTRIMELEMENTRUN_H
+#ifndef MYTRIMDIRACRUN_H
+#define MYTRIMDIRACRUN_H
 
 #include "MyTRIMRunBase.h"
-#include "ThreadedRecoilElementAveragedLoop.h"
+#include "ThreadedRecoilDiracSourceLoop.h"
 
-class MyTRIMElementRun;
+class MyTRIMDiracRun;
 
 template<>
-InputParameters validParams<MyTRIMElementRun>();
+InputParameters validParams<MyTRIMDiracRun>();
 
 /**
- * This UserObject rasterizes a simulation domain for the MyTRIM library
+ * This UserObject rasterizes a simulation domain for the MyTRIM library and
+ * stores the resulting defect distributions as
  */
-class MyTRIMElementRun : public MyTRIMRunBase
+class MyTRIMDiracRun : public MyTRIMRunBase
 {
 public:
-  MyTRIMElementRun(const InputParameters & parameters);
+  MyTRIMDiracRun(const InputParameters & parameters);
 
   virtual void initialize() {}
   virtual void execute();
   virtual void finalize();
 
   /// @{ shorthand typedefs
-  typedef ThreadedRecoilElementAveragedLoop::MyTRIMResult MyTRIMResult;
-  typedef ThreadedRecoilElementAveragedLoop::MyTRIMResultMap MyTRIMResultMap;
+  typedef ThreadedRecoilDiracSourceLoop::MyTRIMResult MyTRIMResult;
+  typedef ThreadedRecoilDiracSourceLoop::MyTRIMResultList MyTRIMResultList;
   /// @}
 
   /// get the TRIM result data
-  const MyTRIMResult & result(const Elem *) const;
+  const MyTRIMResultList & result() const;
 
 protected:
   ///@{ pack/unpack the _result_map into a structure suitable for parallel communication
@@ -42,11 +43,7 @@ protected:
   ///@}
 
   /// data such as interstitials and vacancies produced will be stored here
-  MyTRIMResultMap _result_map;
-
-private:
-  /// zero result to return for elements that have not been touched by the cascades
-  MyTRIMResult _zero;
+  MyTRIMResultList _result_list;
 };
 
-#endif //MYTRIMELEMENTRUN_H
+#endif //MYTRIMDIRACRUN_H
