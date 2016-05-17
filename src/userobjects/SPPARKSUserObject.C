@@ -38,7 +38,7 @@ InputParameters validParams<SPPARKSUserObject>()
 
 SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
     GeneralUserObject(params),
-    _spparks(NULL),
+    _spparks(nullptr),
     _file(getParam<std::string>("file")),
     _spparks_only(getParam<bool>("spparks_only")),
     _from_ivar(getParam<std::vector<unsigned> >("from_ivar")),
@@ -87,7 +87,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
   }
 
   _console << "\n>>>> STARTING SPPARKS <<<<\n";
-  spparks_open(0, NULL, _communicator.get(), &_spparks);
+  spparks_open(0, nullptr, _communicator.get(), &_spparks);
   if (!_spparks)
     mooseError("Error initializing SPPARKS");
 
@@ -176,12 +176,12 @@ SPPARKSUserObject::setSPPARKSData()
 {
   // _console << "\nsetSPPARKSData\n";
   // Update the integer data
-  int * ip = NULL;
+  int * ip = nullptr;
   for (unsigned i = 0; i < _to_ivar.size(); ++i)
     setSPPARKSData(ip, "iarray", _to_ivar[i], *_int_vars[i]);
 
   // Update the double data
-  double * dp = NULL;
+  double * dp = nullptr;
   for (unsigned i = 0; i < _to_dvar.size(); ++i)
     setSPPARKSData(dp, "darray", _to_dvar[i], *_double_vars[i]);
 }
@@ -257,7 +257,7 @@ SPPARKSUserObject::initSPPARKS()
   std::map<libMesh::dof_id_type, int> ints[2];
   std::map<libMesh::dof_id_type, Real> comp;
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
-  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
+  for (auto i = node_range.begin(); i < node_range.end(); ++i)
   {
     int value = int(100*MooseRandom::rand()) + 1;
     ints[0][(*i)->id()] = value;
@@ -272,14 +272,14 @@ SPPARKSUserObject::initSPPARKS()
   }
   solution.close();
 
-  int * pint = NULL;
+  int * pint = nullptr;
   char iarray[] = "iarray";
   for (unsigned i(0); i < 2; ++i)
   {
     getSPPARKSDataPointer(pint, iarray, _from_ivar[i]);
 
     // Index into data is SPPARKS node id.
-    for (std::multimap<FEMID, SPPARKSID>::const_iterator it = _fem_to_spparks.begin(); it != _fem_to_spparks.end(); ++it)
+    for (auto it = _fem_to_spparks.begin(); it != _fem_to_spparks.end(); ++it)
       pint[it->second.id] = ints[i][it->first.id];
 
     // Copy data across processors
@@ -322,7 +322,7 @@ SPPARKSUserObject::initialSetup()
   // node locations.
   std::multiset<FEMID> fem_id; // Local MOOSE FEM nodes
   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
-  for (ConstNodeRange::const_iterator i = node_range.begin(); i < node_range.end(); ++i)
+  for (auto i = node_range.begin(); i < node_range.end(); ++i)
   {
     Point coor(**i);
 
@@ -340,18 +340,18 @@ SPPARKSUserObject::initialSetup()
   // SPPARKS nodes not found on this processor
   std::set<SPPARKSID> unmatched_spparks;
 
-  for (std::set<SPPARKSID>::iterator i = spparks_id.begin(); i != spparks_id.end(); ++i)
+  for (auto i = spparks_id.begin(); i != spparks_id.end(); ++i)
   {
-    std::multiset<FEMID>::iterator fem_iter = fem_id.find(*i);
+    auto fem_iter = fem_id.find(*i);
     if (fem_iter != fem_id.end())
       _spparks_to_fem.insert(std::pair<SPPARKSID, FEMID>(*i, *fem_iter)); // SPPARKSID to FEMID
     else
       unmatched_spparks.insert(*i);
   }
 
-  for (std::multiset<FEMID>::iterator i = fem_id.begin(); i != fem_id.end(); ++i)
+  for (auto i = fem_id.begin(); i != fem_id.end(); ++i)
   {
-    std::set<SPPARKSID>::iterator spparks_iter = spparks_id.find(*i);
+    auto spparks_iter = spparks_id.find(*i);
     if (spparks_iter != spparks_id.end())
       _fem_to_spparks.insert(std::pair<FEMID, SPPARKSID>(*i, *spparks_iter)); // FEMID to SPPARKSID
     // else
@@ -389,7 +389,7 @@ SPPARKSUserObject::initialSetup()
   Real * s_bounds = &spparks_bounds[0] + offset;
   s_bounds[0] = s_bounds[1] = s_bounds[2] = std::numeric_limits<Real>::max();
   s_bounds[3] = s_bounds[4] = s_bounds[5] = std::numeric_limits<Real>::min();
-  for (std::set<SPPARKSID>::const_iterator i = unmatched_spparks.begin(); i != unmatched_spparks.end(); ++i)
+  for (auto i = unmatched_spparks.begin(); i != unmatched_spparks.end(); ++i)
   {
     s_bounds[0] = std::min(s_bounds[0], i->coor(0));
     s_bounds[1] = std::min(s_bounds[1], i->coor(1));
@@ -415,7 +415,7 @@ SPPARKSUserObject::initialSetup()
   Real * e_bounds = &fem_bounds[0] + offset;
   e_bounds[0] = e_bounds[1] = e_bounds[2] = std::numeric_limits<Real>::max();
   e_bounds[3] = e_bounds[4] = e_bounds[5] = std::numeric_limits<Real>::min();
-  for (std::multiset<FEMID>::const_iterator i = fem_id.begin(); i != fem_id.end(); ++i)
+  for (auto i = fem_id.begin(); i != fem_id.end(); ++i)
   {
     e_bounds[0] = std::min(e_bounds[0], i->coor(0));
     e_bounds[1] = std::min(e_bounds[1], i->coor(1));
@@ -538,7 +538,7 @@ SPPARKSUserObject::initialSetup()
   std::vector<libMesh::dof_id_type> fem_ids(_num_local_fem_nodes);
   std::vector<Real> fem_coords(3*_num_local_fem_nodes);
   offset = 0;
-  for (std::multiset<FEMID>::const_iterator i = fem_id.begin(); i != fem_id.end(); ++i)
+  for (auto i = fem_id.begin(); i != fem_id.end(); ++i)
   {
     fem_ids[offset] = i->id;
     fem_coords[offset*3+0] = i->coor(0);
@@ -559,7 +559,7 @@ SPPARKSUserObject::initialSetup()
   std::vector<unsigned> spparks_ids(_num_local_spparks_nodes);
   std::vector<Real> spparks_coords(3*_num_local_spparks_nodes);
   offset = 0;
-  for (std::set<SPPARKSID>::const_iterator i = spparks_id.begin(); i != spparks_id.end(); ++i)
+  for (auto i = spparks_id.begin(); i != spparks_id.end(); ++i)
   {
     spparks_ids[offset] = i->id;
     spparks_coords[offset*3+0] = i->coor(0);
@@ -613,7 +613,7 @@ SPPARKSUserObject::initialSetup()
                      Point(remote_fem_coords[offset*3+0],
                            remote_fem_coords[offset*3+1],
                            remote_fem_coords[offset*3+2]));
-      std::set<SPPARKSID>::iterator iter = spparks_id.find(tmp);
+      auto iter = spparks_id.find(tmp);
       if (iter != spparks_id.end())
       {
         spparks_matches[i].push_back(tmp.id);
@@ -635,7 +635,7 @@ SPPARKSUserObject::initialSetup()
                  Point(remote_spparks_coords[offset*3+0],
                        remote_spparks_coords[offset*3+1],
                        remote_spparks_coords[offset*3+2]));
-      std::multiset<FEMID>::iterator iter = fem_id.find(tmp);
+      auto iter = fem_id.find(tmp);
       if (iter != fem_id.end())
       {
         fem_matches[i].push_back(tmp.id);
