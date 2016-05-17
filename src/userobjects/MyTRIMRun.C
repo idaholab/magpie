@@ -46,8 +46,8 @@ MyTRIMRun::MyTRIMRun(const InputParameters & parameters) :
   if (_dim == 2)
   {
     // make sure all nodes lie in the xy-plane
-    const MeshBase::node_iterator nd_end = _mesh.getMesh().nodes_end();
-    for (MeshBase::node_iterator nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
+    const auto nd_end = _mesh.getMesh().nodes_end();
+    for (auto nd = _mesh.getMesh().nodes_begin(); nd != nd_end; ++nd)
       if ((**nd)(2) != 0.0)
         mooseError("Two dimensional meshes must lie in the z=0 plane.");
   }
@@ -92,7 +92,7 @@ MyTRIMRun::finalize()
   serialize(send_buffers[0]);
 
   // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(NULL), send_buffers.begin(), send_buffers.end(),
+  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
                                        std::back_inserter(recv_buffers));
 
   // unpack the received data and merge it into the local data structures
@@ -102,7 +102,7 @@ MyTRIMRun::finalize()
 const MyTRIMRun::MyTRIMResult &
 MyTRIMRun::result(const Elem * elem) const
 {
-  MyTRIMResultMap::const_iterator i = _result_map.find(elem->id());
+  auto i = _result_map.find(elem->id());
 
   // if no entry in the map was found no collision event happened in the element
   if (i == _result_map.end())
@@ -146,9 +146,9 @@ MyTRIMRun::deserialize(std::vector<std::string> & serialized_buffers)
     dataLoad(iss, other_result_map, this);
 
     // merge the data in with the current processor's data
-    for (MyTRIMResultMap::const_iterator i = other_result_map.begin(); i != other_result_map.end(); ++i)
+    for (auto i = other_result_map.begin(); i != other_result_map.end(); ++i)
     {
-      MyTRIMResultMap::iterator j = _result_map.find(i->first);
+      auto j = _result_map.find(i->first);
 
       // if no entry in the map was found then set it, otherwise add value
       if (j == _result_map.end())
