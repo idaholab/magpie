@@ -9,7 +9,7 @@
 
 #include "GeneralUserObject.h"
 #include "MyTRIMRasterizer.h"
-#include "MooseMyTRIMThreadedRecoilLoop.h"
+#include "ThreadedRecoilElementAveragedLoop.h"
 
 #include <map>
 #include <vector>

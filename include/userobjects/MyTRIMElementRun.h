@@ -27,8 +27,8 @@ public:
   virtual void finalize();
 
   /// @{ shorthand typedefs
-  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResult MyTRIMResult;
-  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResultMap MyTRIMResultMap;
+  typedef ThreadedRecoilElementAveragedLoop::MyTRIMResult MyTRIMResult;
+  typedef ThreadedRecoilElementAveragedLoop::MyTRIMResultMap MyTRIMResultMap;
   /// @}
 
   /// get the TRIM result data

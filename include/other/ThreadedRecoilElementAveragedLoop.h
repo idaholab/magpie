@@ -13,22 +13,22 @@ typedef StoredRange<std::vector<MyTRIM_NS::IonBase>::const_iterator, MyTRIM_NS::
 /**
  * MyTRIM simulation threaded loop for recoil calculation
  */
-class MooseMyTRIMThreadedRecoilLoop
+class ThreadedRecoilElementAveragedLoop
 {
 public:
-  MooseMyTRIMThreadedRecoilLoop(const MyTRIMRasterizer &, const MooseMesh &);
+  ThreadedRecoilElementAveragedLoop(const MyTRIMRasterizer &, const MooseMesh &);
 
   /// Splitting constructor
-  MooseMyTRIMThreadedRecoilLoop(const MooseMyTRIMThreadedRecoilLoop & x, Threads::split split);
+  ThreadedRecoilElementAveragedLoop(const ThreadedRecoilElementAveragedLoop & x, Threads::split split);
 
   /// dummy virtual destructor
-  virtual ~MooseMyTRIMThreadedRecoilLoop() {}
+  virtual ~ThreadedRecoilElementAveragedLoop() {}
 
   /// parens operator with the code that is executed in threads
   void operator() (const PKARange & range);
 
   /// thread join method
-  virtual void join(const MooseMyTRIMThreadedRecoilLoop &);
+  virtual void join(const ThreadedRecoilElementAveragedLoop &);
 
   /**
    * result data map for the TRIM simulation holding interstitial/vacancy pairs

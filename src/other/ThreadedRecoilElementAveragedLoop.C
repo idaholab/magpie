@@ -1,4 +1,4 @@
-#include "MooseMyTRIMThreadedRecoilLoop.h"
+#include "ThreadedRecoilElementAveragedLoop.h"
 #include "MooseMyTRIMCore.h"
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
@@ -6,7 +6,7 @@
 // libmesh includes
 #include "libmesh/quadrature.h"
 
-MooseMyTRIMThreadedRecoilLoop::MooseMyTRIMThreadedRecoilLoop(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
+ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
     _rasterizer(rasterizer),
     _nvars(_rasterizer.nVars()),
     _mesh(mesh),
@@ -15,7 +15,7 @@ MooseMyTRIMThreadedRecoilLoop::MooseMyTRIMThreadedRecoilLoop(const MyTRIMRasteri
 }
 
 // Splitting Constructor
-MooseMyTRIMThreadedRecoilLoop::MooseMyTRIMThreadedRecoilLoop(const MooseMyTRIMThreadedRecoilLoop & x, Threads::split /*split*/) :
+ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(const ThreadedRecoilElementAveragedLoop & x, Threads::split /*split*/) :
     _rasterizer(x._rasterizer),
     _nvars(x._nvars),
     _mesh(x._mesh),
@@ -24,7 +24,7 @@ MooseMyTRIMThreadedRecoilLoop::MooseMyTRIMThreadedRecoilLoop(const MooseMyTRIMTh
 }
 
 void
-MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
+ThreadedRecoilElementAveragedLoop::operator() (const PKARange & pka_list)
 {
   // fetch a point locator
   _pl = _mesh.getMesh().sub_point_locator();
@@ -81,7 +81,7 @@ MooseMyTRIMThreadedRecoilLoop::operator() (const PKARange & pka_list)
 }
 
 void
-MooseMyTRIMThreadedRecoilLoop::join(const MooseMyTRIMThreadedRecoilLoop & rl)
+ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop & rl)
 {
   for (auto && i : _result_map)
   {
@@ -102,7 +102,7 @@ MooseMyTRIMThreadedRecoilLoop::join(const MooseMyTRIMThreadedRecoilLoop & rl)
 }
 
 void
-MooseMyTRIMThreadedRecoilLoop::addDefectToResult(const Point & p, unsigned int var, MooseMyTRIMThreadedRecoilLoop::DefectType type)
+ThreadedRecoilElementAveragedLoop::addDefectToResult(const Point & p, unsigned int var, ThreadedRecoilElementAveragedLoop::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
   if (elem != nullptr && var < _nvars)

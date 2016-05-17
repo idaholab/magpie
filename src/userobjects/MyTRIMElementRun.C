@@ -38,7 +38,7 @@ MyTRIMElementRun::execute()
   _mesh.getMesh().sub_point_locator();
 
   // build thread loop functor
-  MooseMyTRIMThreadedRecoilLoop rl(_rasterizer, _mesh);
+  ThreadedRecoilElementAveragedLoop rl(_rasterizer, _mesh);
 
   // output the number of recoils being launched
   _console << "\nMyTRIM: Running " << _pka_list.size() << " recoils." << std::endl;
