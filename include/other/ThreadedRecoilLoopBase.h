@@ -31,7 +31,7 @@ public:
 
 protected:
   /// defect type enum
-  enum DefectType { VACANCY, INTERSTITIAL };
+  enum DefectType { VACANCY, INTERSTITIAL, NONE };
 
   /// add an interstitial or vacancy to the result list
   virtual void addDefectToResult(const Point & p, unsigned int var, DefectType type) = 0;

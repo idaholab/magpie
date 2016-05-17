@@ -4,13 +4,13 @@
 template<>
 InputParameters validParams<MyTRIMElementResultAux>()
 {
-  InputParameters params = MyTRIMResultAccess<AuxKernel>::validParams();
+  InputParameters params = MyTRIMElementResultAccess<AuxKernel>::validParams();
   params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   return params;
 }
 
 MyTRIMElementResultAux::MyTRIMElementResultAux(const InputParameters & parameters) :
-    MyTRIMResultAccess<AuxKernel>(parameters)
+    MyTRIMElementResultAccess<AuxKernel>(parameters)
 {
 }
 

@@ -20,5 +20,23 @@ ThreadedRecoilDiracSourceLoop::join(const ThreadedRecoilDiracSourceLoop & rl)
 void
 ThreadedRecoilDiracSourceLoop::addDefectToResult(const Point & p, unsigned int var, ThreadedRecoilDiracSourceLoop::DefectType type)
 {
-  _result_list.push_back(std::make_pair(std::make_pair(type, var), p));
+  _result_list.push_back(MyTRIMResult(p, var, type));
+}
+
+template<>
+void
+dataStore(std::ostream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & dsl, void * context)
+{
+  dataStore(stream, dsl._location, context);
+  dataStore(stream, dsl._var, context);
+  dataStore(stream, dsl._type, context);
+}
+
+template<>
+void
+dataLoad(std::istream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & dsl, void * context)
+{
+  dataLoad(stream, dsl._location, context);
+  dataLoad(stream, dsl._var, context);
+  dataLoad(stream, dsl._type, context);
 }

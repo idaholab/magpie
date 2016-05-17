@@ -1,7 +1,7 @@
-#ifndef MYTRIMSOURCE_H
-#define MYTRIMSOURCE_H
+#ifndef MYTRIMELEMENTSOURCE_H
+#define MYTRIMELEMENTSOURCE_H
 
-#include "MyTRIMResultAccess.h"
+#include "MyTRIMElementResultAccess.h"
 #include "Kernel.h"
 
 // forward declarations
@@ -11,7 +11,7 @@ class MyTRIMElementSource;
 template<>
 InputParameters validParams<MyTRIMElementSource>();
 
-class MyTRIMElementSource : public MyTRIMResultAccess<Kernel>
+class MyTRIMElementSource : public MyTRIMElementResultAccess<Kernel>
 {
 public:
   MyTRIMElementSource(const InputParameters & params);
@@ -22,4 +22,4 @@ protected:
   const Real _prefactor;
 };
 
-#endif //MYTRIMAUX_H
+#endif //MYTRIMELEMENTSOURCE_H

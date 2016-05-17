@@ -12,8 +12,12 @@
 #include "DefectAnnihilation.h"
 #include "MyTRIMElementSource.h"
 
+// DiracKernels
+#include "MyTRIMDiracSource.h"
+
 // UserObjects
 #include "MyTRIMRasterizer.h"
+#include "MyTRIMDiracRun.h"
 #include "MyTRIMElementRun.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
@@ -62,7 +66,10 @@ MagpieApp::registerObjects(Factory & factory)
   registerKernel(DefectAnnihilation);
   registerKernel(MyTRIMElementSource);
 
+  registerDiracKernel(MyTRIMDiracSource);
+
   registerUserObject(MyTRIMRasterizer);
+  registerUserObject(MyTRIMDiracRun);
   registerUserObject(MyTRIMElementRun);
   registerUserObject(PKAConstant);
   registerUserObject(PKAFissionFragmentEmpirical);

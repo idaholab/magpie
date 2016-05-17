@@ -1,7 +1,7 @@
 #ifndef MYTRIMRESULTAUX_H
 #define MYTRIMRESULTAUX_H
 
-#include "MyTRIMResultAccess.h"
+#include "MyTRIMElementResultAccess.h"
 #include "AuxKernel.h"
 
 // forward declarations
@@ -11,7 +11,7 @@ class MyTRIMElementResultAux;
 template<>
 InputParameters validParams<MyTRIMElementResultAux>();
 
-class MyTRIMElementResultAux : public MyTRIMResultAccess<AuxKernel>
+class MyTRIMElementResultAux : public MyTRIMElementResultAccess<AuxKernel>
 {
 public:
   MyTRIMElementResultAux(const InputParameters & params);

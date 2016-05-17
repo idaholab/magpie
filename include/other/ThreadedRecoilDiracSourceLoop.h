@@ -2,6 +2,7 @@
 #define THREADEDRECOILDIRACSOURCELOOP_H
 
 #include "ThreadedRecoilLoopBase.h"
+#include "DataIO.h"
 
 /**
  * MyTRIM simulation threaded loop for recoil calculation. Results are stored as
@@ -22,7 +23,7 @@ public:
    * result data map for the TRIM simulation holding defects and their locations
    * for each species in the rasterizer.
    */
-  typedef std::pair<std::pair<DefectType, unsigned int>, Point> MyTRIMResult;
+  struct MyTRIMResult;
   typedef std::vector<MyTRIMResult> MyTRIMResultList;
   const MyTRIMResultList & getResultList() { return _result_list; }
 
@@ -33,5 +34,31 @@ protected:
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultList _result_list;
 };
+
+struct ThreadedRecoilDiracSourceLoop::MyTRIMResult {
+  MyTRIMResult(const Point & location, unsigned int var, ThreadedRecoilDiracSourceLoop::DefectType type) :
+      _location(location),
+      _var(var),
+      _type(type)
+  {
+  }
+
+  MyTRIMResult() :
+      _location(),
+      _var(0),
+      _type(NONE)
+  {
+  }
+
+  Point _location;
+  unsigned int _var;
+  DefectType _type;
+};
+
+template<>
+void dataStore(std::ostream &, ThreadedRecoilDiracSourceLoop::MyTRIMResult &, void *);
+
+template<>
+void dataLoad(std::istream &, ThreadedRecoilDiracSourceLoop::MyTRIMResult &, void *);
 
 #endif //THREADEDRECOILDIRACSOURCELOOP_H

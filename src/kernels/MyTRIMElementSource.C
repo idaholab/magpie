@@ -4,13 +4,13 @@
 template<>
 InputParameters validParams<MyTRIMElementSource>()
 {
-  InputParameters params = MyTRIMResultAccess<Kernel>::validParams();
+  InputParameters params = MyTRIMElementResultAccess<Kernel>::validParams();
   params.addParam<Real>("prefactor", 1.0, "Prefactor to scale the applied production rate");
   return params;
 }
 
 MyTRIMElementSource::MyTRIMElementSource(const InputParameters & parameters) :
-    MyTRIMResultAccess<Kernel>(parameters),
+    MyTRIMElementResultAccess<Kernel>(parameters),
     _prefactor(getParam<Real>("prefactor"))
 {
 }
