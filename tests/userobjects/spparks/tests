@@ -3,5 +3,16 @@
     type = 'Exodiff'
     input = './tofrom_spparks.i'
     exodiff = './tofrom_spparks_out.e'
+    max_parallel = 1
+  [../]
+
+  [./tofrom_spparks_par]
+    type = 'Exodiff'
+    input = './tofrom_spparks.i'
+    exodiff = './tofrom_spparks_par_out.e'
+    cli_args = 'Outputs/file_base=tofrom_spparks_par_out'
+    prereq = 'tofrom_spparks'
+    min_parallel = 2
+    max_parallel = 2
   [../]
 []
