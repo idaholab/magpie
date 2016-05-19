@@ -30,6 +30,9 @@ public:
   // get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
 
+  // get the name of the rasterizer object (this is to add an artificial in an Auxkernel)
+  UserObjectName getRasterizerName() const { return getParam<UserObjectName>("rasterizer"); }
+
 protected:
   /// Rasterizer object to provide the material data
   const MyTRIMRasterizer & _rasterizer;

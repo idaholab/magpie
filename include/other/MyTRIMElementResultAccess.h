@@ -16,11 +16,12 @@ public:
   static InputParameters validParams();
   Real getDefectRate();
 
-private:
+protected:
   const MyTRIMElementRun & _mytrim;
   const unsigned int _ivar;
   const unsigned int _defect;
 
+private:
   /// calculate values only for qp 0 and cache them here
   Real _value_cache;
 };
