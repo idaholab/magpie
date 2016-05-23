@@ -14,7 +14,7 @@ ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(const Threa
 void
 ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop & rl)
 {
-  for (auto && i : _result_map)
+  for (auto && i : rl._result_map)
   {
     auto j = _result_map.find(i.first);
     if (j == _result_map.end())

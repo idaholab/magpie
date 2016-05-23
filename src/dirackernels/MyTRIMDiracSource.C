@@ -1,5 +1,6 @@
 #include "MyTRIMDiracSource.h"
 #include "MyTRIMDiracRun.h"
+#include "MooseMesh.h"
 
 template<>
 InputParameters validParams<MyTRIMDiracSource>()
@@ -9,6 +10,9 @@ InputParameters validParams<MyTRIMDiracSource>()
   params.addParam<unsigned int>("ivar", "Element index");
   MooseEnum defectType("VAC INT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
+
+  // this needs multiplicity enabled to give meaningful results
+  params.set<bool>("drop_duplicate_points") = false;
 
   return params;
 }
@@ -26,7 +30,11 @@ MyTRIMDiracSource::addPoints()
 {
   for (auto && defect : _mytrim.result())
     if (defect._type == _defect && defect._var == _ivar)
-      addPoint(defect._location);
+    {
+      Elem * elem = _mesh.elemPtr(defect._elem);
+      if (elem)
+        addPoint(elem, defect._location);
+    }
 }
 
 Real

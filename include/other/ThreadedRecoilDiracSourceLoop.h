@@ -36,23 +36,26 @@ protected:
 };
 
 struct ThreadedRecoilDiracSourceLoop::MyTRIMResult {
-  MyTRIMResult(const Point & location, unsigned int var, ThreadedRecoilDiracSourceLoop::DefectType type) :
+  MyTRIMResult(const Point & location, unsigned int var, ThreadedRecoilDiracSourceLoop::DefectType type, dof_id_type elem) :
       _location(location),
       _var(var),
-      _type(type)
+      _type(type),
+      _elem(elem)
   {
   }
 
   MyTRIMResult() :
       _location(),
       _var(0),
-      _type(NONE)
+      _type(NONE),
+      _elem(libMesh::invalid_uint)
   {
   }
 
   Point _location;
   unsigned int _var;
   DefectType _type;
+  dof_id_type _elem;
 };
 
 template<>
