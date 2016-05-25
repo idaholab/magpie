@@ -18,6 +18,11 @@ namespace MagpieUtils
  */
 Point randomElementPoint(const Elem & el, const Point & rnd);
 
+///@{ ZAID (ZZAAA) conversion helper
+unsigned int getZFromZAID(unsigned int zaid);
+unsigned int getAFromZAID(unsigned int  zaid);
+///@}
+
 } // namespace MagpieUtils
 
 #endif //MAGPIEUTILS_H

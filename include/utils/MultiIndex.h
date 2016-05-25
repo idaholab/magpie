@@ -102,8 +102,10 @@ class MultiIndex<T>::iterator
 public:
   iterator(MultiIndex<T> & multi_index, unsigned int position) :
       _multi_index(multi_index),
-      _flat_index(position)
+      _flat_index(position),
+      _shape(multi_index.size())
   {
+    _multi_index.findIndexVector(position, _indices);
   }
 
   // Simple data getters
@@ -111,7 +113,7 @@ public:
   MultiIndex<T> & getMultiIndexObject() const {return _multi_index;}
 
   /// Allow retrieving indices vector from position and single index
-  size_type indices() const;
+  size_type indices() const { return _indices; }
 
   /// return index component
   unsigned int index(unsigned int d) const;
@@ -121,6 +123,7 @@ public:
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
+    _indices = other.indices();
     return *this;
   }
 
@@ -128,6 +131,13 @@ public:
   iterator & operator++ ()
   {
     ++_flat_index;
+    // increment indices
+    for (unsigned int j = 0; j < _indices.size(); ++j)
+    {
+      _indices[_indices.size() - j - 1] = (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
+      if (_indices[_indices.size() - j - 1] != 0)
+        break;
+    }
     return *this;
   }
 
@@ -136,6 +146,13 @@ public:
   {
     iterator clone(*this);
     ++_flat_index;
+    // increment indices
+    for (unsigned int j = 0; j < _indices.size(); ++j)
+    {
+      _indices[_indices.size() - j - 1] = (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
+      if (_indices[_indices.size() - j - 1] != 0)
+        break;
+    }
     return clone;
   }
 
@@ -143,6 +160,17 @@ public:
   iterator & operator-- ()
   {
     --_flat_index;
+    // decrement indices
+    for (unsigned int j = 0; j < _indices.size(); ++j)
+    {
+      if (_indices[_indices.size() - j - 1] == 0)
+        _indices[_indices.size() - j - 1] = _shape[_indices.size() - j - 1] - 1;
+      else
+      {
+        --_indices[_indices.size() - j - 1];
+        break;
+      }
+    }
     return *this;
   }
 
@@ -151,6 +179,17 @@ public:
   {
     iterator clone(*this);
     --_flat_index;
+    // decrement indices
+    for (unsigned int j = 0; j < _indices.size(); ++j)
+    {
+      if (_indices[_indices.size() - j - 1] == 0)
+        _indices[_indices.size() - j - 1] = _shape[_indices.size() - j - 1] - 1;
+      else
+      {
+        --_indices[_indices.size() - j - 1];
+        break;
+      }
+    }
     return clone;
   }
 
@@ -164,6 +203,8 @@ public:
 protected:
   MultiIndex<T> & _multi_index;
   unsigned int _flat_index;
+  size_type _shape;
+  size_type _indices;
 };
 
 
@@ -393,22 +434,12 @@ MultiIndex<T>::flatIndex(const size_type & indices) const
   return index;
 }
 
-
-template <class T>
-typename MultiIndex<T>::size_type
-MultiIndex<T>::iterator::indices() const
-{
-  size_type indices;
-  _multi_index.findIndexVector(_flat_index, indices);
-  return indices;
-}
-
 template <class T>
 unsigned int
 MultiIndex<T>::iterator::index(unsigned int d) const
 {
-  mooseAssert(d < _multi_index.dim(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dim());
-  return indices()[d];
+  mooseAssert(d < _index.size(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dim());
+  return _indices[d];
 }
 
 
