@@ -69,7 +69,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   InputParameters params = validParams<ElementUserObject>();
   params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM binary collision Monte Carlo simulation");
   params.addRequiredCoupledVar("var", "Variables to rasterize");
-  params.addCoupledVar("periodic_var", "Optional variables that determines teh periodicity. If not supplied the first argument of 'var' will be used.");
+  params.addCoupledVar("periodic_var", "Optional variables that determines the periodicity. If not supplied the first argument of 'var' will be used.");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
   params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");

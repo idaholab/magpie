@@ -1,1 +1,2 @@
-The element averaged MyTRIM run creates a gold file oon teh fly which the Dirac based runner compares against.
+The element averaged MyTRIM runner creates a gold file on the fly, which the
+Dirac based runner compares against.

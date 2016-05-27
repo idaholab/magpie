@@ -19,10 +19,12 @@ InputParameters validParams<MyTRIMDiracSource>()
 
 MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters) :
     DiracKernel(parameters),
-    _mytrim(this->template getUserObject<MyTRIMDiracRun>("runner")),
-    _ivar(this->template getParam<unsigned int>("ivar")),
-    _defect(this->template getParam<MooseEnum>("defect"))
+    _mytrim(getUserObject<MyTRIMDiracRun>("runner")),
+    _ivar(getParam<unsigned int>("ivar")),
+    _defect(getParam<MooseEnum>("defect"))
 {
+  if (getParam<bool>("drop_duplicate_points") == true)
+    mooseWarning("Explicitly setting drop_duplicate_points to true will cause overlapping defects to be miscounted.");
 }
 
 void
@@ -31,7 +33,7 @@ MyTRIMDiracSource::addPoints()
   for (auto && defect : _mytrim.result())
     if (defect._type == _defect && defect._var == _ivar)
     {
-      Elem * elem = _mesh.elemPtr(defect._elem);
+      Elem * elem = _mesh.elemPtr(defect._elem_id);
       if (elem)
         addPoint(elem, defect._location);
     }

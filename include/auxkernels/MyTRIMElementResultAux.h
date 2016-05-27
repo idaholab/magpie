@@ -1,5 +1,5 @@
-#ifndef MYTRIMRESULTAUX_H
-#define MYTRIMRESULTAUX_H
+#ifndef MYTRIMELEMENTRESULTAUX_H
+#define MYTRIMELEMENTRESULTAUX_H
 
 #include "MyTRIMElementResultAccess.h"
 #include "AuxKernel.h"
@@ -20,4 +20,4 @@ public:
   virtual Real computeValue();
 };
 
-#endif //MYTRIMRESULTAUX_H
+#endif //MYTRIMELEMENTRESULTAUX_H

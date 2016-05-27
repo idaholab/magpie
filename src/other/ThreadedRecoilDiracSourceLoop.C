@@ -32,7 +32,7 @@ dataStore(std::ostream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & d
   dataStore(stream, dsl._location, context);
   dataStore(stream, dsl._var, context);
   dataStore(stream, dsl._type, context);
-  dataStore(stream, dsl._elem, context);
+  dataStore(stream, dsl._elem_id, context);
 }
 
 template<>
@@ -42,5 +42,5 @@ dataLoad(std::istream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & ds
   dataLoad(stream, dsl._location, context);
   dataLoad(stream, dsl._var, context);
   dataLoad(stream, dsl._type, context);
-  dataLoad(stream, dsl._elem, context);
+  dataLoad(stream, dsl._elem_id, context);
 }
