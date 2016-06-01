@@ -1,0 +1,19 @@
+[Tests]
+  [./cascade]
+    type = 'RunApp'
+    input = 'cascade.i'
+    max_parallel = 1
+    max_threads = 1
+    cli_args = 'Outputs/file_base=gold/cascade_dirac_out'
+  [../]
+
+  [./cascade_dirac]
+    type = 'CSVDiff'
+    prereq = cascade
+    input = 'cascade_dirac.i'
+    csvdiff = 'cascade_dirac_out.csv'
+    rel_err = 1.0E-3
+    max_parallel = 1
+    max_threads = 1
+  [../]
+[]

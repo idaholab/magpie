@@ -68,7 +68,8 @@ InputParameters validParams<MyTRIMRasterizer>()
 {
   InputParameters params = validParams<ElementUserObject>();
   params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM binary collision Monte Carlo simulation");
-  params.addCoupledVar("var", "Variables to rasterize");
+  params.addRequiredCoupledVar("var", "Variables to rasterize");
+  params.addCoupledVar("periodic_var", "Optional variables that determines the periodicity. If not supplied the first argument of 'var' will be used.");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
   params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");
@@ -90,7 +91,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _site_volume_prop(getMaterialProperty<Real>("site_volume")),
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
     _pka_generators(),
-    _periodic(coupled("var", 0)),
+    _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _last_time(0.0), //TODO: deal with user specified start times!
     _step_end_time(0.0)
 {
