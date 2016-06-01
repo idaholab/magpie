@@ -10,45 +10,49 @@
   elem_type = TRI3
 []
 
-[Variables]
+[AuxVariables]
   [./c]
     initial_condition = 1.0
   [../]
 []
 
-[AuxVariables]
+[Variables]
   [./int]
-    order = CONSTANT
-    family = MONOMIAL
   [../]
   [./vac]
-    order = CONSTANT
-    family = MONOMIAL
   [../]
 []
 
 [Kernels]
-  [./dt]
+  [./dt_int]
     type = TimeDerivative
-    variable = c
+    variable = int
   [../]
-  [./diff]
+  [./diff_int]
     type = Diffusion
-    variable = c
+    variable = int
+  [../]
+  [./dt_vac]
+    type = TimeDerivative
+    variable = vac
+  [../]
+  [./diff_vac]
+    type = Diffusion
+    variable = vac
   [../]
 []
 
-[AuxKernels]
+[DiracKernels]
   [./int]
     variable = int
-    type = MyTRIMElementResultAux
+    type = MyTRIMDiracSource
     runner = runner
     ivar = 0
     defect = INT
   [../]
   [./vac]
     variable = vac
-    type = MyTRIMElementResultAux
+    type = MyTRIMDiracSource
     runner = runner
     ivar = 0
     defect = VAC
@@ -72,13 +76,14 @@
   [./rasterizer]
     type = MyTRIMRasterizer
     var = c
+    periodic_var = int
     M = 40
     Z = 20
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = thermal_fission
   [../]
   [./runner]
-    type = MyTRIMElementRun
+    type = MyTRIMDiracRun
     rasterizer = rasterizer
   [../]
 []

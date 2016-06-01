@@ -1,40 +1,41 @@
 #ifndef MYTRIMRESULTACCESS_H
 #define MYTRIMRESULTACCESS_H
 
-#include "MyTRIMRun.h"
+#include "MyTRIMElementRun.h"
 
 /**
  * Interface class ("Veneer") to provide encapsulate fetching defect production
- * rates from a MyTRIMRun class
+ * rates from a MyTRIMElementRun class
  */
 template <class T>
-class MyTRIMResultAccess : public T
+class MyTRIMElementResultAccess : public T
 {
 public:
-  MyTRIMResultAccess(const InputParameters & parameters);
+  MyTRIMElementResultAccess(const InputParameters & parameters);
 
   static InputParameters validParams();
   Real getDefectRate();
 
-private:
-  const MyTRIMRun & _mytrim;
+protected:
+  const MyTRIMElementRun & _mytrim;
   const unsigned int _ivar;
   const unsigned int _defect;
 
+private:
   /// calculate values only for qp 0 and cache them here
   Real _value_cache;
 };
 
 
 template <class T>
-MyTRIMResultAccess<T>::MyTRIMResultAccess(const InputParameters & parameters) :
+MyTRIMElementResultAccess<T>::MyTRIMElementResultAccess(const InputParameters & parameters) :
     T(parameters),
-    _mytrim(this->template getUserObject<MyTRIMRun>("runner")),
+    _mytrim(this->template getUserObject<MyTRIMElementRun>("runner")),
     _ivar(this->template getParam<unsigned int>("ivar")),
     _defect(this->template getParam<MooseEnum>("defect"))
 {
   if (this->isNodal())
-    mooseError("MyTRIMResultAccess needs to be applied to an elemental AuxVariable.");
+    mooseError("MyTRIMElementResultAccess needs to be applied to an elemental AuxVariable.");
 
   if (_ivar >= _mytrim.nVars())
     mooseError("Requested invalid element index.");
@@ -42,10 +43,10 @@ MyTRIMResultAccess<T>::MyTRIMResultAccess(const InputParameters & parameters) :
 
 template<typename T>
 InputParameters
-MyTRIMResultAccess<T>::validParams()
+MyTRIMElementResultAccess<T>::validParams()
 {
   InputParameters params = ::validParams<T>();
-  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMRun userobject to pull data from.");
+  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
   MooseEnum defectType("VAC INT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
@@ -54,11 +55,11 @@ MyTRIMResultAccess<T>::validParams()
 
 template<typename T>
 Real
-MyTRIMResultAccess<T>::getDefectRate()
+MyTRIMElementResultAccess<T>::getDefectRate()
 {
   if (this->_qp == 0)
   {
-    const MyTRIMRun::MyTRIMResult & result = _mytrim.result(this->_current_elem);
+    auto & result = _mytrim.result(this->_current_elem);
     mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
 
     const Real volume = this->_current_elem->volume();

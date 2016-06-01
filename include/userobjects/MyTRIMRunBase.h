@@ -4,54 +4,36 @@
 /*          All contents are licensed under LGPL V2.1           */
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
-#ifndef MYTRIMRUN_H
-#define MYTRIMRUN_H
+#ifndef MYTRIMRUNBASE_H
+#define MYTRIMRUNBASE_H
 
 #include "GeneralUserObject.h"
 #include "MyTRIMRasterizer.h"
-#include "MooseMyTRIMThreadedRecoilLoop.h"
 
 #include <map>
 #include <vector>
 
-class MyTRIMRun;
+class MyTRIMRunBase;
 class MooseMesh;
 
 template<>
-InputParameters validParams<MyTRIMRun>();
+InputParameters validParams<MyTRIMRunBase>();
 
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
  */
-class MyTRIMRun : public GeneralUserObject
+class MyTRIMRunBase : public GeneralUserObject
 {
 public:
-  MyTRIMRun(const InputParameters & parameters);
-
-  virtual void initialize() {}
-  virtual void execute();
-  virtual void finalize();
-
-  /// @{ shorthand typedefs
-  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResult MyTRIMResult;
-  typedef MooseMyTRIMThreadedRecoilLoop::MyTRIMResultMap MyTRIMResultMap;
-  /// @}
-
-  /// get the TRIM result data
-  const MyTRIMResult & result(const Elem *) const;
+  MyTRIMRunBase(const InputParameters & parameters);
 
   // get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
 
+  // get the name of the rasterizer object (this is to add an artificial in an Auxkernel)
+  UserObjectName getRasterizerName() const { return getParam<UserObjectName>("rasterizer"); }
+
 protected:
-  ///@{ pack/unpack the _result_map into a structure suitable for parallel communication
-  void serialize(std::string & serialized_buffer);
-  void deserialize(std::vector<std::string> & serialized_buffers);
-  ///@}
-
-  /// data such as interstitials and vacancies produced will be stored here
-  MyTRIMResultMap _result_map;
-
   /// Rasterizer object to provide the material data
   const MyTRIMRasterizer & _rasterizer;
 
@@ -66,10 +48,6 @@ protected:
 
   /// dimension of the mesh
   const unsigned int _dim;
-
-private:
-  /// zero result to return for elements that have not been touched by the cascades
-  MyTRIMResult _zero;
 };
 
-#endif //MYTRIMRUN_H
+#endif //MYTRIMRUNBASE_H
