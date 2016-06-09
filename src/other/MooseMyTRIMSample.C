@@ -20,7 +20,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 MooseMyTRIMSample::~MooseMyTRIMSample()
 {
   // delete all elements of the materials in the cache
-  for (auto && i : _materials_cache)
+  for (auto && i : _materials_master_cache)
     for (auto && j : i.second._element)
       delete j;
 }
@@ -30,9 +30,15 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
 {
   _current_ion = pka;
 
+// TODO: averages do NOT depend on ion energy! Cache averaged materials for all possible PKAs
+// this means adding comparison operators to PKAs so that we can use them as map indices
+// have a master material cache and per-PKA-type cache. Do not average stuff in the master cache at all
+// use it only as a copy construction source for the per-pka-cache
+// std::map<MyTRIM_NS::IonBase, std::map<Elem *, MooseMyTRIMMaterial> _per_pka_cache
+
   // apply averages for all cached materials
-  for (auto  && i : _materials_cache)
-    i.second.average(pka);
+  // for (auto  && i : _materials_cache)
+  //   i.second.average(pka);
 }
 
 MyTRIM_NS::MaterialBase *
@@ -49,33 +55,49 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
   if (elem == nullptr)
     return nullptr;
 
-  // try to find the element in the cache
-  auto i = _materials_cache.find(elem);
-  if (i != _materials_cache.end())
-    return &i->second;
+  // obtain the per pka cache entry (insert if not found)
+  auto & cache = _per_pka_materials_cache[*_current_ion];
 
-  // otherwise prepare the material using data from the rasterizer
-  const std::vector<Real> & material_data = _rasterizer.material(elem);
-  MooseMyTRIMMaterial material(_simconf);
+  // look up current element
+  auto i = cache.find(elem);
 
-  // set elements
-  for (unsigned int i = 0; i < _nvars; ++i)
+  // not averaged yet
+  if (i == cache.end())
   {
-    MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
-    element->_Z = _trim_charge[i];
-    element->_m = _trim_mass[i];
-    element->_t = material_data[i];
-    material._element.push_back(element);
+    // look up if the element is prepared in the master cache
+    auto j = _materials_master_cache.find(elem);
+
+    // not prepared yet
+    if (j == _materials_master_cache.end())
+    {
+      // prepare the material using data from the rasterizer
+      const std::vector<Real> & material_data = _rasterizer.material(elem);
+      MooseMyTRIMMaterial material(_simconf);
+
+      // set elements
+      for (unsigned int i = 0; i < _nvars; ++i)
+      {
+        MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
+        element->_Z = _trim_charge[i];
+        element->_m = _trim_mass[i];
+        element->_t = material_data[i];
+        material._element.push_back(element);
+      }
+
+      // calculate the density (must happen first!)
+      material.calculateDensity(_rasterizer.siteVolume(elem));
+
+      // prepare material
+      material.prepare();
+      j = _materials_master_cache.insert(_materials_master_cache.begin(), std::make_pair(elem, material));
+    }
+
+    // create a copy from the master cache entry, average it and file it
+    MooseMyTRIMMaterial material(j->second);
+    material.average(_current_ion);
+
+    i = cache.insert(cache.begin(), std::make_pair(elem, material));
   }
 
-  // calculate the density (must happen first!)
-  material.calculateDensity(_rasterizer.siteVolume(elem));
-
-  // prepare material
-  material.prepare();
-  material.average(_current_ion);
-
-  // add the material to the cache and return pointer
-  auto mi = _materials_cache.insert(_materials_cache.begin(), std::make_pair(elem, material));
-  return &mi->second;
+  return &i->second;
 }

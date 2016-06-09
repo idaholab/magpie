@@ -29,7 +29,7 @@ MyTRIMRunBase::MyTRIMRunBase(const InputParameters & parameters) :
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension())
 {
-  if (_mesh.isParallelMesh())
+  if (_mesh.isDistributedMesh())
     mooseError("MyTRIM runs currently require serial meshes.");
 
   if (_dim < 2 || _dim > 3)

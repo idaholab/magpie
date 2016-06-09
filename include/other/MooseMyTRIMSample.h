@@ -54,9 +54,11 @@ protected:
   /// point locator to determine element pointers form locations
   UniquePtr<PointLocatorBase> _pl;
 
-  /// material cache map
+  ///@{ material cache maps
   typedef std::map<const Elem *, MooseMyTRIMMaterial> MaterialsCache;
-  MaterialsCache _materials_cache;
+  MaterialsCache _materials_master_cache;
+  std::map<MyTRIM_NS::IonBase, MaterialsCache> _per_pka_materials_cache;
+  ///@}
 
   /// current ion (for on-the fly averaging)
   const MyTRIM_NS::IonBase * _current_ion;

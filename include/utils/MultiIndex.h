@@ -438,7 +438,7 @@ template <class T>
 unsigned int
 MultiIndex<T>::iterator::index(unsigned int d) const
 {
-  mooseAssert(d < _index.size(), "Dimension d=" << d << " exceeds dim=" << _multi_index.dim());
+  mooseAssert(d < _indices.size(), "Dimension d=" << d << " exceeds index size=" << _indices.size());
   return _indices[d];
 }
 
