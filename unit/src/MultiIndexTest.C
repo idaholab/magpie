@@ -140,10 +140,7 @@ MultiIndexTest::testIterators()
   auto it = mindex.begin();
   auto it_end = mindex.end();
   for (; it != it_end ; ++it)
-  {
-    auto indices = it.indices();
-    *it = indices[0] - 3.0 * indices[1] + 100.0 * indices[2];
-  }
+    *it = it.indices().first[0] - 3.0 * it.indices().first[1] + 100.0 * it.indices().first[2];
 
   // check the values
   for (unsigned int j0 = 0; j0 < shape[0]; ++j0)
@@ -167,7 +164,7 @@ MultiIndexTest::testIterators()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( index[0] == it.index(0) && index[1] == it.index(1) && index[2] == it.index(2));
+        CPPUNIT_ASSERT( index[0] == it.indices().first[0] && index[1] == it.indices().first[1] && index[2] == it.indices().first[2]);
         ++it;
       }
 
@@ -176,7 +173,7 @@ MultiIndexTest::testIterators()
   it_end = mindex.end();
   while (it != it_end)
   {
-    std::vector<unsigned int> indices = it.indices();
+    std::vector<unsigned int> indices = it.indices().first;
     *it = indices[0] - 7.0 * indices[1] + 100.0 * indices[2];
     ++it;++it;--it;
   }
@@ -208,10 +205,7 @@ MultiIndexTest::dataStoreLoad()
   auto it = mindex.begin();
   auto it_end = mindex.end();
   for (; it != it_end ; ++it)
-  {
-    auto indices = it.indices();
-    *it = indices[0] - 3.0 * indices[1] + 100.0 * indices[2];
-  }
+    *it = it.indices().first[0] - 3.0 * it.indices().first[1] + 100.0 * it.indices().first[2];
 
   // Serialize
   std::ostringstream oss;
@@ -257,7 +251,7 @@ MultiIndexTest::slice()
   MultiIndex<unsigned int>::iterator it_end = mindex.end();
   for (; it != it_end ; ++it)
   {
-    MultiIndex<unsigned int>::size_type indices = it.indices();
+    MultiIndex<unsigned int>::size_type indices = it.indices().first;
     *it = indices[0] + 10 * indices[1] + 100 * indices[2] + 1000 * indices[3];
   }
 

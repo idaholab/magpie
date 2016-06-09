@@ -120,14 +120,14 @@ public:
   reference_type getMultiIndexObject() const {return _multi_index;}
 
   /// Allow retrieving indices vector from position and single index
-  size_type indices() const { return _indices; }
+  std::pair<size_type, T> indices() const { return std::make_pair(_indices, _multi_index._data[_flat_index]); }
 
   // assignment =
   const_noconst_iterator & operator= (const const_noconst_iterator & other)
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
-    _indices = other.indices();
+    _indices = other.indices().first;
     return *this;
   }
 
@@ -203,13 +203,6 @@ public:
 
   /// dereferencing operator
   T & operator* () { return _multi_index._data[_flat_index]; }
-
-  /// returns the d-th entry of the current indices vector
-  unsigned int index(unsigned int d) const
-  {
-    mooseAssert(d < _indices.size(), "Dimension d=" << d << " exceeds index size=" << _indices.size());
-    return _indices[d];
-  }
 
 protected:
   reference_type _multi_index;

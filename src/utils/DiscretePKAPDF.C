@@ -48,7 +48,7 @@ DiscretePKAPDF::precomputeCDF()
   std::vector<unsigned int> index(4);
   for (MultiIndex<Real>::iterator it = _probabilities.begin(); it != _probabilities.end(); ++it)
   {
-    index = it.indices();
+    index = it.indices().first;
     Real wt = _dmu * _dphi * (_energies[index[1] + 1] - _energies[index[1]]);
     *it *= wt;
   }
@@ -80,16 +80,16 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
   {
-    index = it_zaid.indices();
+    index = it_zaid.indices().first;
     index[0] -= 1;
-    if (it_zaid.index(0) > 0)
+    if (it_zaid.indices().first[0] > 0)
       *it_zaid += _marginal_cdf_zaid(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
   {
-    index = it_zaid.indices();
+    index = it_zaid.indices().first;
     index[0] = _nZA - 1;
     *it_zaid /= _marginal_cdf_zaid(index);
   }
@@ -125,16 +125,16 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
   {
-    index = it_energy.indices();
+    index = it_energy.indices().first;
     index[1] -= 1;
-    if (it_energy.index(1) > 0)
+    if (it_energy.indices().first[1] > 0)
       *it_energy += _marginal_cdf_energy(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
   {
-    index = it_energy.indices();
+    index = it_energy.indices().first;
     index[1] = _ng - 1;
     *it_energy /= _marginal_cdf_energy(index);
   }
@@ -172,16 +172,16 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
   {
-    index = it_phi.indices();
+    index = it_phi.indices().first;
     index[2] -= 1;
-    if (it_phi.index(2) > 0)
+    if (it_phi.indices().first[2] > 0)
       *it_phi += _marginal_cdf_phi(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
   {
-    index = it_phi.indices();
+    index = it_phi.indices().first;
     index[2] = _na - 1;
     *it_phi /= _marginal_cdf_phi(index);
   }
@@ -195,16 +195,16 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
   {
-    index = it_mu.indices();
+    index = it_mu.indices().first;
     index[3] -= 1;
-    if (it_mu.index(3) > 0)
+    if (it_mu.indices().first[3] > 0)
       *it_mu += _marginal_cdf_mu(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
   {
-    index = it_mu.indices();
+    index = it_mu.indices().first;
     index[3] = _np - 1;
     *it_mu /= _marginal_cdf_mu(index);
   }

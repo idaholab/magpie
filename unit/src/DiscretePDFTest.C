@@ -114,7 +114,7 @@ DiscretePDFTest::samplePKA()
 
   for (MultiIndex<Real>::iterator it = frequency.begin(); it !=  frequency.end() ; ++it)
   {
-    index = it.indices();
+    index = it.indices().first;
     Real width = (energies[index[1] + 1] - energies[index[1]]) * dmu * dphi;
     CPPUNIT_ASSERT( std::abs(1.0 - mindex(index) * width / frequency(index)) < 0.1);
   }
