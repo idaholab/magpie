@@ -116,18 +116,16 @@ public:
   }
 
   // Simple data getters
-  unsigned int flatIndex() const {return _flat_index;}
-  reference_type getMultiIndexObject() const {return _multi_index;}
-
-  /// Allow retrieving indices vector from position and single index
-  std::pair<size_type, T> indices() const { return std::make_pair(_indices, _multi_index._data[_flat_index]); }
+  unsigned int flatIndex() const { return _flat_index; }
+  reference_type getMultiIndexObject() const { return _multi_index; }
+  size_type indices() const { return _indices; }
 
   // assignment =
   const_noconst_iterator & operator= (const const_noconst_iterator & other)
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
-    _indices = other.indices().first;
+    _indices = other.indices();
     return *this;
   }
 
@@ -202,7 +200,7 @@ public:
   bool operator!= (const const_noconst_iterator & other) const { return !(*this == other); }
 
   /// dereferencing operator
-  T & operator* () { return _multi_index._data[_flat_index]; }
+  std::pair<const size_type &, T &> operator* () { return std::pair<const size_type &, T &>(_indices, _multi_index._data[_flat_index]); }
 
 protected:
   reference_type _multi_index;
@@ -294,7 +292,7 @@ MultiIndex<T>::slice(size_type dimension, size_type index) const
 
     if (addTo)
     {
-      *it = _data[n];
+      (*it).second = _data[n];
       ++it;
     }
   }
