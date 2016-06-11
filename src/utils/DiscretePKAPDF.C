@@ -31,7 +31,7 @@ DiscretePKAPDF::DiscretePKAPDF(Real magnitude, std::vector<unsigned int> ZAID, s
   if (_probabilities.dim() != 4)
     mooseError("probabilities MultiIndex object has wrong dimensions.");
 
-  std::vector<unsigned int> shape = _probabilities.size();
+  MultiIndex<Real>::size_type shape = _probabilities.size();
   if (shape[0] != _nZA || shape[1] != _ng || shape[2] != _na || shape[3] != _np)
     mooseError("Size of probabilities is inconsistent with random variable input.");
 
@@ -44,13 +44,13 @@ DiscretePKAPDF::precomputeCDF()
   /**
    * Compute the weighted pdf: pdf value * width of the bin
    */
-  std::vector<unsigned int> shape(4);
-  std::vector<unsigned int> index(4);
+  MultiIndex<Real>::size_type shape(4);
+  MultiIndex<Real>::size_type index(4);
   for (MultiIndex<Real>::iterator it = _probabilities.begin(); it != _probabilities.end(); ++it)
   {
-    index = it.indices();
+    index = (*it).first;
     Real wt = _dmu * _dphi * (_energies[index[1] + 1] - _energies[index[1]]);
-    *it *= wt;
+    (*it).second *= wt;
   }
 
   /**
@@ -61,7 +61,7 @@ DiscretePKAPDF::precomputeCDF()
   _marginal_cdf_zaid = MultiIndex<Real>(shape);
   for (unsigned int jZA = 0; jZA < _nZA; ++jZA)
   {
-    std::vector<unsigned int> local_index(1);
+    MultiIndex<Real>::size_type local_index(1);
     Real integral_value = 0.0;
     for (unsigned int jE = 0; jE < _ng; ++jE)
       for (unsigned int jP = 0; jP < _na; ++jP)
@@ -80,18 +80,18 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
   {
-    index = it_zaid.indices();
+    index = (*it_zaid).first;
     index[0] -= 1;
-    if (it_zaid.index(0) > 0)
-      *it_zaid += _marginal_cdf_zaid(index);
+    if ((*it_zaid).first[0] > 0)
+      (*it_zaid).second += _marginal_cdf_zaid(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
   {
-    index = it_zaid.indices();
+    index = (*it_zaid).first;
     index[0] = _nZA - 1;
-    *it_zaid /= _marginal_cdf_zaid(index);
+    (*it_zaid).second /= _marginal_cdf_zaid(index);
   }
 
   /**
@@ -106,7 +106,7 @@ DiscretePKAPDF::precomputeCDF()
   for (unsigned int jZA = 0; jZA < _nZA; ++jZA)
     for (unsigned int jE = 0; jE < _ng; ++jE)
     {
-      std::vector<unsigned int> local_index(2);
+      MultiIndex<Real>::size_type local_index(2);
       Real integral_value = 0.0;
       for (unsigned int jP = 0; jP < _na; ++jP)
         for (unsigned int jM = 0; jM < _np; ++jM)
@@ -125,18 +125,18 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
   {
-    index = it_energy.indices();
+    index = (*it_energy).first;
     index[1] -= 1;
-    if (it_energy.index(1) > 0)
-      *it_energy += _marginal_cdf_energy(index);
+    if ((*it_energy).first[1] > 0)
+      (*it_energy).second += _marginal_cdf_energy(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
   {
-    index = it_energy.indices();
+    index = (*it_energy).first;
     index[1] = _ng - 1;
-    *it_energy /= _marginal_cdf_energy(index);
+    (*it_energy).second /= _marginal_cdf_energy(index);
   }
 
   /**
@@ -153,7 +153,7 @@ DiscretePKAPDF::precomputeCDF()
     for (unsigned int jE = 0; jE < _ng; ++jE)
       for (unsigned int jP = 0; jP < _na; ++jP)
       {
-        std::vector<unsigned int> local_index(3);
+        MultiIndex<Real>::size_type local_index(3);
         Real integral_value = 0.0;
         for (unsigned int jM = 0; jM < _np; ++jM)
         {
@@ -172,18 +172,18 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
   {
-    index = it_phi.indices();
+    index = (*it_phi).first;
     index[2] -= 1;
-    if (it_phi.index(2) > 0)
-      *it_phi += _marginal_cdf_phi(index);
+    if ((*it_phi).first[2] > 0)
+      (*it_phi).second += _marginal_cdf_phi(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
   {
-    index = it_phi.indices();
+    index = (*it_phi).first;
     index[2] = _na - 1;
-    *it_phi /= _marginal_cdf_phi(index);
+    (*it_phi).second /= _marginal_cdf_phi(index);
   }
 
   /**
@@ -195,27 +195,27 @@ DiscretePKAPDF::precomputeCDF()
   // Step 2: Compute cdf
   for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
   {
-    index = it_mu.indices();
+    index = (*it_mu).first;
     index[3] -= 1;
-    if (it_mu.index(3) > 0)
-      *it_mu += _marginal_cdf_mu(index);
+    if ((*it_mu).first[3] > 0)
+      (*it_mu).second += _marginal_cdf_mu(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
   {
-    index = it_mu.indices();
+    index = (*it_mu).first;
     index[3] = _np - 1;
-    *it_mu /= _marginal_cdf_mu(index);
+    (*it_mu).second /= _marginal_cdf_mu(index);
   }
 }
 
 unsigned int
-DiscretePKAPDF::sampleHelper(const MultiIndex<Real> & marginal_pdf, const std::vector<unsigned int> indices) const
+DiscretePKAPDF::sampleHelper(const MultiIndex<Real> & marginal_pdf, const MultiIndex<Real>::size_type indices) const
 {
   if (marginal_pdf.dim() - indices.size() != 1)
     mooseError("For sampling the indices vector must reduce the marginal_pdf to a one-dimensional ladder function.");
-  std::vector<unsigned int> dimension(indices.size());
+  MultiIndex<Real>::size_type dimension(indices.size());
   for (unsigned int j = 0; j < indices.size(); ++j)
     dimension[j] = j;
   MultiIndex<Real> new_marginal_pdf = marginal_pdf.slice(dimension, indices);
@@ -226,7 +226,7 @@ unsigned int
 DiscretePKAPDF::sampleHelper(const MultiIndex<Real> & marginal_pdf) const
 {
   Real r = MooseRandom::rand();
-  std::vector<unsigned int> index(1);
+  MultiIndex<Real>::size_type index(1);
   unsigned int j = 0;
   for (; j < marginal_pdf.size()[0]; ++j)
   {
@@ -245,7 +245,7 @@ DiscretePKAPDF::drawSample(initialPKAState & initial_state)
    * _marginal_cdf_zaid. Then get the conditional _marginal_cdf_energy(zaid)
    * and sample the energy bin from it, then continue on sampling phi...
    */
-  std::vector<unsigned int> sampled_indices;
+  MultiIndex<Real>::size_type sampled_indices;
   sampled_indices.push_back(sampleHelper(_marginal_cdf_zaid));
   sampled_indices.push_back(sampleHelper(_marginal_cdf_energy, sampled_indices));
   sampled_indices.push_back(sampleHelper(_marginal_cdf_phi, sampled_indices));

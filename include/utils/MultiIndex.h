@@ -14,13 +14,15 @@ template<class T>
 class MultiIndex
 {
 public:
+  /// MultiIndex container iterator
+  template<bool is_const = false> class const_noconst_iterator;
+
   ///@{ container related types and categories
   typedef T value_type;
   typedef std::vector<unsigned int> size_type;
+  using iterator = const_noconst_iterator<false>;
+  using const_iterator = const_noconst_iterator<true>;
   ///@}
-
-  /// MultiIndex container iterator
-  class iterator;
 
   /// construct zero initialized container of a given shape
   MultiIndex(const size_type & shape);
@@ -59,8 +61,10 @@ public:
   ///@}
 
   ///@{ iterators for begin and end of this container
-  iterator begin() { return iterator(*this, 0); }
-  iterator end() { return iterator(*this, _nentries); }
+  iterator begin() { return const_noconst_iterator<false>(*this, 0); }
+  iterator end() { return const_noconst_iterator<false>(*this, _nentries); }
+  const_iterator begin() const { return const_noconst_iterator<true>(*this, 0); }
+  const_iterator end() const { return const_noconst_iterator<true>(*this, _nentries); }
   ///@}
 
 protected:
@@ -97,10 +101,13 @@ private:
  * Nested iterator class for MultiIndex containers
  */
 template <class T>
-class MultiIndex<T>::iterator
+template <bool is_const>
+class MultiIndex<T>::const_noconst_iterator
 {
 public:
-  iterator(MultiIndex<T> & multi_index, unsigned int position) :
+  typedef typename std::conditional<is_const, const MultiIndex<T> &, MultiIndex<T> &>::type reference_type;
+
+  const_noconst_iterator(reference_type multi_index, unsigned int position) :
       _multi_index(multi_index),
       _flat_index(position),
       _shape(multi_index.size())
@@ -109,17 +116,12 @@ public:
   }
 
   // Simple data getters
-  unsigned int flatIndex() const {return _flat_index;}
-  MultiIndex<T> & getMultiIndexObject() const {return _multi_index;}
-
-  /// Allow retrieving indices vector from position and single index
+  unsigned int flatIndex() const { return _flat_index; }
+  reference_type getMultiIndexObject() const { return _multi_index; }
   size_type indices() const { return _indices; }
 
-  /// return index component
-  unsigned int index(unsigned int d) const;
-
   // assignment =
-  iterator & operator= (const iterator & other)
+  const_noconst_iterator & operator= (const const_noconst_iterator & other)
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
@@ -128,7 +130,7 @@ public:
   }
 
   // prefix ++
-  iterator & operator++ ()
+  const_noconst_iterator & operator++ ()
   {
     ++_flat_index;
     // increment indices
@@ -142,9 +144,9 @@ public:
   }
 
   // postfix ++
-  iterator & operator++ (int)
+  const_noconst_iterator & operator++ (int)
   {
-    iterator clone(*this);
+    const_noconst_iterator clone(*this);
     ++_flat_index;
     // increment indices
     for (unsigned int j = 0; j < _indices.size(); ++j)
@@ -157,7 +159,7 @@ public:
   }
 
   // prefix --
-  iterator & operator-- ()
+  const_noconst_iterator & operator-- ()
   {
     --_flat_index;
     // decrement indices
@@ -175,9 +177,9 @@ public:
   }
 
   // postfix --
-  iterator & operator-- (int)
+  const_noconst_iterator & operator-- (int)
   {
-    iterator clone(*this);
+    const_noconst_iterator clone(*this);
     --_flat_index;
     // decrement indices
     for (unsigned int j = 0; j < _indices.size(); ++j)
@@ -194,19 +196,18 @@ public:
   }
 
   /// to be equal both iterators must hold a reference to teh same MultiIndexObject and be at the same _flat_index
-  bool operator== (const iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
-  bool operator!= (const iterator & other) const { return !(*this == other); }
+  bool operator== (const const_noconst_iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
+  bool operator!= (const const_noconst_iterator & other) const { return !(*this == other); }
 
   /// dereferencing operator
-  T & operator* () { return _multi_index._data[_flat_index]; }
+  std::pair<const size_type &, T &> operator* () { return std::pair<const size_type &, T &>(_indices, _multi_index._data[_flat_index]); }
 
 protected:
-  MultiIndex<T> & _multi_index;
+  reference_type _multi_index;
   unsigned int _flat_index;
   size_type _shape;
   size_type _indices;
 };
-
 
 template <class T>
 MultiIndex<T>::MultiIndex(const size_type & shape)
@@ -291,7 +292,7 @@ MultiIndex<T>::slice(size_type dimension, size_type index) const
 
     if (addTo)
     {
-      *it = _data[n];
+      (*it).second = _data[n];
       ++it;
     }
   }
@@ -433,15 +434,6 @@ MultiIndex<T>::flatIndex(const size_type & indices) const
 
   return index;
 }
-
-template <class T>
-unsigned int
-MultiIndex<T>::iterator::index(unsigned int d) const
-{
-  mooseAssert(d < _indices.size(), "Dimension d=" << d << " exceeds index size=" << _indices.size());
-  return _indices[d];
-}
-
 
 template<class T>
 void
