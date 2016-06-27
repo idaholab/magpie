@@ -1,14 +1,66 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
-
 #include "DiscretePKAPDFBase.h"
 #include "MooseError.h"
+#include "MooseRandom.h"
 
-DiscretePKAPDFBase::DiscretePKAPDFBase(Real magnitude) :
-    _magnitude(magnitude)
+
+DiscretePKAPDFBase::DiscretePKAPDFBase(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies) :
+    _magnitude(magnitude),
+    _zaids(ZAID),
+    _nZA(_zaids.size()),
+    _energies(energies),
+    _ng(_energies.size() - 1)
 {
+}
+
+unsigned int
+DiscretePKAPDFBase::sampleHelper(const MultiIndex<Real> & marginal_pdf, const MultiIndex<Real>::size_type indices) const
+{
+  if (marginal_pdf.dim() - indices.size() != 1)
+    mooseError("For sampling the indices vector must reduce the marginal_pdf to a one-dimensional ladder function.");
+  MultiIndex<Real>::size_type dimension(indices.size());
+  for (unsigned int j = 0; j < indices.size(); ++j)
+    dimension[j] = j;
+  MultiIndex<Real> new_marginal_pdf = marginal_pdf.slice(dimension, indices);
+  return sampleHelper(new_marginal_pdf);
+}
+
+unsigned int
+DiscretePKAPDFBase::sampleHelper(const MultiIndex<Real> & marginal_pdf) const
+{
+  Real r = MooseRandom::rand();
+  std::vector<unsigned int> index(1);
+  unsigned int j = 0;
+  for (; j < marginal_pdf.size()[0]; ++j)
+  {
+    index[0] = j;
+    if (r <= marginal_pdf(index))
+      break;
+  }
+  return j;
+}
+
+unsigned int
+DiscretePKAPDFBase::sampleHelper(const std::vector<Real> & marginal_pdf) const
+{
+  Real r = MooseRandom::rand();
+  std::vector<unsigned int> index(1);
+  unsigned int j = 0;
+  for (; j < marginal_pdf.size(); ++j)
+  {
+    if (r <= marginal_pdf[j])
+      break;
+  }
+  return j;
+}
+
+std::vector<Real>
+DiscretePKAPDFBase::sampleUniformDirection()
+{
+  Real r1 = MooseRandom::rand();
+  Real r2 = MooseRandom::rand();
+  std::vector<Real> angles(2);
+  // for sampling mu
+  angles[0] = 2.0 * r1 - 1.0;
+  angles[1] = 2.0 * libMesh::pi * r2;
+  return angles;
 }
