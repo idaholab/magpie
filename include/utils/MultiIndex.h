@@ -118,14 +118,13 @@ public:
   // Simple data getters
   unsigned int flatIndex() const { return _flat_index; }
   reference_type getMultiIndexObject() const { return _multi_index; }
-  size_type indices() const { return _indices; }
 
   // assignment =
   const_noconst_iterator & operator= (const const_noconst_iterator & other)
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
-    _indices = other.indices();
+    _multi_index.findIndexVector(_flat_index, _indices);
     return *this;
   }
 
