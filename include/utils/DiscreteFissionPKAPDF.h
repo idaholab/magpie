@@ -32,7 +32,7 @@ protected:
   Real determineFragmentsEnergy(unsigned int Z, unsigned int A);
 
   /// samples the number neutrons per fission based on target and energy
-  unsigned int sampleNu(MagpieUtils::neutronEnergyTypes energy_type, unsigned int zaid);
+  unsigned int sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid);
 
   /// we can cache the marginal distributions
   MultiIndex<Real> _marginal_cdf_target;
@@ -46,4 +46,4 @@ protected:
   std::vector<std::map<unsigned int, std::vector<Real> > >  _fission_cdf;
 };
 
-#endif // DiscreteFissionPKAPDF
+#endif //DISCRETEFISSIONPKAPDF_H

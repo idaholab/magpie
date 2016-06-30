@@ -154,56 +154,55 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & ZAID)
 {
   _fission_zaids.resize(4);
   _fission_cdf.resize(4);
-  MagpieUtils::neutronEnergyTypes etypes;
-  for (unsigned int j = MagpieUtils::Thermal; j != MagpieUtils::enum_max; ++j)
+  MagpieUtils::NeutronEnergyType etypes;
+
+  // iterate over all neutron energy types
+  for (unsigned int j = 0; j < MagpieUtils::NET_MAX; ++j)
   {
-    //Dummy maps
+    // Dummy maps
     std::map<unsigned int, std::vector<unsigned int> > zaid_map;
     std::map<unsigned int, std::vector<Real> > cdf_map;
     for (unsigned int i = 0; i < ZAID.size(); ++i)
     {
-      std::string the_current_enum = MagpieUtils::neutronEnergyString[j];
+      // check if $ENDF_FP_DIR is set
       auto path = std::getenv("ENDF_FP_DIR");
-
-      //check if $ENDF_FP_DIR is set
       if (path == NULL)
         mooseError("Set $ENDF_FP_DIR to the directory holding the sum yield data files.");
 
-      std::string ss = path + std::to_string(ZAID[i]) + "_" + the_current_enum + ".txt";
-
       // check if file exists, if not continue
-      auto x = ss;
-      const char * filename = x.c_str();
+      std::string filename = path + std::to_string(ZAID[i]) + "_" + MagpieUtils::neutronEnergyName(j) + ".txt";
       bool result = MooseUtils::checkFileReadable(filename, false, false);
       if (result == false)
          continue;
 
       // read the data
-      std::ifstream infile(filename);
-      std::vector<unsigned int> _zaid_target;
-      std::vector<Real> _fission_probabilities;
+      std::ifstream infile(filename.c_str());
+      std::vector<unsigned int> zaid_target;
+      std::vector<Real> fission_probabilities;
       int aa;
       Real bb;
       Real prob_prev = 0.0;
-      //Accumulates CDF as it reads from the file
       while (infile >> aa >> bb)
       {
-        _zaid_target.push_back(aa);
-        _fission_probabilities.push_back(bb + prob_prev);
+        zaid_target.push_back(aa);
+        fission_probabilities.push_back(bb + prob_prev);
+
+        // accumulate CDF as it reads from the file
         prob_prev += bb;
       }
 
-      //Renormalize to ensure that cdf[-1] == 1
-      unsigned int last_index = _fission_probabilities.size() - 1;
-      Real last_value = _fission_probabilities[last_index];
-      for (auto & zaid: _fission_probabilities)
-         zaid /= last_value;
+      // renormalize to ensure that cdf[-1] == 1
+      unsigned int last_index = fission_probabilities.size() - 1;
+      Real last_value = fission_probabilities[last_index];
+      for (auto & zaid: fission_probabilities)
+        zaid /= last_value;
 
-      //Step 4: Store std::vectors into maps
-      zaid_map[ZAID[i]] = _zaid_target;
-      cdf_map[ZAID[i]] = _fission_probabilities;
+      // Step 4: Store std::vectors into maps
+      zaid_map[ZAID[i]] = zaid_target;
+      cdf_map[ZAID[i]] = fission_probabilities;
     }
-    //Store map into vector for given energy type
+
+    // store map into vector for given energy type
     _fission_zaids[j] = zaid_map;
     _fission_cdf[j] = cdf_map;
   }
@@ -220,7 +219,7 @@ DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A)
  * determine the avg. number of neutrons per fission.
  */
 unsigned int
-DiscreteFissionPKAPDF::sampleNu(MagpieUtils::neutronEnergyTypes energy_type, unsigned int zaid)
+DiscreteFissionPKAPDF::sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid)
 {
   Real nu_bar;
   if (zaid == 922350 && energy_type == MagpieUtils::Thermal)

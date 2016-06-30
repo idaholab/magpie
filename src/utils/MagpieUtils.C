@@ -131,19 +131,24 @@ getAFromZAID(unsigned int zaid)
   return std::floor(r / 10.0 + eps);
 }
 
-neutronEnergyTypes
+const std::string &
+neutronEnergyName(unsigned int i)
+{
+  const static std::vector<std::string> names({"Thermal", "Epithermal", "Fast", "High"});
+  return names[i];
+}
+
+NeutronEnergyType
 determineNeutronType(Real energy)
 {
-  neutronEnergyTypes type;
   if (energy < 0.5e-6)
-    type = Thermal;
+    return Thermal;
   else if (energy >= 0.5e-6 && energy < 0.75)
-    type = Epithermal;
+    return Epithermal;
   else if (energy >= 0.75 && energy < 7.0)
-    type = Fast;
+    return Fast;
   else
-    type = High;
-  return type;
+    return High;
 }
 
 } // namespace MagpieUtils
