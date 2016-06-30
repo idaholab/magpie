@@ -147,8 +147,7 @@ determineNeutronType(Real energy)
     return Epithermal;
   else if (energy >= 0.75 && energy < 7.0)
     return Fast;
-  else
-    return High;
+  return High;
 }
 
 } // namespace MagpieUtils

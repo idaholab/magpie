@@ -170,9 +170,8 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
 
       // check if file exists, if not continue
       std::string filename = path + std::to_string(zaid) + "_" + MagpieUtils::neutronEnergyName(energy) + ".txt";
-      bool result = MooseUtils::checkFileReadable(filename, false, false);
-      if (result == false)
-         continue;
+      if (!MooseUtils::checkFileReadable(filename, false, false))
+        continue;
 
       // read the data
       std::ifstream infile(filename.c_str());
