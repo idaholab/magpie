@@ -112,23 +112,14 @@ unsigned int
 getZFromZAID(unsigned int zaid)
 {
   mooseAssert(zaid <= 999999 && zaid > 9999, "ZAID " << zaid << " is invalid.");
-
-  // eps ensures that ZAID = 1000 would give Z = 1 and not 0
-  Real eps = 1.0e-6;
-  Real r = zaid;
-  return std::floor(r / 10000.0 + eps);
+  return zaid / 10000;
 }
 
 unsigned int
 getAFromZAID(unsigned int zaid)
 {
-  // check that ZAID is not too short or too long
   mooseAssert(zaid <= 999999 && zaid > 9999, "ZAID " << zaid << " is invalid.");
-
-  // eps ensures that ZAID = 1000 would give Z = 1 and not 0
-  Real eps = 1.0e-6;
-  Real r = zaid % 10000;
-  return std::floor(r / 10.0 + eps);
+  return (zaid % 10000) / 10;
 }
 
 neutronEnergyTypes
