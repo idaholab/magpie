@@ -15,7 +15,7 @@ public:
   /**
    * A struct storing the inital state of a primary knock-on atom
    */
-  struct initialPKAState
+  struct InitialPKAState
   {
     unsigned int _Z;
     Real _mass;
@@ -24,7 +24,7 @@ public:
   };
 
   /// Uses the discrete probabilities for sampling the initial pka state
-  virtual void drawSample(std::vector<initialPKAState> & initial_state) = 0;
+  virtual void drawSample(std::vector<InitialPKAState> & initial_state) = 0;
 
   /// NOTE: we pass by value here because we modify probabilities in the function for
   /// convenience

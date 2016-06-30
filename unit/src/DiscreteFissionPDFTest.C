@@ -97,7 +97,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
 
   while (counter < max)
   {
-    std::vector<DiscretePKAPDFBase::initialPKAState> i_state;
+    std::vector<DiscretePKAPDFBase::InitialPKAState> i_state;
     pdf.drawSample(i_state);
     counter += 1.0;
 

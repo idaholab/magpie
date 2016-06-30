@@ -78,7 +78,7 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 }
 
 void
-DiscreteFissionPKAPDF::drawSample(std::vector<initialPKAState> & initial_state)
+DiscreteFissionPKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
 {
   //resize initial_state
   initial_state.resize(2);
@@ -150,19 +150,18 @@ DiscreteFissionPKAPDF::drawSample(std::vector<initialPKAState> & initial_state)
 }
 
 void
-DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & ZAID)
+DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_list)
 {
-  _fission_zaids.resize(4);
-  _fission_cdf.resize(4);
-  MagpieUtils::NeutronEnergyType etypes;
+  _fission_zaids.resize(MagpieUtils::NET_MAX);
+  _fission_cdf.resize(MagpieUtils::NET_MAX);
 
   // iterate over all neutron energy types
-  for (unsigned int j = 0; j < MagpieUtils::NET_MAX; ++j)
+  for (unsigned int energy = 0; energy < MagpieUtils::NET_MAX; ++energy)
   {
     // Dummy maps
     std::map<unsigned int, std::vector<unsigned int> > zaid_map;
     std::map<unsigned int, std::vector<Real> > cdf_map;
-    for (unsigned int i = 0; i < ZAID.size(); ++i)
+    for (auto & zaid: zaid_list)
     {
       // check if $ENDF_FP_DIR is set
       auto path = std::getenv("ENDF_FP_DIR");
@@ -170,7 +169,7 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & ZAID)
         mooseError("Set $ENDF_FP_DIR to the directory holding the sum yield data files.");
 
       // check if file exists, if not continue
-      std::string filename = path + std::to_string(ZAID[i]) + "_" + MagpieUtils::neutronEnergyName(j) + ".txt";
+      std::string filename = path + std::to_string(zaid) + "_" + MagpieUtils::neutronEnergyName(energy) + ".txt";
       bool result = MooseUtils::checkFileReadable(filename, false, false);
       if (result == false)
          continue;
@@ -194,17 +193,17 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & ZAID)
       // renormalize to ensure that cdf[-1] == 1
       unsigned int last_index = fission_probabilities.size() - 1;
       Real last_value = fission_probabilities[last_index];
-      for (auto & zaid: fission_probabilities)
-        zaid /= last_value;
+      for (auto & probability: fission_probabilities)
+        probability /= last_value;
 
       // Step 4: Store std::vectors into maps
-      zaid_map[ZAID[i]] = zaid_target;
-      cdf_map[ZAID[i]] = fission_probabilities;
+      zaid_map[zaid] = zaid_target;
+      cdf_map[zaid] = fission_probabilities;
     }
 
     // store map into vector for given energy type
-    _fission_zaids[j] = zaid_map;
-    _fission_cdf[j] = cdf_map;
+    _fission_zaids[energy] = zaid_map;
+    _fission_cdf[energy] = cdf_map;
   }
 }
 
