@@ -36,46 +36,46 @@ NeutronEnergyType determineNeutronType(Real energy);
 
 /**
  * Proxy object to emulate a reference to a T object that can be stored in
- * a container and is copy constructible. It uses a pointer to T internally
- * and overloads the assignement operator to make it behave like a reference.
- * This allows us to construct iterators that dereference to pairs and have
- * assignable 'second' members.
+ * a container and is copy constructible but NOT CopyAssignable. It uses a
+ * pointer to T internally and overloads the assignement operator to make it
+ * behave like a reference. This allows us to construct iterators that dereference
+ * to pairs and have assignable 'second' members.
  */
 template <typename T>
 class reference_wrapper
 {
 public:
   reference_wrapper() = delete;
-  reference_wrapper(T & obj) : ptr(&obj) {}
-  reference_wrapper(const reference_wrapper<T> & ref) : ptr(ref.ptr) {}
+  reference_wrapper(T & obj) : _ptr(std::addressof(obj)) {}
+  reference_wrapper(const reference_wrapper<T> & ref) : _ptr(ref._ptr) {}
 
   /// implicit cast to a value type for read access
-  operator T() { return *ptr; }
+  operator T() { return *_ptr; }
 
   /// explicit cast to a value reference
-  T & get() { return *ptr; }
+  T & get() { return *_ptr; }
 
   /// resets the pointer
-  void set(T & rhs) { ptr = &rhs; }
+  void set(T & rhs) { _ptr = &rhs; }
 
   /// write access to the wrapped value
-  T & operator= (const T & value) { *ptr = value; return *ptr; }
+  T & operator= (const T & value) { *_ptr = value; return *_ptr; }
 
   ///@{ compound assignment operators for modification of the value
-  T & operator+= (const T & rhs) { return *ptr += rhs; }
-  T & operator-= (const T & rhs) { return *ptr -= rhs; }
-  T & operator*= (const T & rhs) { return *ptr *= rhs; }
-  T & operator/= (const T & rhs) { return *ptr /= rhs; }
-  T & operator%= (const T & rhs) { return *ptr %= rhs; }
-  T & operator<<= (const T & rhs) { return *ptr <<= rhs; }
-  T & operator>>= (const T & rhs) { return *ptr >>= rhs; }
-  T & operator^= (const T & rhs) { return *ptr ^= rhs; }
-  T & operator&= (const T & rhs) { return *ptr &= rhs; }
-  T & operator|= (const T & rhs) { return *ptr |= rhs; }
+  T & operator+= (const T & rhs) { return *_ptr += rhs; }
+  T & operator-= (const T & rhs) { return *_ptr -= rhs; }
+  T & operator*= (const T & rhs) { return *_ptr *= rhs; }
+  T & operator/= (const T & rhs) { return *_ptr /= rhs; }
+  T & operator%= (const T & rhs) { return *_ptr %= rhs; }
+  T & operator<<= (const T & rhs) { return *_ptr <<= rhs; }
+  T & operator>>= (const T & rhs) { return *_ptr >>= rhs; }
+  T & operator^= (const T & rhs) { return *_ptr ^= rhs; }
+  T & operator&= (const T & rhs) { return *_ptr &= rhs; }
+  T & operator|= (const T & rhs) { return *_ptr |= rhs; }
   ///@}
 
 private:
-  T * ptr;
+  T * _ptr;
 };
 
 } // namespace MagpieUtils
