@@ -66,7 +66,7 @@ DiscretePDFTest::samplePKA()
   Real counter = 0.0, max = 2.0e5;
   while (counter < max)
   {
-    std::vector<DiscretePKAPDFBase::initialPKAState> i_state;
+    std::vector<DiscretePKAPDFBase::InitialPKAState> i_state;
     pdf.drawSample(i_state);
     counter += 1.0;
 
@@ -76,14 +76,14 @@ DiscretePDFTest::samplePKA()
     else if (i_state[0]._Z == 16)
       j1 = 1;
     else
-      mooseError("Incorrect Z in initialPKAState.");
+      mooseError("Incorrect Z in InitialPKAState.");
 
     if (i_state[0]._energy <= 1.0)
       j2 = 0;
     else if (i_state[0]._energy > 1.0 && i_state[0]._energy <= 9.0)
       j2 = 1;
     else
-      mooseError("Incorrect energy in initialPKAState.");
+      mooseError("Incorrect energy in InitialPKAState.");
 
     Real mu = i_state[0]._direction(2);
     j4 = std::floor((mu + 1.0) / dmu);

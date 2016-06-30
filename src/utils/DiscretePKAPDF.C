@@ -180,7 +180,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 }
 
 void
-DiscretePKAPDF::drawSample(std::vector<initialPKAState> & initial_state)
+DiscretePKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
 {
   //resize initial_state
   initial_state.resize(1);

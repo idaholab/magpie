@@ -15,7 +15,7 @@ public:
                  unsigned int na, unsigned int np, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
-  virtual void drawSample(std::vector<initialPKAState> & initial_state) override;
+  virtual void drawSample(std::vector<InitialPKAState> & initial_state) override;
 
   /// NOTE: we pass by value here because we modify probabilities in the function for
   /// convenience
