@@ -10,47 +10,42 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
-DiscretePKAPDF::DiscretePKAPDF(Real magnitude, std::vector<unsigned int> ZAID, std::vector<Real> energies,
-                               unsigned int na, unsigned int np, MultiIndex<Real> probabilities) :
-    DiscretePKAPDFBase(magnitude),
-    _zaids(ZAID),
-    _nZA(_zaids.size()),
-    _energies(energies),
-    _ng(_energies.size() - 1),
+DiscretePKAPDF::DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies,
+                                unsigned int na, unsigned int np, const MultiIndex<Real> & probabilities) :
+    DiscretePKAPDFBase(magnitude, ZAID, energies),
     _na(na),
     _dphi(2.0 * libMesh::pi / _na),
     _np(np),
     _dmu(2.0 / _np),
-    _probabilities(probabilities),
     _marginal_cdf_mu(probabilities),
     _marginal_cdf_phi(probabilities),
     _marginal_cdf_energy(probabilities),
     _marginal_cdf_zaid(probabilities)
 {
   // check the size of _probabilities
-  if (_probabilities.dim() != 4)
+  if (probabilities.dim() != 4)
     mooseError("probabilities MultiIndex object has wrong dimensions.");
 
-  MultiIndex<Real>::size_type shape = _probabilities.size();
+  MultiIndex<Real>::size_type shape = probabilities.size();
   if (shape[0] != _nZA || shape[1] != _ng || shape[2] != _na || shape[3] != _np)
     mooseError("Size of probabilities is inconsistent with random variable input.");
 
-  precomputeCDF();
+  precomputeCDF(probabilities);
 }
 
 void
-DiscretePKAPDF::precomputeCDF()
+DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 {
   /**
    * Compute the weighted pdf: pdf value * width of the bin
    */
   MultiIndex<Real>::size_type shape(4);
   MultiIndex<Real>::size_type index(4);
-  for (MultiIndex<Real>::iterator it = _probabilities.begin(); it != _probabilities.end(); ++it)
+  for (auto it: probabilities)
   {
-    index = (*it).first;
+    index = it.first;
     Real wt = _dmu * _dphi * (_energies[index[1] + 1] - _energies[index[1]]);
-    (*it).second *= wt;
+    it.second *= wt;
   }
 
   /**
@@ -61,37 +56,30 @@ DiscretePKAPDF::precomputeCDF()
   _marginal_cdf_zaid = MultiIndex<Real>(shape);
   for (unsigned int jZA = 0; jZA < _nZA; ++jZA)
   {
-    MultiIndex<Real>::size_type local_index(1);
     Real integral_value = 0.0;
     for (unsigned int jE = 0; jE < _ng; ++jE)
       for (unsigned int jP = 0; jP < _na; ++jP)
         for (unsigned int jM = 0; jM < _np; ++jM)
-        {
-          index[0] = jZA;
-          index[1] = jE;
-          index[2] = jP;
-          index[3] = jM;
-          integral_value += _probabilities(index);
-        }
-    local_index[0] = jZA;
-    _marginal_cdf_zaid(local_index) = integral_value;
+          integral_value += probabilities({jZA, jE, jP, jM});
+
+    _marginal_cdf_zaid({jZA}) = integral_value;
   }
 
   // Step 2: Compute cdf
-  for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
+  for (auto zaid: _marginal_cdf_zaid)
   {
-    index = (*it_zaid).first;
+    index = zaid.first;
     index[0] -= 1;
-    if ((*it_zaid).first[0] > 0)
-      (*it_zaid).second += _marginal_cdf_zaid(index);
+    if (zaid.first[0] > 0)
+      zaid.second += _marginal_cdf_zaid(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (MultiIndex<Real>::iterator it_zaid = _marginal_cdf_zaid.begin(); it_zaid != _marginal_cdf_zaid.end(); ++it_zaid)
+  for (auto zaid: _marginal_cdf_zaid)
   {
-    index = (*it_zaid).first;
+    index = zaid.first;
     index[0] = _nZA - 1;
-    (*it_zaid).second /= _marginal_cdf_zaid(index);
+    zaid.second /= _marginal_cdf_zaid(index);
   }
 
   /**
@@ -106,37 +94,28 @@ DiscretePKAPDF::precomputeCDF()
   for (unsigned int jZA = 0; jZA < _nZA; ++jZA)
     for (unsigned int jE = 0; jE < _ng; ++jE)
     {
-      MultiIndex<Real>::size_type local_index(2);
       Real integral_value = 0.0;
       for (unsigned int jP = 0; jP < _na; ++jP)
         for (unsigned int jM = 0; jM < _np; ++jM)
-        {
-          index[0] = jZA;
-          index[1] = jE;
-          index[2] = jP;
-          index[3] = jM;
-          integral_value += _probabilities(index);
-        }
-      local_index[0] = jZA;
-      local_index[1] = jE;
-      _marginal_cdf_energy(local_index) = integral_value;
+          integral_value += probabilities({jZA, jE, jP, jM});
+      _marginal_cdf_energy({jZA, jE}) = integral_value;
     }
 
   // Step 2: Compute cdf
-  for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
+  for (auto energy: _marginal_cdf_energy)
   {
-    index = (*it_energy).first;
+    index = energy.first;
     index[1] -= 1;
-    if ((*it_energy).first[1] > 0)
-      (*it_energy).second += _marginal_cdf_energy(index);
+    if (energy.first[1] > 0)
+      energy.second += _marginal_cdf_energy(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (MultiIndex<Real>::iterator it_energy = _marginal_cdf_energy.begin(); it_energy != _marginal_cdf_energy.end(); ++it_energy)
+  for (auto energy: _marginal_cdf_energy)
   {
-    index = (*it_energy).first;
+    index = energy.first;
     index[1] = _ng - 1;
-    (*it_energy).second /= _marginal_cdf_energy(index);
+    energy.second /= _marginal_cdf_energy(index);
   }
 
   /**
@@ -153,93 +132,59 @@ DiscretePKAPDF::precomputeCDF()
     for (unsigned int jE = 0; jE < _ng; ++jE)
       for (unsigned int jP = 0; jP < _na; ++jP)
       {
-        MultiIndex<Real>::size_type local_index(3);
         Real integral_value = 0.0;
         for (unsigned int jM = 0; jM < _np; ++jM)
-        {
-          index[0] = jZA;
-          index[1] = jE;
-          index[2] = jP;
-          index[3] = jM;
-          integral_value += _probabilities(index);
-        }
-        local_index[0] = jZA;
-        local_index[1] = jE;
-        local_index[2] = jP;
-        _marginal_cdf_phi(local_index) = integral_value;
+          integral_value += probabilities({jZA, jE, jP, jM});
+        _marginal_cdf_phi({jZA, jE, jP}) = integral_value;
       }
 
   // Step 2: Compute cdf
-  for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
+  for (auto phi: _marginal_cdf_phi)
   {
-    index = (*it_phi).first;
+    index = phi.first;
     index[2] -= 1;
-    if ((*it_phi).first[2] > 0)
-      (*it_phi).second += _marginal_cdf_phi(index);
+    if (phi.first[2] > 0)
+      phi.second += _marginal_cdf_phi(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (MultiIndex<Real>::iterator it_phi = _marginal_cdf_phi.begin(); it_phi != _marginal_cdf_phi.end(); ++it_phi)
+  for (auto phi: _marginal_cdf_phi)
   {
-    index = (*it_phi).first;
+    index = phi.first;
     index[2] = _na - 1;
-    (*it_phi).second /= _marginal_cdf_phi(index);
+    phi.second /= _marginal_cdf_phi(index);
   }
 
   /**
    *  precompute _marginal_cdf_mu
    */
   // Step 1: No need to marginalize pdf for mu
-  _marginal_cdf_mu = _probabilities;
+  _marginal_cdf_mu = probabilities;
 
   // Step 2: Compute cdf
-  for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
+  for (auto mu: _marginal_cdf_mu)
   {
-    index = (*it_mu).first;
+    index = mu.first;
     index[3] -= 1;
-    if ((*it_mu).first[3] > 0)
-      (*it_mu).second += _marginal_cdf_mu(index);
+    if (mu.first[3] > 0)
+      mu.second += _marginal_cdf_mu(index);
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (MultiIndex<Real>::iterator it_mu = _marginal_cdf_mu.begin(); it_mu != _marginal_cdf_mu.end(); ++it_mu)
+  for (auto mu: _marginal_cdf_mu)
   {
-    index = (*it_mu).first;
+    index = mu.first;
     index[3] = _np - 1;
-    (*it_mu).second /= _marginal_cdf_mu(index);
+    mu.second /= _marginal_cdf_mu(index);
   }
-}
-
-unsigned int
-DiscretePKAPDF::sampleHelper(const MultiIndex<Real> & marginal_pdf, const MultiIndex<Real>::size_type indices) const
-{
-  if (marginal_pdf.dim() - indices.size() != 1)
-    mooseError("For sampling the indices vector must reduce the marginal_pdf to a one-dimensional ladder function.");
-  MultiIndex<Real>::size_type dimension(indices.size());
-  for (unsigned int j = 0; j < indices.size(); ++j)
-    dimension[j] = j;
-  MultiIndex<Real> new_marginal_pdf = marginal_pdf.slice(dimension, indices);
-  return sampleHelper(new_marginal_pdf);
-}
-
-unsigned int
-DiscretePKAPDF::sampleHelper(const MultiIndex<Real> & marginal_pdf) const
-{
-  Real r = MooseRandom::rand();
-  MultiIndex<Real>::size_type index(1);
-  unsigned int j = 0;
-  for (; j < marginal_pdf.size()[0]; ++j)
-  {
-    index[0] = j;
-    if (r <= marginal_pdf(index))
-      break;
-  }
-  return j;
 }
 
 void
-DiscretePKAPDF::drawSample(initialPKAState & initial_state)
+DiscretePKAPDF::drawSample(std::vector<initialPKAState> & initial_state)
 {
+  //resize initial_state
+  initial_state.resize(1);
+
   /**
    * Same the discrete pdfs by first sampling from the "most marginal"
    * _marginal_cdf_zaid. Then get the conditional _marginal_cdf_energy(zaid)
@@ -252,18 +197,18 @@ DiscretePKAPDF::drawSample(initialPKAState & initial_state)
   sampled_indices.push_back(sampleHelper(_marginal_cdf_mu, sampled_indices));
 
   // first we need to compute Z and m from ZAID
-  initial_state._Z = MagpieUtils::getZFromZAID(_zaids[sampled_indices[0]]);
-  initial_state._mass = MagpieUtils::getAFromZAID(_zaids[sampled_indices[0]]);
+  initial_state[0]._Z = MagpieUtils::getZFromZAID(_zaids[sampled_indices[0]]);
+  initial_state[0]._mass = MagpieUtils::getAFromZAID(_zaids[sampled_indices[0]]);
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  initial_state._energy = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
+  initial_state[0]._energy = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
 
   Real sampled_phi = _dphi * MooseRandom::rand() + _dphi * sampled_indices[2];
   Real sampled_mu = _dmu * MooseRandom::rand() + _dmu * sampled_indices[3] - 1.0;
   // NOTE: mu is measured w.r.t. the x axis because of the convention in Rattlesnake
   // comparing to D&H Eq. 2-41: x -> y, y -> z, z -> x
-  initial_state._direction(0) = sampled_mu;
-  initial_state._direction(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
-  initial_state._direction(2) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
+  initial_state[0]._direction(0) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
+  initial_state[0]._direction(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
+  initial_state[0]._direction(2) = sampled_mu;
 }

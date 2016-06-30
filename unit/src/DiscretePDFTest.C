@@ -1,17 +1,3 @@
-/****************************************************************/
-/*               DO NOT MODIFY THIS HEADER                      */
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*           (c) 2010 Battelle Energy Alliance, LLC             */
-/*                   ALL RIGHTS RESERVED                        */
-/*                                                              */
-/*          Prepared by Battelle Energy Alliance, LLC           */
-/*            Under Contract No. DE-AC07-05ID14517              */
-/*            With the U. S. Department of Energy               */
-/*                                                              */
-/*            See COPYRIGHT for full restrictions               */
-/****************************************************************/
-
 #include "DiscretePDFTest.h"
 
 //Magpie includes
@@ -80,29 +66,29 @@ DiscretePDFTest::samplePKA()
   Real counter = 0.0, max = 2.0e5;
   while (counter < max)
   {
-    DiscretePKAPDFBase::initialPKAState i_state;
+    std::vector<DiscretePKAPDFBase::initialPKAState> i_state;
     pdf.drawSample(i_state);
     counter += 1.0;
 
     // find the correct "bin"
-    if (i_state._Z == 1)
+    if (i_state[0]._Z == 1)
       j1 = 0;
-    else if (i_state._Z == 16)
+    else if (i_state[0]._Z == 16)
       j1 = 1;
     else
       mooseError("Incorrect Z in initialPKAState.");
 
-    if (i_state._energy <= 1.0)
+    if (i_state[0]._energy <= 1.0)
       j2 = 0;
-    else if (i_state._energy > 1.0 && i_state._energy <= 9.0)
+    else if (i_state[0]._energy > 1.0 && i_state[0]._energy <= 9.0)
       j2 = 1;
     else
       mooseError("Incorrect energy in initialPKAState.");
 
-    Real mu = i_state._direction(0);
+    Real mu = i_state[0]._direction(2);
     j4 = std::floor((mu + 1.0) / dmu);
 
-    Real phi = std::atan2(i_state._direction(2), i_state._direction(1));
+    Real phi = std::atan2(i_state[0]._direction(1), i_state[0]._direction(0));
     j3 = std::floor((phi + libMesh::pi) / dphi);
 
     index[0] = j1;
