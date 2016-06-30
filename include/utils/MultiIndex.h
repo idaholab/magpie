@@ -201,6 +201,7 @@ public:
 
   /// dereferencing operator
   std::pair<const size_type &, T &> operator* () { return std::pair<const size_type &, T &>(_indices, _multi_index._data[_flat_index]); }
+  std::pair<const size_type &, const T &> operator* ()  const { return std::pair<const size_type &, const T &>(_indices, _multi_index._data[_flat_index]); }
 
 protected:
   reference_type _multi_index;
