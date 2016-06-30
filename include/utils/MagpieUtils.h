@@ -26,13 +26,13 @@ unsigned int getAFromZAID(unsigned int  zaid);
 ///@}
 
 ///enum of different neutron energy groups (thermal, epithermal, fast, high)
-enum neutronEnergyTypes{Thermal, Epithermal, Fast, High, enum_max};
+enum NeutronEnergyType {Thermal = 0, Epithermal, Fast, High, NET_MAX};
 
 /// vector of strings for each neutron energy type
-static const std::vector<std::string> neutronEnergyString = {"Thermal", "Epithermal", "Fast", "High"};
+const std::string & neutronEnergyName(unsigned int i);
 
 ///Determines neutron energy type given it's energy
-neutronEnergyTypes determineNeutronType(Real energy);
+NeutronEnergyType determineNeutronType(Real energy);
 
 } // namespace MagpieUtils
 
