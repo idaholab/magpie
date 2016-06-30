@@ -47,6 +47,7 @@ class reference_wrapper
 public:
   reference_wrapper() = delete;
   reference_wrapper(T & obj) : _ptr(std::addressof(obj)) {}
+  reference_wrapper(T && obj) = delete;
   reference_wrapper(const reference_wrapper<T> & ref) : _ptr(ref._ptr) {}
 
   /// implicit cast to a value type for read access
@@ -60,6 +61,9 @@ public:
 
   /// write access to the wrapped value
   T & operator= (const T & value) { *_ptr = value; return *_ptr; }
+
+  /// we need to delete this assignement ioperator as it will have an unexpected effect
+  T & operator= (const reference_wrapper<T> & ref) = delete; // Error: cast to value type explicitly before assigning a reference_wrapper to another reference_wrapper!
 
   ///@{ compound assignment operators for modification of the value
   T & operator+= (const T & rhs) { return *_ptr += rhs; }
@@ -75,6 +79,7 @@ public:
   ///@}
 
 private:
+  /// pointer top the wrapped object
   T * _ptr;
 };
 
