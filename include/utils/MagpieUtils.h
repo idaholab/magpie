@@ -55,6 +55,9 @@ public:
   /// explicit cast to a value reference
   T & get() { return *ptr; }
 
+  /// resets the pointer
+  void set(T & rhs) { ptr = &rhs; }
+
   /// write access to the wrapped value
   T & operator= (const T & value) { *ptr = value; return *ptr; }
 
