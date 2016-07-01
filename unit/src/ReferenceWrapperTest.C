@@ -66,26 +66,21 @@ ReferenceWrapperTest::testRefWrapper()
   ref_wrapper_l += 1;
   CPPUNIT_ASSERT( l2 == 124 );
 
-  // operators ^=, &=, |=
-  bool a_bool = false;
-  bool array[2] = {true, false};
-  MagpieUtils::reference_wrapper<bool> ref_wrapper_b(a_bool);
-  for (unsigned j1 = 0; j1 < 2; ++j1)
-    for (unsigned j2 = 0; j2 < 2; ++j2)
-    {
-      // ^=
-      ref_wrapper_b = array[j1];
-      ref_wrapper_b ^= array[j2];
-      CPPUNIT_ASSERT( a_bool == (array[j1] ^ array[j2]) );
+  // bitwise and &=: 11 & 13 = 9
+  unsigned int l3 = 11;
+  ref_wrapper_l.set(l3);
+  ref_wrapper_l &= 13;
+  CPPUNIT_ASSERT( l3 == 9 );
 
-      // &=
-      ref_wrapper_b = array[j1];
-      ref_wrapper_b &= array[j2];
-      CPPUNIT_ASSERT( a_bool == (array[j1] & array[j2]) );
+  // bitwise or |=: 9 & 12 = 13
+  ref_wrapper_l = 9;
+  ref_wrapper_l.set(l3);
+  ref_wrapper_l |= 12;
+  CPPUNIT_ASSERT( l3 == 13 );
 
-      // |=
-      ref_wrapper_b = array[j1];
-      ref_wrapper_b |= array[j2];
-      CPPUNIT_ASSERT( a_bool == (array[j1] | array[j2]) );
-    }
+  // bitwise xor ^=: 11 & 13 = 6
+  ref_wrapper_l = 11;
+  ref_wrapper_l.set(l3);
+  ref_wrapper_l ^= 13;
+  CPPUNIT_ASSERT( l3 == 6 );
 }
