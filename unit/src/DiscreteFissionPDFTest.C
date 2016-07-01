@@ -16,7 +16,9 @@
 
 //Magpie includes
 #include "DiscreteFissionPKAPDF.h"
+#include "PKAGeneratorBase.h"
 #include "MultiIndex.h"
+#include "mytrim/ion.h"
 
 #include <cmath>
 #include <iostream>
@@ -97,14 +99,14 @@ DiscreteFissionPDFTest::sampleFissionPKA()
 
   while (counter < max)
   {
-    std::vector<DiscretePKAPDFBase::InitialPKAState> i_state;
+    std::vector<MyTRIM_NS::IonBase> i_state;
     pdf.drawSample(i_state);
     counter += 1.0;
 
     //find matching bin to the sample A
     for (unsigned int i = 0; i < fproduct_A.size(); ++i)
     {
-      if ( int(i_state[0]._mass) == fproduct_A[i])
+      if ( int(i_state[0]._m) == fproduct_A[i])
         {
           tally_index = i;
           break;
@@ -113,12 +115,15 @@ DiscreteFissionPDFTest::sampleFissionPKA()
     //tally mass number in corresponding bin
     fproduct_tally[tally_index] += 1.0;
 
-    total_energy += i_state[0]._energy + i_state[1]._energy;
-    total_mass += i_state[0]._mass + i_state[1]._mass + 2.8836;
+    total_energy += i_state[0]._E + i_state[1]._E;
+    total_mass += i_state[0]._m + i_state[1]._m + 2.8836;
     total_Z += i_state[0]._Z + i_state[1]._Z;
 
+    DiscreteFissionPDFTest::setRandomDirection(i_state[0]);
+    i_state[1]._dir = -i_state[0]._dir;
+
     //sampled_mu (int)
-    int sampled_mu = int((i_state[0]._direction(2) + 1.0) * 2.0);
+    int sampled_mu = int((i_state[0]._dir(2) + 1.0) * 2.0);
 
     //mu bins
     if ( sampled_mu >= 0 && sampled_mu < 1)
@@ -133,7 +138,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
       mooseError("mu is not between -1 and 1");
 
     //retrieve phi
-    Real sampled_phi = std::atan2(i_state[0]._direction(1),i_state[0]._direction(0));
+    Real sampled_phi = std::atan2(i_state[0]._dir(1),i_state[0]._dir(0));
 
     //phi bins
     if (sampled_phi >= -libMesh::pi && sampled_phi < -libMesh::pi / 2.0)
@@ -197,4 +202,23 @@ DiscreteFissionPDFTest::sampleFissionPKA()
 
   //check max error of sampled distribution vs true distribution
   CPPUNIT_ASSERT( *maxerror < 1.0e-2);
+}
+
+void
+DiscreteFissionPDFTest::setRandomDirection(MyTRIM_NS::IonBase & ion)
+{
+  Real nsq, x1, x2;
+
+  // Marsaglia's method for uniformly sampling the surface of the sphere
+  do
+  {
+    x1 = 2 * MooseRandom::rand() - 1.0;
+    x2 = 2 * MooseRandom::rand() - 1.0;
+    nsq = x1 * x1 + x2 * x2;
+  } while (nsq >= 1);
+
+  // construct normalized direction vector
+  ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
+  ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
+  ion._dir(2) = 1.0 - 2.0 * nsq;
 }

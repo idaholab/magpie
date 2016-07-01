@@ -56,7 +56,7 @@ DiscretePDFTest::samplePKA()
           mindex(index) = pzaid[j0] * penergies[j1] * pphi * pmu[j3];
         }
 
-  DiscretePKAPDF pdf = DiscretePKAPDF(1.0, zaid, energies, 4, 3, mindex);
+  DiscretePKAPDF pdf = DiscretePKAPDF(1.0, zaid, energies, mindex);
 
   // set up a frequency counter
   unsigned int j1, j2, j3, j4;
@@ -66,7 +66,7 @@ DiscretePDFTest::samplePKA()
   Real counter = 0.0, max = 2.0e5;
   while (counter < max)
   {
-    std::vector<DiscretePKAPDFBase::InitialPKAState> i_state;
+    std::vector<MyTRIM_NS::IonBase> i_state;
     pdf.drawSample(i_state);
     counter += 1.0;
 
@@ -78,17 +78,17 @@ DiscretePDFTest::samplePKA()
     else
       mooseError("Incorrect Z in InitialPKAState.");
 
-    if (i_state[0]._energy <= 1.0)
+    if (i_state[0]._E <= 1.0)
       j2 = 0;
-    else if (i_state[0]._energy > 1.0 && i_state[0]._energy <= 9.0)
+    else if (i_state[0]._E > 1.0 && i_state[0]._E <= 9.0)
       j2 = 1;
     else
       mooseError("Incorrect energy in InitialPKAState.");
 
-    Real mu = i_state[0]._direction(2);
+    Real mu = i_state[0]._dir(2);
     j4 = std::floor((mu + 1.0) / dmu);
 
-    Real phi = std::atan2(i_state[0]._direction(1), i_state[0]._direction(0));
+    Real phi = std::atan2(i_state[0]._dir(1), i_state[0]._dir(0));
     j3 = std::floor((phi + libMesh::pi) / dphi);
 
     index[0] = j1;

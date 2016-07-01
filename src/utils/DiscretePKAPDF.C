@@ -10,12 +10,11 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
-DiscretePKAPDF::DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies,
-                                unsigned int na, unsigned int np, const MultiIndex<Real> & probabilities) :
+DiscretePKAPDF::DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
     DiscretePKAPDFBase(magnitude, ZAID, energies),
-    _na(na),
+    _na(probabilities.size()[2]),
     _dphi(2.0 * libMesh::pi / _na),
-    _np(np),
+    _np(probabilities.size()[3]),
     _dmu(2.0 / _np),
     _marginal_cdf_mu(probabilities),
     _marginal_cdf_phi(probabilities),
@@ -180,7 +179,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 }
 
 void
-DiscretePKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
+DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const
 {
   //resize initial_state
   initial_state.resize(1);
@@ -198,17 +197,16 @@ DiscretePKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
 
   // first we need to compute Z and m from ZAID
   initial_state[0]._Z = MagpieUtils::getZFromZAID(_zaids[sampled_indices[0]]);
-  initial_state[0]._mass = MagpieUtils::getAFromZAID(_zaids[sampled_indices[0]]);
+  initial_state[0]._m = MagpieUtils::getAFromZAID(_zaids[sampled_indices[0]]);
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  initial_state[0]._energy = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
+  initial_state[0]._E = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
 
+  // NOTE: we need to sample the direction in this class because the direction is anisotropic
   Real sampled_phi = _dphi * MooseRandom::rand() + _dphi * sampled_indices[2];
   Real sampled_mu = _dmu * MooseRandom::rand() + _dmu * sampled_indices[3] - 1.0;
-  // NOTE: mu is measured w.r.t. the x axis because of the convention in Rattlesnake
-  // comparing to D&H Eq. 2-41: x -> y, y -> z, z -> x
-  initial_state[0]._direction(0) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
-  initial_state[0]._direction(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
-  initial_state[0]._direction(2) = sampled_mu;
+  initial_state[0]._dir(0) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
+  initial_state[0]._dir(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
+  initial_state[0]._dir(2) = sampled_mu;
 }

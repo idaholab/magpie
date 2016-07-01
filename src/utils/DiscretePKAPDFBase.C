@@ -52,15 +52,3 @@ DiscretePKAPDFBase::sampleHelper(const std::vector<Real> & marginal_pdf) const
   }
   return j;
 }
-
-std::vector<Real>
-DiscretePKAPDFBase::sampleUniformDirection()
-{
-  Real r1 = MooseRandom::rand();
-  Real r2 = MooseRandom::rand();
-  std::vector<Real> angles(2);
-  // for sampling mu
-  angles[0] = 2.0 * r1 - 1.0;
-  angles[1] = 2.0 * libMesh::pi * r2;
-  return angles;
-}
