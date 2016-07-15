@@ -21,6 +21,10 @@
 #include "MyTRIMElementRun.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
+#if RATTLESNAKE_ENABLED
+  #include "RadiationDamageSN.h"
+  #include "RadiationDamageFission.h"
+#endif
 #include "SPPARKSUserObject.h"
 
 template<>
@@ -73,6 +77,10 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(MyTRIMElementRun);
   registerUserObject(PKAConstant);
   registerUserObject(PKAFissionFragmentEmpirical);
+  #if RATTLESNAKE_ENABLED
+    registerUserObject(RadiationDamageSN);
+    registerUserObject(RadiationDamageFission);
+  #endif
   registerUserObject(SPPARKSUserObject);
 }
 
