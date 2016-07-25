@@ -16,4 +16,13 @@
     max_parallel = 1
     max_threads = 1
   [../]
+
+  [./UO2_initial]
+    type = 'RunApp'
+    input = 'UO2_pellet_initial.i'
+    max_parallel = 1
+    max_threads = 1
+    skip = 'requires PKAFissionFragmentsNeutronics'
+  [../]
+
 []
