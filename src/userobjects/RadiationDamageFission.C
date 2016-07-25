@@ -25,7 +25,7 @@ InputParameters validParams<RadiationDamageFission>()
   // FIXME: This is not the permanent solution for providing fission cross sections. It must be implemented as material
   // property.
   params.addRequiredParam<std::vector<Real> >("fission_cross_sections", "Fission cross sections. Size = npoints x nisotopes x G.");
-  params.addClassDescription("Computes fractional fission rates (Ni * simga_fi * phi) for a selection of points.\nUsed for computing PKA distributions from fission reactions.");
+  params.addClassDescription("Computes fractional fission rates (Ni * simga_fi * phi) for a selection of points.\nUsed for computing PDFs from fission reactions to sample PKAs.");
   return params;
 }
 
@@ -58,7 +58,7 @@ RadiationDamageFission::RadiationDamageFission(const InputParameters & parameter
 }
 
 Real
-RadiationDamageFission::computePKA(unsigned int i, unsigned int g, unsigned int /*p*/)
+RadiationDamageFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/)
 {
   return (*_scalar_flux[g])[_qp] * (*_number_densities[i])[_qp] * _fission_cross_section[_current_point][i][g];
 }

@@ -30,7 +30,7 @@ InputParameters validParams<RadiationDamageBase>()
   params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries ommitting E = 0.0. Units are MeV.");
   params.addRequiredParam<unsigned int>("L", "The order up to which angular moments of the PKA distribution are computed.");
   params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
-  params.addClassDescription("Primary Knock-on Atom (PKA) user object base class. Computes PKA distributions at a selection of points.");
+  params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
   return params;
 }
 
@@ -93,21 +93,21 @@ RadiationDamageBase::execute()
       // Set current qp to cached min_qp
       _qp = _qp_cache[_current_point];
 
-      // call back before computing PKA distribution for caching things that
+      // call back before computing radiation damage PDF for caching things that
       // don't change
-      preComputePKA();
+      preComputeRadiationDamagePDF();
 
-      // Evalute the PKA distribution at min_qp
+      // Evalute the radiation damage PDF at min_qp
       for (unsigned int i = 0; i < _I; ++i)
         for (unsigned int g = 0; g < _G; ++g)
           for (unsigned int p = 0; p < _nSH; ++p)
-            _sample_point_data[_current_point][i][g][p] = computePKA(i, g, p);
+            _sample_point_data[_current_point][i][g][p] = computeRadiationDamagePDF(i, g, p);
     }
   }
 }
 
 void
-RadiationDamageBase::preComputePKA()
+RadiationDamageBase::preComputeRadiationDamagePDF()
 {
 }
 
@@ -124,7 +124,7 @@ RadiationDamageBase::meshChanged()
 void
 RadiationDamageBase::initialize()
 {
-  // allocate PKA distribution
+  // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
   _sample_point_data.resize(_npoints);
   for (unsigned j = 0; j < _npoints; ++j)

@@ -25,7 +25,7 @@ InputParameters validParams<RadiationDamageSN>()
   // property.
   params.addRequiredParam<UserObjectName>("aqdata", "Angular quadrature user data.");
   params.addRequiredParam<std::vector<Real> >("recoil_cross_sections", "Recoil cross sections. Size = npoints x nisotopes x G x G x (L+1).");
-  params.addClassDescription("Computes PKA distributions for reactions except fission. User match match target isotopes with recoil isotopes and\nprovide transfer-like recoil cross section data.");
+  params.addClassDescription("Computes PDFs for reactions except fission that can be used for sampling PKAs in coupled BCMC simulations.\n User match match target isotopes with recoil isotopes and provide transfer-like recoil cross section data.");
   return params;
 }
 
@@ -88,7 +88,7 @@ RadiationDamageSN::RadiationDamageSN(const InputParameters & parameters) :
 }
 
 void
-RadiationDamageSN::preComputePKA()
+RadiationDamageSN::preComputeRadiationDamagePDF()
 {
   // compute _flux_moments for current _qp
   for (unsigned int g = 0; g < _G; ++g)
@@ -101,7 +101,7 @@ RadiationDamageSN::preComputePKA()
 }
 
 Real
-RadiationDamageSN::computePKA(unsigned int i, unsigned int g, unsigned int p)
+RadiationDamageSN::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p)
 {
   Real a = 0.0;
   for (unsigned int gp = 0; gp < _G; ++gp)
