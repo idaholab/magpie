@@ -43,11 +43,14 @@ public:
   /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
 
-  /// returns a std::vector<unsigned int> of ZAIDs
-  virtual std::vector<unsigned int> getZAIDs() const;
-
-  /// returns a std::vector<Real> of energies
-  virtual std::vector<Real> getEnergies() const;
+  /// returns a MultiIndex<Real> PDF at a given point ID
+  virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
+  /// returns a Real magnitude at a given point ID
+  virtual Real getMagnitude(unsigned int point_id) const;
+  /// returns a std::vector<unsigned int> of ZAIDs at a given point ID
+  virtual std::vector<unsigned int> getZAIDs(unsigned int point_id) const;
+  /// returns a std::vector<Real> of energies at a given point ID
+  virtual std::vector<Real> getEnergies(unsigned int point_id) const;
 
 protected:
   /// a callback executed right before computeRadiationDamagePDF
