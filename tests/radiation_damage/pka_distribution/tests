@@ -1,0 +1,18 @@
+[Tests]
+  [./radiation_damage_sn]
+    type = 'Exodiff'
+    input = 'radiation_damage_sn.i'
+    exodiff = 'radiation_damage_sn.e'
+    abs_zero = 1e-6
+    recover = false
+    skip = 'requires to be embedded in Mammoth'
+  [../]
+  [./radiation_damage_fission]
+    type = 'Exodiff'
+    input = 'radiation_damage_fission.i'
+    exodiff = 'radiation_damage_fission.e'
+    abs_zero = 1e-6
+    recover = false
+    skip = 'requires to be embedded in Mammoth'
+  [../]
+[]
