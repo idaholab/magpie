@@ -28,8 +28,8 @@ template<>
 InputParameters validParams<RadiationDamageBase>();
 
 /**
- * Computes the PKA species/energy/direction distribution
- * at a given set of point.
+ * Computes PDFs from neutronics calculations transferred from MAMMOTH
+ * that are used to sample PKAs that will be passed to BCMC simulations.
  */
 class RadiationDamageBase : public ElementUserObject
 {
@@ -41,17 +41,20 @@ public:
   virtual void finalize();
   virtual void threadJoin(const UserObject & y);
   virtual void meshChanged();
+  /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
+  /// returns a Real magnitude at a given point ID
   virtual Real getMagnitude(unsigned int point_id) const;
+  /// returns a std::vector<unsigned int> of ZAIDs at a given point ID
   virtual std::vector<unsigned int> getZAIDs(unsigned int point_id) const;
+  /// returns a std::vector<Real> of energies at a given point ID
   virtual std::vector<Real> getEnergies(unsigned int point_id) const;
 
 protected:
-
-  /// a callback executed right before computePKA
-  virtual void preComputePKA();
+  /// a callback executed right before computeRadiationDamagePDF
+  virtual void preComputeRadiationDamagePDF();
   /// computes the PKA for isotope i, group g, and SH indices l, m
-  virtual Real computePKA(unsigned int i, unsigned int g, unsigned int p) = 0;
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p) = 0;
 
   /// vector of target zaids
   const std::vector<std::string> & _target_isotope_names;
@@ -68,7 +71,7 @@ protected:
 
   /// total number of spherical harmonics. Depends on dim.
   unsigned int _nSH;
-  /// the points at which PKAs are computed
+  /// the points at which PDFs are computed
   const std::vector<Point> & _points;
   /// number of points
   unsigned int _npoints;
@@ -78,7 +81,7 @@ protected:
   std::vector<dof_id_type> _point_element;
   /// the array stores the _qp index for each point
   std::vector<unsigned int> _qp_cache;
-  /// stores the PKA distribution
+  /// stores the radiation damage PDF
   std::vector<MultiIndex<Real> > _sample_point_data;
 
   /// the current quadrature point

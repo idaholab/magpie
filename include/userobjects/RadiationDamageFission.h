@@ -24,8 +24,8 @@ template<>
 InputParameters validParams<RadiationDamageFission>();
 
 /**
- * Computes the PKA species/energy/direction distribution
- * for fission reactions.
+ * Computes PDFs from neutronics data that is used to sample PKAs due to fission
+ * for coupled BCMC simulations.
  * NOTE: Currently fission is assumed to be isotropic in the LAB
  * frame regardless of the incoming energy.
  */
@@ -35,13 +35,13 @@ public:
   RadiationDamageFission(const InputParameters & parameters);
 
 protected:
-  /// computes the PKA for isotope i, group g, and SH indices p
+  /// computes the PDF for isotope i, group g, and SH indices p
   /// NOTE: for fission p does not mateter
-  virtual Real computePKA(unsigned int i, unsigned int g, unsigned int /*p*/);
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/);
 
   /// the angular flux
   std::vector<const VariableValue *> _scalar_flux;
-  /// stores the recoil cross sections
+  /// stores the fission cross sections
   std::vector<std::vector<std::vector<Real> > > _fission_cross_section;
 };
 
