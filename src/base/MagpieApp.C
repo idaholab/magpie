@@ -86,6 +86,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(NeutronicsSpectrumSamplerSN);
 #endif
   registerUserObject(NeutronicsSpectrumSamplerFission);
+
   registerUserObject(SPPARKSUserObject);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);

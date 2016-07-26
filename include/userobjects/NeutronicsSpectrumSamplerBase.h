@@ -14,6 +14,10 @@
 #ifndef NEUTRONICSSPECTRUMSAMPLERBASE_H
 #define NEUTRONICSSPECTRUMSAMPLERBASE_H
 
+#ifdef RATTLESNAKE_ENABLED
+  #include "AQData.h"
+#endif
+
 // MOOSE includes
 #include "ElementUserObject.h"
 #include "MultiIndex.h"
@@ -103,8 +107,12 @@ protected:
   /// the current point
   unsigned int _current_point;
 
-  /// vector of ZAIDs
-  std::vector<unsigned int> _zaids;
+  /// vector of magnitudes at each point ID
+  std::vector<Real> _magnitude;
+  /// vector of a vector of ZAIDs at each point ID
+  std::vector<std::vector<unsigned int> > _zaids;
+  /// vector of a vector of Energies at each point ID
+  std::vector<std::vector<Real> > _energies;
 };
 
 #endif //NEUTRONICSSPECTRUMSAMPLERBASE_H

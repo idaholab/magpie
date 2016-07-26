@@ -11,7 +11,6 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "MooseMesh.h"
 
@@ -58,6 +57,10 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
     _number_densities[i] = & coupledValue("number_densities", i);
 
   _zaids.resize(_I);
+
+  #ifdef RATTLESNAKE_ENABLED
+  // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
+  unsigned int Z, A;
   for (unsigned int i = 0; i < _I; ++i)
   {
 #ifdef RATTLESNAKE_ENABLED
@@ -174,8 +177,9 @@ NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
           _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
 }
 
+
 MultiIndex<Real>
-NeutronicsSpectrumSamplerBase::getPDF(unsigned int point_id) const
+RadiationDamageBase::getPDF(unsigned int point_id) const
 {
   return _sample_point_data[point_id];
 }
