@@ -6,6 +6,13 @@
 #include <fstream>
 #include <map>
 
+DiscreteFissionPKAPDF::DiscreteFissionPKAPDF() :
+    DiscretePKAPDFBase(),
+    _marginal_cdf_target(MultiIndex<Real>({1})),
+    _conditional_cdf_energy(MultiIndex<Real>({1}))
+{
+}
+
 DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
     DiscretePKAPDFBase(magnitude, ZAID, energies),
     _marginal_cdf_target(probabilities),
@@ -78,7 +85,7 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 }
 
 void
-DiscreteFissionPKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
+DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const
 {
   //resize initial_state
   initial_state.resize(2);
@@ -122,31 +129,18 @@ DiscreteFissionPKAPDF::drawSample(std::vector<InitialPKAState> & initial_state)
   auto ffindex = sampleHelper(cdf_products);
   auto ffzaid = zaid_products[ffindex];
   initial_state[0]._Z = MagpieUtils::getZFromZAID(ffzaid);
-  initial_state[0]._mass = MagpieUtils::getAFromZAID(ffzaid);
+  initial_state[0]._m = MagpieUtils::getAFromZAID(ffzaid);
 
   // sample neutrons per fission
   auto neutrons_per_fission = sampleNu(energy, key);
 
   // mass balance to find Z and A of second fission product
   initial_state[1]._Z = target_Z - initial_state[0]._Z;
-  initial_state[1]._mass = target_A - initial_state[0]._mass - neutrons_per_fission;
+  initial_state[1]._m = target_A - initial_state[0]._m - neutrons_per_fission;
 
   // calculate the kinetic energy of each fission product
-  initial_state[0]._energy = total_ke / (1.0 + (initial_state[0]._mass / initial_state[1]._mass));
-  initial_state[1]._energy = (initial_state[0]._mass / initial_state[1]._mass) * initial_state[0]._energy;
-
-  // uniformly sample mu and phi (mu is backwards I think but it doesn't matter for uniform sampling)
-  // angles[0] = mu, angles[1] = phi
-  auto angles = sampleUniformDirection();
-
-  // calculate direction of fission products
-  // x: direction(0), y: direction(1), z: direction(2)
-  initial_state[0]._direction(0) = std::sqrt(1.0 - angles[0] * angles[0]) * std::cos(angles[1]);
-  initial_state[0]._direction(1) = std::sqrt(1.0 - angles[0] * angles[0]) * std::sin(angles[1]);
-  initial_state[0]._direction(2) = angles[0];
-  initial_state[1]._direction(0) = -initial_state[0]._direction(0);
-  initial_state[1]._direction(1) = -initial_state[0]._direction(1);
-  initial_state[1]._direction(2) = -initial_state[0]._direction(2);
+  initial_state[0]._E = total_ke / (1.0 + (initial_state[0]._m / initial_state[1]._m));
+  initial_state[1]._E = (initial_state[0]._m / initial_state[1]._m) * initial_state[0]._E;
 }
 
 void
@@ -207,7 +201,7 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
 }
 
 Real
-DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A)
+DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A) const
 {
   return 0.1178 * (std::pow(Z, 2.0) / std::pow(A, 1.0 / 3.0)) + 5.8;
 }
@@ -217,7 +211,7 @@ DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A)
  * determine the avg. number of neutrons per fission.
  */
 unsigned int
-DiscreteFissionPKAPDF::sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid)
+DiscreteFissionPKAPDF::sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid) const
 {
   Real nu_bar;
   if (zaid == 922350 && energy_type == MagpieUtils::Thermal)

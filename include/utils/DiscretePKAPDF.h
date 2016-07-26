@@ -3,6 +3,7 @@
 
 #include "DiscretePKAPDFBase.h"
 #include "MultiIndex.h"
+#include "mytrim/ion.h"
 
 /**
  * Implements a discrete PDF for sampling
@@ -11,11 +12,10 @@
 class DiscretePKAPDF : DiscretePKAPDFBase
 {
 public:
-  DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies,
-                 unsigned int na, unsigned int np, const MultiIndex<Real> & probabilities);
+  DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
-  virtual void drawSample(std::vector<InitialPKAState> & initial_state) override;
+  virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
   /// NOTE: we pass by value here because we modify probabilities in the function for
   /// convenience

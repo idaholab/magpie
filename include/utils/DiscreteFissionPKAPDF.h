@@ -3,8 +3,8 @@
 
 #include "DiscretePKAPDFBase.h"
 #include "MultiIndex.h"
-#include "MooseEnum.h"
 #include "MagpieUtils.h"
+#include "mytrim/ion.h"
 
 /**
  * Implements a discrete PDF for sampling fission products given target, energy,
@@ -13,10 +13,14 @@
 class DiscreteFissionPKAPDF : DiscretePKAPDFBase
 {
 public:
-  DiscreteFissionPKAPDF(Real magnitude,const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  /// the default constructor
+  DiscreteFissionPKAPDF();
+
+  /// the actual constructor
+  DiscreteFissionPKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
-  virtual void drawSample(std::vector<InitialPKAState> & initial_state) override;
+  virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
   /// override preComputeCDF. NOTE: we pass by value here because we modify probabilities in the function for
   /// convenience
@@ -29,10 +33,10 @@ protected:
   /**
    * reads Z and A number and returns kinetic energy in MeV
    */
-  Real determineFragmentsEnergy(unsigned int Z, unsigned int A);
+  Real determineFragmentsEnergy(unsigned int Z, unsigned int A) const;
 
   /// samples the number neutrons per fission based on target and energy
-  unsigned int sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid);
+  unsigned int sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsigned int zaid) const;
 
   /// we can cache the marginal distributions
   MultiIndex<Real> _marginal_cdf_target;
