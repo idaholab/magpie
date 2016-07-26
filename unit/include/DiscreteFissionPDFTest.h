@@ -18,6 +18,7 @@
 //CPPUnit includes
 #include "cppunit/extensions/HelperMacros.h"
 #include "DiscreteFissionPKAPDF.h"
+#include "MooseRandom.h"
 
 class DiscreteFissionPDFTest : public CppUnit::TestFixture
 {
@@ -29,6 +30,7 @@ class DiscreteFissionPDFTest : public CppUnit::TestFixture
 
 public:
   void sampleFissionPKA();
+  void setRandomDirection(MyTRIM_NS::IonBase & ion);
 };
 
 #endif  // DiscreteFissionPDFTest_H
