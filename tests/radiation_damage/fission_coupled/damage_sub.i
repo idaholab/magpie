@@ -100,11 +100,10 @@
 [Functions]
   [./U02_conc]
     type = ParsedFunction
-    #value = 'r:=sqrt(x*x+y*y); Rlow:=low*R; Rhigh:=high*R; Z:= (r-high*R)/(r-low*R); if(r<Rlow,1,
-    #                                                                               if(r>Rhigh,0,
-    #                                                                                 -(exp(2*Z)-1)/(exp(2*Z)+1)))'
-                                                                                    #-(1/(high-low))*(r/R-1)+0.5))'
-    value = 'if((abs(x+y)+abs(x-y))<=sqrt(200),1,0)'
+    value = 'r:=sqrt(x*x+y*y); Rlow:=low*R; Rhigh:=high*R; Z:= (r-high*R)/(r-low*R); if(r<Rlow,1,
+                                                                                     if(r>Rhigh,0,
+                                                                                     -(exp(2*Z)-1)/(exp(2*Z)+1)))'
+                                                                                     #-(1/(high-low))*(r/R-1)+0.5))'
     vars = 'R low high'
     vals = '20 0.9 1.1'
   [../]

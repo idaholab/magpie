@@ -47,14 +47,11 @@ public:
   /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
 
-  /// returns a MultiIndex<Real> PDF at a given point ID
-  virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
-  /// returns a Real magnitude at a given point ID
-  virtual Real getMagnitude(unsigned int point_id) const;
-  /// returns a std::vector<unsigned int> of ZAIDs at a given point ID
-  virtual std::vector<unsigned int> getZAIDs(unsigned int point_id) const;
-  /// returns a std::vector<Real> of energies at a given point ID
-  virtual std::vector<Real> getEnergies(unsigned int point_id) const;
+  /// returns a std::vector<unsigned int> of ZAIDs
+  virtual std::vector<unsigned int> getZAIDs() const;
+
+  /// returns a std::vector<Real> of energies
+  virtual std::vector<Real> getEnergies() const;
 
 protected:
   /// a callback executed right before computeRadiationDamagePDF
@@ -107,12 +104,8 @@ protected:
   /// the current point
   unsigned int _current_point;
 
-  /// vector of magnitudes at each point ID
-  std::vector<Real> _magnitude;
-  /// vector of a vector of ZAIDs at each point ID
-  std::vector<std::vector<unsigned int> > _zaids;
-  /// vector of a vector of Energies at each point ID
-  std::vector<std::vector<Real> > _energies;
+  /// vector of ZAIDs
+  std::vector<unsigned int> _zaids;
 };
 
 #endif //NEUTRONICSSPECTRUMSAMPLERBASE_H

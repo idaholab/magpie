@@ -31,6 +31,7 @@
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
 
+
 template<>
 InputParameters validParams<MagpieApp>()
 {
@@ -86,6 +87,8 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(NeutronicsSpectrumSamplerSN);
 #endif
   registerUserObject(NeutronicsSpectrumSamplerFission);
+
+  registerUserObject(SPPARKSUserObject);
 
   registerUserObject(SPPARKSUserObject);
 

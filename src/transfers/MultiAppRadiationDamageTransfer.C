@@ -36,15 +36,14 @@ MultiAppRadiationDamageTransfer::execute()
   for (unsigned int i = 0; i < _multi_app->numGlobalApps(); ++i)
     if (_multi_app->hasLocalApp(i))
     {
-      Real magnitude = neutronics_pdf.getMagnitude(i);
-      std::vector<unsigned int> zaids = neutronics_pdf.getZAIDs(i);
-      std::vector<Real> energies = neutronics_pdf.getEnergies(i);
+      std::vector<unsigned int> zaids = neutronics_pdf.getZAIDs();
+      std::vector<Real> energies = neutronics_pdf.getEnergies();
       MultiIndex<Real> probabilities = neutronics_pdf.getPDF(i);
 
       for (THREAD_ID tid = 0; tid < libMesh::n_threads(); ++tid)
       {
         PKAGeneratorNeutronicsBase & pka_uo = const_cast<PKAGeneratorNeutronicsBase &>(_multi_app->appProblem(i).getUserObject<PKAGeneratorNeutronicsBase>(_pka_generator_name, tid));
-        pka_uo.setPDF(magnitude, zaids, energies, probabilities);
+        pka_uo.setPDF(zaids, energies, probabilities);
       }
     }
 }

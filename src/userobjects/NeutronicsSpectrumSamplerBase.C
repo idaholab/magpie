@@ -58,9 +58,6 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
 
   _zaids.resize(_I);
 
-  #ifdef RATTLESNAKE_ENABLED
-  // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
-  unsigned int Z, A;
   for (unsigned int i = 0; i < _I; ++i)
   {
 #ifdef RATTLESNAKE_ENABLED
@@ -138,7 +135,11 @@ NeutronicsSpectrumSamplerBase::meshChanged()
 }
 
 void
+<<<<<<< 640f64de8ecd2bedbb9a27ab22d1c7252ec7cf8c:src/userobjects/NeutronicsSpectrumSamplerBase.C
 NeutronicsSpectrumSamplerBase::initialSetup()
+=======
+RadiationDamageBase::initialSetup()
+>>>>>>> Modified transfer and user objects to get transfer working #98:src/userobjects/RadiationDamageBase.C
 {
   // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
