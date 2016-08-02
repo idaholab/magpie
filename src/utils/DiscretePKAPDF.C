@@ -10,8 +10,8 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
-DiscretePKAPDF::DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
-    DiscretePKAPDFBase(magnitude, ZAID, energies),
+DiscretePKAPDF::DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
+    DiscretePKAPDFBase(ZAID, energies),
     _na(probabilities.size()[2]),
     _dphi(2.0 * libMesh::pi / _na),
     _np(probabilities.size()[3]),
@@ -30,6 +30,7 @@ DiscretePKAPDF::DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> &
     mooseError("Size of probabilities is inconsistent with random variable input.");
 
   precomputeCDF(probabilities);
+  computeMagnitude(probabilities);
 }
 
 void
@@ -209,4 +210,16 @@ DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) cons
   initial_state[0]._dir(0) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
   initial_state[0]._dir(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
   initial_state[0]._dir(2) = sampled_mu;
+}
+
+void
+DiscretePKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
+{
+  _magnitude = 0.0;
+  for (auto it : probabilities)
+  {
+    MultiIndex<Real>::size_type index = it.first;
+    Real delE = _energies[index[1] + 1] - _energies[index[1]];
+    _magnitude += delE * _dphi * _dmu * it.second;
+  }
 }

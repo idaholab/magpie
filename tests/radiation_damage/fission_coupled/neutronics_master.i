@@ -89,7 +89,7 @@
 
 [UserObjects]
   [./fission_damage_sampler]
-    type = RadiationDamageFission
+    type = NeutronicsSpectrumSamplerFission
     points = '0.5 0.5 0.0
               0.9 0.9 0.0'
     energy_group_boundaries = '0.0 0.5e-6 0.75'
@@ -119,7 +119,7 @@
 
 [Transfers]
   [./radiation_damage_transfer]
-    type = MultiAppRadiationDamageTransfer
+    type = MultiAppNeutronicsSpectrumTransfer
     multi_app = radiation_damage_app
     pka_neutronics = neutronics_fission_generator
     radiation_damage_sampler = fission_damage_sampler

@@ -12,7 +12,7 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "RadiationDamageBase.h"
+#include "NeutronicsSpectrumSamplerBase.h"
 #include "MooseMesh.h"
 
 #ifdef RATTLESNAKE_ENABLED
@@ -25,7 +25,7 @@
 #include <limits>
 
 template<>
-InputParameters validParams<RadiationDamageBase>()
+InputParameters validParams<NeutronicsSpectrumSamplerBase>()
 {
   InputParameters params = validParams<ElementUserObject>();
   params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
@@ -37,7 +37,7 @@ InputParameters validParams<RadiationDamageBase>()
   return params;
 }
 
-RadiationDamageBase::RadiationDamageBase(const InputParameters & parameters) :
+NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _target_isotope_names(getParam<std::vector<std::string> >("target_isotope_names")),
     _energy_group_boundaries(getParam<std::vector<Real> >("energy_group_boundaries")),
@@ -76,7 +76,7 @@ RadiationDamageBase::RadiationDamageBase(const InputParameters & parameters) :
 }
 
 void
-RadiationDamageBase::execute()
+NeutronicsSpectrumSamplerBase::execute()
 {
   if (std::find(_point_element.begin(), _point_element.end(), _current_elem->id()) != _point_element.end())
   {
@@ -120,12 +120,12 @@ RadiationDamageBase::execute()
 }
 
 void
-RadiationDamageBase::preComputeRadiationDamagePDF()
+NeutronicsSpectrumSamplerBase::preComputeRadiationDamagePDF()
 {
 }
 
 void
-RadiationDamageBase::meshChanged()
+NeutronicsSpectrumSamplerBase::meshChanged()
 {
   // Rebuild point_locator & find the right element for each point
   UniquePtr<PointLocatorBase> point_locator = PointLocatorBase::build(TREE_ELEMENTS, _mesh.getMesh());
@@ -135,7 +135,7 @@ RadiationDamageBase::meshChanged()
 }
 
 void
-RadiationDamageBase::initialSetup()
+NeutronicsSpectrumSamplerBase::initialSetup()
 {
   // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
@@ -144,13 +144,13 @@ RadiationDamageBase::initialSetup()
 }
 
 void
-RadiationDamageBase::initialize()
+NeutronicsSpectrumSamplerBase::initialize()
 {
   meshChanged();
 }
 
 void
-RadiationDamageBase::finalize()
+NeutronicsSpectrumSamplerBase::finalize()
 {
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
@@ -164,9 +164,9 @@ RadiationDamageBase::finalize()
 }
 
 void
-RadiationDamageBase::threadJoin(const UserObject & y)
+NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
 {
-  const RadiationDamageBase & uo = static_cast<const RadiationDamageBase &>(y);
+  const NeutronicsSpectrumSamplerBase & uo = static_cast<const NeutronicsSpectrumSamplerBase &>(y);
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
       for (unsigned int g = 0; g < _G; ++g)
@@ -175,25 +175,25 @@ RadiationDamageBase::threadJoin(const UserObject & y)
 }
 
 MultiIndex<Real>
-RadiationDamageBase::getPDF(unsigned int point_id) const
+NeutronicsSpectrumSamplerBase::getPDF(unsigned int point_id) const
 {
   return _sample_point_data[point_id];
 }
 
 std::vector<unsigned int>
-RadiationDamageBase::getZAIDs() const
+NeutronicsSpectrumSamplerBase::getZAIDs() const
 {
   return _zaids;
 }
 
 std::vector<Real>
-RadiationDamageBase::getEnergies() const
+NeutronicsSpectrumSamplerBase::getEnergies() const
 {
   return _energy_group_boundaries;
 }
 
 unsigned int
-RadiationDamageBase::localStringToZaid(std::string s) const
+NeutronicsSpectrumSamplerBase::localStringToZaid(std::string s) const
 {
   if (s == "U235")
     return 922350;

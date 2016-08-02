@@ -3,8 +3,7 @@
 #include "MooseRandom.h"
 
 
-DiscretePKAPDFBase::DiscretePKAPDFBase(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies) :
-    _magnitude(magnitude),
+DiscretePKAPDFBase::DiscretePKAPDFBase(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies) :
     _zaids(ZAID),
     _nZA(_zaids.size()),
     _energies(energies),

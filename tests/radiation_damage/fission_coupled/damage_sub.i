@@ -66,7 +66,7 @@
 
 [UserObjects]
   [./neutronics_fission_generator]
-    type = PKAFissionFragmentEmpirical
+    type = PKAFissionFragmentNeutronics
     relative_density = 1
     fission_rate = 0.001
   [../]

@@ -12,16 +12,16 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 #ifdef RATTLESNAKE_ENABLED
-#ifndef RADIATIONDAMAGESN_H
-#define RADIATIONDAMAGESN_H
+#ifndef NEUTRONICSSPECTRUMSAMPLERSN_H
+#define NEUTRONICSSPECTRUMSAMPLERSN_H
 
-#include "RadiationDamageBase.h"
+#include "NeutronicsSpectrumSamplerBase.h"
 
 // Forward Declarations
-class RadiationDamageSN;
+class NeutronicsSpectrumSamplerSN;
 
 template<>
-InputParameters validParams<RadiationDamageSN>();
+InputParameters validParams<NeutronicsSpectrumSamplerSN>();
 
 /**
  * Computes PDFs from neutronics data that is used to sample PKAs due to
@@ -29,10 +29,10 @@ InputParameters validParams<RadiationDamageSN>();
  * The reaction creating the PKAs _must_
  * match target_isotope_names with a unique recoil_isotope_names
  */
-class RadiationDamageSN : public RadiationDamageBase
+class NeutronicsSpectrumSamplerSN : public NeutronicsSpectrumSamplerBase
 {
 public:
-  RadiationDamageSN(const InputParameters & parameters);
+  NeutronicsSpectrumSamplerSN(const InputParameters & parameters);
 
 protected:
   /// a callback executed right before computeRadiatonDamagePDF
@@ -56,5 +56,5 @@ protected:
   std::vector<std::vector<std::vector<std::vector<std::vector<Real> > > > > _recoil_cross_section;
 };
 
-#endif //RADIATIONDAMAGESN_H
+#endif //NEUTRONICSSPECTRUMSAMPLERSN_H
 #endif //RATTLESNAKE_ENABLED

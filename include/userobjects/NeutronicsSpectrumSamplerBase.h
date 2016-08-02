@@ -11,27 +11,27 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#ifndef RADIATIONDAMAGEBASE_H
-#define RADIATIONDAMAGEBASE_H
+#ifndef NEUTRONICSSPECTRUMSAMPLERBASE_H
+#define NEUTRONICSSPECTRUMSAMPLERBASE_H
 
 // MOOSE includes
 #include "ElementUserObject.h"
 #include "MultiIndex.h"
 
 // Forward Declarations
-class RadiationDamageBase;
+class NeutronicsSpectrumSamplerBase;
 
 template<>
-InputParameters validParams<RadiationDamageBase>();
+InputParameters validParams<NeutronicsSpectrumSamplerBase>();
 
 /**
  * Computes PDFs from neutronics calculations that are
  * used to sample PKAs that will be passed to BCMC simulations.
  */
-class RadiationDamageBase : public ElementUserObject
+class NeutronicsSpectrumSamplerBase : public ElementUserObject
 {
 public:
-  RadiationDamageBase(const InputParameters & parameters);
+  NeutronicsSpectrumSamplerBase(const InputParameters & parameters);
 
   virtual void execute();
   virtual void initialSetup();
@@ -104,4 +104,4 @@ protected:
   std::vector<unsigned int> _zaids;
 };
 
-#endif //RADIATIONDAMAGEBASE_H
+#endif //NEUTRONICSSPECTRUMSAMPLERBASE_H

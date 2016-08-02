@@ -37,7 +37,7 @@ PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_l
   //FIXME this only works for a single source of PKAs dependent on a single variable
   // This variable must be provided as the first var argument in the rasterizer
   if (averaged_data._elements.size() > 1)
-    mooseDoOnce(mooseWarning("PKAFissionFragmentNeutronics::appendPKAs only works for a single PDF associated with a single variable in the rasterizer."));
+    mooseDoOnce(mooseWarning("PKAFissionFragmentNeutronics::appendPKAs only works for a single PDF associated with a single variable in the rasterizer since there is only one fissionable material for now."));
 
   unsigned int num_fission = std::floor(dt * vol * _fission_rate * averaged_data._elements[0] + getRandomReal());
 

@@ -11,13 +11,13 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#include "RadiationDamageFission.h"
+#include "NeutronicsSpectrumSamplerFission.h"
 #include "MooseMesh.h"
 
 template<>
-InputParameters validParams<RadiationDamageFission>()
+InputParameters validParams<NeutronicsSpectrumSamplerFission>()
 {
-  InputParameters params = validParams<RadiationDamageBase>();
+  InputParameters params = validParams<NeutronicsSpectrumSamplerBase>();
   params.suppressParameter<unsigned int>("L");
   params.set<unsigned int>("L") = 0;
   params.addRequiredCoupledVar("scalar_fluxes", "Scalar fluxes, dimension G.");
@@ -28,8 +28,8 @@ InputParameters validParams<RadiationDamageFission>()
   return params;
 }
 
-RadiationDamageFission::RadiationDamageFission(const InputParameters & parameters) :
-    RadiationDamageBase(parameters)
+NeutronicsSpectrumSamplerFission::NeutronicsSpectrumSamplerFission(const InputParameters & parameters) :
+    NeutronicsSpectrumSamplerBase(parameters)
 {
   _nSH = 1; // can't initialize base class members in initializer
   std::vector<Real> fxs = getParam<std::vector<Real> >("fission_cross_sections");
@@ -57,13 +57,13 @@ RadiationDamageFission::RadiationDamageFission(const InputParameters & parameter
 }
 
 Real
-RadiationDamageFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/)
+NeutronicsSpectrumSamplerFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/)
 {
   return (*_scalar_flux[g])[_qp] * (*_number_densities[i])[_qp] * _fission_cross_section[_current_point][i][g];
 }
 
 MultiIndex<Real>
-RadiationDamageFission::getPDF(unsigned int point_id) const
+NeutronicsSpectrumSamplerFission::getPDF(unsigned int point_id) const
 {
   mooseAssert(_sample_point_data[point_id].size()[2] == 1, "RadiationDamageBase: Dimension of last index is not 1.");
   // the final index of the pdf has dimension 1 so we slice it to return a MI of dimension 2
