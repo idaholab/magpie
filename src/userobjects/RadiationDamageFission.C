@@ -11,7 +11,6 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#ifdef RATTLESNAKE_ENABLED
 #include "RadiationDamageFission.h"
 #include "MooseMesh.h"
 
@@ -25,14 +24,14 @@ InputParameters validParams<RadiationDamageFission>()
   // FIXME: This is not the permanent solution for providing fission cross sections. It must be implemented as material
   // property.
   params.addRequiredParam<std::vector<Real> >("fission_cross_sections", "Fission cross sections. Size = npoints x nisotopes x G.");
-  params.addClassDescription("Computes fractional fission rates (Ni * simga_fi * phi) for a selection of points.\nUsed for computing PKA distributions from fission reactions.");
+  params.addClassDescription("Computes fractional fission rates (Ni * simga_fi * phi) for a selection of points.\nUsed for computing PDFs from fission reactions to sample PKAs.");
   return params;
 }
 
 RadiationDamageFission::RadiationDamageFission(const InputParameters & parameters) :
-    RadiationDamageBase(parameters),
-    _nSH = 1
+    RadiationDamageBase(parameters)
 {
+  _nSH = 1; // can't initialize base class members in initializer
   std::vector<Real> fxs = getParam<std::vector<Real> >("fission_cross_sections");
   if (fxs.size() != _npoints * _I * _G)
     mooseError("fission cross sections must be of length npoints x nisotopes x G");
@@ -58,9 +57,15 @@ RadiationDamageFission::RadiationDamageFission(const InputParameters & parameter
 }
 
 Real
-RadiationDamageFission::computePKA(unsigned int i, unsigned int g, unsigned int /*p*/)
+RadiationDamageFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/)
 {
   return (*_scalar_flux[g])[_qp] * (*_number_densities[i])[_qp] * _fission_cross_section[_current_point][i][g];
 }
 
-#endif //RATTLESNAKE_ENABLED
+MultiIndex<Real>
+RadiationDamageFission::getPDF(unsigned int point_id) const
+{
+  mooseAssert(_sample_point_data[point_id].size()[2] == 1, "RadiationDamageBase: Dimension of last index is not 1.");
+  // the final index of the pdf has dimension 1 so we slice it to return a MI of dimension 2
+  return _sample_point_data[point_id].slice(2, 0);
+}

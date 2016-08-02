@@ -11,11 +11,8 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#ifdef RATTLESNAKE_ENABLED
 #ifndef RADIATIONDAMAGEBASE_H
 #define RADIATIONDAMAGEBASE_H
-
-#include "AQData.h"
 
 // MOOSE includes
 #include "ElementUserObject.h"
@@ -28,8 +25,8 @@ template<>
 InputParameters validParams<RadiationDamageBase>();
 
 /**
- * Computes the PKA species/energy/direction distribution
- * at a given set of point.
+ * Computes PDFs from neutronics calculations that are
+ * used to sample PKAs that will be passed to BCMC simulations.
  */
 class RadiationDamageBase : public ElementUserObject
 {
@@ -37,24 +34,34 @@ public:
   RadiationDamageBase(const InputParameters & parameters);
 
   virtual void execute();
+  virtual void initialSetup();
   virtual void initialize();
   virtual void finalize();
   virtual void threadJoin(const UserObject & y);
   virtual void meshChanged();
+
+  /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const;
-  virtual Real getMagnitude(unsigned int point_id) const;
-  virtual std::vector<unsigned int> getZAIDs(unsigned int point_id) const;
-  virtual std::vector<Real> getEnergies(unsigned int point_id) const;
+
+  /// returns a std::vector<unsigned int> of ZAIDs
+  virtual std::vector<unsigned int> getZAIDs() const;
+
+  /// returns a std::vector<Real> of energies
+  virtual std::vector<Real> getEnergies() const;
 
 protected:
+  /// a callback executed right before computeRadiationDamagePDF
+  virtual void preComputeRadiationDamagePDF();
 
-  /// a callback executed right before computePKA
-  virtual void preComputePKA();
   /// computes the PKA for isotope i, group g, and SH indices l, m
-  virtual Real computePKA(unsigned int i, unsigned int g, unsigned int p) = 0;
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p) = 0;
+
+  /// a subsitute to convert isotope names to zaid if RSN is not available
+  unsigned int localStringToZaid(std::string s) const;
 
   /// vector of target zaids
   const std::vector<std::string> & _target_isotope_names;
+
   /// the number densities of these isotopes given as variables
   std::vector<const VariableValue *> _number_densities;
   const std::vector<Real> & _energy_group_boundaries;
@@ -68,24 +75,33 @@ protected:
 
   /// total number of spherical harmonics. Depends on dim.
   unsigned int _nSH;
-  /// the points at which PKAs are computed
+
+  /// the points at which PDFs are computed
   const std::vector<Point> & _points;
+
   /// number of points
   unsigned int _npoints;
+
   /// flag indicating of recaching the _qp is necessary
   bool _qp_is_cached;
+
   /// array storing the element id for each point
   std::vector<dof_id_type> _point_element;
+
   /// the array stores the _qp index for each point
   std::vector<unsigned int> _qp_cache;
-  /// stores the PKA distribution
+
+  /// stores the radiation damage PDF
   std::vector<MultiIndex<Real> > _sample_point_data;
 
   /// the current quadrature point
   unsigned int _qp;
+
   /// the current point
   unsigned int _current_point;
+
+  /// vector of ZAIDs
+  std::vector<unsigned int> _zaids;
 };
 
 #endif //RADIATIONDAMAGEBASE_H
-#endif //RATTLESNAKE_ENABLED
