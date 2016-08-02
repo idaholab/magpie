@@ -7,11 +7,14 @@ template<>
 InputParameters validParams<PKAFissionFragmentNeutronics>()
 {
   InputParameters params = validParams<PKAGeneratorNeutronicsBase>();
+  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (default is in nm^-3*s^-1)");
+  params.addClassDescription("PKA generator (fission) user object.\n Takes pdf and samples PKAs due to fission.");
   return params;
 }
 
 PKAFissionFragmentNeutronics::PKAFissionFragmentNeutronics(const InputParameters & parameters):
-    PKAGeneratorNeutronicsBase(parameters)
+    PKAGeneratorNeutronicsBase(parameters),
+    _fission_rate(getParam<Real>("fission_rate"))
 {
 }
 
@@ -20,20 +23,23 @@ PKAFissionFragmentNeutronics::~PKAFissionFragmentNeutronics()
 }
 
 void
-PKAFissionFragmentNeutronics::setPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities)
+PKAFissionFragmentNeutronics::setPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities)
 {
-  _pdf = DiscreteFissionPKAPDF(magnitude, ZAID, energies, probabilities);
+  _pdf = DiscreteFissionPKAPDF(ZAID, energies, probabilities);
 }
 
 void
-PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const
+PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
   mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentNeutronics::appendPKAs");
 
-  //FIXME need getMagnitude from user object currently in another commit
-  //unsigned int num_fission = std::floor(dt * vol * _pdf.getMagnitude() + getRandomReal());
-  unsigned int num_fission = 1e5;
+  //FIXME this only works for a single source of PKAs dependent on a single variable
+  // This variable must be provided as the first var argument in the rasterizer
+  if (averaged_data._elements.size() > 1)
+    mooseDoOnce(mooseWarning("PKAFissionFragmentNeutronics::appendPKAs only works for a single PDF associated with a single variable in the rasterizer."));
+
+  unsigned int num_fission = std::floor(dt * vol * _fission_rate * averaged_data._elements[0] + getRandomReal());
 
   for (unsigned i = 0; i < num_fission; ++i)
   {
