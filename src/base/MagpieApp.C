@@ -31,6 +31,9 @@
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
 
+// Meshes
+#include "MyTRIMMesh.h"
+
 template<>
 InputParameters validParams<MagpieApp>()
 {
@@ -89,6 +92,8 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(SPPARKSUserObject);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
+
+  registerMesh(MyTRIMMesh);
 }
 
 void

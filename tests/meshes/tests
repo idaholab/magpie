@@ -1,0 +1,29 @@
+[Tests]
+  [./mytrimmesh_error_2D]
+    type = RunException
+    input = 'mytrimmesh.i'
+    cli_args = 'Mesh/dim=2 Mesh/elem_type=TRI3'
+    expect_err = '2D simulations need to use QUAD4 elements'
+  [../]
+
+  [./mytrimmesh_error_3D]
+    type = RunException
+    input = 'mytrimmesh.i'
+    cli_args = 'Mesh/dim=3 Mesh/elem_type=TET4'
+    expect_err = '3D simulations need to use HEX8 elements'
+  [../]
+
+  [./mytrimmesh_error_1D]
+    type = RunException
+    input = 'mytrimmesh.i'
+    cli_args = 'Mesh/dim=1'
+    expect_err = 'Only 2D and 3D simulations are currently supported.'
+  [../]
+
+  [./mytrimmesh_error_bias]
+    type = RunException
+    input = 'mytrimmesh.i'
+    cli_args = 'Mesh/dim=2 Mesh/bias_x=1.1'
+    expect_err = 'Biased meshes are not supported.'
+  [../]
+[]
