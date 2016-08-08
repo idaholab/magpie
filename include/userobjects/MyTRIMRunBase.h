@@ -1,9 +1,3 @@
-/****************************************************************/
-/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
-/*                                                              */
-/*          All contents are licensed under LGPL V2.1           */
-/*             See LICENSE for full restrictions                */
-/****************************************************************/
 #ifndef MYTRIMRUNBASE_H
 #define MYTRIMRUNBASE_H
 
@@ -30,7 +24,7 @@ public:
   // get the number of elements in the TRIM simulation
   unsigned int nVars() const { return _nvars; }
 
-  // get the name of the rasterizer object (this is to add an artificial in an Auxkernel)
+  // get the name of the rasterizer object (this is to add an artificial dependence in an AuxKernel)
   UserObjectName getRasterizerName() const { return getParam<UserObjectName>("rasterizer"); }
 
 protected:
