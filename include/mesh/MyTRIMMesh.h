@@ -2,7 +2,7 @@
 #define MYTRIMMESH_H
 
 #include "GeneratedMesh.h"
-#include "UnsignedIntegerPoint.h"
+#include "PointLocatorRegularOrthogonal.h"
 
 class MyTRIMMesh;
 
@@ -19,18 +19,15 @@ public:
   MooseMesh & operator=(const MooseMesh & other_mesh) = delete;
   virtual MooseMesh & clone() const override;
 
-  virtual void buildMesh() override;
-
-  ///@{ Public interface methods to get the mesh structure
-  const UnsignedIntegerPoint & getCellCount() const { return _cell_count; }
-  const Point & minCorner() const { return _min_corner; }
-  const Point & maxCorner() const { return _max_corner; }
-  ///@}
+  /// obtain a specialized PointLocator for the current mesh
+  virtual std::unique_ptr<PointLocatorBase> getPointLocator() const override;
 
 protected:
-  UnsignedIntegerPoint _cell_count;
+  std::vector<unsigned int> _cell_count;
   Point _min_corner;
   Point _max_corner;
+
+  mutable std::unique_ptr<PointLocatorRegularOrthogonal> _point_locator;
 };
 
 #endif //MYTRIMMESH_H

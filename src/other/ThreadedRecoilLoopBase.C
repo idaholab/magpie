@@ -27,7 +27,7 @@ void
 ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 {
   // fetch a point locator
-  _pl = _mesh.getMesh().sub_point_locator();
+  _pl = _mesh.getPointLocator();
 
   // create a new sample class to bridge the MOOSE mesh and the MyTRIM domain
   MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);

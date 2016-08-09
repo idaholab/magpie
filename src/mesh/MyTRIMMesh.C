@@ -1,4 +1,5 @@
 #include "MyTRIMMesh.h"
+#include "PointLocatorRegularOrthogonal.h"
 
 template<>
 InputParameters validParams<MyTRIMMesh>()
@@ -12,23 +13,27 @@ InputParameters validParams<MyTRIMMesh>()
 
 MyTRIMMesh::MyTRIMMesh(const InputParameters & parameters) :
     GeneratedMesh(parameters),
-    _cell_count(_nx, _ny, _nz),
+    _cell_count({_nx, _ny, _nz}),
     _min_corner(_xmin, _ymin, _zmin),
     _max_corner(_xmax, _ymax, _zmax)
 {
-  MooseEnum elem_type_enum = getParam<MooseEnum>("elem_type");
+  _cell_count.resize(dimension());
 
   if (isParamValid("elem_type"))
   {
+    MooseEnum elem_type_enum = getParam<MooseEnum>("elem_type");
+
     // validate element type (only orthogonal stuff)
     switch (_dim)
     {
       case 1:
         if (elem_type_enum != "EDGE2")
           mooseError("1D simulations need to use EDGE2 elements");
+        break;
       case 2:
         if (elem_type_enum != "QUAD4")
           mooseError("2D simulations need to use QUAD4 elements");
+        break;
       case 3:
         if (elem_type_enum != "HEX8")
           mooseError("3D simulations need to use HEX8 elements");
@@ -56,9 +61,13 @@ MyTRIMMesh::clone() const
   return *(new MyTRIMMesh(*this));
 }
 
-void
-MyTRIMMesh::buildMesh()
+std::unique_ptr<PointLocatorBase>
+MyTRIMMesh::getPointLocator() const
 {
-  // build the main mesh
-  GeneratedMesh::buildMesh();
+  if (_point_locator.get() == nullptr)
+  {
+    _point_locator.reset(new PointLocatorRegularOrthogonal(getMesh()));
+    _point_locator->init(_cell_count, _min_corner, _max_corner);
+  }
+  return std::unique_ptr<PointLocatorBase>(new PointLocatorRegularOrthogonal(getMesh(), _point_locator.get()));
 }
