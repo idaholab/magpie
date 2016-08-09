@@ -119,6 +119,11 @@ protected:
   bool _pbc[LIBMESH_DIM];
   /// @}
 
+  unsigned int getNPKA(dof_id_type elem_id);
+
+  //map of number of PKAs paired with element ID
+  std::map<dof_id_type, unsigned int> _npka_per_element;
+
 private:
   bool _execute_this_timestep;
 };

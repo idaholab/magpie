@@ -187,9 +187,15 @@ MyTRIMRasterizer::execute()
   // store in map
   _material_map[_current_elem->id()] = average;
 
+  //number of PKAs per element
+  unsigned int old_size = _pka_list.size();
+
   // add PKAs for current element
   for (auto && gen : _pka_generators)
     gen->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
+
+  unsigned int n = _pka_list.size() - old_size;
+  _npka_per_element[_current_elem->id()] = n;
 }
 
 void
@@ -310,4 +316,10 @@ MyTRIMRasterizer::deserialize(std::vector<std::string> & serialized_buffers)
     // List combining will be used in the furture to enable better load balancing.
     // _pka_list.insert(other_pka_list.begin(), other_pka_list.end());
   }
+}
+
+unsigned int
+MyTRIMRasterizer::getNPKA(dof_id_type elem_id)
+{
+  return _npka_per_element[elem_id];
 }

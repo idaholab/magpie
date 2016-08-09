@@ -53,20 +53,21 @@
     family = MONOMIAL
   [../]
 
-   [./Tfuel]
-      order = CONSTANT
-      family = MONOMIAL
-       [./InitialCondition]
+  [./Tfuel]
+    order = CONSTANT
+    family = MONOMIAL
+      [./InitialCondition]
         type = ConstantIC
         value = 293.6  # Tabulated value
       [../]
-   [../]
- [./MatID]
+  [../]
+
+  [./MatID]
    order = CONSTANT
    family = MONOMIAL
    initial_from_file_var = material_id
    initial_from_file_timestep = 1
- [../]
+  [../]
 []
 
 [AuxKernels]
@@ -114,30 +115,12 @@
                             2.63065e-5 1.49392e-5 1.09581e-5 8.08171e-6 4.72438e-6 2.33593e-5 7.24493e-5 5.65586e-4 6.63056e-5 1.1122e-1 6.01374e-1
                             9.4511e2 5.12074e2 3.52511e2 2.37127e2 1.4114e2 3.14337e1 4.48499e1 1.18495e1 2.55139 1.24034 1.17273
                             2.63065e-5 1.49392e-5 1.09581e-5 8.08171e-6 4.72438e-6 2.33593e-5 7.24493e-5 5.65586e-4 6.63056e-5 1.1122e-1 6.01374e-1
+                            9.4511e2 5.12074e2 3.52511e2 2.37127e2 1.4114e2 3.14337e1 4.48499e1 1.18495e1 2.55139 1.24034 1.17273
+                            2.63065e-5 1.49392e-5 1.09581e-5 8.08171e-6 4.72438e-6 2.33593e-5 7.24493e-5 5.65586e-4 6.63056e-5 1.1122e-1 6.01374e-1
                           '
   execute_on = initial
 [../]
 
-[MultiApps]
-  [./radiation_damage_app]
-    type = FullSolveMultiApp
-    input_files = TREAT_sub.i
-    points = '0 0 143.552375
-              0 0 163.79425
-              0 0 183.79425'
-    execute_on = nonlinear
-  []
-[]
-
-[Transfers]
-  [./radiation_damage_transfer]
-    type = MultiAppRadiationDamageTransfer
-    multi_app = radiation_damage_app
-    pka_neutronics = neutronics_fission_generator
-    radiation_damage_sampler = fission_damage_sampler
-    direction = to_multiapp
-  [../]
-[]
 
 [./Power]
   type = VariableCartesianCoreMap
@@ -158,6 +141,27 @@
      type = BaseLibObject
      library_name = A0_A11000
      library_type = MultigroupLibrary
+  [../]
+[]
+
+[MultiApps]
+  [./radiation_damage_app]
+    type = FullSolveMultiApp
+    input_files = TREAT_sub.i
+    points = '0 0 143.552375
+              0 0 163.79425
+              0 0 183.79425'
+    execute_on = nonlinear
+  []
+[]
+
+[Transfers]
+  [./radiation_damage_transfer]
+    type = MultiAppRadiationDamageTransfer
+    multi_app = radiation_damage_app
+    pka_neutronics = neutronics_fission_generator
+    radiation_damage_sampler = fission_damage_sampler
+    direction = to_multiapp
   [../]
 []
 
