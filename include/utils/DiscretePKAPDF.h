@@ -12,25 +12,27 @@
 class DiscretePKAPDF : DiscretePKAPDFBase
 {
 public:
-  DiscretePKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
   virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
-  /// NOTE: we pass by value here because we modify probabilities in the function for
-  /// convenience
+protected:
+  /// NOTE: we pass by value here because we modify probabilities in the function for convenience
   virtual void precomputeCDF(MultiIndex<Real> probabilities) override;
 
-protected:
-
+  /// this method computes the magnitude encoded in probabilities
+  virtual void computeMagnitude(MultiIndex<Real> probabilities) override;
 
   /// number of azimuthal bins
   unsigned int _na;
+
   /// vector storing the azimuthal angle boundaries
   const Real _dphi;
 
   /// number of polar bins
   unsigned int _np;
+
   /// polar cosine bin width
   const Real _dmu;
 

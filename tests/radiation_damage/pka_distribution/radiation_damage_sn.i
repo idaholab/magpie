@@ -77,10 +77,10 @@
 
 [UserObjects]
   [./pka]
-    type = PKADistributionSN
+    type = RadiationDamageSN
     L = 1
     points = '0.625 0.625 0.0'
-    energy_group_boundaries = '1e-6 20.0'
+    energy_group_boundaries = '0 1e-6 20.0'
     target_isotope_names = 'U235 U238 O16'
     recoil_isotope_names = 'U235 U238 O16'
     number_densities = 'N92235 N92238 N08016'

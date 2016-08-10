@@ -7,6 +7,7 @@ template<>
 InputParameters validParams<PKAGeneratorNeutronicsBase>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
+  params.addClassDescription("PKA generator (neutronics) user object base class.\n Takes pdf and samples PKAs due to various interactions.");
   return params;
 }
 

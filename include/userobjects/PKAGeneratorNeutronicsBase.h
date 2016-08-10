@@ -22,7 +22,7 @@ public:
   PKAGeneratorNeutronicsBase(const InputParameters & parameters);
 
   /// helper function to set pdf based on neutronics information from Mammoth
-  virtual void setPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) = 0;
+  virtual void setPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) = 0;
 };
 
 #endif // PKAGENERATORNEUTRONICSBASE_H

@@ -22,7 +22,7 @@
     input = 'UO2_pellet_initial.i'
     max_parallel = 1
     max_threads = 1
-    skip = 'requires PKAFissionFragmentsNeutronics'
+    skip = 'Need to pass probabilities of the correct dimensions'
   [../]
 
 []

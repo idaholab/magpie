@@ -4,6 +4,8 @@ import sys, os, inspect
 # Set the current working directory to the directory where this script is located
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 
+os.putenv("ENDF_FP_DIR", os.path.abspath(os.path.dirname(sys.argv[0])) + "/data/fission_yield/")
+
 #### Set the name of the application here and moose directory relative to the application
 app_name = 'magpie'
 

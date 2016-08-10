@@ -17,19 +17,21 @@ public:
   DiscreteFissionPKAPDF();
 
   /// the actual constructor
-  DiscreteFissionPKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
   virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
-  /// override preComputeCDF. NOTE: we pass by value here because we modify probabilities in the function for
-  /// convenience
+protected:
+  /// override preComputeCDF. NOTE: we pass by value here because we modify probabilities in the function for convenience
   virtual void precomputeCDF(MultiIndex<Real> probabilities) override;
 
   /// reads fission yield data
   void readFissionData(const std::vector<unsigned int> & ZAID);
 
-protected:
+  /// this method computes the magnitude encoded in probabilities
+  virtual void computeMagnitude(MultiIndex<Real> probabilities) override;
+
   /**
    * reads Z and A number and returns kinetic energy in MeV
    */

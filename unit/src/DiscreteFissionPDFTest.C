@@ -64,7 +64,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
       mindex(index) = pzaid[j0] * penergies[j1];
     }
 
-  DiscreteFissionPKAPDF pdf = DiscreteFissionPKAPDF(1.0, zaid, energies, mindex);
+  DiscreteFissionPKAPDF pdf = DiscreteFissionPKAPDF(zaid, energies, mindex);
 
   // set up a frequency counter
   unsigned int j1, j2;

@@ -5,6 +5,7 @@ template<>
 InputParameters validParams<PKAGeneratorBase>()
 {
   InputParameters params = validParams<DiscreteElementUserObject>();
+  params.addClassDescription("PKA generator user object base class.\n Takes pdf and samples PKAs due to various interactions.");
   return params;
 }
 

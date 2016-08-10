@@ -11,39 +11,40 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#if RATTLESNAKE_ENABLED
-#ifndef RADIATIONDAMAGEFISSION_H
-#define RADIATIONDAMAGEFISSION_H
+#ifndef NEUTRONICSSPECTRUMSAMPLERFISSION_H
+#define NEUTRONICSSPECTRUMSAMPLERFISSION_H
 
-#include "RadiationDamageBase.h"
+#include "NeutronicsSpectrumSamplerBase.h"
 
 // Forward Declarations
-class RadiationDamageFission;
+class NeutronicsSpectrumSamplerFission;
 
 template<>
-InputParameters validParams<RadiationDamageFission>();
+InputParameters validParams<NeutronicsSpectrumSamplerFission>();
 
 /**
- * Computes the PKA species/energy/direction distribution
- * for fission reactions.
+ * Computes PDFs from neutronics data that is used to sample PKAs due to fission
+ * for coupled BCMC simulations.
  * NOTE: Currently fission is assumed to be isotropic in the LAB
  * frame regardless of the incoming energy.
  */
-class RadiationDamageFission : public RadiationDamageBase
+class NeutronicsSpectrumSamplerFission : public NeutronicsSpectrumSamplerBase
 {
 public:
-  RadiationDamageFission(const InputParameters & parameters);
+  NeutronicsSpectrumSamplerFission(const InputParameters & parameters);
+
+  /// returns a MultiIndex<Real> PDF at a given point ID
+  virtual MultiIndex<Real> getPDF(unsigned int point_id) const override;
 
 protected:
-  /// computes the PKA for isotope i, group g, and SH indices p
+  /// computes the PDF for isotope i, group g, and SH indices p
   /// NOTE: for fission p does not mateter
-  virtual Real computePKA(unsigned int i, unsigned int g, unsigned int /*p*/);
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/) override;
 
-  /// the angular flux
+  /// the scalar flux
   std::vector<const VariableValue *> _scalar_flux;
-  /// stores the recoil cross sections
+  /// stores the fission cross sections
   std::vector<std::vector<std::vector<Real> > > _fission_cross_section;
 };
 
-#endif //RADIATIONDAMAGEFISSION_H
-#endif //RATTLESNAKE_ENABLED
+#endif //NEUTRONCSSPECTRUMSAMPLERFISSION_H

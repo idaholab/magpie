@@ -12,33 +12,33 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 #ifdef RATTLESNAKE_ENABLED
-#ifndef RADIATIONDAMAGESN_H
-#define RADIATIONDAMAGESN_H
+#ifndef NEUTRONICSSPECTRUMSAMPLERSN_H
+#define NEUTRONICSSPECTRUMSAMPLERSN_H
 
-#include "RadiationDamageBase.h"
+#include "NeutronicsSpectrumSamplerBase.h"
 
 // Forward Declarations
-class RadiationDamageSN;
+class NeutronicsSpectrumSamplerSN;
 
 template<>
-InputParameters validParams<RadiationDamageSN>();
+InputParameters validParams<NeutronicsSpectrumSamplerSN>();
 
 /**
- * Computes the PKA species/energy/direction distribution
- * at a given set of point for an SN calculation.
+ * Computes PDFs from neutronics data that is used to sample PKAs due to
+ * other reactions (not fission) for coupled BCMC simulations.
  * The reaction creating the PKAs _must_
  * match target_isotope_names with a unique recoil_isotope_names
  */
-class RadiationDamageSN : public RadiationDamageBase
+class NeutronicsSpectrumSamplerSN : public NeutronicsSpectrumSamplerBase
 {
 public:
-  RadiationDamageSN(const InputParameters & parameters);
+  NeutronicsSpectrumSamplerSN(const InputParameters & parameters);
 
 protected:
-  /// a callback executed right before computePKA
-  virtual void preComputePKA();
-  /// computes the PKA for isotope i, group g, and SH indices p
-  virtual Real computePKA(unsigned int i, unsigned int g, unsigned int p);
+  /// a callback executed right before computeRadiatonDamagePDF
+  virtual void preComputeRadiationDamagePDF();
+  /// computes the PDF for isotope i, group g, and SH indices p
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p);
 
   /// vector of target zaids
   const std::vector<std::string> & _recoil_isotope_names;
@@ -56,5 +56,5 @@ protected:
   std::vector<std::vector<std::vector<std::vector<std::vector<Real> > > > > _recoil_cross_section;
 };
 
-#endif //RADIATIONDAMAGESN_H
+#endif //NEUTRONICSSPECTRUMSAMPLERSN_H
 #endif //RATTLESNAKE_ENABLED

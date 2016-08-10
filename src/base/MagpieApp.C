@@ -21,11 +21,15 @@
 #include "MyTRIMElementRun.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
+#include "PKAFissionFragmentNeutronics.h"
 #if RATTLESNAKE_ENABLED
-  #include "RadiationDamageSN.h"
-  #include "RadiationDamageFission.h"
+  #include "NeutronicsSpectrumSamplerSN.h"
 #endif
+#include "NeutronicsSpectrumSamplerFission.h"
 #include "SPPARKSUserObject.h"
+
+// Transfers
+#include "MultiAppNeutronicsSpectrumTransfer.h"
 
 template<>
 InputParameters validParams<MagpieApp>()
@@ -77,11 +81,14 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(MyTRIMElementRun);
   registerUserObject(PKAConstant);
   registerUserObject(PKAFissionFragmentEmpirical);
-  #if RATTLESNAKE_ENABLED
-    registerUserObject(RadiationDamageSN);
-    registerUserObject(RadiationDamageFission);
-  #endif
+  registerUserObject(PKAFissionFragmentNeutronics);
+#ifdef RATTLESNAKE_ENABLED
+  registerUserObject(NeutronicsSpectrumSamplerSN);
+#endif
+  registerUserObject(NeutronicsSpectrumSamplerFission);
   registerUserObject(SPPARKSUserObject);
+
+  registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 }
 
 void
