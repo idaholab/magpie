@@ -11,10 +11,13 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#ifdef RATTLESNAKE_ENABLED
-#include "RadiationDamageBase.h"
+
+#include "NeutronicsSpectrumSamplerBase.h"
 #include "MooseMesh.h"
-#include "YakxsUtilities.h"
+
+#ifdef RATTLESNAKE_ENABLED
+  #include "YakxsUtilities.h"
+#endif //RATTLESNAKE_ENABLED
 
 // C++ includes
 #include <sstream>
@@ -22,7 +25,7 @@
 #include <limits>
 
 template<>
-InputParameters validParams<RadiationDamageBase>()
+InputParameters validParams<NeutronicsSpectrumSamplerBase>()
 {
   InputParameters params = validParams<ElementUserObject>();
   params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
@@ -30,16 +33,16 @@ InputParameters validParams<RadiationDamageBase>()
   params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries ommitting E = 0.0. Units are MeV.");
   params.addRequiredParam<unsigned int>("L", "The order up to which angular moments of the PKA distribution are computed.");
   params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
-  params.addClassDescription("Primary Knock-on Atom (PKA) user object base class. Computes PKA distributions at a selection of points.");
+  params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
   return params;
 }
 
-RadiationDamageBase::RadiationDamageBase(const InputParameters & parameters) :
+NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _target_isotope_names(getParam<std::vector<std::string> >("target_isotope_names")),
     _energy_group_boundaries(getParam<std::vector<Real> >("energy_group_boundaries")),
     _I(_target_isotope_names.size()),
-    _G(_energy_group_boundaries.size()),
+    _G(_energy_group_boundaries.size() - 1),
     _L(getParam<unsigned int>("L")),
     _points(getParam<std::vector<Point> >("points")),
     _npoints(_points.size()),
@@ -54,16 +57,26 @@ RadiationDamageBase::RadiationDamageBase(const InputParameters & parameters) :
   for (unsigned int i = 0; i < _I; ++i)
     _number_densities[i] = & coupledValue("number_densities", i);
 
-  // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
-  unsigned int Z, A;
+  _zaids.resize(_I);
   for (unsigned int i = 0; i < _I; ++i)
+  {
+#ifdef RATTLESNAKE_ENABLED
+    unsigned int Z, A;
+    // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
     YAKXS::Utility::getAZFromIsotopeName(_target_isotope_names[i], A, Z);
+    // convert from name to ZAID
+    _zaids[i] = stringToZaid(_target_isotope_names[i]);
+#else
+    _zaids[i] = localStringToZaid(_target_isotope_names[i]);
+#endif
+  }
+
   _point_element.resize(_npoints);
   _qp_cache.resize(_npoints);
 }
 
 void
-RadiationDamageBase::execute()
+NeutronicsSpectrumSamplerBase::execute()
 {
   if (std::find(_point_element.begin(), _point_element.end(), _current_elem->id()) != _point_element.end())
   {
@@ -93,26 +106,26 @@ RadiationDamageBase::execute()
       // Set current qp to cached min_qp
       _qp = _qp_cache[_current_point];
 
-      // call back before computing PKA distribution for caching things that
+      // call back before computing radiation damage PDF for caching things that
       // don't change
-      preComputePKA();
+      preComputeRadiationDamagePDF();
 
-      // Evalute the PKA distribution at min_qp
+      // Evalute the radiation damage PDF at min_qp
       for (unsigned int i = 0; i < _I; ++i)
         for (unsigned int g = 0; g < _G; ++g)
           for (unsigned int p = 0; p < _nSH; ++p)
-            _sample_point_data[_current_point][i][g][p] = computePKA(i, g, p);
+            _sample_point_data[_current_point]({i, g, p}) = computeRadiationDamagePDF(i, g, p);
     }
   }
 }
 
 void
-RadiationDamageBase::preComputePKA()
+NeutronicsSpectrumSamplerBase::preComputeRadiationDamagePDF()
 {
 }
 
 void
-RadiationDamageBase::meshChanged()
+NeutronicsSpectrumSamplerBase::meshChanged()
 {
   // Rebuild point_locator & find the right element for each point
   UniquePtr<PointLocatorBase> point_locator = PointLocatorBase::build(TREE_ELEMENTS, _mesh.getMesh());
@@ -122,33 +135,28 @@ RadiationDamageBase::meshChanged()
 }
 
 void
-RadiationDamageBase::initialize()
+NeutronicsSpectrumSamplerBase::initialSetup()
 {
-  // allocate PKA distribution
+  // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
-  _sample_point_data.resize(_npoints);
-  for (unsigned j = 0; j < _npoints; ++j)
-  {
-    _sample_point_data[j].resize(_I);
-    for (unsigned int i = 0; i < _I; ++i)
-    {
-      _sample_point_data[j][i].resize(_G);
-      for (unsigned int g = 0; g < _G; ++g)
-        _sample_point_data[j][i][g].resize(_nSH);
-    }
-  }
+  for (unsigned int j = 0; j < _npoints; ++j)
+    _sample_point_data.push_back(MultiIndex<Real>({_I, _G, _nSH}));
+}
 
+void
+NeutronicsSpectrumSamplerBase::initialize()
+{
   meshChanged();
 }
 
 void
-RadiationDamageBase::finalize()
+NeutronicsSpectrumSamplerBase::finalize()
 {
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
       for (unsigned int g = 0; g < _G; ++g)
         for (unsigned int p = 0; p < _nSH; ++p)
-          gatherSum(_sample_point_data[j][i][g][p]);
+          gatherSum(_sample_point_data[j]({i, g, p}));
 
   // set _qp_is_cached flag to true. Actually we only need to do this if
   // it was false but this way we can save an if statement
@@ -156,38 +164,47 @@ RadiationDamageBase::finalize()
 }
 
 void
-RadiationDamageBase::threadJoin(const UserObject & y)
+NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
 {
-  const RadiationDamageBase & uo = static_cast<const RadiationDamageBase &>(y);
+  const NeutronicsSpectrumSamplerBase & uo = static_cast<const NeutronicsSpectrumSamplerBase &>(y);
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
       for (unsigned int g = 0; g < _G; ++g)
         for (unsigned int p = 0; p < _nSH; ++p)
-          _sample_point_data[j][i][g][p] += uo._sample_point_data[j][i][g][p];
+          _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
 }
 
 MultiIndex<Real>
-getPDF(unsigned int point_id) const
+NeutronicsSpectrumSamplerBase::getPDF(unsigned int point_id) const
 {
   return _sample_point_data[point_id];
 }
 
-Real
-getMagnitude(unsigned int point_id) const
-{
-  return _magnitude[point_id];
-}
-
 std::vector<unsigned int>
-getZAIDs(unsigned int point_id) const
+NeutronicsSpectrumSamplerBase::getZAIDs() const
 {
-  return _zaids[point_id];
+  return _zaids;
 }
 
 std::vector<Real>
-getEnergies(unsigned int point_id) const
+NeutronicsSpectrumSamplerBase::getEnergies() const
 {
-  return _energies[point_id];
+  return _energy_group_boundaries;
 }
 
-#endif //RATTLESNAKE_ENABLED
+unsigned int
+NeutronicsSpectrumSamplerBase::localStringToZaid(std::string s) const
+{
+  if (s == "U235")
+    return 922350;
+  else if (s == "U238")
+    return 922380;
+  else if (s == "Pu238")
+    return 942380;
+  else if (s == "Pu239")
+    return 942390;
+  else if (s == "Pu240")
+    return 942400;
+  mooseError("Isotope name " << s << " cannot be converted with the localStringToZaid conversion method.");
+  return 0;
+}

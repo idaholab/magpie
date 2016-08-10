@@ -71,9 +71,9 @@
 
 [UserObjects]
   [./pka]
-    type = PKADistributionFission
+    type = RadiationDamageFission
     points = '0.625 0.625 0.0'
-    energy_group_boundaries = '1e-6 20.0'
+    energy_group_boundaries = '0 1e-6 20.0'
     target_isotope_names = 'U235 U238'
     number_densities = 'N92235 N92238'
     scalar_fluxes = 'flux_moment_g0_L0_M0 flux_moment_g1_L0_M0'
@@ -84,6 +84,14 @@
                             '
   [../]
 []
+
+#[MultiApps]
+#  [./magpie]
+#    type = TransientMultiApp
+#    app_type = MagpieApp
+#    execute_on = timestep_end
+#  [../]
+#[]
 
 [Executioner]
   type = NonlinearEigen

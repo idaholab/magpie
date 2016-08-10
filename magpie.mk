@@ -15,4 +15,3 @@ ifneq ($(wildcard $(MYTRIM_DIR)/trim.h),)
   app_INCLUDES   += -I $(MYTRIM_DIR)/..
   include $(APPLICATION_DIR)/contrib/mytrim.mk
 endif
-

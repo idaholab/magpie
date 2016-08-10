@@ -19,7 +19,7 @@ public:
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const;
 
-  virtual void setPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  virtual void setPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
 protected:
   /**
@@ -28,6 +28,9 @@ protected:
   / will be sampled to determine the initial state of the ions passed to MyTRIM
   **/
   DiscreteFissionPKAPDF _pdf;
+
+  /// the fission rate density [ fissions / ( cm^3 sec ) ]
+  Real _fission_rate;
 };
 
 #endif //PKAFISSIONFRAGMENTNEUTRONICS_H

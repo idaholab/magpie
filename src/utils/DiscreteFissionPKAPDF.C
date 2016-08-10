@@ -13,8 +13,8 @@ DiscreteFissionPKAPDF::DiscreteFissionPKAPDF() :
 {
 }
 
-DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(Real magnitude, const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
-    DiscretePKAPDFBase(magnitude, ZAID, energies),
+DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
+    DiscretePKAPDFBase(ZAID, energies),
     _marginal_cdf_target(probabilities),
     _conditional_cdf_energy(probabilities)
 {
@@ -27,8 +27,8 @@ DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(Real magnitude, const std::vector<u
     mooseError("Size of probabilities is inconsistent with random variable input.");
 
   precomputeCDF(probabilities);
-
   readFissionData(ZAID);
+  computeMagnitude(probabilities);
 }
 
 void
@@ -245,4 +245,16 @@ DiscreteFissionPKAPDF::sampleNu(MagpieUtils::NeutronEnergyType energy_type, unsi
     return std::floor(nu_bar);
   else
     return std::ceil(nu_bar);
+}
+
+void
+DiscreteFissionPKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
+{
+  _magnitude = 0.0;
+  for (auto it : probabilities)
+  {
+    MultiIndex<Real>::size_type index = it.first;
+    Real delE = _energies[index[1] + 1] - _energies[index[1]];
+    _magnitude += delE * it.second;
+  }
 }

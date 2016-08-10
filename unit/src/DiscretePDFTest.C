@@ -56,7 +56,7 @@ DiscretePDFTest::samplePKA()
           mindex(index) = pzaid[j0] * penergies[j1] * pphi * pmu[j3];
         }
 
-  DiscretePKAPDF pdf = DiscretePKAPDF(1.0, zaid, energies, mindex);
+  DiscretePKAPDF pdf = DiscretePKAPDF(zaid, energies, mindex);
 
   // set up a frequency counter
   unsigned int j1, j2, j3, j4;
