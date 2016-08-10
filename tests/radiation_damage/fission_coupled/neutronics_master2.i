@@ -93,13 +93,11 @@
     points = '0.5 0.5 0.0
               0.9 0.9 0.0'
     energy_group_boundaries = '0.0 0.5e-6 0.75'
-    target_isotope_names = 'U235 U238'
-    number_densities = 'N92235 N92238'
+    target_isotope_names = 'U235'
+    number_densities = 'N92235'
     scalar_fluxes = 'scalar_flux_g1 scalar_flux_g0'
     # each row are the recoil cross sections for a single isotope && all group (g=0,1)
     fission_cross_sections = '
-                              1 0
-                              0 0.01
                               1 0
                               0 0.01
                             '

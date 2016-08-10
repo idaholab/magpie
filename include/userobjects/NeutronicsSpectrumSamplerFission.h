@@ -36,9 +36,6 @@ public:
   /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const override;
 
-  /// returns a MultiIndex<Real> PDF at a given point ID
-  virtual MultiIndex<Real> getPDF(unsigned int point_id) const override;
-
 protected:
   /// computes the PDF for isotope i, group g, and SH indices p
   /// NOTE: for fission p does not mateter

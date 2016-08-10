@@ -195,6 +195,7 @@ MyTRIMRasterizer::execute()
     gen->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
 
   unsigned int n = _pka_list.size() - old_size;
+
   _npka_per_element[_current_elem->id()] = n;
 }
 
@@ -319,7 +320,7 @@ MyTRIMRasterizer::deserialize(std::vector<std::string> & serialized_buffers)
 }
 
 unsigned int
-MyTRIMRasterizer::getNPKA(dof_id_type elem_id)
+MyTRIMRasterizer::getNPKA(dof_id_type elem_id) const
 {
-  return _npka_per_element[elem_id];
+  return _npka_per_element.at(elem_id);
 }

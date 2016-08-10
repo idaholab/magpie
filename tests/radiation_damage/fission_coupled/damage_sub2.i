@@ -77,6 +77,10 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./nPKA]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 #[Kernels]
@@ -157,6 +161,12 @@
     variable = rho
     rasterizer = rasterizer
   [../]
+
+  [./nPKA]
+    type = PKAAux
+    variable = nPKA
+    rasterizer = rasterizer
+  [../]
 []
 
 
@@ -164,7 +174,7 @@
   [./neutronics_fission_generator]
     type = PKAFissionFragmentNeutronics
     relative_density = c_U
-    fission_rate = 1e-4
+    fission_rate = 1.0
   [../]
   [./rasterizer]
     type = MyTRIMRasterizer

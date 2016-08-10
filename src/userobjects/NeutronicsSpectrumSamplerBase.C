@@ -135,11 +135,7 @@ NeutronicsSpectrumSamplerBase::meshChanged()
 }
 
 void
-<<<<<<< 640f64de8ecd2bedbb9a27ab22d1c7252ec7cf8c:src/userobjects/NeutronicsSpectrumSamplerBase.C
 NeutronicsSpectrumSamplerBase::initialSetup()
-=======
-RadiationDamageBase::initialSetup()
->>>>>>> Modified transfer and user objects to get transfer working #98:src/userobjects/RadiationDamageBase.C
 {
   // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
@@ -180,7 +176,7 @@ NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
 
 
 MultiIndex<Real>
-RadiationDamageBase::getPDF(unsigned int point_id) const
+NeutronicsSpectrumSamplerBase::getPDF(unsigned int point_id) const
 {
   return _sample_point_data[point_id];
 }
