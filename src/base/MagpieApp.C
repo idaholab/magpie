@@ -7,6 +7,7 @@
 #include "MyTRIMDensityAux.h"
 #include "MyTRIMElementResultAux.h"
 #include "SPPARKSAux.h"
+#include "PKAAux.h"
 
 // Kernels
 #include "DefectAnnihilation.h"
@@ -73,6 +74,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerAux(MyTRIMDensityAux);
   registerAux(MyTRIMElementResultAux);
   registerAux(SPPARKSAux);
+  registerAux(PKAAux);
 
   registerKernel(DefectAnnihilation);
   registerKernel(MyTRIMElementSource);

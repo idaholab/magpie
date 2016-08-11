@@ -68,6 +68,8 @@ public:
     Real _site_volume;
   };
 
+  unsigned int getNPKA(dof_id_type elem_id) const;
+
 protected:
   ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
   void serialize(std::string & serialized_buffer);
@@ -118,6 +120,9 @@ protected:
   Point _max_dim;
   bool _pbc[LIBMESH_DIM];
   /// @}
+
+  //map of number of PKAs paired with element ID
+  std::map<dof_id_type, unsigned int> _npka_per_element;
 
 private:
   bool _execute_this_timestep;
