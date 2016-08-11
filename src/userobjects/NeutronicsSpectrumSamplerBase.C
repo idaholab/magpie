@@ -11,7 +11,6 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "MooseMesh.h"
 
@@ -58,6 +57,7 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
     _number_densities[i] = & coupledValue("number_densities", i);
 
   _zaids.resize(_I);
+
   for (unsigned int i = 0; i < _I; ++i)
   {
 #ifdef RATTLESNAKE_ENABLED
@@ -173,6 +173,7 @@ NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
         for (unsigned int p = 0; p < _nSH; ++p)
           _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
 }
+
 
 MultiIndex<Real>
 NeutronicsSpectrumSamplerBase::getPDF(unsigned int point_id) const

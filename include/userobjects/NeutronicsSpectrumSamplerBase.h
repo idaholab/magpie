@@ -14,6 +14,10 @@
 #ifndef NEUTRONICSSPECTRUMSAMPLERBASE_H
 #define NEUTRONICSSPECTRUMSAMPLERBASE_H
 
+#ifdef RATTLESNAKE_ENABLED
+  #include "AQData.h"
+#endif
+
 // MOOSE includes
 #include "ElementUserObject.h"
 #include "MultiIndex.h"

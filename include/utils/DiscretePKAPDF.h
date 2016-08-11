@@ -21,7 +21,7 @@ protected:
   /// NOTE: we pass by value here because we modify probabilities in the function for convenience
   virtual void precomputeCDF(MultiIndex<Real> probabilities) override;
 
-  /// this method computes the magnitude encoded in probabilities
+  // this method computes the magnitude encoded in probabilities
   virtual void computeMagnitude(MultiIndex<Real> probabilities) override;
 
   /// number of azimuthal bins
