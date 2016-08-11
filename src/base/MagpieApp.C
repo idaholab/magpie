@@ -7,6 +7,7 @@
 #include "MyTRIMDensityAux.h"
 #include "MyTRIMElementResultAux.h"
 #include "SPPARKSAux.h"
+#include "PKAAux.h"
 
 // Kernels
 #include "DefectAnnihilation.h"
@@ -30,6 +31,7 @@
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
+
 
 template<>
 InputParameters validParams<MagpieApp>()
@@ -70,6 +72,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerAux(MyTRIMDensityAux);
   registerAux(MyTRIMElementResultAux);
   registerAux(SPPARKSAux);
+  registerAux(PKAAux);
 
   registerKernel(DefectAnnihilation);
   registerKernel(MyTRIMElementSource);
@@ -86,6 +89,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(NeutronicsSpectrumSamplerSN);
 #endif
   registerUserObject(NeutronicsSpectrumSamplerFission);
+
   registerUserObject(SPPARKSUserObject);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
