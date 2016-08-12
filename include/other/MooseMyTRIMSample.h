@@ -48,7 +48,7 @@ protected:
   /// mesh of the simulation domain
   const MooseMesh & _mesh;
 
-  // dimension of the mesh
+  /// dimension of the mesh
   const unsigned int _dim;
 
   /// point locator to determine element pointers form locations

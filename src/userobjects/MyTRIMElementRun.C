@@ -35,8 +35,8 @@ MyTRIMElementRun::execute()
   if (!_rasterizer.executeThisTimestep())
     return;
 
-  // trigger the creation of a master PointLocatior outside the threaded region
-  _mesh.getMesh().sub_point_locator();
+  // trigger the creation of a master PointLocator outside the threaded region
+  _mesh.getPointLocator();
 
   // build thread loop functor
   ThreadedRecoilElementAveragedLoop rl(_rasterizer, _mesh);
@@ -47,6 +47,7 @@ MyTRIMElementRun::execute()
   // run threads
   Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");
   Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
+
   Moose::perf_log.pop("MyTRIMRecoilLoop", "Solve");
 
   // fetch the joined data from thread 0

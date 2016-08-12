@@ -35,7 +35,7 @@ MyTRIMDiracRun::execute()
     return;
 
   // trigger the creation of a master PointLocatior outside the threaded region
-  _mesh.getMesh().sub_point_locator();
+  _mesh.getPointLocator();
 
   // build thread loop functor
   ThreadedRecoilDiracSourceLoop rl(_rasterizer, _mesh);

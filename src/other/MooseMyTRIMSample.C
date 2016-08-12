@@ -1,5 +1,6 @@
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
+#include "MyTRIMMesh.h"
 
 MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::SimconfType * simconf) :
     MyTRIM_NS::SampleBase(),
@@ -9,7 +10,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
     _trim_charge(_rasterizer.charge()),
     _mesh(mesh),
     _dim(_mesh.dimension()),
-    _pl(_mesh.getMesh().sub_point_locator()),
+    _pl(_mesh.getPointLocator()),
     _simconf(simconf)
 {
   if (_dim < 2 || _dim > 3)
