@@ -50,4 +50,49 @@
     prereq = point_locator_copy_gold
   [../]
 
+  #
+  # Run the cascade test with the GenerateMesh and the built in tree point
+  # locator first
+  #
+  [./point_locator_prepare_amr]
+    type = RunApp
+    input = 'cascade_amr.i'
+    cli_args = 'Mesh/type=GeneratedMesh'
+  [../]
+  # copy the resulting output into the gold directory
+  [./point_locator_copy_gold_amr]
+    type = RunCommand
+    command = 'mkdir -p gold; mv cascade_amr_out.e gold'
+    prereq = point_locator_prepare_amr
+  [../]
+  # run the same cadcade with the custom point locator
+  [./point_locator_compare_amr]
+    type = Exodiff
+    input = 'cascade_amr.i'
+    exodiff = 'cascade_amr_out.e'
+    prereq = point_locator_copy_gold_amr
+  [../]
+
+  #
+  # Run the cascade test with the GenerateMesh and the built in tree point
+  # locator first
+  #
+  [./point_locator_prepare_3d]
+    type = RunApp
+    input = 'cascade_3d.i'
+    cli_args = 'Mesh/type=GeneratedMesh'
+  [../]
+  # copy the resulting output into the gold directory
+  [./point_locator_copy_gold_3d]
+    type = RunCommand
+    command = 'mkdir -p gold; mv cascade_3d_out.e gold'
+    prereq = point_locator_prepare_3d
+  [../]
+  # run the same cadcade with the custom point locator
+  [./point_locator_compare_3d]
+    type = Exodiff
+    input = 'cascade_3d.i'
+    exodiff = 'cascade_3d_out.e'
+    prereq = point_locator_copy_gold_3d
+  [../]
 []
