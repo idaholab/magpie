@@ -68,15 +68,29 @@ const Elem *
 PointLocatorRegularOrthogonal::operator() (const Point & p,
                                            const std::set<subdomain_id_type> * /* allowed_subdomains */) const
 {
-  const Elem * el = _data->rootElement(p);
-  mooseAssert(el != nullptr, "No element found at p");
+  Point el_pos;
+  const Elem * el = _data->rootElement(p, el_pos);
 
-  // element has no active children
-  if (el->active())
-    return el;
+  while (true)
+  {
+    // element has no active children
+    if (el->active() || el == nullptr)
+      return el;
 
-  // TODO: bisect the children
-  mooseError("AMR is not yet supported for use with the MyTRIMMesh and its associated point locator.");
+    // bisect the children
+    unsigned int child = 0;
+    for (unsigned int i = 0; i < _data->_dim; ++i)
+      if (el_pos(i) >= 0.5)
+      {
+        // fortunately the libMesh child ordering is this simple (bit 0/1 for left right of center point, etc.)
+        child += 1 << i;
+        el_pos(i) = (el_pos(i) - 0.5) * 2.0;
+      }
+      else
+        el_pos(i) *= 2.0;
+
+    el = el->child_ptr(child);
+  }
 }
 
 void

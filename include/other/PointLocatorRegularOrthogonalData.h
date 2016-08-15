@@ -28,24 +28,24 @@ public:
                                     const Point & max_corner,
                                     const MeshBase & mesh);
 
-  /// get the root element pointer
-  const Elem * rootElement(const Point & p) const;
+  /// get the root element pointer and (if applicable) the coordinates in element space
+  const Elem * rootElement(const Point & p, Point & el_pos) const;
 
-protected:
-  /// get the root element index for the current point
+  /// get the root element index for an element centroid when constructing the root element table
   unsigned int rootElementIndex(const Point & p) const;
-
-  /// number of cells (bins) along each dimension
-  std::vector<unsigned int> _cell_count;
 
   /// underlying mesh dimension
   unsigned int _dim;
 
+protected:
+  /// number of cells (bins) along each dimension
+  std::vector<unsigned int> _cell_count;
+
   /// mesh point with the smallest coordinate components (bottom left back corner)
   Point _min_corner;
 
-  /// lengths of the sides of mesh
-  Point _size;
+  /// lengths of the sides of a grid cell
+  Point _cell_size;
 
   /// serialized nz*ny*nx list of pointers to the coarsest elements in the mesh
   std::vector<Elem *> _root_elems;
