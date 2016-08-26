@@ -22,9 +22,7 @@
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
 #include "PKAFissionFragmentNeutronics.h"
-#if RATTLESNAKE_ENABLED
-  #include "NeutronicsSpectrumSamplerSN.h"
-#endif
+#include "NeutronicsSpectrumSamplerSN.h"
 #include "NeutronicsSpectrumSamplerFission.h"
 #include "SPPARKSUserObject.h"
 

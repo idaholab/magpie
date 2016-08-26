@@ -23,4 +23,4 @@ protected:
   UserObjectName _neutronics_pdf_name;
 };
 
-#endif // MULTIAPPNEUTRONICSSPECTRUMTRANSFER_H
+#endif //MULTIAPPNEUTRONICSSPECTRUMTRANSFER_H
