@@ -50,6 +50,10 @@ MyTRIMElementRun::execute()
 void
 MyTRIMElementRun::finalize()
 {
+  // for single processor runs we do not need to do anything here
+  if (_app.n_processors() == 1)
+    return;
+
   // create a one send buffer for use with the libMesh packed range routines
   std::vector<std::string> send_buffers(1);
 
@@ -102,7 +106,7 @@ MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
   // Loop over all datastructures for all procerssors to perfrom the gather operation
   for (unsigned int rank = 0; rank < serialized_buffers.size(); ++rank)
   {
-    // skip the current processor (its data is already in the strutures)
+    // skip the current processor (its data is already in the structures)
     if (rank == processor_id())
       continue;
 
