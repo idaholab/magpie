@@ -18,5 +18,6 @@ PKAAux::PKAAux(const InputParameters & parameters) :
 Real
 PKAAux::computeValue()
 {
-  return _rasterizer.getNPKA(_current_elem->id());
+  // we have to divide by the volume to get the number and not number * volume
+  return _rasterizer.getNPKA(_current_elem->id()) / _current_elem->volume();
 }

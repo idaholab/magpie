@@ -30,7 +30,7 @@ InputParameters validParams<NeutronicsSpectrumSamplerBase>()
   InputParameters params = validParams<ElementUserObject>();
   params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
   params.addRequiredCoupledVar("number_densities", "Number densities for each isotope.");
-  params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries ommitting E = 0.0. Units are MeV.");
+  params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries in units of MeV.");
   params.addRequiredParam<unsigned int>("L", "The order up to which angular moments of the PKA distribution are computed.");
   params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
   params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
