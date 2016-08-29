@@ -77,7 +77,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
   Real total_Z = 0.0;
   Real mubin1 = 0.0, mubin2 = 0.0, mubin3 = 0.0, mubin4 = 0.0;
   Real phibin1 = 0.0, phibin2 = 0.0, phibin3 = 0.0, phibin4 = 0.0;
-  Real true_energy = 173.5265049499354998486; //for Pu-239
+  Real true_energy = 173.5265049499354998486e6; //for Pu-239
 
   //create std::vector for A values of fission products, corresponding tallies, and true pdf
   std::vector<unsigned int> fproduct_A;
@@ -180,7 +180,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
   auto maxerror = std::max_element(error.begin(), error.end());
 
   //check if total energy is conserved
-  CPPUNIT_ASSERT( std::abs(total_energy / max - true_energy) < 1.0e-6 );
+  CPPUNIT_ASSERT( std::abs(total_energy / max - true_energy) < 1.0 );
 
   //check if total mass is conserved
   CPPUNIT_ASSERT( std::abs(total_mass / max - 239.0) < 1.0e-3);
