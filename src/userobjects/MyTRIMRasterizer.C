@@ -1,5 +1,6 @@
 #include "MyTRIMRasterizer.h"
 #include "PKAGeneratorBase.h"
+#include "MooseRandom.h"
 #include "MooseMesh.h"
 
 // libmesh includes
@@ -201,25 +202,67 @@ void
 MyTRIMRasterizer::finalize()
 {
   // for single processor runs we do not need to do anything here
-  if (_app.n_processors() == 1)
-    return;
+  if (_app.n_processors() > 1)
+  {
+    // create a one send buffer for use with the libMesh packed range routines
+    std::vector<std::string> send_buffers(1);
 
-  // create a one send buffer for use with the libMesh packed range routines
-  std::vector<std::string> send_buffers(1);
+    // create byte buffers for the streams received from all processors
+    std::vector<std::string> recv_buffers;
+    recv_buffers.reserve(_app.n_processors());
 
-  // create byte buffers for the streams received from all processors
-  std::vector<std::string> recv_buffers;
-  recv_buffers.reserve(_app.n_processors());
+    // pack the comples datastructures into the string stream
+    serialize(send_buffers[0]);
 
-  // pack the comples datastructures into the string stream
-  serialize(send_buffers[0]);
+    // broadcast serialized data to and receive from all processors
+    _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
+                                         std::back_inserter(recv_buffers));
 
-  // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
-                                       std::back_inserter(recv_buffers));
+    // unpack the received data and merge it into the local data structures
+    deserialize(recv_buffers);
+  }
 
-  // unpack the received data and merge it into the local data structures
-  deserialize(recv_buffers);
+  // generate a list of RNG seeds - one for each PKA
+  std::vector<unsigned int> pka_seeds(_pka_list.size());
+  if (processor_id() == 0)
+  {
+    // only do this on proc 0 thread 0
+    for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)
+      pka_seeds[i] = MooseRandom::randl();
+  }
+
+  // broadcast seeds
+  _communicator.broadcast(pka_seeds);
+
+  // sort PKA list
+  std::sort(_pka_list.begin(), _pka_list.end(), [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b) {
+    return (a._pos < b._pos) ||
+           (a._pos == b._pos && a._m < b._m) ||
+           (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
+           (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
+  });
+
+  // store seeds in tag values
+  for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)
+    _pka_list[i]._seed = pka_seeds[i];
+
+  // prune PKA list
+  if (_app.n_processors() > 1)
+  {
+    // split PKAs into per-processor ranges
+    std::vector<unsigned int> interval(_app.n_processors() + 1, 0);
+    for (unsigned int i = 0; i < _app.n_processors(); ++i)
+      interval[i+1] += (_pka_list.size() - interval[i]) / (_app.n_processors() - i) + interval[i];
+
+    auto begin = interval[processor_id()];
+    auto end = interval[processor_id() + 1];
+    std::vector<MyTRIM_NS::IonBase> own_pka_list(end - begin);
+
+    for (auto i = begin; i < end; ++i)
+      own_pka_list[i - begin] = _pka_list[i];
+
+    _pka_list = own_pka_list;
+  }
 }
 
 const std::vector<Real> &
@@ -303,8 +346,7 @@ MyTRIMRasterizer::deserialize(std::vector<std::string> & serialized_buffers)
     // merge the data in with the current processor's data
     _material_map.insert(other_material_map.begin(), other_material_map.end());
 
-    // We are not yet merging the PKA lists but let each processor work on its own list.
-    // List combining will be used in the furture to enable better load balancing.
-    // _pka_list.insert(other_pka_list.begin(), other_pka_list.end());
+    // merging the PKA lists
+    _pka_list.insert(_pka_list.begin(), other_pka_list.begin(), other_pka_list.end());
   }
 }
