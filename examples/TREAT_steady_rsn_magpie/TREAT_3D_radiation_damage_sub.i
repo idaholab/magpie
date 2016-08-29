@@ -127,11 +127,6 @@
     ivar = 2
     defect = VAC
   [../]
-  #[./count_pkas]
-  #  type = PKAAux
-  #  variable = pka_count
-  #  rasterizer = rasterizer
-  #[../]
 []
 
 [UserObjects]

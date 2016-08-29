@@ -1,0 +1,9 @@
+[Tests]
+  [./coupled_fission_mockup]
+    type = 'Exodiff'
+    input = 'coupled_fission_mockup.i'
+    exodiff = 'coupled_fission_mockup.e coupled_fission_mockup_out_radiation_damage_app0.e'
+    max_parallel = 1
+    max_threads = 1
+  [../]
+[]
