@@ -203,7 +203,8 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
 Real
 DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A) const
 {
-  return 0.1178 * (std::pow(Z, 2.0) / std::pow(A, 1.0 / 3.0)) + 5.8;
+  // MyTRIM expects energies to be in eV, hence the 1.0e6 factor
+  return (0.1178 * (std::pow(Z, 2.0) / std::pow(A, 1.0 / 3.0)) + 5.8) * 1.0e6;
 }
 
 /**
