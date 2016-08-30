@@ -33,12 +33,12 @@ dataStore(std::ostream & stream, MyTRIM_NS::IonBase & pl, void * context)
   dataStore(stream, pl._E, context);
   dataStore(stream, pl._dir, context);
   dataStore(stream, pl._pos, context);
-  dataStore(stream, pl._time, context);
-  dataStore(stream, pl.gen, context);
-  dataStore(stream, pl.id, context);
-  dataStore(stream, pl.tag, context);
+  dataStore(stream, pl._seed, context);
+  dataStore(stream, pl._gen, context);
+  dataStore(stream, pl._id, context);
+  dataStore(stream, pl._tag, context);
   dataStore(stream, pl._Ef, context);
-  dataStore(stream, pl.state, context);
+  dataStore(stream, pl._state, context);
 }
 template<>
 inline void
@@ -49,12 +49,12 @@ dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
   dataLoad(stream, pl._E, context);
   dataLoad(stream, pl._dir, context);
   dataLoad(stream, pl._pos, context);
-  dataLoad(stream, pl._time, context);
-  dataLoad(stream, pl.gen, context);
-  dataLoad(stream, pl.id, context);
-  dataLoad(stream, pl.tag, context);
+  dataLoad(stream, pl._seed, context);
+  dataLoad(stream, pl._gen, context);
+  dataLoad(stream, pl._id, context);
+  dataLoad(stream, pl._tag, context);
   dataLoad(stream, pl._Ef, context);
-  dataLoad(stream, pl.state, context);
+  dataLoad(stream, pl._state, context);
 }
 
 template<>

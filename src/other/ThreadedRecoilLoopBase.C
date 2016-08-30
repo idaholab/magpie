@@ -69,10 +69,10 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       TRIM.trim(recoil, recoils);
 
       // store interstitials
-      if (recoil->tag >= 0 && recoil->state == MyTRIM_NS::IonBase::INTERSTITIAL)
+      if (recoil->_tag >= 0 && recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
       {
         // locate element the interstitial is deposited in
-        addInterstitialToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->tag);
+        addInterstitialToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->_tag);
       }
 
       // store vacancies
