@@ -43,39 +43,45 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 
   // copy the pka list into the recoil queue
   for (auto && pka : pka_list)
+  {
+    // seed the RNG with the seed assigned to the primary knock on atom (for parallel reproducibility)
+    _simconf.seed(pka._seed);
+
+    // push primary knock on atom onto the recoil queue
     recoils.push(new MyTRIM_NS::IonBase(pka));
 
-  MyTRIM_NS::IonBase * pka;
-  while (!recoils.empty())
-  {
-    pka = recoils.front();
-    recoils.pop();
-    sample.averages(pka);
-
-    // project into xy plane
-    if (_dim == 2)
+    MyTRIM_NS::IonBase * recoil;
+    while (!recoils.empty())
     {
-      pka->_pos(2) = 0.0;
-      pka->_dir(2) = 0.0;
+      recoil = recoils.front();
+      recoils.pop();
+      sample.averages(recoil);
+
+      // project into xy plane
+      if (_dim == 2)
+      {
+        recoil->_pos(2) = 0.0;
+        recoil->_dir(2) = 0.0;
+      }
+
+      // follow this ion's trajectory and store recoils
+      // Moose::out << "PKA " << ::round(recoil->_E) << "eV (" << recoil->_Ef << "eV) at " << recoil->_pos(0) << ' ' << recoil->_pos(1) << ' ' << recoil->_pos(2) << ' ' << vac.size() << '\n';
+      TRIM.trim(recoil, recoils);
+
+      // store interstitials
+      if (recoil->_tag >= 0 && recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
+      {
+        // locate element the interstitial is deposited in
+        addInterstitialToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->_tag);
+      }
+
+      // store vacancies
+      for (unsigned int i = 0; i < vac.size(); ++i)
+        addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
+      vac.clear();
+
+      // done with this recoil
+      delete recoil;
     }
-
-    // follow this ion's trajectory and store recoils
-    // Moose::out << "PKA " << ::round(pka->_E) << "eV (" << pka->_Ef << "eV) at " << pka->_pos(0) << ' ' << pka->_pos(1) << ' ' << pka->_pos(2) << ' ' << vac.size() << '\n';
-    TRIM.trim(pka, recoils);
-
-    // store interstitials
-    if (pka->tag >= 0 && pka->state == MyTRIM_NS::IonBase::INTERSTITIAL)
-    {
-      // locate element the interstitial is deposited in
-      addInterstitialToResult(_rasterizer.periodicPoint(pka->_pos), pka->tag);
-    }
-
-    // store vacancies
-    for (unsigned int i = 0; i < vac.size(); ++i)
-      addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
-    vac.clear();
-
-    // done with this recoil
-    delete pka;
   }
 }

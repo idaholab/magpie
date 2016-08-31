@@ -40,7 +40,7 @@ PKAConstant::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Rea
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    pka.tag = -1;
+    pka._tag = -1;
 
     // set stopping criteria
     pka.setEf();

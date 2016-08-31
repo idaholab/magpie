@@ -53,8 +53,8 @@ PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_l
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    ion[0].tag = -1;
-    ion[1].tag = -1;
+    ion[0]._tag = -1;
+    ion[1]._tag = -1;
 
     // set location of the fission event
     setPosition(ion[0]);
