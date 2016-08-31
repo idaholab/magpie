@@ -53,8 +53,8 @@ public:
    * \p p  Pure virtual. Optionally allows the user to restrict the subdomains searched.
    */
   virtual void operator() (const Point & p,
-                            std::set<const Elem *> & candidate_elements,
-                            const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const; // override once libmesh is updated
+                           std::set<const Elem *> & candidate_elements,
+                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
