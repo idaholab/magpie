@@ -73,8 +73,8 @@ PointLocatorRegularOrthogonal::operator() (const Point & p,
 
   while (true)
   {
-    // element has no active children
-    if (el->active() || el == nullptr)
+    // element has no active children (or point is out of mesh)
+    if (el == nullptr || el->active())
       return el;
 
     // bisect the children
