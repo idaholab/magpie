@@ -72,6 +72,11 @@ InputParameters validParams<MyTRIMRasterizer>()
   // we run this object once a timestep
   setup_options = "timestep_begin";
   params.set<MultiMooseEnum>("execute_on") = setup_options;
+
+  // Advanced options
+  params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
+  params.addParamNamesToGroup("interval", "Advanced");
+
   return params;
 }
 
@@ -86,8 +91,9 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
     _pka_generators(),
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
-    _last_time(0.0), //TODO: deal with user specified start times!
-    _step_end_time(0.0)
+    _accumulated_time(0.0),
+    _accumulated_time_old(0.0),
+    _interval(getParam<unsigned int>("interval"))
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
@@ -118,7 +124,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
 bool
 MyTRIMRasterizer::executeThisTimestep() const
 {
-  return true;
+  return (_fe_problem.timeStep() - 1) % _interval == 0;
 }
 
 void
@@ -126,20 +132,15 @@ MyTRIMRasterizer::initialize()
 {
   _execute_this_timestep = executeThisTimestep();
 
-  // We reset the time of the last run of the BCMC only if the
-  // preceeding iteration did converge.
-  if (_fe_problem.converged())
-    _last_time = _step_end_time;
+  // We roll back the accumulated time time if the preceeding timestep did
+  // not converge
+  if (!_fe_problem.converged())
+    _accumulated_time = _accumulated_time_old;
 
   if (_execute_this_timestep)
   {
     _material_map.clear();
     _pka_list.clear();
-
-    // Projected time at the end of this step. The total time used to
-    // compute the number of PKAs is the time since the end of the last converged
-    // timestep in which BCMC ran up to the end of the current timestep.
-    _step_end_time = _fe_problem.time() + _fe_problem.dt();
   }
 }
 
@@ -183,7 +184,7 @@ MyTRIMRasterizer::execute()
 
   // add PKAs for current element
   for (auto && gen : _pka_generators)
-    gen->appendPKAs(_pka_list, _step_end_time - _last_time, vol, average);
+    gen->appendPKAs(_pka_list, _accumulated_time + _fe_problem.dt(), vol, average);
 }
 
 void
@@ -201,6 +202,20 @@ MyTRIMRasterizer::threadJoin(const UserObject &y)
 void
 MyTRIMRasterizer::finalize()
 {
+  // save the accumulated time so that we can properly roll back if the step does not converge
+  _accumulated_time_old = _accumulated_time;
+
+  // bail out early if not executing this timestep
+  if (!_execute_this_timestep)
+  {
+    // no BCMC done, so wee accumulate this step's time to be taken care of by a later BCMC run
+    _accumulated_time += _fe_problem.dt();
+    return;
+  }
+
+  // BCMC was run for the accumulated time - the debt is paid
+  _accumulated_time = 0.0;
+
   // for single processor runs we do not need to do anything here
   if (_app.n_processors() > 1)
   {

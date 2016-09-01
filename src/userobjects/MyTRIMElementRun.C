@@ -51,7 +51,7 @@ void
 MyTRIMElementRun::finalize()
 {
   // for single processor runs we do not need to do anything here
-  if (_app.n_processors() == 1)
+  if (!_rasterizer.executeThisTimestep() || _app.n_processors() == 1)
     return;
 
   // create a one send buffer for use with the libMesh packed range routines
