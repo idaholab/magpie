@@ -32,6 +32,9 @@
 // Meshes
 #include "MyTRIMMesh.h"
 
+// VectorPostprocessors
+#include "MyTRIMDiracResult.h"
+
 template<>
 InputParameters validParams<MagpieApp>()
 {
@@ -92,6 +95,8 @@ MagpieApp::registerObjects(Factory & factory)
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 
   registerMesh(MyTRIMMesh);
+
+  registerVectorPostprocessor(MyTRIMDiracResult);
 }
 
 void
