@@ -165,7 +165,19 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
       // check if file exists, if not continue
       std::string filename = path + std::to_string(zaid) + "_" + MagpieUtils::neutronEnergyName(energy) + ".txt";
       if (!MooseUtils::checkFileReadable(filename, false, false))
-        continue;
+      {
+        // most isotopes have fission data for High but not for Fast wich is weird
+        // if fast is not available, then try to load High instead
+        if (MagpieUtils::neutronEnergyName(energy) == "Fast")
+        {
+          std::string alt_filename = path + std::to_string(zaid) + "_" + "High" + ".txt";
+          if (!MooseUtils::checkFileReadable(alt_filename, false, false))
+            continue;
+          filename = alt_filename;
+        }
+        else
+          continue;
+      }
 
       // read the data
       std::ifstream infile(filename.c_str());
