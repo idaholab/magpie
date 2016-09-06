@@ -72,7 +72,7 @@
     E = 1000
     Z = 60
     m = 120
-    pka_rate = 0.01
+    pka_rate = 0.005
   [../]
   [./rasterizer]
     type = MyTRIMRasterizer
