@@ -101,11 +101,14 @@ protected:
   /// cumulative PKA list
   std::vector<MyTRIM_NS::IonBase> _pka_list;
 
-  /// last time the BCMC simulation ran
-  Real _last_time;
+  /// time for which the next BCMC simulation is responsible (current dt plus skipped steps)
+  Real _accumulated_time;
 
-  /// End time of the curent step
-  Real _step_end_time;
+  /// rollback buffer for _accumulated_time if the previous step did not converge
+  Real _accumulated_time_old;
+
+  /// timestep interval on which to run BCMC
+  const unsigned int _interval;
 
   /// @{ periodicity data
   Point _min_dim;
