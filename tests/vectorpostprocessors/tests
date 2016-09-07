@@ -1,0 +1,7 @@
+[Tests]
+  [./mytrimdiracresult]
+    type = 'CSVDiff'
+    input = 'mytrimdiracresult.i'
+    csvdiff = 'mytrimdiracresult_out_int_0001.csv'
+  [../]
+[]
