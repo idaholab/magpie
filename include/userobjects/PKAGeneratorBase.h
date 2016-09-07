@@ -34,8 +34,8 @@ protected:
   /// helper function to set the ion direction to a random direction
   void setRandomDirection(MyTRIM_NS::IonBase & ion) const;
 
-  /// Return a point with random uniformly distributed coordinates in the unit cube
-  Point getRandomPoint() const { return Point(getRandomReal(), getRandomReal(), getRandomReal()); }
+  /// Return a point with random uniformly distributed coordinates in the unit cube (temp variables are required to ensure execution order!)
+  Point getRandomPoint() const { const Real X = getRandomReal(), Y = getRandomReal(), Z = getRandomReal(); return Point(X,Y,Z); }
 };
 
 #endif // PKAGENERATORBASE_H
