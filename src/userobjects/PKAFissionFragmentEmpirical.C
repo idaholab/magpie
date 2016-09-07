@@ -45,7 +45,7 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_li
 
     // assume p/n ratio like U (Semi-empirical mass formula would be marginally better ~15%,
     // but it is harder to achieve charge neutrality
-    ion1._Z = ::round((ion1._m * 92.0) / (235.0 - 2.0));
+    ion1._Z = std::round((ion1._m * 92.0) / (235.0 - 2.0));
     ion2._Z = 92 - ion1._Z;
 
     // set stopping criteria
