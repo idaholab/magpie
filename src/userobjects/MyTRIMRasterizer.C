@@ -276,7 +276,7 @@ MyTRIMRasterizer::finalize()
     for (auto i = begin; i < end; ++i)
       own_pka_list[i - begin] = _pka_list[i];
 
-    _pka_list = own_pka_list;
+    _pka_list.swap(own_pka_list);
   }
 }
 
