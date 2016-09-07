@@ -23,6 +23,8 @@ MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) :
 void
 MyTRIMDiracRun::execute()
 {
+  _result_list.clear();
+
   // bail out early if no run is requested for this timestep
   if (!_rasterizer.executeThisTimestep())
     return;

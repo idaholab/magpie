@@ -24,6 +24,8 @@ MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters) :
 void
 MyTRIMElementRun::execute()
 {
+  _result_map.clear();
+
   // bail out early if no run is requested for this timestep
   if (!_rasterizer.executeThisTimestep())
     return;
