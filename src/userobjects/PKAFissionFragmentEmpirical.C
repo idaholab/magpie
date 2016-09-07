@@ -22,7 +22,7 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_li
   mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentEmpirical::appendPKAs");
 
-  unsigned int num_fission = std::floor(dt * vol * _fission_rate + getRandomReal());
+  unsigned int num_fission = std::floor(dt * vol * _fission_rate * _relative_density[0] + getRandomReal());
 
   /// Mass inverter to sample PKA mass distribution
   MyTRIM_NS::MassInverter mass_inverter;
