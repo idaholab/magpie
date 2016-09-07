@@ -50,7 +50,7 @@ MyTRIMDiracResult::finalize()
 }
 
 void
-MyTRIMDiracResult::threadJoin(const UserObject & uo)
+MyTRIMDiracResult::threadJoin(const UserObject &)
 {
   // the MyTRIMDiracRunner already does the necessary communication
 }
