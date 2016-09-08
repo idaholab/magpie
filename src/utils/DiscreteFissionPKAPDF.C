@@ -3,6 +3,9 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 #include "MooseUtils.h"
+
+#include "libmesh/utility.h"
+
 #include <fstream>
 #include <map>
 
@@ -216,7 +219,7 @@ Real
 DiscreteFissionPKAPDF::determineFragmentsEnergy(unsigned int Z, unsigned int A) const
 {
   // MyTRIM expects energies to be in eV, hence the 1.0e6 factor
-  return (0.1178 * (std::pow(Z, 2.0) / std::pow(A, 1.0 / 3.0)) + 5.8) * 1.0e6;
+  return (0.1178 * (Utility::pow<2>(Z) / std::cbrt(A)) + 5.8) * 1.0e6;
 }
 
 /**
