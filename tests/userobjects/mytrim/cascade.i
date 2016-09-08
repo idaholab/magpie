@@ -1,13 +1,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 60
-  ny = 60
+  nx = 20
+  ny = 20
   xmin = -100
   xmax = 100
   ymin = 0
   ymax = 200
-  elem_type = TRI3
 []
 
 [Variables]
@@ -27,15 +26,8 @@
   [../]
 []
 
-[Kernels]
-  [./dt]
-    type = TimeDerivative
-    variable = c
-  [../]
-  [./diff]
-    type = Diffusion
-    variable = c
-  [../]
+[Problem]
+  kernel_coverage_check = false
 []
 
 [AuxKernels]
@@ -55,19 +47,11 @@
   [../]
 []
 
-#[BCs]
-#  [./Periodic]
-#    [./all]
-#      auto_direction = 'x y'
-#    [../]
-#  [../]
-#[]
-
 [UserObjects]
   [./thermal_fission]
     type = PKAFissionFragmentEmpirical
     relative_density = 1
-    fission_rate = 0.001
+    fission_rate = 0.01
   [../]
   [./rasterizer]
     type = MyTRIMRasterizer
@@ -105,4 +89,5 @@
 [Outputs]
   exodus = true
   csv = true
+  hide = c
 []
