@@ -34,6 +34,7 @@
 
 // VectorPostprocessors
 #include "MyTRIMDiracResult.h"
+#include "PKAList.h"
 
 template<>
 InputParameters validParams<MagpieApp>()
@@ -97,6 +98,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerMesh(MyTRIMMesh);
 
   registerVectorPostprocessor(MyTRIMDiracResult);
+  registerVectorPostprocessor(PKAList);
 }
 
 void
