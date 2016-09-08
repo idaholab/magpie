@@ -3,5 +3,17 @@
     type = 'CSVDiff'
     input = 'mytrimdiracresult.i'
     csvdiff = 'mytrimdiracresult_out_int_0001.csv'
+    max_parallel = 1
+    max_threads = 1
+  [../]
+
+  #
+  # this test should pass in parallel (MPI and/or threads)
+  # at least the PKA list generation is reproducible
+  #
+  [./pkalist]
+    type = 'CSVDiff'
+    input = 'pkalist.i'
+    csvdiff = 'pkalist_out_pkas_0001.csv'
   [../]
 []
