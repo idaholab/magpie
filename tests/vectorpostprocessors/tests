@@ -3,8 +3,6 @@
     type = 'CSVDiff'
     input = 'mytrimdiracresult.i'
     csvdiff = 'mytrimdiracresult_out_int_0001.csv'
-    max_parallel = 1
-    max_threads = 1
   [../]
 
   #
