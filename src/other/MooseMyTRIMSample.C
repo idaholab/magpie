@@ -15,15 +15,6 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 {
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
-
-}
-
-MooseMyTRIMSample::~MooseMyTRIMSample()
-{
-  // delete all elements of the materials in the cache
-  for (auto && i : _materials_master_cache)
-    for (auto && j : i.second._element)
-      delete j;
 }
 
 void
@@ -31,15 +22,11 @@ MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
 {
   _current_ion = pka;
 
-// TODO: averages do NOT depend on ion energy! Cache averaged materials for all possible PKAs
-// this means adding comparison operators to PKAs so that we can use them as map indices
-// have a master material cache and per-PKA-type cache. Do not average stuff in the master cache at all
-// use it only as a copy construction source for the per-pka-cache
-// std::map<MyTRIM_NS::IonBase, std::map<Elem *, MooseMyTRIMMaterial> _per_pka_cache
-
-  // apply averages for all cached materials
-  // for (auto  && i : _materials_cache)
-  //   i.second.average(pka);
+  // averages do NOT depend on ion energy! Cache averaged materials for all possible PKAs
+  // this means adding comparison operators to PKAs so that we can use them as map indices
+  // have a master material cache and per-PKA-type cache. Do not average stuff in the master
+  // cache at all use it only as a copy construction source for the per-pka-cache
+  // std::map<MyTRIM_NS::IonBase, std::map<Elem *, MooseMyTRIMMaterial> _per_pka_cache
 }
 
 MyTRIM_NS::MaterialBase *
@@ -76,12 +63,12 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
       MooseMyTRIMMaterial material(_simconf);
 
       // set elements
+      MyTRIM_NS::Element element;
       for (unsigned int i = 0; i < _nvars; ++i)
       {
-        MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
-        element->_Z = _trim_charge[i];
-        element->_m = _trim_mass[i];
-        element->_t = material_data[i];
+        element._Z = _trim_charge[i];
+        element._m = _trim_mass[i];
+        element._t = material_data[i];
         material._element.push_back(element);
       }
 
