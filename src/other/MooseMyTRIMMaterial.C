@@ -5,7 +5,7 @@ MooseMyTRIMMaterial::MooseMyTRIMMaterial(MyTRIM_NS::SimconfType * simconf) :
 {
 }
 
-MyTRIM_NS::ElementBase *
+const MyTRIM_NS::Element &
 MooseMyTRIMMaterial::getElement(unsigned int nn)
 {
   // store the recoil element index in the tag field
@@ -19,7 +19,7 @@ MooseMyTRIMMaterial::calculateDensity(Real site_volume)
   // sum up mass per lattice site
   _rho = 0.0;
   for (auto && el : _element)
-    _rho += el->_t * el->_m;
+    _rho += el._t * el._m;
 
   // compute density in amu/nm^3
   _rho /= site_volume;

@@ -267,7 +267,7 @@ MyTRIMRasterizer::finalize()
     // split PKAs into per-processor ranges
     std::vector<unsigned int> interval(_app.n_processors() + 1, 0);
     for (unsigned int i = 0; i < _app.n_processors(); ++i)
-      interval[i+1] += (_pka_list.size() - interval[i]) / (_app.n_processors() - i) + interval[i];
+      interval[i+1] = (_pka_list.size() - interval[i]) / (_app.n_processors() - i) + interval[i];
 
     auto begin = interval[processor_id()];
     auto end = interval[processor_id() + 1];
