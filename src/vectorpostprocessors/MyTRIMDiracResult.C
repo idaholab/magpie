@@ -19,7 +19,8 @@ MyTRIMDiracResult::MyTRIMDiracResult(const InputParameters & parameters) :
     _defect(getParam<MooseEnum>("defect")),
     _x(declareVector("x")),
     _y(declareVector("y")),
-    _z(declareVector("z"))
+    _z(declareVector("z")),
+    _elem_id(declareVector("elem_id"))
 {
 }
 
@@ -29,6 +30,7 @@ MyTRIMDiracResult::initialize()
   _x.clear();
   _y.clear();
   _z.clear();
+  _elem_id.clear();
 }
 
 void
@@ -40,6 +42,7 @@ MyTRIMDiracResult::execute()
       _x.push_back(defect._location(0));
       _y.push_back(defect._location(1));
       _z.push_back(defect._location(2));
+      _elem_id.push_back(defect._elem_id);
     }
 }
 
