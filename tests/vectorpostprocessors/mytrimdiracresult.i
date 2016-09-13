@@ -3,10 +3,10 @@
   dim = 2
   nx = 60
   ny = 60
-  xmin = -100
-  xmax = 100
+  xmin = -1000
+  xmax = 1000
   ymin = 0
-  ymax = 200
+  ymax = 2000
   elem_type = TRI3
 []
 
@@ -28,10 +28,10 @@
 [UserObjects]
   [./thermal_fission]
     type = PKAConstant
-    E = 200000
+    E = 200
     Z = 40
     m = 80
-    pka_rate = 5e-4
+    pka_rate = 2e-3
   [../]
   [./rasterizer]
     type = MyTRIMRasterizer
@@ -59,6 +59,10 @@
     runner = runner
     defect = VAC
     ivar = 0
+  [../]
+  [./pka]
+    type = PKAList
+    rasterizer = rasterizer
   [../]
 []
 
