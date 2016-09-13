@@ -12,7 +12,7 @@ class MooseMyTRIMMaterial : public MyTRIM_NS::MaterialBase
 public:
   MooseMyTRIMMaterial(MyTRIM_NS::SimconfType * simconf);
 
-  virtual MyTRIM_NS::ElementBase * getElement(unsigned int nn);
+  virtual const MyTRIM_NS::Element & getElement(unsigned int nn);
 
   /**
    * Calculate the density rho by multiplying the fractions t with the atomic weight

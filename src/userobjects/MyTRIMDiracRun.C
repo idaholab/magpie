@@ -29,7 +29,7 @@ MyTRIMDiracRun::execute()
   if (!_rasterizer.executeThisTimestep())
     return;
 
-  // trigger the creation of a master PointLocatior outside the threaded region
+  // trigger the creation of a master PointLocator outside the threaded region
   _mesh.getPointLocator();
 
   // build thread loop functor
