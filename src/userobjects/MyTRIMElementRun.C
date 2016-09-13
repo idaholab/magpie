@@ -1,4 +1,5 @@
 #include "MyTRIMElementRun.h"
+#include "MagpieParallel.h"
 #include "MooseMesh.h"
 
 // libmesh includes
@@ -56,19 +57,17 @@ MyTRIMElementRun::finalize()
   if (!_rasterizer.executeThisTimestep() || _app.n_processors() == 1)
     return;
 
-  // create a one send buffer for use with the libMesh packed range routines
-  std::vector<std::string> send_buffers(1);
+  // create send buffer
+  std::string send_buffer;
 
   // create byte buffers for the streams received from all processors
   std::vector<std::string> recv_buffers;
-  recv_buffers.reserve(_app.n_processors());
 
-  // pack the comples datastructures into the string stream
-  serialize(send_buffers[0]);
+  // pack the complex datastructures into the string stream
+  serialize(send_buffer);
 
   // broadcast serialized data to and receive from all processors
-  _communicator.allgather_packed_range((void *)(nullptr), send_buffers.begin(), send_buffers.end(),
-                                       std::back_inserter(recv_buffers));
+  MagpieUtils::allgatherStringBuffers(_communicator, send_buffer, recv_buffers);
 
   // unpack the received data and merge it into the local data structures
   deserialize(recv_buffers);
