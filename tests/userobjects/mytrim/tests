@@ -3,8 +3,6 @@
     type = 'Exodiff'
     input = 'cascade.i'
     exodiff = 'cascade_out.e'
-    max_parallel = 1
-    max_threads = 1
   [../]
 
   [./cascade_dirac]

@@ -30,11 +30,11 @@ MyTRIMDensityAux::computeValue()
     MooseMyTRIMMaterial material(&_simconf);
 
     // set elements
+    MyTRIM_NS::Element element;
     for (unsigned int i = 0; i < _nvars; ++i)
     {
-      MyTRIM_NS::ElementBase * element = new MyTRIM_NS::ElementBase;
-      element->_m = _trim_mass[i];
-      element->_t = material_data[i];
+      element._m = _trim_mass[i];
+      element._t = material_data[i];
       material._element.push_back(element);
     }
 

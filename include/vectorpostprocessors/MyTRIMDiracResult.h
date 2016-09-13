@@ -31,6 +31,7 @@ protected:
   VectorPostprocessorValue & _x;
   VectorPostprocessorValue & _y;
   VectorPostprocessorValue & _z;
+  VectorPostprocessorValue & _elem_id;
   ///@}
 };
 
