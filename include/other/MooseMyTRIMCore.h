@@ -15,8 +15,6 @@ public:
   MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample, std::vector<std::pair<Point, unsigned int> > & vac);
 
   virtual void vacancyCreation();
-  virtual void checkPKAState();
-  virtual void dissipateRecoilEnergy();
 
 protected:
   /// list of vacancies generated during the recoil
