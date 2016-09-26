@@ -41,6 +41,9 @@ protected:
   /// add a vacancy to the result list
   void addVacancyToResult(const Point & p, unsigned int var) { addDefectToResult(p, var, VACANCY); }
 
+  /// add a vacancy to the result list
+  void addEnergyToResult(const Point & p, Real edep) {}
+
   /// rasterizer to manage the sample data
   const MyTRIMRasterizer & _rasterizer;
 
