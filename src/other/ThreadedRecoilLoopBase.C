@@ -100,7 +100,6 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       vac_list.clear();
 
       // store energy deposition
-      if (false)
       for (auto & edep: edep_list)
         addEnergyToResult(_rasterizer.periodicPoint(edep.first), edep.second);
       edep_list.clear();
