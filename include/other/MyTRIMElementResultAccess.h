@@ -1,5 +1,5 @@
-#ifndef MYTRIMRESULTACCESS_H
-#define MYTRIMRESULTACCESS_H
+#ifndef MYTRIMELEMENTRESULTACCESS_H
+#define MYTRIMELEMENTRESULTACCESS_H
 
 #include "MyTRIMElementRun.h"
 
@@ -82,4 +82,4 @@ MyTRIMElementResultAccess<T>::getDefectRate()
   return _value_cache;
 }
 
-#endif //MYTRIMRESULTACCESS_H
+#endif //MYTRIMELEMENTRESULTACCESS_H

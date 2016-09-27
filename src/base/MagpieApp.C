@@ -5,11 +5,13 @@
 
 // AuxKernels
 #include "MyTRIMDensityAux.h"
+#include "MyTRIMElementEnergyAux.h"
 #include "MyTRIMElementResultAux.h"
 #include "SPPARKSAux.h"
 
 // Kernels
 #include "DefectAnnihilation.h"
+#include "MyTRIMElementHeatSource.h"
 #include "MyTRIMElementSource.h"
 
 // DiracKernels
@@ -74,10 +76,12 @@ void
 MagpieApp::registerObjects(Factory & factory)
 {
   registerAux(MyTRIMDensityAux);
+  registerAux(MyTRIMElementEnergyAux);
   registerAux(MyTRIMElementResultAux);
   registerAux(SPPARKSAux);
 
   registerKernel(DefectAnnihilation);
+  registerKernel(MyTRIMElementHeatSource);
   registerKernel(MyTRIMElementSource);
 
   registerDiracKernel(MyTRIMDiracSource);
