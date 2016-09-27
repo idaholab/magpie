@@ -60,18 +60,18 @@ MyTRIMElementResultAccess<T>::getDefectRate()
   if (this->_qp == 0)
   {
     auto & result = _mytrim.result(this->_current_elem);
-    mooseAssert(_ivar < result.size(), "Result set does not contain the requested element.");
+    mooseAssert(_ivar < result._defects.size(), "Result set does not contain the requested element.");
 
     const Real volume = this->_current_elem->volume();
 
     switch (_defect)
     {
       case 0: // vacancy
-        _value_cache = result[_ivar].first / volume;
+        _value_cache = result._defects[_ivar]._vacancies / volume;
         break;
 
       case 1: // interstitial
-        _value_cache = result[_ivar].second / volume;
+        _value_cache = result._defects[_ivar]._interstitials / volume;
         break;
 
       default:

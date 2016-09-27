@@ -18,7 +18,7 @@ InputParameters validParams<MyTRIMElementRun>()
 
 MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters) :
     MyTRIMRunBase(parameters),
-    _zero(_nvars, std::pair<Real, Real>(0.0, 0.0))
+    _zero(_nvars)
 {
 }
 
@@ -129,14 +129,19 @@ MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
         _result_map.insert(other_result);
       else
       {
-        mooseAssert(other_result.second.size() == _nvars && j->second.size() == _nvars, "Inconsistent TRIM result vector sizes across processors.");
+
+        mooseAssert(other_result.second._defects.size() == j->second._defects.size(), "Inconsistent TRIM defect vector sizes across processors.");
+        mooseAssert( j->second._defects.size() == _nvars, "Defect vector size must be _nvars.");
 
         for (unsigned int k = 0; k < _nvars; ++k)
         {
           // sum vacancy and interstitial production
-          j->second[k].first += other_result.second[k].first;
-          j->second[k].second += other_result.second[k].second;
+          j->second._defects[k]._vacancies += other_result.second._defects[k]._vacancies;
+          j->second._defects[k]._interstitials += other_result.second._defects[k]._interstitials;
         }
+
+        // sum energy contributions
+        j->second._energy += other_result.second._energy;
       }
     }
   }
