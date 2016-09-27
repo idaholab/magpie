@@ -25,6 +25,7 @@
 #include "NeutronicsSpectrumSamplerSN.h"
 #include "NeutronicsSpectrumSamplerFission.h"
 #include "SPPARKSUserObject.h"
+#include "MyTRIMPKAInfo.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -92,6 +93,7 @@ MagpieApp::registerObjects(Factory & factory)
 #endif
   registerUserObject(NeutronicsSpectrumSamplerFission);
   registerUserObject(SPPARKSUserObject);
+  registerUserObject(MyTRIMPKAInfo);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 
