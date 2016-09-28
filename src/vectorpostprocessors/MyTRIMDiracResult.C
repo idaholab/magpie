@@ -51,9 +51,3 @@ MyTRIMDiracResult::finalize()
 {
   // the MyTRIMDiracRunner already does the necessary communication
 }
-
-void
-MyTRIMDiracResult::threadJoin(const UserObject &)
-{
-  // the MyTRIMDiracRunner already does the necessary communication
-}
