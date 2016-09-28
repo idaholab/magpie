@@ -23,8 +23,8 @@ PKAConstant::PKAConstant(const InputParameters & parameters) :
 void
 PKAConstant::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const
 {
-  mooseAssert(dt > 0, "Passed a negative time window into PKAConstant::appendPKAs");
-  mooseAssert(vol > 0, "Passed a volume into PKAConstant::appendPKAs");
+  mooseAssert(dt >= 0, "Passed a negative time window into PKAConstant::appendPKAs");
+  mooseAssert(vol >= 0, "Passed a negative volume into PKAConstant::appendPKAs");
 
   unsigned int num_pka = std::floor(dt * vol * _pka_rate + getRandomReal());
 
