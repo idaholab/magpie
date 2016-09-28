@@ -20,7 +20,6 @@ public:
   virtual void initialize();
   virtual void execute();
   virtual void finalize();
-  virtual void threadJoin(const UserObject &);
 
 protected:
   const MyTRIMDiracRun & _mytrim;
