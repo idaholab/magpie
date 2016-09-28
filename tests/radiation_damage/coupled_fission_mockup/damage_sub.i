@@ -147,10 +147,6 @@
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = neutronics_fission_generator
   [../]
-  [./pka_info]
-    type = MyTRIMPKAInfo
-    rasterizer = rasterizer
-  [../]
   [./runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
@@ -158,6 +154,11 @@
 []
 
 [Postprocessors]
+  #[./pka_info]
+  #  type = MyTRIMPKAInfo
+  #  rasterizer = rasterizer
+  #  value_type = TOTAL_ENERGY
+  #[../]
   [./int_U_pp]
     type = ElementIntegralVariablePostprocessor
     variable = int_U

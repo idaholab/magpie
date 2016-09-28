@@ -75,6 +75,26 @@
     variable = edep
     execute_on = timestep_end
   [../]
+  [./pka_total_E]
+    type = MyTRIMPKAInfo
+    rasterizer = rasterizer
+    value_type = TOTAL_ENERGY
+  [../]
+  [./pka_total_Z]
+    type = MyTRIMPKAInfo
+    rasterizer = rasterizer
+    value_type = TOTAL_CHARGE
+  [../]
+  [./pka_total_m]
+    type = MyTRIMPKAInfo
+    rasterizer = rasterizer
+    value_type = TOTAL_MASS
+  [../]
+  [./pka_total_num]
+    type = MyTRIMPKAInfo
+    rasterizer = rasterizer
+    value_type = TOTAL_NUMBER
+  [../]
 []
 
 [Executioner]
