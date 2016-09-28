@@ -70,9 +70,14 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");
   params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
+
   // we run this object once a timestep
   setup_options = "timestep_begin";
   params.set<MultiMooseEnum>("execute_on") = setup_options;
+
+  // which TRIM Module to run for optional capabilities like energy deposition
+  MooseEnum trim_module_options("CORE=0 ENERGY_DEPOSITION=1", "CORE");
+  params.addParam<MooseEnum>("trim_module", trim_module_options, "TRIM Module to run for optional capabilities like energy deposition");
 
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
@@ -94,7 +99,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _accumulated_time(0.0),
     _accumulated_time_old(0.0),
-    _interval(getParam<unsigned int>("interval"))
+    _interval(getParam<unsigned int>("interval")),
+    _trim_module(getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>())
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);

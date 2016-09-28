@@ -62,6 +62,13 @@ public:
     Real _site_volume;
   };
 
+  enum TRIMModuleEnum {
+    MYTRIM_CORE = 0,
+    MYTRIM_ENERGY_DEPOSITION = 1
+  };
+
+  TRIMModuleEnum trimModule() const { return _trim_module; }
+
 protected:
   ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
   void serialize(std::string & serialized_buffer);
@@ -115,6 +122,9 @@ protected:
   Point _max_dim;
   bool _pbc[LIBMESH_DIM];
   /// @}
+
+  /// the TRIM class to instantiate in the recoil loops
+  const TRIMModuleEnum _trim_module;
 
 private:
   bool _execute_this_timestep;

@@ -1,5 +1,6 @@
 #include "ThreadedRecoilLoopBase.h"
 #include "MooseMyTRIMCore.h"
+#include "MooseMyTRIMEnergyDeposition.h"
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
 
@@ -36,10 +37,28 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   std::queue<MyTRIM_NS::IonBase *> recoils;
 
   // create a list for vacancies created
-  std::vector<std::pair<Point, unsigned int> > vac;
+  std::list<std::pair<Point, unsigned int> > vac_list;
 
-  // use the vacancy mapping TRIM module
-  MooseMyTRIMCore TRIM(&_simconf, &sample, vac);
+  // create a list potentially used for energy deposition
+  std::list<std::pair<Point, Real> > edep_list;
+
+  // build the requested TRIM module
+  std::unique_ptr<MooseMyTRIMCore> TRIM;
+  switch (_rasterizer.trimModule())
+  {
+    // basic module with interstitial and vacancy generation
+    case MyTRIMRasterizer::MYTRIM_CORE:
+      TRIM.reset(new MooseMyTRIMCore(&_simconf, &sample, vac_list));
+      break;
+
+    // record energy deposited to the lattice
+    case MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION:
+      TRIM.reset(new MooseMyTRIMEnergyDeposition(&_simconf, &sample, vac_list, edep_list));
+      break;
+
+    default:
+      mooseError("Unknown TRIM module.");
+  }
 
   // copy the pka list into the recoil queue
   for (auto && pka : pka_list)
@@ -66,7 +85,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 
       // follow this ion's trajectory and store recoils
       // Moose::out << "PKA " << ::round(recoil->_E) << "eV (" << recoil->_Ef << "eV) at " << recoil->_pos(0) << ' ' << recoil->_pos(1) << ' ' << recoil->_pos(2) << ' ' << vac.size() << '\n';
-      TRIM.trim(recoil, recoils);
+      TRIM->trim(recoil, recoils);
 
       // store interstitials
       if (recoil->_tag >= 0 && recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
@@ -76,9 +95,14 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       }
 
       // store vacancies
-      for (unsigned int i = 0; i < vac.size(); ++i)
-        addVacancyToResult(_rasterizer.periodicPoint(vac[i].first), vac[i].second);
-      vac.clear();
+      for (auto & vac: vac_list)
+        addVacancyToResult(_rasterizer.periodicPoint(vac.first), vac.second);
+      vac_list.clear();
+
+      // store energy deposition
+      for (auto & edep: edep_list)
+        addEnergyToResult(_rasterizer.periodicPoint(edep.first), edep.second);
+      edep_list.clear();
 
       // done with this recoil
       delete recoil;
