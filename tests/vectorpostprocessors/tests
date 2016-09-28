@@ -1,4 +1,10 @@
 [Tests]
+  [pkaenergyhistogram]
+    type = CSVDiff
+    input = 'pkaenergyhistogram.i'
+    csvdiff = 'pkaenergyhistogram_out_histo_0001.csv'
+  [../]
+
   [./mytrimdiracresult]
     type = 'CSVDiff'
     input = 'mytrimdiracresult.i'
