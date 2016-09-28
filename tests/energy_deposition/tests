@@ -4,4 +4,11 @@
     input = 'elemental.i'
     csvdiff = 'elemental_out.csv'
   [../]
+
+  [./balance]
+    type = 'CSVDiff'
+    input = 'balance.i'
+    csvdiff = 'balance_out.csv'
+    abs_zero = 1e-9
+  [../]
 []

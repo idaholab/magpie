@@ -18,6 +18,7 @@ public:
 
   virtual void checkPKAState();
   virtual void dissipateRecoilEnergy();
+  virtual void vacancyCreation();
   virtual bool followRecoil();
 
 protected:
