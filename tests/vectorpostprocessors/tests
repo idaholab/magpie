@@ -1,23 +1,35 @@
 [Tests]
-  [pkaenergyhistogram]
-    type = CSVDiff
-    input = 'pkaenergyhistogram.i'
-    csvdiff = 'pkaenergyhistogram_out_histo_0001.csv'
-  [../]
-
   [./mytrimdiracresult]
     type = 'CSVDiff'
     input = 'mytrimdiracresult.i'
     csvdiff = 'mytrimdiracresult_out_int_0001.csv'
   [../]
 
-  #
-  # this test should pass in parallel (MPI and/or threads)
-  # at least the PKA list generation is reproducible
-  #
   [./pkalist]
     type = 'CSVDiff'
     input = 'pkalist.i'
     csvdiff = 'pkalist_out_pkas_0001.csv'
+  [../]
+
+  [./pkastatistics]
+    type = 'CSVDiff'
+    input = 'pkastatistics.i'
+    csvdiff = 'pkastatistics_out_mass_0001.csv'
+  [../]
+  [./pkastatistics_zaid]
+    type = 'CSVDiff'
+    input = 'pkastatistics.i'
+    prereq = pkastatistics
+    csvdiff = 'pkastatistics_out_zaid_0001.csv'
+
+    # do not rerun the simulation, but use the result from the prereq test
+    cli_args = '--check-input'
+    delete_output_before_running = false
+  [../]
+
+  [pkaenergyhistogram]
+    type = CSVDiff
+    input = 'pkaenergyhistogram.i'
+    csvdiff = 'pkaenergyhistogram_out_histo_0001.csv'
   [../]
 []

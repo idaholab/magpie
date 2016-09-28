@@ -38,6 +38,7 @@
 // VectorPostprocessors
 #include "MyTRIMDiracResult.h"
 #include "MyTRIMPKAEnergyHistogram.h"
+#include "MyTRIMPKAStatistics.h"
 #include "PKAList.h"
 
 template<>
@@ -106,6 +107,7 @@ MagpieApp::registerObjects(Factory & factory)
 
   registerVectorPostprocessor(MyTRIMDiracResult);
   registerVectorPostprocessor(MyTRIMPKAEnergyHistogram);
+  registerVectorPostprocessor(MyTRIMPKAStatistics);
   registerVectorPostprocessor(PKAList);
 }
 
