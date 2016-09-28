@@ -31,6 +31,9 @@ protected:
   /// add an interstitial or vacancy to the result list
   void addDefectToResult(const Point & p, unsigned int var, DefectType type);
 
+  /// add deposited energy to the result list
+  void addEnergyToResult(const Point & /*p*/, Real /*edep*/) { mooseError("Energy deposition is not implemented for dirac-based TRIM runs."); }
+
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultList _result_list;
 };

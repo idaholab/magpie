@@ -31,8 +31,8 @@ PKAFissionFragmentNeutronics::setPDF(const std::vector<unsigned int> & ZAID, con
 void
 PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
-  mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
-  mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentNeutronics::appendPKAs");
+  mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
+  mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentNeutronics::appendPKAs");
 
   //FIXME this only works for a single source of PKAs dependent on a single variable
   // This variable must be provided as the first var argument in the rasterizer

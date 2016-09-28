@@ -19,8 +19,8 @@ PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters &
 void
 PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const
 {
-  mooseAssert(dt > 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
-  mooseAssert(vol > 0, "Passed a volume into PKAFissionFragmentEmpirical::appendPKAs");
+  mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
+  mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentEmpirical::appendPKAs");
 
   unsigned int num_fission = std::floor(dt * vol * _fission_rate * _relative_density[0] + getRandomReal());
 
