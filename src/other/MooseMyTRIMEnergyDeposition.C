@@ -12,22 +12,48 @@ MooseMyTRIMEnergyDeposition::MooseMyTRIMEnergyDeposition(MyTRIM_NS::SimconfType 
 void
 MooseMyTRIMEnergyDeposition::checkPKAState()
 {
-  if (_pka->_state == MyTRIM_NS::IonBase::MOVING ||
-      _pka->_state == MyTRIM_NS::IonBase::LOST) return;
+  switch (_pka->_state)
+  {
+    // PKA is gone, and with it all energy
+    case MyTRIM_NS::IonBase::LOST:
+      return;
 
-  depositEnergy(_pka, _recoil->_E);
+    // only deposit electronic stopping (PKA is moving on)
+    case MyTRIM_NS::IonBase::MOVING:
+      depositEnergy(_pka, _dee);
+      return;
+
+    case MyTRIM_NS::IonBase::INTERSTITIAL:
+      // deposit residual energy of the stopped PKA and electronic stopping
+      depositEnergy(_pka, _pka->_E + _dee);
+      return;
+
+    case MyTRIM_NS::IonBase::REPLACEMENT:
+    case MyTRIM_NS::IonBase::SUBSTITUTIONAL:
+      // deposit residual energy of the stopped PKA, electronic stopping, and binding energy to the new lattice site
+      depositEnergy(_pka, _pka->_E + _element->_Elbind + _dee);
+      return ;
+  }
 }
 
 void
 MooseMyTRIMEnergyDeposition::dissipateRecoilEnergy()
 {
+  // new recoil is not leaving its lattice site, reimburse binding energy
   depositEnergy(_recoil, _recoil->_E + _element->_Elbind);
+}
+
+void
+MooseMyTRIMEnergyDeposition::vacancyCreation()
+{
+  // TODO: lattice relaxation around the vacancy?
+  MooseMyTRIMCore::vacancyCreation();
 }
 
 bool
 MooseMyTRIMEnergyDeposition::followRecoil()
 {
-  depositEnergy(_recoil, _element->_Elbind);
+  // TODO: if we ever return false here we need to deposit the discarded recoil energy
   return true;
 }
 
