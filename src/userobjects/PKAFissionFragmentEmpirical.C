@@ -4,7 +4,7 @@ template<>
 InputParameters validParams<PKAFissionFragmentEmpirical>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (default is in nm^-3*s^-1)");
+  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (default is in Ang^-3*s^-1)");
   params.addRequiredCoupledVar("relative_density", "Relative UO2 density (1 is fully dense, 0 is no UO2");
   return params;
 }
