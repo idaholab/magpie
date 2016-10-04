@@ -18,6 +18,9 @@ public:
 
 protected:
   virtual Real computeQpResidual();
+
+  // current timestep size
+  const Real & _dt;
 };
 
 #endif //MYTRIMELEMENTHEATSOURCE_H
