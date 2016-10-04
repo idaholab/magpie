@@ -9,12 +9,13 @@ InputParameters validParams<MyTRIMElementHeatSource>()
 }
 
 MyTRIMElementHeatSource::MyTRIMElementHeatSource(const InputParameters & parameters) :
-    MyTRIMElementEnergyAccess<Kernel>(parameters)
+    MyTRIMElementEnergyAccess<Kernel>(parameters),
+    _dt(_fe_problem.dt())
 {
 }
 
 Real
 MyTRIMElementHeatSource::computeQpResidual()
 {
-  return -getEnergyDensity() * _test[_i][_qp];
+  return -getEnergyDensity() / _dt * _test[_i][_qp];
 }
