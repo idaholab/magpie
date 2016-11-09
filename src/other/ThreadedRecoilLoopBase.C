@@ -13,6 +13,7 @@ ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasteriz
     _mesh(mesh),
     _dim(_mesh.dimension())
 {
+  _simconf.setLengthScale(_rasterizer.lengthScale());
 }
 
 // Splitting Constructor
@@ -22,6 +23,7 @@ ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x,
     _mesh(x._mesh),
     _dim(x._dim)
 {
+  _simconf.setLengthScale(_rasterizer.lengthScale());
 }
 
 void
