@@ -6,6 +6,7 @@ template<>
 InputParameters validParams<MyTRIMDensityAux>()
 {
   InputParameters params = validParams<AuxKernel>();
+  params.addClassDescription("Returns the material density in g/cm^3");
   params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
   return params;
 }

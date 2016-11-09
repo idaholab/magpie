@@ -22,6 +22,9 @@ protected:
 
   /// Rasterizer object to provide the material data
   const MyTRIMRasterizer & _rasterizer;
+
+  /// volume scale factor to go from nm^3 to the mesh units selected in the rasterizer
+  const Real _volume_scale;
 };
 
 #endif // ATOMICDENSITYAUX_H

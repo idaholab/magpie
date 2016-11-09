@@ -67,7 +67,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addCoupledVar("periodic_var", "Optional variables that determines the periodicity. If not supplied the first argument of 'var' will be used.");
   params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
-  params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3");
+  params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
   params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
 
@@ -78,6 +78,10 @@ InputParameters validParams<MyTRIMRasterizer>()
   // which TRIM Module to run for optional capabilities like energy deposition
   MooseEnum trim_module_options("CORE=0 ENERGY_DEPOSITION=1", "CORE");
   params.addParam<MooseEnum>("trim_module", trim_module_options, "TRIM Module to run for optional capabilities like energy deposition");
+
+  // which units of length to use
+  MooseEnum length_unit_options("ANGSTROM=0 NANOMETER MICROMETER", "ANGSTROM");
+  params.addParam<MooseEnum>("length_unit", length_unit_options, "Length units of the MOOSE mesh. MyTRIM contains pretabulated crossection data with units so this option must be set correctly to obtain physical results.");
 
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
@@ -116,6 +120,7 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   if (_trim_charge.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
+  // set up data for sample periodicity
   for (unsigned int i = 0; i < _dim; ++i)
   {
     _pbc[i] = _mesh.isRegularOrthogonal() && _mesh.isTranslatedPeriodic(_periodic, i);
@@ -125,6 +130,25 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
       _min_dim(i) = _mesh.getMinInDimension(i);
       _max_dim(i) = _mesh.getMaxInDimension(i);
     }
+  }
+
+  // determine length scale factor for TRIM
+  switch (getParam<MooseEnum>("length_unit").getEnum<Unit>())
+  {
+    case ANGSTROM:
+      _length_scale = 1.0;
+      break;
+
+    case NANOMETER:
+      _length_scale = 10.0;
+      break;
+
+    case MICROMETER:
+      _length_scale = 10000.0;
+      break;
+
+    default:
+      mooseError("Unknown length unit.");
   }
 }
 
