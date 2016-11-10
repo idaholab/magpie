@@ -4,6 +4,7 @@
 #include "AppFactory.h"
 
 // AuxKernels
+#include "AtomicDensityAux.h"
 #include "MyTRIMDensityAux.h"
 #include "MyTRIMElementEnergyAux.h"
 #include "MyTRIMElementResultAux.h"
@@ -77,6 +78,7 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
+  registerAux(AtomicDensityAux);
   registerAux(MyTRIMDensityAux);
   registerAux(MyTRIMElementEnergyAux);
   registerAux(MyTRIMElementResultAux);
