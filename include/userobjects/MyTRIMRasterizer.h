@@ -136,7 +136,7 @@ protected:
 private:
   bool _execute_this_timestep;
 
-  /// length scale
+  /// conversion factor from chosen length unit to Angstrom
   Real _length_scale;
 };
 

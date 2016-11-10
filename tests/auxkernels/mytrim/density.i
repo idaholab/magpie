@@ -55,7 +55,7 @@
   [./rasterizer]
     type = MyTRIMRasterizer
     var = 'c_U   c_O2'
-    M   = '253 16' # Uranium Mass is wrong here
+    M   = '235 16'
     Z   = '92  8'
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = dummy
