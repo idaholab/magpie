@@ -67,7 +67,14 @@ public:
     MYTRIM_ENERGY_DEPOSITION = 1
   };
 
+  enum Unit {
+    ANGSTROM = 0,
+    NANOMETER,
+    MICROMETER
+  };
+
   TRIMModuleEnum trimModule() const { return _trim_module; }
+  Real lengthScale() const { return _length_scale; }
 
 protected:
   ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
@@ -128,6 +135,9 @@ protected:
 
 private:
   bool _execute_this_timestep;
+
+  /// conversion factor from chosen length unit to Angstrom
+  Real _length_scale;
 };
 
 #endif //MYTRIMRASTERIZER_H

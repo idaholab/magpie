@@ -4,7 +4,7 @@ template<>
 InputParameters validParams<PKAConstant>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addParam<Real>("pka_rate", 1e-8, "PKA rate per unit volume (default is in Ang^-3*s^-1)");
+  params.addParam<Real>("pka_rate", 1e-8, "PKA rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
   params.addRequiredParam<Real>("Z", "PKA nuclear charge");
   params.addRequiredParam<Real>("m", "PKA mass in amu");
   params.addRequiredParam<Real>("E", "PKA energy in eV");

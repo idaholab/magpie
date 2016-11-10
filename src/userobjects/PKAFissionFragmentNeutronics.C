@@ -7,7 +7,7 @@ template<>
 InputParameters validParams<PKAFissionFragmentNeutronics>()
 {
   InputParameters params = validParams<PKAGeneratorNeutronicsBase>();
-  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (default is in Ang^-3*s^-1)");
+  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
   params.addClassDescription("PKA generator (fission) user object.\n Takes pdf and samples PKAs due to fission.");
   return params;
 }
