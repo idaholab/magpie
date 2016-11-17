@@ -29,8 +29,8 @@ protected:
   **/
   DiscreteFissionPKAPDF _pdf;
 
-  /// the fission rate density [ fissions / ( cm^3 sec ) ]
-  Real _fission_rate;
+  /// the fission rate density [ fissions / ( mesh-length-unit^3 sec ) ]
+  const PostprocessorValue & _fission_rate;
 };
 
 #endif //PKAFISSIONFRAGMENTNEUTRONICS_H
