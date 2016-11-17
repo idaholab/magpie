@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cmath>
 #include <vector>
 
 typedef double Real;
@@ -13,6 +14,7 @@ std::vector<std::vector<std::vector<Real>>> g(nelem + 1);
 
 // Lattice A (final entry is PKA)
 std::vector<Real> A = { 30.0, 70.0, 20.0 };
+std::vector<Real> Z = { 15.0, 30.0, 10.0 };
 
 // atomic fraction
 std::vector<Real> f = { 0.33333, 0.66666 };
@@ -35,8 +37,45 @@ Real lambda(unsigned int i, unsigned int k, Real T) { return T < Ecap[i][k]; }
 // electronic stopping (MyTRIM provides this)
 Real s(Real E) { return 1.0; }
 
-// differential crossection (MyTRIM probably provides this, too)
-Real dRhoikdT(Real E, Real T) { return 1.0; };
+// differential crossection (Huang/Ghoniem)
+Real dRhoikdT(unsigned int i, unsigned int k, Real E, Real T)
+{
+  const Real ep1 = 15.0, ep2 = 0.369, ep3 = 0.0234;
+
+  // charge in the right units!
+  const Real e = 1.0;
+
+  // tabulate Z^2/3!
+  const Real a = 0.4683 / std::sqrt(std::pow(Z[i], 2.0/3.0) +  std::pow(Z[k], 2.0/3.0));
+  const Real e0 = Z[i]*Z[k] * e*e / a;
+  const Real ep = E/e0;
+
+  Real m, lm;
+  if (ep < ep3)
+  {
+    m = 0;
+    lm = 24.0;
+  }
+  else if (ep <= ep2)
+  {
+    m = 1.0/3.0;
+    lm = 1.309;
+  }
+  else if (ep <= ep1)
+  {
+    m = 0.5;
+    lm = 0.327;
+  }
+  else
+  {
+    m = 1.0;
+    lm = 0.5;
+  }
+
+  const Real Cm = 3.14159265359/2.0 * lm * a*a * A[i]/A[k] * std::pow(2.0 * Z[i]*Z[k]* e*e / a, 2.0 * m);
+
+  return Cm * std::pow(E, -m) * (-1.0-m) * std::pow(T, -2.0-m); // d/dT of (5) in Huang/Ghoniem 1992
+};
 
 
 // maximum energy and binning
@@ -74,7 +113,7 @@ int main()
           Real integral = 0.0;
           const Real MikE = E * (2.0 * A[i] * A[j]) / sqr(A[i] + A[j]);
           for (Real T = 0; T < MikE; T += dE)
-            integral += dE * dRhoikdT(E,T) * (Rho(k,T) * gij(k,j,T - Eb[k]) + (1.0 - Rho(k,T) * lambda(i,k,E-T)) * gij(i,j, E-T) - gij(i,j,E));
+            integral += dE * dRhoikdT(i,k,E,T) * (Rho(k,T) * gij(k,j,T - Eb[k]) + (1.0 - Rho(k,T) * lambda(i,k,E-T)) * gij(i,j, E-T) - gij(i,j,E));
 
           sum += f[k] * integral;
         }
