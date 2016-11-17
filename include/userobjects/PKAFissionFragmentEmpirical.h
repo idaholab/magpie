@@ -21,7 +21,7 @@ public:
 
 protected:
   /// Fission rate (per unit volume) assuming pure fully dense UO2
-  const Real _fission_rate;
+  const PostprocessorValue & _fission_rate;
 
   /**
    * Variable for the relative Uranium density (0..1).

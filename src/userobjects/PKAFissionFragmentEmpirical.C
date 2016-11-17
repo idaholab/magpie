@@ -4,14 +4,14 @@ template<>
 InputParameters validParams<PKAFissionFragmentEmpirical>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addParam<Real>("fission_rate", 1e-8, "Fission rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
+  params.addParam<PostprocessorName>("fission_rate", 1e-8, "Fission rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
   params.addRequiredCoupledVar("relative_density", "Relative UO2 density (1 is fully dense, 0 is no UO2");
   return params;
 }
 
 PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters & parameters) :
     PKAGeneratorBase(parameters),
-    _fission_rate(getParam<Real>("fission_rate")),
+    _fission_rate(getPostprocessorValue("fission_rate")),
     _relative_density(coupledValue("relative_density"))
 {
 }
