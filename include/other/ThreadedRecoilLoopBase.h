@@ -64,6 +64,14 @@ protected:
 
   /// ID number of the current thread
   THREAD_ID _tid;
+
+  /// energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
+  const Real _analytical_cutoff;
+
+  ///@{ Element data for Kinchin-Pease
+  const std::vector<Real> & _trim_mass;
+  const std::vector<Real> & _trim_charge;
+  ///@}
 };
 
 #endif //THREADEDRECOILLOOPBASE_H

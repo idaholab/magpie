@@ -76,6 +76,8 @@ public:
   TRIMModuleEnum trimModule() const { return _trim_module; }
   Real lengthScale() const { return _length_scale; }
 
+  Real analyticalCutoff() const { return _analytical_cutoff; }
+
 protected:
   ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
   void serialize(std::string & serialized_buffer);
@@ -132,6 +134,9 @@ protected:
 
   /// the TRIM class to instantiate in the recoil loops
   const TRIMModuleEnum _trim_module;
+
+  ///energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
+  const Real _analytical_cutoff;
 
 private:
   bool _execute_this_timestep;

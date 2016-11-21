@@ -86,6 +86,7 @@ InputParameters validParams<MyTRIMRasterizer>()
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
   params.addParamNamesToGroup("interval", "Advanced");
+  params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
 
   return params;
 }
@@ -104,7 +105,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _accumulated_time(0.0),
     _accumulated_time_old(0.0),
     _interval(getParam<unsigned int>("interval")),
-    _trim_module(getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>())
+    _trim_module(getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>()),
+    _analytical_cutoff(getParam<Real>("analytical_energy_cutoff"))
 {
   for (unsigned int i = 0; i < _nvars; ++i)
     _var[i] = &coupledValue("var", i);
