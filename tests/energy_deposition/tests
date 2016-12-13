@@ -11,4 +11,14 @@
     csvdiff = 'balance_out.csv'
     abs_zero = 1e-9
   [../]
+
+
+  [./balance_with_energy_cutoff]
+    type = 'CSVDiff'
+    input = 'balance.i'
+    csvdiff = 'balance_cut_out.csv'
+    prereq = balance
+    cli_args = 'UserObjects/rasterizer/analytical_energy_cutoff=1000 Outputs/file_base=balance_cut_out'
+    abs_zero = 1e-9
+  [../]
 []
