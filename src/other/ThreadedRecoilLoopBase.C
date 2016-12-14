@@ -97,6 +97,8 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
         const auto pp = _rasterizer.periodicPoint(recoil->_pos);
         const auto elem = (*_pl)(pp);
 
+        mooseDoOnce(mooseWarning("Skipping detailed cascade calculation below cutoff energy."));
+
         // Parkin, Don M., and C. Alton Coulter. “Total and Net Displacement
         // Functions for Polyatomic Materials.” Journal of Nuclear Materials
         // 101, no. 3 (October 1, 1981): 261–76. doi:10.1016/0022-3115(81)90169-0.
