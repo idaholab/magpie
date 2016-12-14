@@ -6,6 +6,8 @@
 #include <cmath>
 #include <vector>
 
+#define _console std:: cout
+
 typedef double Real;
 Real sqr(Real a) { return a * a; }
 
@@ -128,13 +130,13 @@ int main()
   for (unsigned int j = 0; j < nelem; ++j)
   {
     if (j > 0)
-      std::cout << '\n';
+      _console << '\n';
 
     for (unsigned int bin = 0; bin < nbin; ++bin)
     {
       // energy
       const Real E = (bin * Emax) / nbin;
-      std::cout << E << ' ' << g[nelem][j][bin] << '\n';
+      _console << E << ' ' << g[nelem][j][bin] << '\n';
     }
   }
 }
