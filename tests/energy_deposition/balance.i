@@ -1,7 +1,7 @@
 #
 # This input logs the total energy of all PKAs each timestep and compares
 # it to the deposited electronic and nuclear energy (due to stopping) and
-# the potential energy of teh vacancies taht are created.
+# the potential energy of the vacancies that are created.
 # Epka - Estopping - Evac != 0 to ensure conservation of energy!
 # The equation above only holds under periodic boundary conditions or if
 # no recoil leaves the simulation box!
@@ -34,7 +34,7 @@
 []
 
 [BCs]
-  # the composition field used by teh rasterizer is marked as periodic
+  # the composition field used by the rasterizer is marked as periodic
   [./Periodic]
     [./all]
       variable = c
