@@ -206,13 +206,13 @@
 
 [Materials]
   [./graphite]
-    type = ConstantDensityFeedbackNeutronicsMaterial
+    type = CoupledFeedbackNeutronicsMaterial
     block = '1'
     material_id = 104
   [../]
 
   [./fuel]
-    type = ConstantDensityFeedbackNeutronicsMaterial
+    type = CoupledFeedbackNeutronicsMaterial
     block ='2'
     material_id = 106
   [../]
@@ -322,6 +322,7 @@
     input_files = 'TREAT_3D_radiation_damage_sub_P1.i'
     positions = '200 200 200'
     execute_on = 'timestep_end'
+    sub_cycling = true
   [../]
 
   [./radiation_damage_app_P2]
@@ -329,6 +330,7 @@
     input_files = 'TREAT_3D_radiation_damage_sub_P2.i'
     positions = '299 200 200'
     execute_on = 'timestep_end'
+    sub_cycling = true
   [../]
 []
 

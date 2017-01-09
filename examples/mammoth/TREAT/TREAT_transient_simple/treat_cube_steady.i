@@ -144,13 +144,13 @@
 
 [Materials]
   [./graphite]
-    type = ConstantDensityFeedbackNeutronicsMaterial
+    type = CoupledFeedbackNeutronicsMaterial
     block = '1'
     material_id = 104
   [../]
 
   [./fuel]
-    type = ConstantDensityFeedbackNeutronicsMaterial
+    type = CoupledFeedbackNeutronicsMaterial
     block ='2'
     material_id = 106
   [../]
