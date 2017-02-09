@@ -57,19 +57,18 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
 #endif
   }
 
-  _point_element.resize(_npoints);
+  _owner.resize(_npoints);
   _qp_cache.resize(_npoints);
 }
 
 void
 NeutronicsSpectrumSamplerBase::execute()
 {
-  if (std::find(_point_element.begin(), _point_element.end(), _current_elem->id()) != _point_element.end())
+  if (_local_elem_to_contained_points.find(_current_elem) != _local_elem_to_contained_points.end())
   {
-    for (_current_point = 0; _current_point < _npoints; _current_point++)
+    for (auto & j : _local_elem_to_contained_points[_current_elem])
     {
-      if (_point_element[_current_point] != _current_elem->id()) continue;
-
+      _current_point = j;
       // NOTE: PKA is evaluated at a point that is not necessarily a qp but material
       // props only live on qps. This is a cheap and dirty solution evaluating the
       // PKA at the closest quadrature point.
@@ -113,10 +112,30 @@ NeutronicsSpectrumSamplerBase::preComputeRadiationDamagePDF()
 void
 NeutronicsSpectrumSamplerBase::meshChanged()
 {
+  // make sure that _local_elem_to_contained_points is empty
+  _local_elem_to_contained_points.clear();
+
   // Rebuild point_locator & find the right element for each point
-  UniquePtr<PointLocatorBase> point_locator = PointLocatorBase::build(TREE_ELEMENTS, _mesh.getMesh());
+  UniquePtr<PointLocatorBase> point_locator = _mesh.getPointLocator();
   for (unsigned int j = 0; j < _npoints; j++)
-    _point_element[j] = (*point_locator)(_points[j])->id();
+  {
+    // make sure element is local
+    _owner[j] = 0;
+    const Elem * candidate_elem = (*point_locator)(_points[j]);
+    if (candidate_elem && candidate_elem->processor_id() == processor_id())
+    {
+      _owner[j] = processor_id();
+      if (_local_elem_to_contained_points.find(candidate_elem) != _local_elem_to_contained_points.end())
+        _local_elem_to_contained_points[candidate_elem].push_back(j);
+      else
+        _local_elem_to_contained_points[candidate_elem] = {j};
+    }
+  }
+
+  // make sure everyone knows who owns which point
+  for (unsigned int j = 0; j < _npoints; j++)
+    gatherMax(_owner[j]);
+
   _qp_is_cached = false;
 }
 
@@ -133,16 +152,29 @@ void
 NeutronicsSpectrumSamplerBase::initialize()
 {
   meshChanged();
+
+  for (unsigned j = 0; j < _npoints; ++j)
+    for (auto entry : _sample_point_data[j])
+      entry.second = 0;
 }
 
 void
 NeutronicsSpectrumSamplerBase::finalize()
 {
-  for (unsigned j = 0; j < _npoints; ++j)
-    for (unsigned int i = 0; i < _I; ++i)
-      for (unsigned int g = 0; g < _G; ++g)
-        for (unsigned int p = 0; p < _nSH; ++p)
-          gatherSum(_sample_point_data[j]({i, g, p}));
+  if (_mesh.n_processors() > 1)
+  {
+    for (unsigned j = 0; j < _npoints; ++j)
+    {
+      std::vector<Real> flat_data(_I * _G * _nSH);
+      if (_owner[j] == processor_id())
+        flat_data = _sample_point_data[j].getRawData();
+
+      _communicator.broadcast(flat_data, _owner[j]);
+
+      if (_owner[j] != processor_id())
+        _sample_point_data[j] = MultiIndex<Real>({_I, _G, _nSH}, flat_data);
+    }
+  }
 
   // set _qp_is_cached flag to true. Actually we only need to do this if
   // it was false but this way we can save an if statement

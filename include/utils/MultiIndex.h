@@ -49,6 +49,9 @@ public:
   /// total number of values stored in the container
   unsigned int nEntries() const { return _nentries; }
 
+  /// get the raw data vector
+  std::vector<T> getRawData() const { return _data; }
+
   /// Resize container. Must keep dimensionality constant.
   void resize(const size_type & shape);
 
