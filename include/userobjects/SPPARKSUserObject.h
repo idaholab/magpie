@@ -170,12 +170,12 @@ SPPARKSUserObject::getValue(const std::map<unsigned int, std::map<unsigned int, 
   // Extract the data
   const auto it = data.find(index);
   if (it == data.end())
-    mooseError("SPPARKSUserObject error: unknown index " << index);
+    mooseError2("SPPARKSUserObject error: unknown index ", index);
 
   const auto it2 = it->second.find(fem_node_id);
   if (it2 == it->second.end())
   {
-    mooseWarning("SPPARKSUserObject error: unknown MOOSE FEM node id " << fem_node_id);
+    mooseWarning2("SPPARKSUserObject error: unknown MOOSE FEM node id ", fem_node_id);
     return 0;
   }
 
@@ -198,7 +198,7 @@ SPPARKSUserObject::getSPPARKSPointer(T *& ptr, const std::string & name) const
 {
   void * p = spparks_extract(_spparks, name.c_str());
   if (!p)
-    mooseError("SPPARKS returned NULL pointer for " << name);
+    mooseError2("SPPARKS returned NULL pointer for ", name);
   ptr = static_cast<T*>(p);
 }
 

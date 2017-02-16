@@ -263,9 +263,9 @@ MultiIndex<T>::slice(size_type dimension, size_type index) const
   for (unsigned int d = 0; d < dimension.size(); ++d)
   {
     if (dimension[d] >= _dim)
-      mooseError("dimension is set to " << dimension[d] << " which is larger than _dim " << _dim);
+      mooseError2("dimension is set to ", dimension[d], " which is larger than _dim ", _dim);
     if (index[d] >= _shape[dimension[d]])
-      mooseError("index= " << index[d] << " at dimension=" << dimension[d] << " is larger than " << _shape[dimension[d]]);
+      mooseError2("index= ", index[d], " at dimension=", dimension[d], " is larger than ", _shape[dimension[d]]);
   }
 #endif
 
@@ -423,7 +423,7 @@ MultiIndex<T>::flatIndex(const size_type & indices) const
   #if DEBUG
   for (unsigned int j = 0; j < indices.size(); ++j)
     if (indices[j] >= _shape[j])
-      mooseError("Indices vector at entry " << j << " is " << indices[j] << " vs. shape " << _shape[j]);
+      mooseError2("Indices vector at entry ", j, " is ", indices[j], " vs. shape ", _shape[j]);
   #endif
 
   // implement the index
