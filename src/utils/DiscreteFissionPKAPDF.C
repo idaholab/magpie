@@ -79,12 +79,11 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
+  std::vector<Real> last_element_per_target;
+  for (unsigned int j = 0; j < _conditional_cdf_energy.size()[0]; ++j)
+    last_element_per_target.push_back(_conditional_cdf_energy({j, _ng - 1}));
   for (auto energy: _conditional_cdf_energy)
-  {
-    index = energy.first;
-    index[0] = _nZA - 1;
-    energy.second /= _conditional_cdf_energy(index);
-  }
+    energy.second /= last_element_per_target[energy.first[0]];
 }
 
 void
@@ -116,10 +115,10 @@ DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_stat
 
   /// check if key exists
   if (zaid_map.find(key) == zaid_map.end())
-    mooseError("Fission product ZAID's not found for this target isotope, " << key << " at this energy, " << energy);
+    mooseError2("Fission product ZAID's not found for this target isotope, ", key, " at this energy, ", energy);
 
   if (cdf_map.find(key) == cdf_map.end())
-    mooseError("Sum yield not found for this target isotope, " << key << " at this energy, " << energy);
+    mooseError2("Sum yield not found for this target isotope, ", key, " at this energy, ", energy);
 
   // now we know the key1/key2 pair exists
   auto zaid_products = zaid_map[key];

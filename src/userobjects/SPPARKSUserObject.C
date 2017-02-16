@@ -341,8 +341,8 @@ SPPARKSUserObject::initialSetup()
     if (spparks_id.size() != _spparks_to_fem.size())
     {
       // Error skipped to allow unmatched meshes
-      // mooseError("Did not find MOOSE FEM node for each SPPARKS node, " << spparks_id.size()
-      //            << ", " << fem_id.size() << ", " << _spparks_to_fem.size());
+      // mooseError2("Did not find MOOSE FEM node for each SPPARKS node, ", spparks_id.size()
+      //           , ", ", fem_id.size(), ", ", _spparks_to_fem.size());
 
       _console << "\n  spparks size  "<< spparks_id.size() << "not equal to fem size  " << fem_id.size()  << '\n';
     }
