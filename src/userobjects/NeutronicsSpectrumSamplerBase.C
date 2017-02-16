@@ -191,6 +191,6 @@ NeutronicsSpectrumSamplerBase::localStringToZaid(std::string s) const
     return 942390;
   else if (s == "Pu240")
     return 942400;
-  mooseError("Isotope name " << s << " cannot be converted with the localStringToZaid conversion method.");
+  mooseError2("Isotope name ", s, " cannot be converted with the localStringToZaid conversion method.");
   return 0;
 }
