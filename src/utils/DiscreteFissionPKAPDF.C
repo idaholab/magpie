@@ -116,10 +116,10 @@ DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_stat
 
   /// check if key exists
   if (zaid_map.find(key) == zaid_map.end())
-    mooseError("Fission product ZAID's not found for this target isotope, " << key << " at this energy, " << energy);
+    mooseError2("Fission product ZAID's not found for this target isotope, ", key, " at this energy, ", energy);
 
   if (cdf_map.find(key) == cdf_map.end())
-    mooseError("Sum yield not found for this target isotope, " << key << " at this energy, " << energy);
+    mooseError2("Sum yield not found for this target isotope, ", key, " at this energy, ", energy);
 
   // now we know the key1/key2 pair exists
   auto zaid_products = zaid_map[key];
