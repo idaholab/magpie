@@ -72,8 +72,11 @@ protected:
   /// flag indicating of recaching the _qp is necessary
   bool _qp_is_cached;
 
-  /// array storing the element id for each point
-  std::vector<dof_id_type> _point_element;
+  /// a map from a local existing element to contained points (there can be more than one!)
+  std::map<const Elem *, std::vector<unsigned int> > _local_elem_to_contained_points;
+
+  /// determines which process owns this point
+  std::vector<unsigned int> _owner;
 
   /// the array stores the _qp index for each point
   std::vector<unsigned int> _qp_cache;
