@@ -3,6 +3,7 @@
 
 #include "GeneralUserObject.h"
 #include "MooseMesh.h"
+#include "SystemBase.h"
 
 #include "spparks/src/library.h"
 
