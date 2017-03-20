@@ -2,6 +2,7 @@
 #define SPPARKSUSEROBJECT_H
 
 #include "GeneralUserObject.h"
+#include "MooseVariable.h"
 #include "MooseMesh.h"
 #include "SystemBase.h"
 
