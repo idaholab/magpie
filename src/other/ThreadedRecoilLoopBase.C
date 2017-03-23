@@ -38,6 +38,9 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   // fetch a point locator
   _pl = _mesh.getPointLocator();
 
+  // permit querying points that are potentially outside the mesh
+  _pl->enable_out_of_mesh_mode();
+
   // create a new sample class to bridge the MOOSE mesh and the MyTRIM domain
   MooseMyTRIMSample sample(_rasterizer, _mesh, &_simconf);
 

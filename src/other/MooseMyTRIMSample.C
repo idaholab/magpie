@@ -15,6 +15,9 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 {
   if (_dim < 2 || _dim > 3)
     mooseError("TRIM simulation works in 2D or 3D only.");
+
+  // permit querying points that are potentially outside the mesh
+  _pl->enable_out_of_mesh_mode();
 }
 
 void
