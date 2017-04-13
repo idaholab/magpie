@@ -137,7 +137,7 @@
   [./neutronics_fission_generator]
     type = PKAFissionFragmentNeutronics
     relative_density = 1
-    fission_rate = 2.0e-11
+    partial_fission_rates = '2.0e-11 0 0'
   [../]
   [./rasterizer]
     type = MyTRIMRasterizer
