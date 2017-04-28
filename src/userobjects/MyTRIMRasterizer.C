@@ -65,10 +65,12 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM binary collision Monte Carlo simulation");
   params.addRequiredCoupledVar("var", "Variables to rasterize");
   params.addCoupledVar("periodic_var", "Optional variables that determines the periodicity. If not supplied the first argument of 'var' will be used.");
-  params.addRequiredParam<std::vector<Real> >("M", "Element mass in amu");
-  params.addRequiredParam<std::vector<Real> >("Z", "Nuclear charge in e");
+  params.addRequiredParam<std::vector<Real>>("M", "Element mass in amu");
+  params.addRequiredParam<std::vector<Real>>("Z", "Nuclear charge in e");
+  params.addParam<std::vector<Real>>("Ebind", "Binding energy in eV");
+  params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
   params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
-  params.addRequiredParam<std::vector<UserObjectName> >("pka_generator", "List of PKA generating user objects");
+  params.addRequiredParam<std::vector<UserObjectName>>("pka_generator", "List of PKA generating user objects");
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
 
   // we run this object once a timestep
@@ -95,11 +97,11 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
     _dim(_mesh.dimension()),
-    _trim_mass(getParam<std::vector<Real> >("M")),
-    _trim_charge(getParam<std::vector<Real> >("Z")),
+    _trim_mass(getParam<std::vector<Real>>("M")),
+    _trim_charge(getParam<std::vector<Real>>("Z")),
     _var(_nvars),
     _site_volume_prop(getMaterialProperty<Real>("site_volume")),
-    _pka_generator_names(getParam<std::vector<UserObjectName> >("pka_generator")),
+    _pka_generator_names(getParam<std::vector<UserObjectName>>("pka_generator")),
     _pka_generators(),
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _accumulated_time(0.0),
@@ -121,6 +123,32 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     mooseError("Parameter 'M' must have as many components as coupled variables.");
   if (_trim_charge.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
+
+  if (isParamValid("Ebind"))
+  {
+    _trim_Ebind = getParam<std::vector<Real>>("Ebind");
+    if (_trim_Ebind.size() != _nvars)
+      mooseError("Parameter 'Ebind' must have as many components as coupled variables.");
+  }
+  else
+  {
+    // fill in the mytrim default of 3 eV
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_Ebind.push_back(3.0);
+  }
+
+  if (isParamValid("Edisp"))
+  {
+    _trim_Edisp = getParam<std::vector<Real>>("Edisp");
+    if (_trim_Edisp.size() != _nvars)
+      mooseError("Parameter 'Edisp' must have as many components as coupled variables.");
+  }
+  else
+  {
+    // fill in the mytrim default of 325eV
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_Edisp.push_back(25.0);
+  }
 
   // set up data for sample periodicity
   for (unsigned int i = 0; i < _dim; ++i)
