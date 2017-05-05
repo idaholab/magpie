@@ -29,6 +29,8 @@
 #include "NeutronicsSpectrumSamplerFission.h"
 #include "SPPARKSUserObject.h"
 #include "MyTRIMPKAInfo.h"
+#include "PKAFixedPointGenerator.h"
+#include "PKAGun.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -94,6 +96,8 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(MyTRIMDiracRun);
   registerUserObject(MyTRIMElementRun);
   registerUserObject(PKAConstant);
+  registerUserObject(PKAFixedPointGenerator);
+  registerUserObject(PKAGun);
   registerUserObject(PKAFissionFragmentEmpirical);
   registerUserObject(PKAFissionFragmentNeutronics);
 #ifdef RATTLESNAKE_ENABLED
