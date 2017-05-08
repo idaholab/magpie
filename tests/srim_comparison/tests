@@ -1,0 +1,7 @@
+[Tests]
+  [./incident_ion_homogeneous]
+    type = 'Exodiff'
+    input = 'incident_ion_homogeneous.i'
+    exodiff = 'incident_ion_homogeneous_out.e'
+  [../]
+[]
