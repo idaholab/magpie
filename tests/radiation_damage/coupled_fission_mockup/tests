@@ -5,6 +5,6 @@
     exodiff = 'coupled_fission_mockup.e coupled_fission_mockup_out_radiation_damage_app0.e'
     max_parallel = 1
     max_threads = 1
-    valgrind = 'HEAVY'
+    valgrind = 'NONE'
   [../]
 []
