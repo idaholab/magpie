@@ -1,7 +1,7 @@
+#include "AppFactory.h"
 #include "MagpieApp.h"
 #include "Moose.h"
 #include "MooseSyntax.h"
-#include "AppFactory.h"
 
 // AuxKernels
 #include "AtomicDensityAux.h"
@@ -11,6 +11,7 @@
 #include "SPPARKSAux.h"
 
 // Kernels
+#include "CoupledDefectAnnihilation.h"
 #include "DefectAnnihilation.h"
 #include "MyTRIMElementHeatSource.h"
 #include "MyTRIMElementSource.h"
@@ -19,18 +20,18 @@
 #include "MyTRIMDiracSource.h"
 
 // UserObjects
-#include "MyTRIMRasterizer.h"
 #include "MyTRIMDiracRun.h"
 #include "MyTRIMElementRun.h"
+#include "MyTRIMPKAInfo.h"
+#include "MyTRIMRasterizer.h"
+#include "NeutronicsSpectrumSamplerFission.h"
+#include "NeutronicsSpectrumSamplerSN.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
 #include "PKAFissionFragmentNeutronics.h"
-#include "NeutronicsSpectrumSamplerSN.h"
-#include "NeutronicsSpectrumSamplerFission.h"
-#include "SPPARKSUserObject.h"
-#include "MyTRIMPKAInfo.h"
 #include "PKAFixedPointGenerator.h"
 #include "PKAGun.h"
+#include "SPPARKSUserObject.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -44,8 +45,9 @@
 #include "MyTRIMPKAStatistics.h"
 #include "PKAList.h"
 
-template<>
-InputParameters validParams<MagpieApp>()
+template <>
+InputParameters
+validParams<MagpieApp>()
 {
   InputParameters params = validParams<MooseApp>();
 
@@ -54,8 +56,8 @@ InputParameters validParams<MagpieApp>()
   return params;
 }
 
-MagpieApp::MagpieApp(const InputParameters & parameters) :
-    MooseApp(parameters)
+MagpieApp::MagpieApp(const InputParameters & parameters)
+  : MooseApp(parameters)
 {
   srand(processor_id());
 
@@ -70,7 +72,11 @@ MagpieApp::~MagpieApp()
 {
 }
 
-extern "C" void MagpieApp__registerApps() { MagpieApp::registerApps(); }
+extern "C" void
+MagpieApp__registerApps()
+{
+  MagpieApp::registerApps();
+}
 void
 MagpieApp::registerApps()
 {
@@ -86,6 +92,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerAux(MyTRIMElementResultAux);
   registerAux(SPPARKSAux);
 
+  registerKernel(CoupledDefectAnnihilation);
   registerKernel(DefectAnnihilation);
   registerKernel(MyTRIMElementHeatSource);
   registerKernel(MyTRIMElementSource);
