@@ -1,0 +1,25 @@
+[Tests]
+  [./polyatomic_cascade_default]
+    type = 'Exodiff'
+    input = 'polyatomic_cascade.i'
+    exodiff = 'polyatomic_cascade_default_out.e'
+    abs_zero = 1e-6
+    recover = false
+    cli_args = 'Outputs/file_base=polyatomic_cascade_default_out'
+  [../]
+  [./polyatomic_cascade]
+    type = 'Exodiff'
+    input = 'polyatomic_cascade.i'
+    exodiff = 'polyatomic_cascade_out.e'
+    abs_zero = 1e-6
+    recover = false
+    cli_args = 'UserObjects/rasterizer/Ebind='3.0  3.3' UserObjects/rasterizer/Edisp='16.3 92.6''
+  [../]
+  [./monoatomic_cascade]
+    type = 'Exodiff'
+    input = 'monoatomic_cascade.i'
+    exodiff = 'monoatomic_cascade_out.e'
+    abs_zero = 1e-6
+    recover = false
+  [../]
+[]

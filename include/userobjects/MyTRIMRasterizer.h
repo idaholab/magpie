@@ -42,6 +42,12 @@ public:
   /// get the charge array
   const std::vector<Real> & charge() const { return _trim_charge; }
 
+  /// get the Ebind array
+  const std::vector<Real> & eBind() const { return _trim_Ebind; }
+
+  /// get the Edisp array
+  const std::vector<Real> & eDisp() const { return _trim_Edisp; }
+
   /// get the PKA list
   const std::vector<MyTRIM_NS::IonBase> & getPKAList() const { return _pka_list; }
 
@@ -93,6 +99,8 @@ protected:
   ///@{ Element data
   std::vector<Real> _trim_mass;
   std::vector<Real> _trim_charge;
+  std::vector<Real> _trim_Ebind;
+  std::vector<Real> _trim_Edisp;
   ///@}
 
   /// coupled variable values
