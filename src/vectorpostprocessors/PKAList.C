@@ -58,9 +58,3 @@ PKAList::finalize()
   _communicator.allgather(_m, false);
   _communicator.allgather(_Z, false);
 }
-
-void
-PKAList::threadJoin(const UserObject &)
-{
-  // the MyTRIMrasterizer already does the necessary communication
-}
