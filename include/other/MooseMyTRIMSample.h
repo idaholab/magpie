@@ -42,6 +42,8 @@ protected:
   ///@{ Element data
   const std::vector<Real> & _trim_mass;
   const std::vector<Real> & _trim_charge;
+  const std::vector<Real> & _trim_Ebind;
+  const std::vector<Real> & _trim_Edisp;
   ///@}
 
   /// mesh of the simulation domain
