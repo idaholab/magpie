@@ -65,7 +65,7 @@ PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_l
 
   for (unsigned int nuclide = 0; nuclide < _partial_fission_rates.size(); ++nuclide)
   {
-    unsigned int num_fission = std::floor(dt * vol * (*_partial_fission_rates[nuclide]) * averaged_data._elements[0] + getRandomReal());
+    unsigned int num_fission = std::floor(dt * vol * (*_partial_fission_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
 
     for (unsigned i = 0; i < num_fission; ++i)
     {
