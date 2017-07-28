@@ -32,6 +32,7 @@
 #include "PKAFixedPointGenerator.h"
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
+#include "ElasticRecoilCrossSectionUserObject.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -113,6 +114,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(NeutronicsSpectrumSamplerFission);
   registerUserObject(SPPARKSUserObject);
   registerUserObject(MyTRIMPKAInfo);
+  registerUserObject(ElasticRecoilCrossSectionUserObject);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 
