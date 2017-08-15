@@ -29,7 +29,7 @@ void
 MultiAppNeutronicsSpectrumTransfer::execute()
 {
   // get the neutronics PDF user object
-  FEProblem & from_problem = _multi_app->problem();
+  FEProblemBase & from_problem = _multi_app->problemBase();
   const NeutronicsSpectrumSamplerBase & neutronics_pdf = from_problem.getUserObject<NeutronicsSpectrumSamplerBase>(_neutronics_pdf_name);
 
   // loop over all sub apps and copy over the neutronics data
