@@ -15,20 +15,23 @@ endif
 $(APPLICATION_DIR)/lib/libmagpie-$(METHOD).la: $(GSL_DIR)/libgsl.la
 
 #
-# compile and build gsl on demand
+# compile and build gsl first! (if no command line target was specified)
 #
 
-$(GSL_DIR)/libgsl.la: $(GSL_DIR)/Makefile
-	@echo ===========================
-	@echo ====== Building GSL =======
-	@echo ===========================
-	$(MAKE) -C $(shell dirname $@)
+ifeq ($(MAKECMDGOALS),)
 
-$(GSL_DIR)/Makefile: $(GSL_DIR)/configure
-	@echo ===========================
-	@echo ===== Configuring GSL =====
-	@echo ===========================
-	cd $(shell dirname $@) && ./configure
+# configure GSL
+ifeq ($(shell [ ! -s $(GSL_DIR)/Makefile -o $(GSL_DIR)/configure -nt $(GSL_DIR)/Makefile ] && echo go),go)
+$(info Configuring GSL...)
+$(info $(shell cd $(GSL_DIR) && ./configure))
+endif
+
+# make GSL
+ifeq ($(shell [ ! -s $(GSL_DIR)/libgsl.la -o $(GSL_DIR)/Makefile -nt $(GSL_DIR)/libgsl.la ] && echo go),go)
+$(info Building GSL...)
+$(info $(shell $(MAKE) -C $(GSL_DIR)))
+endif
+endif
 
 ADDITIONAL_INCLUDES += -I$(GSL_DIR)
 ADDITIONAL_CPPFLAGS += -DGSL_ENABLED
