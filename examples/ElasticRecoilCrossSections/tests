@@ -1,0 +1,37 @@
+[Tests]
+  [./erxs_H1_simple]
+    type = 'RunApp'
+    input = 'erxs_H1_simple.i'
+    cli_args = '--check-input'
+  [../]
+
+  [./erxs_H1_spectrum]
+    type = 'RunApp'
+    input = 'erxs_H1_spectrum.i'
+    cli_args = '--check-input'
+  [../]
+
+  [./erxs_H1_spectrum_xs]
+    type = 'RunApp'
+    input = 'erxs_H1_spectrum_xs.i'
+    cli_args = '--check-input'
+  [../]
+
+  [./erxs_C12_simple]
+    type = 'RunApp'
+    input = 'erxs_C12_simple.i'
+    cli_args = '--check-input'
+  [../]
+
+  [./erxs_C12_spectrum]
+    type = 'RunApp'
+    input = 'erxs_C12_spectrum.i'
+    cli_args = '--check-input'
+  [../]
+
+  [./erxs_C12_spectrum_xs]
+    type = 'RunApp'
+    input = 'erxs_C12_spectrum_xs.i'
+    cli_args = '--check-input'
+  [../]
+[]
