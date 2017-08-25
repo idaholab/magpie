@@ -1,7 +1,7 @@
 ###############################################################################
 ######################## GNU Scientific Library (GSL) #########################
 ###############################################################################
-GSL_DIR ?= $(realpath $(APPLICATION_DIR)/contrib/gsl)
+GSL_DIR ?= $(realpath $(MAGPIE_DIR)/contrib/gsl)
 
 # check if gsl submodule is checked out
 ifeq ($(wildcard $(GSL_DIR)/Makefile.am),)

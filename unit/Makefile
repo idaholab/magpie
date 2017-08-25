@@ -12,6 +12,7 @@ MOOSE_DIR          ?= $(shell dirname `pwd`)/../moose
 FRAMEWORK_DIR      ?= $(MOOSE_DIR)/framework
 ###############################################################################
 CURRENT_DIR        := $(shell pwd)
+MAGPIE_DIR         := $(CURRENT_DIR)/..
 
 # framework
 include $(FRAMEWORK_DIR)/build.mk
