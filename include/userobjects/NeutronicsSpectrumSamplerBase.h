@@ -40,8 +40,8 @@ protected:
   /// a callback executed right before computeRadiationDamagePDF
   virtual void preComputeRadiationDamagePDF();
 
-  /// computes the PKA for isotope i, group g, and SH indices l, m
-  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p) = 0;
+  /// computes the PKA for isotope i, group g, and angular indieces p [mu] and q [phi]
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q) = 0;
 
   /// a subsitute to convert isotope names to zaid if RSN is not available
   unsigned int localStringToZaid(std::string s) const;
@@ -57,11 +57,14 @@ protected:
   unsigned int _I;
   /// number of energy groups
   unsigned int _G;
-  /// spherical harmonics order
+  /// order of angular expansion in Legendre Pols
   unsigned int _L;
 
-  /// total number of spherical harmonics. Depends on dim.
-  unsigned int _nSH;
+  /// total number of angular bins in the mu direction
+  unsigned int _nmu;
+
+  // total number of angular bins in the azimuthal direction
+  unsigned int _nphi;
 
   /// the points at which PDFs are computed
   const std::vector<Point> & _points;

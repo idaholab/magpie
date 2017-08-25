@@ -17,7 +17,7 @@ InputParameters validParams<NeutronicsSpectrumSamplerBase>()
   params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
   params.addRequiredCoupledVar("number_densities", "Number densities for each isotope.");
   params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries in units of MeV.");
-  params.addRequiredParam<unsigned int>("L", "The order up to which angular moments of the PKA distribution are computed.");
+  params.addRequiredParam<unsigned int>("L", "The maximum order of Legendre terms for expanding the recoil XS in mu_lab.");
   params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
   params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
   return params;
@@ -98,8 +98,9 @@ NeutronicsSpectrumSamplerBase::execute()
       // Evalute the radiation damage PDF at min_qp
       for (unsigned int i = 0; i < _I; ++i)
         for (unsigned int g = 0; g < _G; ++g)
-          for (unsigned int p = 0; p < _nSH; ++p)
-            _sample_point_data[_current_point]({i, g, p}) = computeRadiationDamagePDF(i, g, p);
+          for (unsigned int p = 0; p < _nmu; ++p)
+            for (unsigned int q = 0; q < _nphi; ++q)
+              _sample_point_data[_current_point]({i, g, p, q}) = computeRadiationDamagePDF(i, g, p, q);
     }
   }
 }
@@ -145,7 +146,7 @@ NeutronicsSpectrumSamplerBase::initialSetup()
   // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
   for (unsigned int j = 0; j < _npoints; ++j)
-    _sample_point_data.push_back(MultiIndex<Real>({_I, _G, _nSH}));
+    _sample_point_data.push_back(MultiIndex<Real>({_I, _G, _nmu, _nphi}));
 }
 
 void
@@ -165,14 +166,14 @@ NeutronicsSpectrumSamplerBase::finalize()
   {
     for (unsigned j = 0; j < _npoints; ++j)
     {
-      std::vector<Real> flat_data(_I * _G * _nSH);
+      std::vector<Real> flat_data(_I * _G * _nmu * _nphi);
       if (_owner[j] == processor_id())
         flat_data = _sample_point_data[j].getRawData();
 
       _communicator.broadcast(flat_data, _owner[j]);
 
       if (_owner[j] != processor_id())
-        _sample_point_data[j] = MultiIndex<Real>({_I, _G, _nSH}, flat_data);
+        _sample_point_data[j] = MultiIndex<Real>({_I, _G, _nmu, _nphi}, flat_data);
     }
   }
 
@@ -188,8 +189,9 @@ NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
       for (unsigned int g = 0; g < _G; ++g)
-        for (unsigned int p = 0; p < _nSH; ++p)
-          _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
+        for (unsigned int p = 0; p < _nmu; ++p)
+          for (unsigned int q = 0; q < _nphi; ++q)
+            _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
 }
 
 MultiIndex<Real>
