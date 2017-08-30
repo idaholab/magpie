@@ -114,8 +114,8 @@ NeutronicsSpectrumSamplerBase::execute()
       // Evalute the radiation damage PDF at min_qp
       for (unsigned int i = 0; i < _I; ++i)
         for (unsigned int g = 0; g < _G; ++g)
-          for (unsigned int p = 0; p < _nmu; ++p)
-            for (unsigned int q = 0; q < _nphi; ++q)
+          for (unsigned int p = 0; p < _nphi; ++p)
+            for (unsigned int q = 0; q < _nmu; ++q)
               _sample_point_data[_current_point]({i, g, p, q}) = computeRadiationDamagePDF(i, g, p, q);
     }
   }
@@ -162,7 +162,7 @@ NeutronicsSpectrumSamplerBase::initialSetup()
   // allocate PDF
   // NOTE: Needs to be delayed to initialize because _nSH is set in derived class
   for (unsigned int j = 0; j < _npoints; ++j)
-    _sample_point_data.push_back(MultiIndex<Real>({_I, _G, _nmu, _nphi}));
+    _sample_point_data.push_back(MultiIndex<Real>({_I, _G, _nphi, _nmu}));
 }
 
 void
@@ -189,7 +189,7 @@ NeutronicsSpectrumSamplerBase::finalize()
       _communicator.broadcast(flat_data, _owner[j]);
 
       if (_owner[j] != processor_id())
-        _sample_point_data[j] = MultiIndex<Real>({_I, _G, _nmu, _nphi}, flat_data);
+        _sample_point_data[j] = MultiIndex<Real>({_I, _G, _nphi, _nmu}, flat_data);
     }
   }
 
@@ -205,9 +205,9 @@ NeutronicsSpectrumSamplerBase::threadJoin(const UserObject & y)
   for (unsigned j = 0; j < _npoints; ++j)
     for (unsigned int i = 0; i < _I; ++i)
       for (unsigned int g = 0; g < _G; ++g)
-        for (unsigned int p = 0; p < _nmu; ++p)
-          for (unsigned int q = 0; q < _nphi; ++q)
-            _sample_point_data[j]({i, g, p}) += uo._sample_point_data[j]({i, g, p});
+        for (unsigned int p = 0; p < _nphi; ++p)
+          for (unsigned int q = 0; q < _nmu; ++q)
+            _sample_point_data[j]({i, g, p, q}) += uo._sample_point_data[j]({i, g, p, q});
 }
 
 MultiIndex<Real>
