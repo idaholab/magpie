@@ -116,7 +116,7 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
       Real mu_lab_max = _recoil_cross_sections[_current_point][i]->getMaxRecoilCosine(gp, g);
 
       // check if mu_lab is permissible
-      if (mu_lab >  mu_lab_max || mu_lab < mu_lab_min)
+      if (mu_lab > mu_lab_max || mu_lab < mu_lab_min)
         continue;
 
       Real mu_transformed = 2.0 * (mu_lab - mu_lab_min) / (mu_lab_max - mu_lab_min) - 1.0;
@@ -125,11 +125,10 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
       if (L_data < _L)
         mooseDoOnce(mooseWarning("L is larger than the legendre order of the provided data"));
 
-      for (unsigned int l = 0; l < std::min(_L, L_data); ++l)
+      for (unsigned int l = 0; l <= std::min(_L, L_data); ++l)
         a += (*_number_densities[i])[_qp] * _aq.getWeight(dir) * gsl_sf_legendre_Pl(l, mu_transformed)
              * _recoil_cross_sections[_current_point][i]->getSigmaRecoil(gp, g, l) * (*_angular_flux[gp][dir])[_qp];
     }
-
   return a;
 }
 

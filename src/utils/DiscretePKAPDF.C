@@ -11,6 +11,16 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
+DiscretePKAPDF::DiscretePKAPDF() :
+    DiscretePKAPDFBase(),
+    _probability_density_function(MultiIndex<Real>({1})),
+    _marginal_cdf_mu(MultiIndex<Real>({1})),
+    _marginal_cdf_phi(MultiIndex<Real>({1})),
+    _marginal_cdf_energy(MultiIndex<Real>({1})),
+    _marginal_cdf_zaid(MultiIndex<Real>({1}))
+{
+}
+
 DiscretePKAPDF::DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
     DiscretePKAPDFBase(ZAID, energies),
     _na(probabilities.size()[2]),
