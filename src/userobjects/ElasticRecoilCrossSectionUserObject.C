@@ -41,9 +41,9 @@ validParams<ElasticRecoilCrossSectionUserObject>()
   params.addParam<unsigned int>(
       "legendre_order", 10, "Order of Legendre polynomials where n = 0, ..., 10. Default to P10");
   params.addParam<std::string>(
-      "erxs_output_file_name", "erxs_output.csv", "Name of the output file with the cross section coefficients (.csv)");
+      "erxs_output_file_name", "Name of the output file with the cross section coefficients (.csv)");
   params.addParam<std::string>(
-      "mu_L_output_file_name", "mu_L_out.csv", "Name of the output file with the mininum and maximum mu_L (.csv)");
+      "mu_L_output_file_name", "Name of the output file with the mininum and maximum mu_L (.csv)");
   return params;
 }
 
@@ -57,10 +57,11 @@ ElasticRecoilCrossSectionUserObject::ElasticRecoilCrossSectionUserObject(const I
     _L(getParam<unsigned int>("legendre_order")),
     _atomic_mass(getParam<Real>("atomic_mass")),
     _neutron_energy_limits(getParam<std::vector<Real>>("neutron_energy_limits")),
-    _recoil_energy_limits(getParam<std::vector<Real>>("recoil_energy_limits")),
-    _erxs_file_name(getParam<std::string>("erxs_output_file_name")),
-    _mu_L_file_name(getParam<std::string>("mu_L_output_file_name"))
+    _recoil_energy_limits(getParam<std::vector<Real>>("recoil_energy_limits"))
 {
+  if (isParamValid("erxs_output_file_name") ^ isParamValid("mu_L_output_file_name"))
+    mooseError("erxs_output_file_name and mu_L_output_file_name must either both be present or absent");
+
   const gsl_integration_fixed_type * qtpe = gsl_integration_fixed_legendre;
   gsl_integration_fixed_workspace * workspace = gsl_integration_fixed_alloc(qtpe, _quad_order, -1.0, 1.0, 0.0, 0.0);
   for (unsigned int j = 0; j < _quad_order; ++j)
@@ -230,6 +231,11 @@ ElasticRecoilCrossSectionUserObject::execute()
 void
 ElasticRecoilCrossSectionUserObject::finalize()
 {
+  if (!(isParamValid("erxs_output_file_name") && isParamValid("mu_L_output_file_name")))
+    return;
+  _erxs_file_name = getParam<std::string>("erxs_output_file_name");
+  _mu_L_file_name = getParam<std::string>("mu_L_output_file_name");
+
   /*
    * Write the elastic recoil cross section (g -> t) output file
    *

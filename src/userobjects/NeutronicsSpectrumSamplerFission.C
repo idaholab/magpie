@@ -18,7 +18,9 @@ InputParameters validParams<NeutronicsSpectrumSamplerFission>()
 NeutronicsSpectrumSamplerFission::NeutronicsSpectrumSamplerFission(const InputParameters & parameters) :
     NeutronicsSpectrumSamplerBase(parameters)
 {
-  _nSH = 1; // can't initialize base class members in initializer
+  _nmu = 1;
+  _nphi = 1;  // can't initialize base class members in initializer
+
   std::vector<Real> fxs = getParam<std::vector<Real> >("fission_cross_sections");
   if (fxs.size() != _npoints * _I * _G)
     mooseError("fission cross sections must be of length npoints x nisotopes x G");
@@ -44,7 +46,7 @@ NeutronicsSpectrumSamplerFission::NeutronicsSpectrumSamplerFission(const InputPa
 }
 
 Real
-NeutronicsSpectrumSamplerFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/)
+NeutronicsSpectrumSamplerFission::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/, unsigned int /*q*/)
 {
   return (*_scalar_flux[g])[_qp] * (*_number_densities[i])[_qp] * _fission_cross_section[_current_point][i][g];
 }
@@ -52,7 +54,8 @@ NeutronicsSpectrumSamplerFission::computeRadiationDamagePDF(unsigned int i, unsi
 MultiIndex<Real>
 NeutronicsSpectrumSamplerFission::getPDF(unsigned int point_id) const
 {
-  mooseAssert(_sample_point_data[point_id].size()[2] == 1, "RadiationDamageBase: Dimension of last index is not 1.");
+  mooseAssert(_sample_point_data[point_id].size()[2] == 1, "RadiationDamageBase: Dimension of mu index is not 1.");
+  mooseAssert(_sample_point_data[point_id].size()[3] == 1, "RadiationDamageBase: Dimension of phi index is not 1.");
   // the final index of the pdf has dimension 1 so we slice it to return a MI of dimension 2
-  return _sample_point_data[point_id].slice(2, 0);
+  return _sample_point_data[point_id].slice(3, 0).slice(2, 0);
 }

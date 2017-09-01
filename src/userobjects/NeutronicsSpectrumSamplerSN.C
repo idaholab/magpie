@@ -2,6 +2,12 @@
 
 #include "NeutronicsSpectrumSamplerSN.h"
 #include "YakxsUtilities.h"
+#include "ElasticRecoilCrossSectionUserObject.h"
+
+// gsl includes
+#include "gsl/gsl_sf_legendre.h"
+
+#include <algorithm>
 
 template<>
 InputParameters validParams<NeutronicsSpectrumSamplerSN>()
@@ -9,10 +15,10 @@ InputParameters validParams<NeutronicsSpectrumSamplerSN>()
   InputParameters params = validParams<NeutronicsSpectrumSamplerBase>();
   params.addRequiredCoupledVar("angular_variables", "Angular fluxes, dimension G x M (# angular directions).");
   params.addRequiredParam<std::vector<std::string> >("recoil_isotope_names", "The list of recoil isotope names e.g. U235.");
-  // FIXME: This is not the permanent solution for providing recoil cross sections. It must be implemented as material
-  // property.
   params.addRequiredParam<UserObjectName>("aqdata", "Angular quadrature user data.");
-  params.addRequiredParam<std::vector<Real> >("recoil_cross_sections", "Recoil cross sections. Size = npoints x nisotopes x G x G x (L+1).");
+  params.addRequiredParam<std::vector<UserObjectName> >("recoil_cross_sections", "Recoil cross section UserObject names. Size = npoints x nisotopes");
+  params.addParam<unsigned int>("nmu", 10, "Number of polar subdivisions for angular dependence of PDF");
+  params.addParam<unsigned int>("nphi", 10, "Number of azimuthal subdivisions for angular dependence of PDF");
   params.addClassDescription("Computes PDFs for reactions except fission that can be used for sampling PKAs in coupled BCMC simulations.\n User match match target isotopes with recoil isotopes and provide transfer-like recoil cross section data.");
   return params;
 }
@@ -24,11 +30,13 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
     _ndir(_aq.getNQuadratures()),
     _shm(SHCoefficients(_aq, _L))
 {
-  _nSH = _shm.getNSH(); // Set the number of spherical harmonics
+  _nmu = getParam<unsigned int>("nmu");
+  _nphi = getParam<unsigned int>("nphi");
+
   // check recoil cross section length
-  std::vector<Real> rxs = getParam<std::vector<Real> >("recoil_cross_sections");
-  if (rxs.size() != _npoints * _I * _G * _G * (_L + 1))
-    mooseError("recoil cross sections must be of length npoints x nisotopes x G**2 x (L+1)");
+  std::vector<UserObjectName> names = getParam<std::vector<UserObjectName>>("recoil_cross_sections");
+  if (names.size() != _npoints * _I)
+    mooseError("recoil_cross_sections must be a vector of length npoints x nisotopes of UserObjectNames");
 
   // check recoil ZAIDs
   if (_recoil_isotope_names.size() != _I)
@@ -43,57 +51,60 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
   {
     _angular_flux[g].resize(_ndir);
     for (unsigned int dir = 0; dir < _ndir; ++dir)
-      _angular_flux[g][dir] = & coupledValue("angular_variables", g * _ndir + dir);
+      _angular_flux[g][dir] = &coupledValue("angular_variables", g * _ndir + dir);
   }
-
-  // allocate flux moments
-  _flux_moment.resize(_G);
-  for (unsigned int g = 0; g < _G; ++g)
-    _flux_moment[g].resize(_nSH);
 
   // allocate and assign recoil cross section
   unsigned int p = 0;
-  _recoil_cross_section.resize(_npoints);
+  _recoil_cross_sections.resize(_npoints);
   for (unsigned j = 0; j < _npoints; ++j)
   {
-    _recoil_cross_section[j].resize(_I);
+    _recoil_cross_sections[j].resize(_I);
     for (unsigned int i = 0; i < _I; ++i)
-    {
-      _recoil_cross_section[j][i].resize(_L + 1);
-      for (unsigned l = 0; l < _L + 1; ++l)
-      {
-        // first allocate the whole block
-        _recoil_cross_section[j][i][l].resize(_G);
-        for (unsigned int g = 0; g < _G; ++g)
-          _recoil_cross_section[j][i][l][g].resize(_G);
-        // set the values
-        for (unsigned int g = 0; g < _G; ++g)
-          for (unsigned int gp = 0; gp < _G; ++gp)
-            _recoil_cross_section[j][i][l][gp][g] = rxs[p++];
-      }
-    }
+      _recoil_cross_sections[j][i] = &getUserObjectByName<ElasticRecoilCrossSectionUserObject>(names[p]);
   }
 }
 
-void
-NeutronicsSpectrumSamplerSN::preComputeRadiationDamagePDF()
-{
-  // compute _flux_moments for current _qp
-  for (unsigned int g = 0; g < _G; ++g)
-    for (unsigned int p = 0; p < _nSH; ++p)
-    {
-       _flux_moment[g][p] = 0.0;
-       for (unsigned int dir = 0; dir < _ndir; ++dir)
-         _flux_moment[g][p] += _aq.getWeight(dir) * _shm.getSH(p, dir) * (*_angular_flux[g][dir])[_qp];
-    }
-}
-
 Real
-NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p)
+NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q)
 {
   Real a = 0.0;
+
+  // find the mu and phi ranges in the current bin
+  Real lower_mu = p * 2.0 / Real(_nmu) - 1.0;
+  Real upper_mu = (p + 1) * 2.0 / Real(_nmu) - 1.0;
+  Real lower_phi = q * 2.0 * libMesh::pi / Real(_nphi);
+  Real upper_phi = (q + 1) * 2.0 * libMesh::pi / Real(_nphi);
+
+  // TODO for better accuracy we may use a quadrature rule over the intervals;
+  // for now the midpoint is good enough
+  Real mu = 0.5 * (lower_mu + upper_mu);
+  Real phi = 0.5 * (lower_phi + upper_phi);
+  RealVectorValue omega_T(std::cos(phi) * std::sqrt(1 - mu * mu),
+                          std::sin(phi) * std::sqrt(1 - mu * mu), mu);
+
   for (unsigned int gp = 0; gp < _G; ++gp)
-    a += _flux_moment[gp][p] * (*_number_densities[i])[_qp] * _recoil_cross_section[_current_point][i][_shm.p2l(p)][gp][g];
+    for (unsigned int dir = 0; dir < _ndir; ++dir)
+    {
+      Real mu_lab = omega_T * _aq.getDirectionInRV(dir);
+      Real mu_lab_min = _recoil_cross_sections[_current_point][i]->getMinRecoilCosine(gp, g);
+      Real mu_lab_max = _recoil_cross_sections[_current_point][i]->getMaxRecoilCosine(gp, g);
+
+      // check if mu_lab is permissible
+      if (mu_lab >  mu_lab_max || mu_lab < mu_lab_min)
+        continue;
+
+      Real mu_transformed = 2.0 * (mu_lab - mu_lab_min) / (mu_lab_max - mu_lab_min) - 1.0;
+      unsigned int L_data = _recoil_cross_sections[_current_point][i]->legendreOrder();
+
+      if (L_data < _L)
+        mooseDoOnce(mooseWarning("L is larger than the legendre order of the provided data"));
+
+      for (unsigned int l = 0; l < std::min(_L, L_data); ++l)
+        a += (*_number_densities[i])[_qp] * _aq.getWeight(dir) * gsl_sf_legendre_Pl(l, mu_transformed)
+             * _recoil_cross_sections[_current_point][i]->getSigmaRecoil(gp, g, l) * (*_angular_flux[gp][dir])[_qp];
+    }
+
   return a;
 }
 

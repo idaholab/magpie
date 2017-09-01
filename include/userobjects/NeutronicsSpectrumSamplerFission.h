@@ -26,7 +26,7 @@ public:
 protected:
   /// computes the PDF for isotope i, group g, and SH indices p
   /// NOTE: for fission p does not mateter
-  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/) override;
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/, unsigned int /*q*/) override;
 
   /// the scalar flux
   std::vector<const VariableValue *> _scalar_flux;
