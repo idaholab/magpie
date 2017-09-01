@@ -7,6 +7,7 @@
 
 // Forward Declarations
 class NeutronicsSpectrumSamplerSN;
+class ElasticRecoilCrossSectionUserObject;
 
 template<>
 InputParameters validParams<NeutronicsSpectrumSamplerSN>();
@@ -23,10 +24,8 @@ public:
   NeutronicsSpectrumSamplerSN(const InputParameters & parameters);
 
 protected:
-  /// a callback executed right before computeRadiatonDamagePDF
-  virtual void preComputeRadiationDamagePDF();
   /// computes the PDF for isotope i, group g, and SH indices p
-  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p);
+  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q) override;
 
   /// vector of target zaids
   const std::vector<std::string> & _recoil_isotope_names;
@@ -38,10 +37,8 @@ protected:
   const SHCoefficients _shm;
   /// the angular flux
   std::vector<std::vector<const VariableValue *> > _angular_flux;
-  /// the angular flux moment evaluated at one quadrature point
-  std::vector<std::vector<Real> > _flux_moment;
-  /// stores the recoil cross sections
-  std::vector<std::vector<std::vector<std::vector<std::vector<Real> > > > > _recoil_cross_section;
+  /// UserObjects storing the recoil cross sections
+  std::vector<std::vector<const ElasticRecoilCrossSectionUserObject *>> _recoil_cross_sections;
 };
 
 #endif //NEUTRONICSSPECTRUMSAMPLERSN_H
