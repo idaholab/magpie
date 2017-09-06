@@ -332,7 +332,7 @@ ElasticRecoilCrossSectionUserObject::getMaxRecoilCosine(unsigned int g, unsigned
 {
   mooseAssert(g < _G, "g is larger than _G [indexed from g = 0, ..., G - 1]");
   mooseAssert(t < _T, "t is larger than _T [indexed from t = 0, ..., T - 1]");
-  return _save_mu_L[t][g][0];
+  return _save_mu_L[t][g][1];
 }
 
 Real
@@ -340,5 +340,5 @@ ElasticRecoilCrossSectionUserObject::getMinRecoilCosine(unsigned int g, unsigned
 {
   mooseAssert(g < _G, "g is larger than _G [indexed from g = 0, ..., G - 1]");
   mooseAssert(t < _T, "t is larger than _T [indexed from t = 0, ..., T - 1]");
-  return _save_mu_L[t][g][1];
+  return _save_mu_L[t][g][0];
 }
