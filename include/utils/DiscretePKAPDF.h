@@ -17,6 +17,9 @@ public:
   /// override drawSample
   virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
+  /// overload the outstream operator
+  friend std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf);
+
 protected:
   /// NOTE: we pass by value here because we modify probabilities in the function for convenience
   virtual void precomputeCDF(MultiIndex<Real> probabilities) override;
@@ -35,6 +38,9 @@ protected:
 
   /// polar cosine bin width
   const Real _dmu;
+
+  /// store the pdf
+  MultiIndex<Real> _probability_density_function;
 
   /// we can cache the marginal distributions
   MultiIndex<Real> _marginal_cdf_mu;
