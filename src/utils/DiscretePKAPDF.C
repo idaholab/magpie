@@ -9,6 +9,7 @@ DiscretePKAPDF::DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std
     _dphi(2.0 * libMesh::pi / _na),
     _np(probabilities.size()[3]),
     _dmu(2.0 / _np),
+    _probability_density_function(probabilities),
     _marginal_cdf_mu(probabilities),
     _marginal_cdf_phi(probabilities),
     _marginal_cdf_energy(probabilities),
@@ -215,4 +216,35 @@ DiscretePKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
     Real delE = _energies[index[1] + 1] - _energies[index[1]];
     _magnitude += delE * _dphi * _dmu * it.second;
   }
+}
+
+std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf)
+{
+  out << "Magnitude " << pdf._magnitude << "\n";
+  out << "ZAIDs ";
+  for (auto & z : pdf._zaids)
+    out << z << " ";
+  out << "\nEnergy group boundaries ";
+  for (auto & e : pdf._energies)
+    out << e << " ";
+  out << "\nPolar cosine boundaries spacing " << pdf._dmu;
+  out << "\nAzimuthal angle spacing " << pdf._dphi;
+  out << "\nPDF values:\n";
+  for (unsigned int jZA = 0; jZA < pdf._nZA; ++jZA)
+    for (unsigned int jE = 0; jE < pdf._ng; ++jE)
+      for (unsigned int jP = 0; jP < pdf._np; ++jP)
+        for (unsigned int jM = 0; jM < pdf._na; ++jM)
+        {
+          Real mu = (Real(jP) + 0.5) * pdf._dmu - 1.0;
+          Real phi = (Real(jM) + 0.5) * pdf._dphi;
+          RealVectorValue omega(std::cos(phi) * std::sqrt(1 - mu * mu),
+                                  std::sin(phi) * std::sqrt(1 - mu * mu), mu);
+          out << "Zaid: " << pdf._zaids[jZA]
+              << " Energies: [" << pdf._energies[jE] << ", " << pdf._energies[jE + 1] << "] "
+              << " mu: [" << jP * pdf._dmu - 1.0 << ", " << (jP + 1) * pdf._dmu - 1.0 << "] "
+              << " phi [" << jM * pdf._dphi << ", " << (jM + 1) * pdf._dphi << "] "
+              << " omega " << omega
+              << " pdf: " << pdf._probability_density_function({jZA, jE, jP, jM}) << "\n";
+        }
+  return out;
 }
