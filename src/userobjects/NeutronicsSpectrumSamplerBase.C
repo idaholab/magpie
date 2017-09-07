@@ -16,7 +16,8 @@ InputParameters validParams<NeutronicsSpectrumSamplerBase>()
   InputParameters params = validParams<ElementUserObject>();
   params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
   params.addRequiredCoupledVar("number_densities", "Number densities for each isotope.");
-  params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries in units of MeV.");
+  params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries in units of eV orderd "
+                                                                         "from high to low [natural neutronics ordering].");
   params.addRequiredParam<unsigned int>("L", "The maximum order of Legendre terms for expanding the recoil XS in mu_lab.");
   params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
   params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
@@ -59,6 +60,13 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
 
   _owner.resize(_npoints);
   _qp_cache.resize(_npoints);
+
+  // check energy group ordering
+  if (_energy_group_boundaries.size() < 2)
+    mooseError("At least 2 boundaries must be provided for energy_group_boundaries");
+  for (unsigned int j = 1; j < _energy_group_boundaries.size(); ++j)
+    if (_energy_group_boundaries[j] >= _energy_group_boundaries[j - 1])
+      mooseError("energy_group_boundaries must be ordered from high to low");
 }
 
 void

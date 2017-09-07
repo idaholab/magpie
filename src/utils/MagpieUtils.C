@@ -125,11 +125,11 @@ neutronEnergyName(unsigned int i)
 NeutronEnergyType
 determineNeutronType(Real energy)
 {
-  if (energy < 0.5e-6)
+  if (energy < 0.5)
     return Thermal;
-  else if (energy >= 0.5e-6 && energy < 0.75)
+  else if (energy >= 0.5 && energy < 0.75e6)
     return Epithermal;
-  else if (energy >= 0.75 && energy < 7.0)
+  else if (energy >= 0.75e6 && energy < 7.0e6)
     return Fast;
   return High;
 }
