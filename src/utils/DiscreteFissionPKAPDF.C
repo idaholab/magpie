@@ -103,7 +103,7 @@ DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_stat
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  auto neutron_energy = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
+  auto neutron_energy = (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() + _energies[sampled_indices[1] + 1];
 
   // pull the right fission yield table and sample Z, A, and energy
   auto energy = MagpieUtils::determineNeutronType(neutron_energy);
@@ -269,7 +269,7 @@ DiscreteFissionPKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
   for (auto it : probabilities)
   {
     MultiIndex<Real>::size_type index = it.first;
-    Real delE = _energies[index[1] + 1] - _energies[index[1]];
+    Real delE = _energies[index[1]] - _energies[index[1] + 1];
     _magnitude += delE * it.second;
   }
 }
