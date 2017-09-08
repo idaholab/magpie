@@ -38,7 +38,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   for (auto it: probabilities)
   {
     index = it.first;
-    Real wt = _dmu * _dphi * (_energies[index[1] + 1] - _energies[index[1]]);
+    Real wt = _dmu * _dphi * (_energies[index[1]] - _energies[index[1] + 1]);
     it.second *= wt;
   }
 
@@ -196,7 +196,7 @@ DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) cons
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  initial_state[0]._E = (_energies[sampled_indices[1] + 1] - _energies[sampled_indices[1]]) * MooseRandom::rand() + _energies[sampled_indices[1]];
+  initial_state[0]._E = (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() + _energies[sampled_indices[1] + 1];
 
   // NOTE: we need to sample the direction in this class because the direction is anisotropic
   Real sampled_phi = _dphi * MooseRandom::rand() + _dphi * sampled_indices[2];
@@ -213,7 +213,7 @@ DiscretePKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
   for (auto it : probabilities)
   {
     MultiIndex<Real>::size_type index = it.first;
-    Real delE = _energies[index[1] + 1] - _energies[index[1]];
+    Real delE = _energies[index[1]] - _energies[index[1] + 1];
     _magnitude += delE * _dphi * _dmu * it.second;
   }
 }
@@ -240,7 +240,7 @@ std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf)
           RealVectorValue omega(std::cos(phi) * std::sqrt(1 - mu * mu),
                                   std::sin(phi) * std::sqrt(1 - mu * mu), mu);
           out << "Zaid: " << pdf._zaids[jZA]
-              << " Energies: [" << pdf._energies[jE] << ", " << pdf._energies[jE + 1] << "] "
+              << " Energies: [" << pdf._energies[jE + 1] << ", " << pdf._energies[jE] << "] "
               << " mu: [" << jP * pdf._dmu - 1.0 << ", " << (jP + 1) * pdf._dmu - 1.0 << "] "
               << " phi [" << jM * pdf._dphi << ", " << (jM + 1) * pdf._dphi << "] "
               << " omega " << omega
