@@ -219,9 +219,10 @@ DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) cons
   // NOTE: we need to sample the direction in this class because the direction is anisotropic
   Real sampled_phi = _dphi * MooseRandom::rand() + _dphi * sampled_indices[2];
   Real sampled_mu = _dmu * MooseRandom::rand() + _dmu * sampled_indices[3] - 1.0;
-  initial_state[0]._dir(0) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
-  initial_state[0]._dir(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
-  initial_state[0]._dir(2) = sampled_mu;
+  // NOTE: this is consistent with Rattlesnake's definition of omega
+  initial_state[0]._dir(0) = sampled_mu;
+  initial_state[0]._dir(1) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::cos(sampled_phi);
+  initial_state[0]._dir(2) = std::sqrt(1.0 - sampled_mu * sampled_mu) * std::sin(sampled_phi);
 }
 
 void
@@ -250,17 +251,17 @@ std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf)
   out << "\nPDF values:\n";
   for (unsigned int jZA = 0; jZA < pdf._nZA; ++jZA)
     for (unsigned int jE = 0; jE < pdf._ng; ++jE)
-      for (unsigned int jP = 0; jP < pdf._np; ++jP)
-        for (unsigned int jM = 0; jM < pdf._na; ++jM)
+      for (unsigned int jP = 0; jP < pdf._na; ++jP)
+        for (unsigned int jM = 0; jM < pdf._np; ++jM)
         {
-          Real mu = (Real(jP) + 0.5) * pdf._dmu - 1.0;
-          Real phi = (Real(jM) + 0.5) * pdf._dphi;
-          RealVectorValue omega(std::cos(phi) * std::sqrt(1 - mu * mu),
-                                  std::sin(phi) * std::sqrt(1 - mu * mu), mu);
+          Real mu = (Real(jM) + 0.5) * pdf._dmu - 1.0;
+          Real phi = (Real(jP) + 0.5) * pdf._dphi;
+          RealVectorValue omega(mu, std::cos(phi) * std::sqrt(1 - mu * mu),
+                                std::sin(phi) * std::sqrt(1 - mu * mu));
           out << "Zaid: " << pdf._zaids[jZA]
               << " Energies: [" << pdf._energies[jE + 1] << ", " << pdf._energies[jE] << "] "
-              << " mu: [" << jP * pdf._dmu - 1.0 << ", " << (jP + 1) * pdf._dmu - 1.0 << "] "
-              << " phi [" << jM * pdf._dphi << ", " << (jM + 1) * pdf._dphi << "] "
+              << " phi [" << jP * pdf._dphi << ", " << (jP + 1) * pdf._dphi << "] "
+              << " mu: [" << jM * pdf._dmu - 1.0 << ", " << (jM + 1) * pdf._dmu - 1.0 << "] "
               << " omega " << omega
               << " pdf: " << pdf._probability_density_function({jZA, jE, jP, jM}) << "\n";
         }

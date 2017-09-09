@@ -55,6 +55,7 @@ void
 PKAGeneratorRecoil::setPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities)
 {
   _pdf = DiscretePKAPDF(ZAID, energies, probabilities);
+_console << _pdf << std::endl;
 }
 
 void
