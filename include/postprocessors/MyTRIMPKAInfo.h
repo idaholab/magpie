@@ -2,6 +2,7 @@
 #define MYTRIMPKAINFO_H
 
 #include "GeneralPostprocessor.h"
+#include "mytrim/ion.h"
 
 // forward declarations
 class MyTRIMPKAInfo;
@@ -22,6 +23,9 @@ public:
   virtual Real getValue() override;
 
 protected:
+  /// override this function to add conditions for the considered PKAs
+  virtual bool skipPKA(const MyTRIM_NS::IonBase & /*ion*/) const { return false; }
+
   /// the rasterizer object to pull data from
   const MyTRIMRasterizer & _rasterizer;
 
