@@ -102,6 +102,22 @@
   [../]
 []
 
+[Postprocessors]
+  [./partial_fission_rate_U235]
+    type = IsotopeRecoilRate
+    point_id = 0
+    target_isotope = 'U235'
+    neutronics_sampler = fission_damage_sampler
+  [../]
+
+  [./partial_fission_rate_U238]
+    type = IsotopeRecoilRate
+    point_id = 0
+    target_isotope = 'U238'
+    neutronics_sampler = fission_damage_sampler
+  [../]
+[]
+
 [MultiApps]
   [./radiation_damage_app]
     type = FullSolveMultiApp

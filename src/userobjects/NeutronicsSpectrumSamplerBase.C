@@ -220,6 +220,13 @@ NeutronicsSpectrumSamplerBase::getEnergies() const
   return _energy_group_boundaries;
 }
 
+bool
+NeutronicsSpectrumSamplerBase::hasIsotope(std::string target_isotope) const
+{
+  auto it = std::find(_target_isotope_names.begin(), _target_isotope_names.end(), target_isotope);
+  return it != _target_isotope_names.end();
+}
+
 unsigned int
 NeutronicsSpectrumSamplerBase::localStringToZaid(std::string s) const
 {
