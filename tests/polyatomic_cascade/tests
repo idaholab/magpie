@@ -13,7 +13,7 @@
     exodiff = 'polyatomic_cascade_out.e'
     abs_zero = 1e-6
     recover = false
-    cli_args = 'UserObjects/rasterizer/Ebind='3.0  3.3' UserObjects/rasterizer/Edisp='16.3 92.6''
+    cli_args = "UserObjects/rasterizer/Ebind='3.0  3.3' UserObjects/rasterizer/Edisp='16.3 92.6'"
   [../]
   [./monoatomic_cascade]
     type = 'Exodiff'
