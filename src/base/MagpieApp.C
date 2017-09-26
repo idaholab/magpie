@@ -23,6 +23,7 @@
 #include "MyTRIMDiracRun.h"
 #include "MyTRIMElementRun.h"
 #include "MyTRIMPKAInfo.h"
+#include "MyTRIMPKAInConeInfo.h"
 #include "MyTRIMRasterizer.h"
 #include "NeutronicsSpectrumSamplerFission.h"
 #include "NeutronicsSpectrumSamplerSN.h"
@@ -114,6 +115,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(NeutronicsSpectrumSamplerFission);
   registerUserObject(SPPARKSUserObject);
   registerUserObject(MyTRIMPKAInfo);
+  registerUserObject(MyTRIMPKAInConeInfo);
   registerUserObject(ElasticRecoilCrossSectionUserObject);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);

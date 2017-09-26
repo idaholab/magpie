@@ -1,7 +1,6 @@
 #include "MyTRIMPKAInfo.h"
 #include "MyTRIMRasterizer.h"
 #include "MagpieParallel.h"
-#include "mytrim/ion.h"
 
 template<>
 InputParameters validParams<MyTRIMPKAInfo>()
@@ -31,29 +30,32 @@ void
 MyTRIMPKAInfo::execute()
 {
   const std::vector<MyTRIM_NS::IonBase> & pka_list = _rasterizer.getPKAList();
-  switch (_value_type)
+  for (auto & pka : pka_list)
   {
-    case TOTAL_MASS:
-      for (auto & pka : pka_list)
+    if (skipPKA(pka))
+      continue;
+
+    switch (_value_type)
+    {
+      case TOTAL_MASS:
         _value += pka._m;
-      break;
+        break;
 
-    case TOTAL_ENERGY:
-      for (auto & pka : pka_list)
+      case TOTAL_ENERGY:
         _value += pka._E;
-      break;
+        break;
 
-    case TOTAL_CHARGE:
-      for (auto & pka : pka_list)
+      case TOTAL_CHARGE:
         _value += pka._Z;
-      break;
+        break;
 
-    case TOTAL_NUMBER:
-      _value += pka_list.size();
-      break;
+      case TOTAL_NUMBER:
+        _value += 1.0;
+        break;
 
-    default:
-      mooseError("Internal error");
+      default:
+        mooseError("Internal error");
+    }
   }
 }
 
