@@ -34,6 +34,7 @@
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
 #include "ElasticRecoilCrossSectionUserObject.h"
+#include "IsotopeRecoilRate.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -117,6 +118,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(MyTRIMPKAInfo);
   registerUserObject(MyTRIMPKAInConeInfo);
   registerUserObject(ElasticRecoilCrossSectionUserObject);
+  registerUserObject(IsotopeRecoilRate);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 

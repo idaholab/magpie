@@ -1,0 +1,27 @@
+#ifndef ISOTOPERECOILRATE_H
+#define ISOTOPERECOILRATE_H
+
+#include "GeneralPostprocessor.h"
+
+// forward declarations
+class IsotopeRecoilRate;
+class NeutronicsSpectrumSamplerBase;
+
+template<>
+InputParameters validParams<IsotopeRecoilRate>();
+
+class IsotopeRecoilRate : public GeneralPostprocessor
+{
+public:
+  IsotopeRecoilRate(const InputParameters & parameters);
+  virtual void execute() override {}
+  virtual void initialize() override {}
+  virtual Real getValue() override;
+
+protected:
+  std::string _target_isotope;
+  unsigned int _point_id;
+  const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
+};
+
+#endif //IsotopeRecoilRate_H

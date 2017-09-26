@@ -66,6 +66,23 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
 }
 
 Real
+NeutronicsSpectrumSamplerFission::totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const
+{
+  Real rate = 0.0;
+  Real dmu = 2.0 / Real(_nmu);
+  Real dphi = 2.0 * libMesh::pi / Real(_nphi);
+  auto it = std::find(_target_isotope_names.begin(), _target_isotope_names.end(), target_isotope);
+  if (it == _target_isotope_names.end())
+    mooseError("Isotope ", target_isotope, "does not exist");
+  unsigned int target_isotope_id = std::distance(_target_isotope_names.begin(), it);
+  for (unsigned int g = 0; g < _G; ++g)
+    for (unsigned int p = 0; p < _nmu; ++p)
+      for (unsigned int q = 0; q < _nphi; ++q)
+        rate += dmu * dphi * _sample_point_data[point_id]({target_isotope_id, g, p, q});
+  return rate;
+}
+
+Real
 NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q)
 {
   Real a = 0.0;

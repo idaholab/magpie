@@ -23,6 +23,8 @@ class NeutronicsSpectrumSamplerSN : public NeutronicsSpectrumSamplerBase
 public:
   NeutronicsSpectrumSamplerSN(const InputParameters & parameters);
 
+  virtual Real totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const override;
+
 protected:
   /// computes the PDF for isotope i, group g, and SH indices p
   virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q) override;
