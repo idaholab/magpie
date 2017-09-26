@@ -131,6 +131,21 @@
     type = FunctionValuePostprocessor
     function = ebalance
   [../]
+
+  [./CountOctant]
+    type = MyTRIMPKAInConeInfo
+    cone_axis = '1 1 1'
+    # this corresponds to a solid angle of pi / 2 = one octant
+    opening_angle = 1.4454684
+    rasterizer = rasterizer
+    value_type = TOTAL_NUMBER
+  [../]
+
+  [./CountAll]
+    type = MyTRIMPKAInfo
+    rasterizer = rasterizer
+    value_type = TOTAL_NUMBER
+  [../]
 []
 
 [Problem]

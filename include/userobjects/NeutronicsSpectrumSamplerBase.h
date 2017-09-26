@@ -36,6 +36,13 @@ public:
   /// returns a std::vector<Real> of energies
   virtual std::vector<Real> getEnergies() const;
 
+  /// returns the total point and isotope wise recoil rate
+  virtual Real totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const = 0;
+
+  unsigned int getNumberOfPoints() const { return _npoints; }
+
+  bool hasIsotope(std::string target_isotope) const;
+
 protected:
   /// a callback executed right before computeRadiationDamagePDF
   virtual void preComputeRadiationDamagePDF();
