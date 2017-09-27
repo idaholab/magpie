@@ -66,7 +66,7 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
 }
 
 Real
-NeutronicsSpectrumSamplerFission::totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const
+NeutronicsSpectrumSamplerSN::totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const
 {
   Real rate = 0.0;
   Real dmu = 2.0 / Real(_nmu);
