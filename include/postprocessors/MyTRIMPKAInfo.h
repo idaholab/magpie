@@ -1,3 +1,11 @@
+/**********************************************************************/
+/*                     DO NOT MODIFY THIS HEADER                      */
+/* MAGPIE - Mesoscale Atomistic Glue Program for Integrated Execution */
+/*                                                                    */
+/*            Copyright 2017 Battelle Energy Alliance, LLC            */
+/*                        ALL RIGHTS RESERVED                         */
+/**********************************************************************/
+
 #ifndef MYTRIMPKAINFO_H
 #define MYTRIMPKAINFO_H
 
