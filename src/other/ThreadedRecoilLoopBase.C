@@ -1,3 +1,11 @@
+/**********************************************************************/
+/*                     DO NOT MODIFY THIS HEADER                      */
+/* MAGPIE - Mesoscale Atomistic Glue Program for Integrated Execution */
+/*                                                                    */
+/*            Copyright 2017 Battelle Energy Alliance, LLC            */
+/*                        ALL RIGHTS RESERVED                         */
+/**********************************************************************/
+
 #include "ThreadedRecoilLoopBase.h"
 #include "MooseMyTRIMCore.h"
 #include "MooseMyTRIMEnergyDeposition.h"
