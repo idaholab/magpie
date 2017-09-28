@@ -85,10 +85,10 @@ DiscretePDFTest::samplePKA()
     else
       mooseError("Incorrect energy in InitialPKAState.");
 
-    Real mu = i_state[0]._dir(2);
+    Real mu = i_state[0]._dir(0);
     j4 = std::floor((mu + 1.0) / dmu);
 
-    Real phi = std::atan2(i_state[0]._dir(1), i_state[0]._dir(0));
+    Real phi = std::atan2(i_state[0]._dir(2), i_state[0]._dir(1));
     j3 = std::floor((phi + libMesh::pi) / dphi);
 
     index[0] = j1;

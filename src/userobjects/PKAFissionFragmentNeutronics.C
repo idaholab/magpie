@@ -52,10 +52,6 @@ PKAFissionFragmentNeutronics::PKAFissionFragmentNeutronics(const InputParameters
   }
 }
 
-PKAFissionFragmentNeutronics::~PKAFissionFragmentNeutronics()
-{
-}
-
 void
 PKAFissionFragmentNeutronics::setPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities)
 {
