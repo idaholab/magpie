@@ -39,6 +39,7 @@
 #include "PKAFissionFragmentEmpirical.h"
 #include "PKAFissionFragmentNeutronics.h"
 #include "PKAGeneratorRecoil.h"
+#include "PKAGeneratorAlphaDecay.h"
 #include "PKAFixedPointGenerator.h"
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
@@ -121,6 +122,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(PKAFissionFragmentEmpirical);
   registerUserObject(PKAFissionFragmentNeutronics);
   registerUserObject(PKAGeneratorRecoil);
+  registerUserObject(PKAGeneratorAlphaDecay);
 #ifdef RATTLESNAKE_ENABLED
   registerUserObject(NeutronicsSpectrumSamplerSN);
 #endif
