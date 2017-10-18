@@ -1,0 +1,9 @@
+[Tests]
+  [./alpha]
+    type = 'Exodiff'
+    input = 'alpha.i'
+    exodiff = 'alpha_out.e'
+    abs_zero = 1e-6
+    recover = false
+  [../]
+[]
