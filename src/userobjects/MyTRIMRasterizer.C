@@ -233,7 +233,11 @@ MyTRIMRasterizer::execute()
 
     // average compositions on the element
     for (unsigned int i = 0; i < _nvars; ++i)
+    {
       average._elements[i] += qpvol * (*_var[i])[qp];
+      average._Z[i] = _trim_charge[i];
+      average._M[i] = _trim_mass[i];
+    }
 
     // average site volume property
     average._site_volume += qpvol * _site_volume_prop[qp];

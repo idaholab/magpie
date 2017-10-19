@@ -70,9 +70,11 @@ public:
 
   /// element averaged data
   struct AveragedData {
-    AveragedData(unsigned int nvars = 0) : _elements(nvars, 0.0), _site_volume(0.0) {}
+    AveragedData(unsigned int nvars = 0) : _elements(nvars, 0.0), _Z(nvars, 0.0), _M(nvars, 0.0), _site_volume(0.0) {}
 
     std::vector<Real> _elements;
+    std::vector<Real> _Z;
+    std::vector<Real> _M;
     Real _site_volume;
   };
 
