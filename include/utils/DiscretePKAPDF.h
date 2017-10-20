@@ -20,6 +20,9 @@
 class DiscretePKAPDF : DiscretePKAPDFBase
 {
 public:
+  /// default constructor
+  DiscretePKAPDF();
+
   DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
 
   /// override drawSample
@@ -39,13 +42,13 @@ protected:
   unsigned int _na;
 
   /// vector storing the azimuthal angle boundaries
-  const Real _dphi;
+  Real _dphi;
 
   /// number of polar bins
   unsigned int _np;
 
   /// polar cosine bin width
-  const Real _dmu;
+  Real _dmu;
 
   /// store the pdf
   MultiIndex<Real> _probability_density_function;
