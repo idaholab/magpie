@@ -44,6 +44,9 @@ protected:
 
   /// Return a point with random uniformly distributed coordinates in the unit cube (temp variables are required to ensure execution order!)
   Point getRandomPoint() const { const Real X = getRandomReal(), Y = getRandomReal(), Z = getRandomReal(); return Point(X,Y,Z); }
+
+  /// finds the right ion tag; -1 means that the nuclide is not tracked, otherwise the index in the rasterizer nuclide vector must be retrieved
+  int ionTag(const std::vector<Real> & rasterizer_Z, const std::vector<Real> & rasterizer_m, Real Z, Real m) const;
 };
 
 #endif // PKAGENERATORBASE_H
