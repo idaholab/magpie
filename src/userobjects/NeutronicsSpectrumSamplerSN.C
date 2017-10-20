@@ -69,7 +69,10 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
   {
     _recoil_cross_sections[j].resize(_I);
     for (unsigned int i = 0; i < _I; ++i)
+    {
       _recoil_cross_sections[j][i] = &getUserObjectByName<ElasticRecoilCrossSectionUserObject>(names[p]);
+      ++p;
+    }
   }
 }
 
@@ -96,17 +99,17 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
   Real a = 0.0;
 
   // find the mu and phi ranges in the current bin
-  Real lower_mu = p * 2.0 / Real(_nmu) - 1.0;
-  Real upper_mu = (p + 1) * 2.0 / Real(_nmu) - 1.0;
-  Real lower_phi = q * 2.0 * libMesh::pi / Real(_nphi);
-  Real upper_phi = (q + 1) * 2.0 * libMesh::pi / Real(_nphi);
+  Real lower_phi = p * 2.0 * libMesh::pi / Real(_nphi);
+  Real upper_phi = (p + 1) * 2.0 * libMesh::pi / Real(_nphi);
+  Real lower_mu = q * 2.0 / Real(_nmu) - 1.0;
+  Real upper_mu = (q + 1) * 2.0 / Real(_nmu) - 1.0;
 
   // TODO for better accuracy we may use a quadrature rule over the intervals;
   // for now the midpoint is good enough
   Real mu = 0.5 * (lower_mu + upper_mu);
   Real phi = 0.5 * (lower_phi + upper_phi);
-  RealVectorValue omega_T(std::cos(phi) * std::sqrt(1 - mu * mu),
-                          std::sin(phi) * std::sqrt(1 - mu * mu), mu);
+  RealVectorValue omega_T(mu, std::cos(phi) * std::sqrt(1 - mu * mu),
+                          std::sin(phi) * std::sqrt(1 - mu * mu));
 
   for (unsigned int gp = 0; gp < _G; ++gp)
     for (unsigned int dir = 0; dir < _ndir; ++dir)
@@ -116,7 +119,7 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
       Real mu_lab_max = _recoil_cross_sections[_current_point][i]->getMaxRecoilCosine(gp, g);
 
       // check if mu_lab is permissible
-      if (mu_lab >  mu_lab_max || mu_lab < mu_lab_min)
+      if (mu_lab > mu_lab_max || mu_lab < mu_lab_min)
         continue;
 
       Real mu_transformed = 2.0 * (mu_lab - mu_lab_min) / (mu_lab_max - mu_lab_min) - 1.0;
@@ -125,11 +128,10 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
       if (L_data < _L)
         mooseDoOnce(mooseWarning("L is larger than the legendre order of the provided data"));
 
-      for (unsigned int l = 0; l < std::min(_L, L_data); ++l)
+      for (unsigned int l = 0; l <= std::min(_L, L_data); ++l)
         a += (*_number_densities[i])[_qp] * _aq.getWeight(dir) * gsl_sf_legendre_Pl(l, mu_transformed)
              * _recoil_cross_sections[_current_point][i]->getSigmaRecoil(gp, g, l) * (*_angular_flux[gp][dir])[_qp];
     }
-
   return a;
 }
 
