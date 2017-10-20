@@ -25,7 +25,7 @@ PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters &
 }
 
 void
-PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const
+PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentEmpirical::appendPKAs");
@@ -62,8 +62,8 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_li
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    ion1._tag = -1;
-    ion2._tag = -1;
+    ion1._tag = ionTag(averaged_data._Z, averaged_data._M, ion1._Z, ion1._m);
+    ion2._tag = ionTag(averaged_data._Z, averaged_data._M, ion2._Z, ion2._m);
 
     // set location of the fission event
     setPosition(ion1);

@@ -25,7 +25,7 @@ class PKAFixedPointGenerator : public PKAGeneratorBase
 public:
   PKAFixedPointGenerator(const InputParameters & parameters);
 
-  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData &) const;
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const;
   virtual void meshChanged() { updateCachedElementID(); }
 
 protected:

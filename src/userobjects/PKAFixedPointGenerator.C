@@ -36,7 +36,7 @@ PKAFixedPointGenerator::PKAFixedPointGenerator(const InputParameters & parameter
 }
 
 void
-PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real /*dt*/, Real /*vol*/, const MyTRIMRasterizer::AveragedData &) const
+PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real /*dt*/, Real /*vol*/, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   if (_current_elem->id() != _elem_id)
     return;
@@ -53,7 +53,7 @@ PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, R
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    pka._tag = -1;
+    pka._tag = ionTag(averaged_data._Z, averaged_data._M, pka._Z, pka._m);;
 
     // set stopping criteria
     pka.setEf();

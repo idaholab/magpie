@@ -8,6 +8,7 @@
 
 #include "PKAGeneratorBase.h"
 #include "MagpieUtils.h"
+#include <algorithm>
 
 template<>
 InputParameters validParams<PKAGeneratorBase>()
@@ -27,6 +28,21 @@ void
 PKAGeneratorBase::setPosition(MyTRIM_NS::IonBase & ion) const
 {
   ion._pos = MagpieUtils::randomElementPoint(*_current_elem, getRandomPoint());
+}
+
+int
+PKAGeneratorBase::ionTag(const std::vector<Real> & rasterizer_Z, const std::vector<Real> & rasterizer_m, Real Z, Real m) const
+{
+  // this function relies on the exact representation of whole numbers in IEEE floating point numbers
+  // up to a reasonable upper limit [Z < m < 300]
+  const auto & it = std::find(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
+  if (it != rasterizer_Z.end())
+  {
+    unsigned int index = std::distance(rasterizer_Z.begin(), it);
+    if (rasterizer_m[index] == m)
+      return index;
+  }
+  return -1;
 }
 
 void
