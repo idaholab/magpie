@@ -56,6 +56,7 @@
 #include "MyTRIMPKAEnergyHistogram.h"
 #include "MyTRIMPKAStatistics.h"
 #include "PKAList.h"
+#include "IsotopeRecoilRateSampler.h"
 
 template <>
 InputParameters
@@ -138,6 +139,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerVectorPostprocessor(MyTRIMPKAEnergyHistogram);
   registerVectorPostprocessor(MyTRIMPKAStatistics);
   registerVectorPostprocessor(PKAList);
+  registerVectorPostprocessor(IsotopeRecoilRateSampler);
 }
 
 void
