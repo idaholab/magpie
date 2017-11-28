@@ -27,7 +27,6 @@ ReferenceWrapperTest::testRefWrapper()
 
   // the simplest of tests
   CPPUNIT_ASSERT( ref_wrapper_l.get() == l );
-  //CPPUNIT_ASSERT( ref_wrapper_l == l );
 
   // make sure that when l changes we pick that change up
   l++;
@@ -36,6 +35,10 @@ ReferenceWrapperTest::testRefWrapper()
   // test the assignment operator
   ref_wrapper_l = 5;
   CPPUNIT_ASSERT( l == 5 );
+
+  // assign the reference wrapper to an unsigned int
+  unsigned int l_dummy = ref_wrapper_l;
+  CPPUNIT_ASSERT( l_dummy == 5 );
 
   // check the += / -= / *= / /= / %=
   ref_wrapper_l += 2;
@@ -74,13 +77,35 @@ ReferenceWrapperTest::testRefWrapper()
 
   // bitwise or |=: 9 & 12 = 13
   ref_wrapper_l = 9;
-  ref_wrapper_l.set(l3);
   ref_wrapper_l |= 12;
   CPPUNIT_ASSERT( l3 == 13 );
 
   // bitwise xor ^=: 11 & 13 = 6
   ref_wrapper_l = 11;
-  ref_wrapper_l.set(l3);
   ref_wrapper_l ^= 13;
   CPPUNIT_ASSERT( l3 == 6 );
+
+  // test reference_wrapper for std::vector<unsigned int>
+  std::vector<unsigned int> vec = {13, 121};
+  MagpieUtils::reference_wrapper<std::vector<unsigned int> > ref_wrapper_vec(vec);
+
+  std::vector<unsigned int> another_vec = ref_wrapper_vec;
+  CPPUNIT_ASSERT( another_vec[0] == 13 &&  another_vec[1] == 121 );
+
+  // test reference_wrapper for std::vector<const unsigned int>
+  MagpieUtils::reference_wrapper<const std::vector<unsigned int> > ref_wrapper_cvec(vec);
+  std::vector<unsigned int> another_nonc_vec = ref_wrapper_cvec;
+  CPPUNIT_ASSERT( another_nonc_vec[0] == 13 &&  another_nonc_vec[1] == 121 );
+
+  // standard pair
+  Real r = 1.0;
+  std::pair<MagpieUtils::reference_wrapper<const std::vector<unsigned int> >, MagpieUtils::reference_wrapper<Real> >
+    ref_wrapper_pair(std::make_pair<MagpieUtils::reference_wrapper<const std::vector<unsigned int> >, MagpieUtils::reference_wrapper<Real> >(vec, r));
+  // Why can I do this
+  std::vector<unsigned int> yet_another_nonc_vec = ref_wrapper_pair.first;
+
+  // ... but not this?
+  another_nonc_vec = ref_wrapper_pair.first;
+  //ref_wrapper_pair.first.set(vec);
+  //ref_wrapper_pair.second.set(r);
 }
