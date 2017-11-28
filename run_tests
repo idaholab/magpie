@@ -5,6 +5,7 @@ import sys, os, inspect
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 
 os.putenv("ENDF_FP_DIR", os.path.abspath(os.path.dirname(sys.argv[0])) + "/data/fission_yield/")
+os.putenv("ALPHA_DIR", os.path.abspath(os.path.dirname(sys.argv[0])) + "/data/alpha_decay/")
 
 #### Set the name of the application here and moose directory relative to the application
 app_name = 'magpie'
