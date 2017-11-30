@@ -40,7 +40,7 @@ protected:
   std::vector<unsigned int> _point_ids;
   const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
 
-  std::vector<Real> _recoil_rates;
+  std::vector<Real> & _recoil_rates;
 };
 
 #endif
