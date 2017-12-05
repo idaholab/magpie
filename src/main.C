@@ -20,13 +20,10 @@ int main(int argc, char *argv[])
   MagpieApp::registerApps();
 
   // This creates dynamic memory that we're responsible for deleting
-  MooseApp * app = AppFactory::createApp("MagpieApp", argc, argv);
+  std::shared_ptr<MooseApp> app = AppFactory::createAppShared("MagpieApp", argc, argv);
 
   // Execute the application
   app->run();
-
-  // Free up the memory we created earlier
-  delete app;
 
   return 0;
 }
