@@ -29,6 +29,7 @@ validParams<IsotopeRecoilRateSampler>()
   params.addRequiredParam<std::string>("target_isotope", "The isotope name that you want to get the total recoil rate for");
   params.addRequiredParam<std::vector<unsigned int>>("point_ids", "The indices of the points in neutronics_sampler");
   params.addRequiredParam<UserObjectName>("neutronics_sampler", "The neutronics sampler object that the data is retrieved from");
+  params.addParam<PostprocessorName>("scaling_factor", 1, "A scaling factor multiplying the isotope recoil rate");
   params.addClassDescription("Gets the total recoil rate from target_isotope at points provided in point_id contained in the neutronics_sampler");
   return params;
 }
@@ -38,6 +39,7 @@ IsotopeRecoilRateSampler::IsotopeRecoilRateSampler(const InputParameters & param
   _target_isotope(getParam<std::string>("target_isotope")),
   _point_ids(getParam<std::vector<unsigned int>>("point_ids")),
   _neutronics_sampler(getUserObject<NeutronicsSpectrumSamplerBase>("neutronics_sampler")),
+  _scaling_factor(getPostprocessorValue("scaling_factor")),
   _recoil_rates(declareVector("recoil_rates"))
 {
   _recoil_rates.assign(_point_ids.size(), 0);
@@ -53,5 +55,5 @@ void
 IsotopeRecoilRateSampler::execute()
 {
   for (unsigned int j = 0; j < _point_ids.size(); ++j)
-    _recoil_rates[j] = _neutronics_sampler.totalRecoilRate(_point_ids[j], _target_isotope);
+    _recoil_rates[j] = _scaling_factor * _neutronics_sampler.totalRecoilRate(_point_ids[j], _target_isotope);
 }

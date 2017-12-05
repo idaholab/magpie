@@ -39,6 +39,7 @@ protected:
   std::string _target_isotope;
   std::vector<unsigned int> _point_ids;
   const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
+  const PostprocessorValue & _scaling_factor;
 
   std::vector<Real> & _recoil_rates;
 };

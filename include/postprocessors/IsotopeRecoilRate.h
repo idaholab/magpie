@@ -30,6 +30,7 @@ protected:
   std::string _target_isotope;
   unsigned int _point_id;
   const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
+  const PostprocessorValue & _scaling_factor;
 };
 
 #endif //IsotopeRecoilRate_H
