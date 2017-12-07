@@ -35,13 +35,18 @@ PKAGeneratorBase::ionTag(const std::vector<Real> & rasterizer_Z, const std::vect
 {
   // this function relies on the exact representation of whole numbers in IEEE floating point numbers
   // up to a reasonable upper limit [Z < m < 300]
-  const auto & it = std::find(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
-  if (it != rasterizer_Z.end())
+  unsigned int count = std::count(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
+  if (count == 1)
   {
+    const auto & it = std::find(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
+    mooseAssert(it != rasterizer_Z.end(), "Z position in rasterizer_Z was unexpectedly not found");
     unsigned int index = std::distance(rasterizer_Z.begin(), it);
-    if (rasterizer_m[index] == m)
-      return index;
+    return index;
   }
+  else if (count > 1)
+    for (unsigned int j = 0; j < rasterizer_Z.size(); ++j)
+      if (rasterizer_Z[j] == Z && rasterizer_m[j] == m)
+        return j;
   return -1;
 }
 
