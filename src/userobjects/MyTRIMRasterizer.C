@@ -79,11 +79,11 @@ InputParameters validParams<MyTRIMRasterizer>()
   params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
   params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
   params.addRequiredParam<std::vector<UserObjectName>>("pka_generator", "List of PKA generating user objects");
-  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
+  ExecFlagEnum setup_options(MooseUtils::getDefaultExecFlagEnum());
 
   // we run this object once a timestep
-  setup_options = "timestep_begin";
-  params.set<MultiMooseEnum>("execute_on") = setup_options;
+  setup_options = EXEC_TIMESTEP_BEGIN;
+  params.set<ExecFlagEnum>("execute_on") = setup_options;
 
   // which TRIM Module to run for optional capabilities like energy deposition
   MooseEnum trim_module_options("CORE=0 ENERGY_DEPOSITION=1", "CORE");
