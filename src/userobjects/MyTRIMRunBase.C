@@ -16,8 +16,8 @@ InputParameters validParams<MyTRIMRunBase>()
   params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
 
   // we run this object once a timestep
-  params.set<MultiMooseEnum>("execute_on") = "timestep_begin";
-  params.suppressParameter<MultiMooseEnum>("execute_on");
+  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
+  params.suppressParameter<ExecFlagEnum>("execute_on");
 
   return params;
 }
