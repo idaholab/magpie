@@ -46,7 +46,9 @@ MyTRIMElementRun::execute()
   ThreadedRecoilElementAveragedLoop rl(_rasterizer, _mesh);
 
   // output the number of recoils being launched
-  _console << "\nMyTRIM: Running " << _pka_list.size() << " recoils." << std::endl;
+  _console << "\nMyTRIM: Running " << _trim_parameters.scaled_npka << " recoils.\n"
+           << "Sampled number of recoils: " << _trim_parameters.original_npka << "\n"
+           << "Result scaling factor: " << _trim_parameters.result_scaling_factor << std::endl;
 
   // run threads
   Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");
@@ -61,24 +63,38 @@ MyTRIMElementRun::execute()
 void
 MyTRIMElementRun::finalize()
 {
-  // for single processor runs we do not need to do anything here
-  if (!_rasterizer.executeThisTimestep() || _app.n_processors() == 1)
+  if (!_rasterizer.executeThisTimestep())
     return;
 
-  // create send buffer
-  std::string send_buffer;
+  // for single processor runs we do not need to do anything here
+  if (_app.n_processors() > 1)
+  {
+    // create send buffer
+    std::string send_buffer;
 
-  // create byte buffers for the streams received from all processors
-  std::vector<std::string> recv_buffers;
+    // create byte buffers for the streams received from all processors
+    std::vector<std::string> recv_buffers;
 
-  // pack the complex datastructures into the string stream
-  serialize(send_buffer);
+    // pack the complex datastructures into the string stream
+    serialize(send_buffer);
 
-  // broadcast serialized data to and receive from all processors
-  MagpieUtils::allgatherStringBuffers(_communicator, send_buffer, recv_buffers);
+    // broadcast serialized data to and receive from all processors
+    MagpieUtils::allgatherStringBuffers(_communicator, send_buffer, recv_buffers);
 
-  // unpack the received data and merge it into the local data structures
-  deserialize(recv_buffers);
+    // unpack the received data and merge it into the local data structures
+    deserialize(recv_buffers);
+  }
+
+  for (auto & result : _result_map)
+  {
+    result.second._energy *= _trim_parameters.result_scaling_factor;
+
+    for (unsigned int k = 0; k < _nvars; ++k)
+    {
+      result.second._defects[k]._vacancies *= _trim_parameters.result_scaling_factor;
+      result.second._defects[k]._interstitials *= _trim_parameters.result_scaling_factor;
+    }
+  }
 }
 
 const MyTRIMElementRun::MyTRIMResult &

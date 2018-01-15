@@ -96,7 +96,8 @@ InputParameters validParams<MyTRIMRasterizer>()
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
   params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
-  params.addParamNamesToGroup("interval analytical_energy_cutoff", "Advanced");
+  params.addParam<unsigned int>("number_pka", "Desired number of PKAs to be run during each invocation of mytrim");
+  params.addParamNamesToGroup("interval analytical_energy_cutoff number_pka", "Advanced");
 
   params.addParam<Real>("r_rec", "Recombination radius in Angstrom. Frenkel pairs with a separation distance lower than this will be removed from the cascade");
   params.addParamNamesToGroup("r_rec", "Recombination");
@@ -124,6 +125,10 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   _trim_parameters.element_prototypes.resize(_nvars);
   _trim_parameters.analytical_cutoff = getParam<Real>("analytical_energy_cutoff");
   _trim_parameters.trim_module = getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>();
+  if (isParamValid("number_pka"))
+    _trim_parameters.desired_npka = getParam<unsigned int>("number_pka");
+  else
+    _trim_parameters.desired_npka = 0;
 
   auto trim_M = getParam<std::vector<Real>>("M");
   auto trim_Z = getParam<std::vector<Real>>("Z");
@@ -323,29 +328,83 @@ MyTRIMRasterizer::finalize()
     deserialize(recv_buffers);
   }
 
-  // generate a list of RNG seeds - one for each PKA
-  std::vector<unsigned int> pka_seeds(_pka_list.size());
+  // we will assign random seeds on proc 0 & reject on proc 0. To guarantee reproducibility
+  // we need to sort the PKA list
   if (processor_id() == 0)
   {
+    std::vector<unsigned int> pka_seeds(_pka_list.size());
+
     // only do this on proc 0 thread 0
     for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)
       pka_seeds[i] = MooseRandom::randl();
+
+    // sort PKA list only on processor 0 & assign random number seeds
+    std::sort(_pka_list.begin(), _pka_list.end(), [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b) {
+      return (a._pos < b._pos) ||
+             (a._pos == b._pos && a._m < b._m) ||
+             (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
+             (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
+    });
+
+    // store seeds in tag values
+    for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)
+      _pka_list[i]._seed = pka_seeds[i];
   }
 
-  // broadcast seeds
-  _communicator.broadcast(pka_seeds);
+  // rejection is performed in processor 0 only
+  _trim_parameters.original_npka = _pka_list.size();
+  if (_trim_parameters.desired_npka == 0 || _trim_parameters.desired_npka > _trim_parameters.original_npka)
+  {
+    _trim_parameters.scaled_npka = _trim_parameters.original_npka;
+    _trim_parameters.result_scaling_factor = 1;
 
-  // sort PKA list
-  std::sort(_pka_list.begin(), _pka_list.end(), [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b) {
-    return (a._pos < b._pos) ||
-           (a._pos == b._pos && a._m < b._m) ||
-           (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
-           (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
-  });
+    if (_trim_parameters.desired_npka > _trim_parameters.original_npka)
+      mooseDoOnce(mooseWarning("number_pka is larger than number of sampled PKAs and will be ignored!"));
+  }
+  else
+  {
+    if (processor_id() == 0)
+    {
+      Real acceptance_probability = Real(_trim_parameters.desired_npka) / Real(_trim_parameters.original_npka);
 
-  // store seeds in tag values
-  for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)
-    _pka_list[i]._seed = pka_seeds[i];
+      // most straight-forward but probably inefficient implementation of rejection
+      std::vector<MyTRIM_NS::IonBase> old_pka_list = _pka_list;
+      _pka_list.resize(0);
+      for (auto & p : old_pka_list)
+        if (MooseRandom::rand() < acceptance_probability)
+          _pka_list.push_back(p);
+
+      // save the size of the PKA list after rejection & the scaling factor
+      _trim_parameters.scaled_npka = _pka_list.size();
+      _trim_parameters.result_scaling_factor = Real(_trim_parameters.original_npka) / Real(_trim_parameters.scaled_npka);
+    }
+
+    // need to broadcast the size of the PKA list after rejection & result scaling factor
+    _communicator.broadcast(_trim_parameters.scaled_npka);
+    _communicator.broadcast(_trim_parameters.result_scaling_factor);
+  }
+
+  // communicate the PKA list if n_proc > 1
+  if (_app.n_processors() > 1)
+  {
+    std::string pka_list_buffer;
+    if (processor_id() == 0)
+    {
+      // pack the local _pka_list into a string buffer
+      std::ostringstream oss;
+      dataStore(oss, _pka_list, this);
+      pka_list_buffer.assign(oss.str());
+    }
+
+    // communicate the pka list
+    _communicator.broadcast(pka_list_buffer);
+    if (processor_id() != 0)
+    {
+      _pka_list.resize(0);
+      std::istringstream iss(pka_list_buffer);
+      dataLoad(iss, _pka_list, this);
+    }
+  }
 
   // prune PKA list
   if (_app.n_processors() > 1)
