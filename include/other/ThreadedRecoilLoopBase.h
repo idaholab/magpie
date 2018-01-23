@@ -9,8 +9,9 @@
 #ifndef THREADEDRECOILLOOPBASE_H
 #define THREADEDRECOILLOOPBASE_H
 
-#include "ParallelUniqueId.h"
 #include "MooseMyTRIMMaterial.h"
+#include "MyTRIMRasterizer.h"
+#include "ParallelUniqueId.h"
 #include "PointListAdaptor.h"
 
 #include "mytrim/simconf.h"
@@ -18,7 +19,6 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/nanoflann.hpp"
 
-class MyTRIMRasterizer;
 class MooseMesh;
 
 typedef StoredRange<std::vector<MyTRIM_NS::IonBase>::const_iterator, MyTRIM_NS::IonBase> PKARange;
@@ -56,6 +56,9 @@ protected:
   /// rasterizer to manage the sample data
   const MyTRIMRasterizer & _rasterizer;
 
+  /// trim simulation parameters
+  const MyTRIMRasterizer::TrimParameters & _trim_parameters;
+
   /// number of elements in the TRIM simulation
   unsigned int _nvars;
 
@@ -73,14 +76,6 @@ protected:
 
   /// ID number of the current thread
   THREAD_ID _tid;
-
-  /// energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
-  const Real _analytical_cutoff;
-
-  ///@{ Element data for Kinchin-Pease
-  const std::vector<Real> & _trim_mass;
-  const std::vector<Real> & _trim_charge;
-  ///@}
 
 private:
   ///@{ Buffer vacancies and interstitials from the same cascade for instantaneous recombination

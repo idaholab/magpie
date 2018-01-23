@@ -13,11 +13,8 @@
 MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::SimconfType * simconf) :
     MyTRIM_NS::SampleBase(),
     _rasterizer(rasterizer),
-    _nvars(_rasterizer.nVars()),
-    _trim_mass(_rasterizer.mass()),
-    _trim_charge(_rasterizer.charge()),
-    _trim_Ebind(_rasterizer.eBind()),
-    _trim_Edisp(_rasterizer.eDisp()),
+    _trim_parameters(_rasterizer.getTrimParameters()),
+    _nvars(_trim_parameters.nVars()),
     _mesh(mesh),
     _dim(_mesh.dimension()),
     _pl(_mesh.getPointLocator()),
@@ -79,10 +76,7 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
       MyTRIM_NS::Element element;
       for (unsigned int i = 0; i < _nvars; ++i)
       {
-        element._Z = _trim_charge[i];
-        element._m = _trim_mass[i];
-        element._Edisp = _trim_Edisp[i];
-        element._Elbind = _trim_Ebind[i];
+        element = _trim_parameters.element_prototypes[i];
         element._t = material_data[i];
         material._element.push_back(element);
       }

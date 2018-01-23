@@ -22,27 +22,23 @@ PointListAdaptor<ThreadedRecoilLoopBase::MyTRIMDefectBufferItem>::getPoint(const
 
 ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
     _rasterizer(rasterizer),
-    _nvars(_rasterizer.nVars()),
+    _trim_parameters(_rasterizer.getTrimParameters()),
+    _nvars(_trim_parameters.nVars()),
     _mesh(mesh),
-    _dim(_mesh.dimension()),
-    _analytical_cutoff(_rasterizer.analyticalCutoff()),
-    _trim_mass(_rasterizer.mass()),
-    _trim_charge(_rasterizer.charge())
+    _dim(_mesh.dimension())
 {
-  _simconf.setLengthScale(_rasterizer.lengthScale());
+  _simconf.setLengthScale(_trim_parameters.length_scale);
 }
 
 // Splitting Constructor
 ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x, Threads::split /*split*/) :
     _rasterizer(x._rasterizer),
+    _trim_parameters(x._trim_parameters),
     _nvars(x._nvars),
     _mesh(x._mesh),
-    _dim(x._dim),
-    _analytical_cutoff(_rasterizer.analyticalCutoff()),
-    _trim_mass(_rasterizer.mass()),
-    _trim_charge(_rasterizer.charge())
+    _dim(x._dim)
 {
-  _simconf.setLengthScale(_rasterizer.lengthScale());
+  _simconf.setLengthScale(_trim_parameters.length_scale);
 }
 
 void
@@ -68,7 +64,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 
   // build the requested TRIM module
   std::unique_ptr<MooseMyTRIMCore> TRIM;
-  switch (_rasterizer.trimModule())
+  switch (_trim_parameters.trim_module)
   {
     // basic module with interstitial and vacancy generation
     case MyTRIMRasterizer::MYTRIM_CORE:
@@ -117,7 +113,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       }
 
       // full recoil or analytical approximation
-      if (recoil->_E < _analytical_cutoff)
+      if (recoil->_E < _trim_parameters.analytical_cutoff)
       {
         const auto pp = _rasterizer.periodicPoint(recoil->_pos);
         // const auto elem = (*_pl)(pp);
@@ -133,7 +129,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
         // mooseAssert(material_data.size() == _nvars, "Unexpected material data size");
 
         // add remaining recoil energy
-        if (_rasterizer.trimModule() == MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION)
+        if (_trim_parameters.trim_module == MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION)
           addEnergyToResult(pp, recoil->_E);
       }
       else

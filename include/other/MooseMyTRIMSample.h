@@ -44,15 +44,11 @@ protected:
   /// the rasterizer provides average concentrations for each element
   const MyTRIMRasterizer & _rasterizer;
 
+  /// trim simulation parameters
+  const MyTRIMRasterizer::TrimParameters & _trim_parameters;
+
   /// number of elements used in the problem
   unsigned int _nvars;
-
-  ///@{ Element data
-  const std::vector<Real> & _trim_mass;
-  const std::vector<Real> & _trim_charge;
-  const std::vector<Real> & _trim_Ebind;
-  const std::vector<Real> & _trim_Edisp;
-  ///@}
 
   /// mesh of the simulation domain
   const MooseMesh & _mesh;
