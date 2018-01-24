@@ -95,8 +95,11 @@ InputParameters validParams<MyTRIMRasterizer>()
 
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
-  params.addParamNamesToGroup("interval", "Advanced");
   params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
+  params.addParamNamesToGroup("interval analytical_energy_cutoff", "Advanced");
+
+  params.addParam<Real>("r_rec", "Recombination radius in Angstrom. Frenkel pairs with a separation distance lower than this will be removed from the cascade");
+  params.addParamNamesToGroup("r_rec", "Recombination");
 
   return params;
 }
@@ -156,6 +159,14 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
       _trim_parameters.element_prototypes[i]._Edisp = 25.0;
   else
     mooseError("Parameter 'Edisp' must have as many components as coupled variables (or left empty for a default of 25eV).");
+
+  if (isParamValid("r_rec"))
+  {
+    _trim_parameters.recombination = true;
+    _trim_parameters.r_rec = getParam<Real>("r_rec");
+  }
+  else
+    _trim_parameters.recombination = false;
 
   // fetch PKA Generators
   for (auto && name : _pka_generator_names)

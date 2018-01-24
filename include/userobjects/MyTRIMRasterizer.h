@@ -85,8 +85,14 @@ public:
     /// the TRIM class to instantiate in the recoil loops
     TRIMModuleEnum trim_module;
 
-    ///energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
+    /// energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
     Real analytical_cutoff;
+
+    /// enable instantaneous recombination
+    bool recombination;
+
+    /// recombination radius
+    Real r_rec;
 
     /// get the number of elements in the TRIM simulation
     unsigned int nVars() const { return element_prototypes.size(); }

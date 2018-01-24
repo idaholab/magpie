@@ -157,7 +157,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
     }
 
     // Process instantaneous recombination of this PKA's defects
-    if (true && !_vacancy_buffer.empty())
+    if (_trim_parameters.recombination && !_vacancy_buffer.empty())
     {
       // 1. build kd-tree for the vacancies
       const unsigned int max_leaf_size = 50; // slightly affects runtime
@@ -169,7 +169,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
       kd_tree->buildIndex();
 
-      const Real r_rec = 25.0;
+      const Real r_rec = _trim_parameters.r_rec;
       nanoflann::SearchParams params;
 
       // 2. iterate over interstitials and recombine them if they are with r_rec of a vacancy
