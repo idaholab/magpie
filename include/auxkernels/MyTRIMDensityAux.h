@@ -10,10 +10,10 @@
 #define MYTRIMDENSITYAUX_H
 
 #include "AuxKernel.h"
+#include "MyTRIMRasterizer.h"
 #include "mytrim/simconf.h"
 
 // forward declarations
-class MyTRIMRasterizer;
 class MyTRIMDensityAux;
 
 template<>
@@ -29,12 +29,10 @@ public:
 
 protected:
   const MyTRIMRasterizer & _rasterizer;
+  const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 
   /// number of elements used in the problem
   unsigned int _nvars;
-
-  /// Element masses
-  const std::vector<Real> & _trim_mass;
 
 private:
   /// internal TRIM simulation status object

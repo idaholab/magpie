@@ -20,4 +20,10 @@
     max_threads = 1
     skip = 'Need to pass probabilities of the correct dimensions'
   [../]
+
+  [./cascade_recombine]
+    type = 'CSVDiff'
+    input = 'cascade_recombine.i'
+    csvdiff = 'cascade_recombine_out.csv'
+  [../]
 []
