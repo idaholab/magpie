@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "mytrim/ion.h"
+#include "mytrim/element.h"
 
 class MyTRIMRasterizer;
 class PKAGeneratorBase;
@@ -44,18 +45,6 @@ public:
   /// get the site volume
   Real siteVolume(const Elem *) const;
 
-  /// get the mass array
-  const std::vector<Real> & mass() const { return _trim_mass; }
-
-  /// get the charge array
-  const std::vector<Real> & charge() const { return _trim_charge; }
-
-  /// get the Ebind array
-  const std::vector<Real> & eBind() const { return _trim_Ebind; }
-
-  /// get the Edisp array
-  const std::vector<Real> & eDisp() const { return _trim_Edisp; }
-
   /// get the PKA list
   const std::vector<MyTRIM_NS::IonBase> & getPKAList() const { return _pka_list; }
 
@@ -64,9 +53,6 @@ public:
 
   /// returns a point with the periodic boundary conditions applied
   Point periodicPoint(const Point &) const;
-
-  /// get the number of elements in the TRIM simulation
-  unsigned int nVars() const { return _nvars; }
 
   /// element averaged data
   struct AveragedData {
@@ -89,10 +75,31 @@ public:
     MICROMETER
   };
 
-  TRIMModuleEnum trimModule() const { return _trim_module; }
-  Real lengthScale() const { return _length_scale; }
+  struct TrimParameters {
+    // Element prototype data (charge, mass, displacement and binding energies)
+    std::vector<MyTRIM_NS::Element> element_prototypes;
 
-  Real analyticalCutoff() const { return _analytical_cutoff; }
+    /// conversion factor from chosen length unit to Angstrom
+    Real length_scale;
+
+    /// the TRIM class to instantiate in the recoil loops
+    TRIMModuleEnum trim_module;
+
+    /// energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
+    Real analytical_cutoff;
+
+    /// enable instantaneous recombination
+    bool recombination;
+
+    /// recombination radius
+    Real r_rec;
+
+    /// get the number of elements in the TRIM simulation
+    unsigned int nVars() const { return element_prototypes.size(); }
+  };
+
+  /// get the simulation parameters
+  const TrimParameters & getTrimParameters() const { return _trim_parameters; }
 
 protected:
   ///@{ pack/unpack the _material_map and _pka_list data into a structure suitable for parallel communication
@@ -106,12 +113,8 @@ protected:
   /// dimension of the mesh
   const unsigned int _dim;
 
-  ///@{ Element data
-  std::vector<Real> _trim_mass;
-  std::vector<Real> _trim_charge;
-  std::vector<Real> _trim_Ebind;
-  std::vector<Real> _trim_Edisp;
-  ///@}
+  /// Simulation parameters
+  TrimParameters _trim_parameters;
 
   /// coupled variable values
   std::vector<const VariableValue *> _var;
@@ -150,17 +153,8 @@ protected:
   bool _pbc[LIBMESH_DIM];
   /// @}
 
-  /// the TRIM class to instantiate in the recoil loops
-  const TRIMModuleEnum _trim_module;
-
-  ///energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
-  const Real _analytical_cutoff;
-
 private:
   bool _execute_this_timestep;
-
-  /// conversion factor from chosen length unit to Angstrom
-  Real _length_scale;
 };
 
 #endif //MYTRIMRASTERIZER_H

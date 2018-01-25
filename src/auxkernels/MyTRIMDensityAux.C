@@ -7,7 +7,6 @@
 /**********************************************************************/
 
 #include "MyTRIMDensityAux.h"
-#include "MyTRIMRasterizer.h"
 #include "MooseMyTRIMMaterial.h"
 
 template<>
@@ -22,8 +21,8 @@ InputParameters validParams<MyTRIMDensityAux>()
 MyTRIMDensityAux::MyTRIMDensityAux(const InputParameters & parameters) :
     AuxKernel(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
-    _nvars(_rasterizer.nVars()),
-    _trim_mass(_rasterizer.mass())
+    _trim_parameters(_rasterizer.getTrimParameters()),
+    _nvars(_trim_parameters.nVars())
 {
   if (isNodal())
     mooseError("MyTRIMDensityAux needs to be applied to an elemental AuxVariable.");
@@ -42,7 +41,7 @@ MyTRIMDensityAux::computeValue()
     MyTRIM_NS::Element element;
     for (unsigned int i = 0; i < _nvars; ++i)
     {
-      element._m = _trim_mass[i];
+      element = _trim_parameters.element_prototypes[i];
       element._t = material_data[i];
       material._element.push_back(element);
     }

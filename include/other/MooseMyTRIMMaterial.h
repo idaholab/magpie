@@ -25,7 +25,7 @@ public:
   /**
    * Calculate the density rho by multiplying the fractions t with the atomic weight
    * and dividing by the site volume.
-   * This needs to be called before prepare, as prepare renormalizes teh fractions
+   * This needs to be called before prepare, as prepare renormalizes the fractions
    * to sum up to one. However we are assuming the fraction difference to one to be
    * the fraction of unoccupied sites.
    */

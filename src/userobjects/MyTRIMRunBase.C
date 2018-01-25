@@ -25,7 +25,8 @@ InputParameters validParams<MyTRIMRunBase>()
 MyTRIMRunBase::MyTRIMRunBase(const InputParameters & parameters) :
     GeneralUserObject(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
-    _nvars(_rasterizer.nVars()),
+    _trim_parameters(_rasterizer.getTrimParameters()),
+    _nvars(_trim_parameters.nVars()),
     _pka_list(_rasterizer.getPKAList()),
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension())

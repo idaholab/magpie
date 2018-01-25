@@ -205,7 +205,7 @@ public:
     return clone;
   }
 
-  /// to be equal both iterators must hold a reference to teh same MultiIndexObject and be at the same _flat_index
+  /// to be equal both iterators must hold a reference to the same MultiIndexObject and be at the same _flat_index
   bool operator== (const const_noconst_iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
   bool operator!= (const const_noconst_iterator & other) const { return !(*this == other); }
 

@@ -39,6 +39,9 @@ protected:
   /// Rasterizer object to provide the material data
   const MyTRIMRasterizer & _rasterizer;
 
+  /// trim simulation parameters
+  const MyTRIMRasterizer::TrimParameters & _trim_parameters;
+
   /// number of elements in the TRIM simulation
   const unsigned int _nvars;
 

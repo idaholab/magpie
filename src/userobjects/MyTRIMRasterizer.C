@@ -95,8 +95,11 @@ InputParameters validParams<MyTRIMRasterizer>()
 
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
-  params.addParamNamesToGroup("interval", "Advanced");
   params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
+  params.addParamNamesToGroup("interval analytical_energy_cutoff", "Advanced");
+
+  params.addParam<Real>("r_rec", "Recombination radius in Angstrom. Frenkel pairs with a separation distance lower than this will be removed from the cascade");
+  params.addParamNamesToGroup("r_rec", "Recombination");
 
   return params;
 }
@@ -105,8 +108,6 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
     _dim(_mesh.dimension()),
-    _trim_mass(getParam<std::vector<Real>>("M")),
-    _trim_charge(getParam<std::vector<Real>>("Z")),
     _var(_nvars),
     _site_volume_prop(getMaterialProperty<Real>("site_volume")),
     _pka_generator_names(getParam<std::vector<UserObjectName>>("pka_generator")),
@@ -114,49 +115,62 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _accumulated_time(0.0),
     _accumulated_time_old(0.0),
-    _interval(getParam<unsigned int>("interval")),
-    _trim_module(getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>()),
-    _analytical_cutoff(getParam<Real>("analytical_energy_cutoff"))
+    _interval(getParam<unsigned int>("interval"))
 {
-  for (unsigned int i = 0; i < _nvars; ++i)
-    _var[i] = &coupledValue("var", i);
-
-  for (auto && name : _pka_generator_names)
-    _pka_generators.push_back(&getUserObjectByName<PKAGeneratorBase>(name));
-
   if (_nvars == 0)
-    mooseError("Must couple variables to MyTRIMRasterier.");
+    mooseError("Must couple variables to MyTRIMRasterizer.");
 
-  if (_trim_mass.size() != _nvars)
+  // fill in trim parameters
+  _trim_parameters.element_prototypes.resize(_nvars);
+  _trim_parameters.analytical_cutoff = getParam<Real>("analytical_energy_cutoff");
+  _trim_parameters.trim_module = getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>();
+
+  auto trim_M = getParam<std::vector<Real>>("M");
+  auto trim_Z = getParam<std::vector<Real>>("Z");
+
+  if (trim_M.size() != _nvars)
     mooseError("Parameter 'M' must have as many components as coupled variables.");
-  if (_trim_charge.size() != _nvars)
+  if (trim_Z.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
-  if (isParamValid("Ebind"))
+  for (unsigned int i = 0; i < _nvars; ++i)
   {
-    _trim_Ebind = getParam<std::vector<Real>>("Ebind");
-    if (_trim_Ebind.size() != _nvars)
-      mooseError("Parameter 'Ebind' must have as many components as coupled variables.");
-  }
-  else
-  {
-    // fill in the mytrim default of 3 eV
-    for (unsigned int i = 0; i < _nvars; ++i)
-      _trim_Ebind.push_back(3.0);
+    _var[i] = &coupledValue("var", i);
+    _trim_parameters.element_prototypes[i]._m = trim_M[i];
+    _trim_parameters.element_prototypes[i]._Z = trim_Z[i];
   }
 
-  if (isParamValid("Edisp"))
+  auto trim_Ebind = getParam<std::vector<Real>>("Ebind");
+  if (trim_Ebind.size() == _nvars)
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_parameters.element_prototypes[i]._Elbind = trim_Ebind[i];
+  else if (trim_Ebind.empty())
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_parameters.element_prototypes[i]._Elbind = 3.0;
+  else
+    mooseError("Parameter 'Ebind' must have as many components as coupled variables (or left empty for a default of 3eV).");
+
+  auto trim_Edisp = getParam<std::vector<Real>>("Edisp");
+  if (trim_Edisp.size() == _nvars)
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_parameters.element_prototypes[i]._Edisp = trim_Edisp[i];
+  else if (trim_Edisp.empty())
+    for (unsigned int i = 0; i < _nvars; ++i)
+      _trim_parameters.element_prototypes[i]._Edisp = 25.0;
+  else
+    mooseError("Parameter 'Edisp' must have as many components as coupled variables (or left empty for a default of 25eV).");
+
+  if (isParamValid("r_rec"))
   {
-    _trim_Edisp = getParam<std::vector<Real>>("Edisp");
-    if (_trim_Edisp.size() != _nvars)
-      mooseError("Parameter 'Edisp' must have as many components as coupled variables.");
+    _trim_parameters.recombination = true;
+    _trim_parameters.r_rec = getParam<Real>("r_rec");
   }
   else
-  {
-    // fill in the mytrim default of 325eV
-    for (unsigned int i = 0; i < _nvars; ++i)
-      _trim_Edisp.push_back(25.0);
-  }
+    _trim_parameters.recombination = false;
+
+  // fetch PKA Generators
+  for (auto && name : _pka_generator_names)
+    _pka_generators.push_back(&getUserObjectByName<PKAGeneratorBase>(name));
 
   // set up data for sample periodicity
   for (unsigned int i = 0; i < _dim; ++i)
@@ -174,15 +188,15 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   switch (getParam<MooseEnum>("length_unit").getEnum<Unit>())
   {
     case ANGSTROM:
-      _length_scale = 1.0;
+      _trim_parameters.length_scale = 1.0;
       break;
 
     case NANOMETER:
-      _length_scale = 10.0;
+      _trim_parameters.length_scale = 10.0;
       break;
 
     case MICROMETER:
-      _length_scale = 10000.0;
+      _trim_parameters.length_scale = 10000.0;
       break;
 
     default:
@@ -234,9 +248,10 @@ MyTRIMRasterizer::execute()
     // average compositions on the element
     for (unsigned int i = 0; i < _nvars; ++i)
     {
+
       average._elements[i] += qpvol * (*_var[i])[qp];
-      average._Z[i] = _trim_charge[i];
-      average._M[i] = _trim_mass[i];
+      average._M[i] = _trim_parameters.element_prototypes[i]._m;
+      average._Z[i] = _trim_parameters.element_prototypes[i]._Z;
     }
 
     // average site volume property

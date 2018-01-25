@@ -13,7 +13,7 @@ template<>
 InputParameters validParams<PKAFixedPointGenerator>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addClassDescription("This PKAGenerator starts particle from a fixed point in a random direction [isotropically]. Angular distribution can be override.");
+  params.addClassDescription("This PKAGenerator starts particle from a fixed point in a random direction [isotropically].");
   params.addParam<unsigned int>("num_pkas", 1000, "The number of PKAs to be started from this position");
   params.addRequiredParam<Point>("point", "The point from which the PKAs are started");
   params.addRequiredParam<Real>("Z", "PKA nuclear charge");

@@ -23,7 +23,7 @@ InputParameters validParams<AtomicDensityAux>()
 AtomicDensityAux::AtomicDensityAux(const InputParameters & parameters) :
     AuxKernel(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
-    _volume_scale(Utility::pow<3>(_rasterizer.lengthScale()) / 1000.0)
+    _volume_scale(Utility::pow<3>(_rasterizer.getTrimParameters().length_scale / 1000.0))
 {
 }
 
