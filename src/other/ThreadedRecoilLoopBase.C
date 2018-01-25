@@ -156,7 +156,11 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       delete recoil;
     }
 
+    //
     // Process instantaneous recombination of this PKA's defects
+    // Recombination only takes place within the cascade of an individual PKA.
+    // Cascades are assumed to be non-overlapping in time and space.
+    ///
     if (_trim_parameters.recombination && !_vacancy_buffer.empty())
     {
       // 1. build kd-tree for the vacancies
