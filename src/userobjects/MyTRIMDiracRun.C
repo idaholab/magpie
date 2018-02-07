@@ -27,6 +27,8 @@ InputParameters validParams<MyTRIMDiracRun>()
 MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) :
     MyTRIMRunBase(parameters)
 {
+  if (_trim_parameters.desired_npka != 0)
+    mooseError("Result scaling not supported in MyTRIMDiracRun");
 }
 
 void
@@ -45,7 +47,7 @@ MyTRIMDiracRun::execute()
   ThreadedRecoilDiracSourceLoop rl(_rasterizer, _mesh);
 
   // output the number of recoils being launched
-  _console << "\nMyTRIM: Running " << _pka_list.size() << " recoils." << std::endl;
+  _console << "\nMyTRIM: Running " << _trim_parameters.original_npka << " recoils." << std::endl;
 
   // run threads
   Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");

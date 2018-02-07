@@ -94,6 +94,18 @@ public:
     /// recombination radius
     Real r_rec;
 
+    /// target number of pkas
+    unsigned int desired_npka;
+
+    /// original length of pka list
+    unsigned int original_npka;
+
+    /// length of pka list after rejection
+    unsigned int scaled_npka;
+
+    /// scaling factor for the results
+    Real result_scaling_factor;
+
     /// get the number of elements in the TRIM simulation
     unsigned int nVars() const { return element_prototypes.size(); }
   };
