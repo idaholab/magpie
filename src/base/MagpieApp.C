@@ -28,7 +28,6 @@
 #include "MyTRIMDiracSource.h"
 
 // UserObjects
-#include "ElasticRecoilCrossSectionUserObject.h"
 #include "IsotopeRecoilRate.h"
 #include "MyTRIMDiracRun.h"
 #include "MyTRIMElementRun.h"
@@ -46,6 +45,7 @@
 #include "PKAGeneratorRecoil.h"
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
+#include "ElasticRecoil.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -114,8 +114,6 @@ MagpieApp::registerObjects(Factory & factory)
 
   registerDiracKernel(MyTRIMDiracSource);
 
-  registerUserObject(ElasticRecoilCrossSectionUserObject);
-  registerUserObject(IsotopeRecoilRate);
   registerUserObject(MyTRIMDiracRun);
   registerUserObject(MyTRIMElementRun);
   registerUserObject(MyTRIMPKAInConeInfo);
@@ -134,6 +132,8 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(PKAGeneratorRecoil);
   registerUserObject(PKAGun);
   registerUserObject(SPPARKSUserObject);
+  registerUserObject(ElasticRecoil);
+  registerUserObject(IsotopeRecoilRate);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 

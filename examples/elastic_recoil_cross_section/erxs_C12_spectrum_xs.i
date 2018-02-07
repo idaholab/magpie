@@ -19,11 +19,11 @@
 
 [UserObjects]
   [./XSGenerator]
-     type = ElasticRecoilCrossSectionUserObject
+     type = ElasticRecoil
 
      # Inputs
-     erxs_output_file_name = erxs_C_spectrum_xs_out.csv
-     mu_L_output_file_name = erxs_C_spectrum_xs_mu_L_out.csv
+     cross_section_output_filename = erxs_C_spectrum_xs_out.csv
+     mu_L_output_filename = erxs_C_spectrum_xs_mu_L_out.csv
      atomic_mass = 12
      legendre_order = 7
      # 14 group CASMO lib
@@ -33,7 +33,7 @@
                              4  1.855  1.15  1.097  1.02  0.972  0.625  0.35  0.28  0.14  0.058  0.03  0.00001'
      neutron_spectrum = neutron_spectrum
      scattering_law = scattering_law
-     elastic_xs = elastic_xs
+     scattering_xs = scattering_xs
      execute_on = timestep_end
   [../]
 []
@@ -46,7 +46,7 @@
   [../]
 
   # t is equal to Ei
-  [./elastic_xs]
+  [./scattering_xs]
     type = PiecewiseLinear
     data_file = C12_input.csv
     xy_in_file_only = false
