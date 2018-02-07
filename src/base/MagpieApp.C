@@ -46,6 +46,8 @@
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
 #include "ElasticRecoil.h"
+#include "InelasticRecoil.h"
+#include "IsotopeRecoilRate.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -133,6 +135,7 @@ MagpieApp::registerObjects(Factory & factory)
   registerUserObject(PKAGun);
   registerUserObject(SPPARKSUserObject);
   registerUserObject(ElasticRecoil);
+  registerUserObject(InelasticRecoil);
   registerUserObject(IsotopeRecoilRate);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
