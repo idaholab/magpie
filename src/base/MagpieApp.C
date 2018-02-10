@@ -28,23 +28,24 @@
 #include "MyTRIMDiracSource.h"
 
 // UserObjects
+#include "ElasticRecoilCrossSectionUserObject.h"
+#include "IsotopeRecoilRate.h"
 #include "MyTRIMDiracRun.h"
 #include "MyTRIMElementRun.h"
-#include "MyTRIMPKAInfo.h"
 #include "MyTRIMPKAInConeInfo.h"
+#include "MyTRIMPKAInfo.h"
 #include "MyTRIMRasterizer.h"
 #include "NeutronicsSpectrumSamplerFission.h"
 #include "NeutronicsSpectrumSamplerSN.h"
 #include "PKAConstant.h"
 #include "PKAFissionFragmentEmpirical.h"
 #include "PKAFissionFragmentNeutronics.h"
-#include "PKAGeneratorRecoil.h"
-#include "PKAGeneratorAlphaDecay.h"
 #include "PKAFixedPointGenerator.h"
+#include "PKAFunction.h"
+#include "PKAGeneratorAlphaDecay.h"
+#include "PKAGeneratorRecoil.h"
 #include "PKAGun.h"
 #include "SPPARKSUserObject.h"
-#include "ElasticRecoilCrossSectionUserObject.h"
-#include "IsotopeRecoilRate.h"
 
 // Transfers
 #include "MultiAppNeutronicsSpectrumTransfer.h"
@@ -113,25 +114,26 @@ MagpieApp::registerObjects(Factory & factory)
 
   registerDiracKernel(MyTRIMDiracSource);
 
-  registerUserObject(MyTRIMRasterizer);
+  registerUserObject(ElasticRecoilCrossSectionUserObject);
+  registerUserObject(IsotopeRecoilRate);
   registerUserObject(MyTRIMDiracRun);
   registerUserObject(MyTRIMElementRun);
-  registerUserObject(PKAConstant);
-  registerUserObject(PKAFixedPointGenerator);
-  registerUserObject(PKAGun);
-  registerUserObject(PKAFissionFragmentEmpirical);
-  registerUserObject(PKAFissionFragmentNeutronics);
-  registerUserObject(PKAGeneratorRecoil);
-  registerUserObject(PKAGeneratorAlphaDecay);
+  registerUserObject(MyTRIMPKAInConeInfo);
+  registerUserObject(MyTRIMPKAInfo);
+  registerUserObject(MyTRIMRasterizer);
+  registerUserObject(NeutronicsSpectrumSamplerFission);
 #ifdef RATTLESNAKE_ENABLED
   registerUserObject(NeutronicsSpectrumSamplerSN);
 #endif
-  registerUserObject(NeutronicsSpectrumSamplerFission);
+  registerUserObject(PKAConstant);
+  registerUserObject(PKAFissionFragmentEmpirical);
+  registerUserObject(PKAFissionFragmentNeutronics);
+  registerUserObject(PKAFixedPointGenerator);
+  registerUserObject(PKAFunction);
+  registerUserObject(PKAGeneratorAlphaDecay);
+  registerUserObject(PKAGeneratorRecoil);
+  registerUserObject(PKAGun);
   registerUserObject(SPPARKSUserObject);
-  registerUserObject(MyTRIMPKAInfo);
-  registerUserObject(MyTRIMPKAInConeInfo);
-  registerUserObject(ElasticRecoilCrossSectionUserObject);
-  registerUserObject(IsotopeRecoilRate);
 
   registerTransfer(MultiAppNeutronicsSpectrumTransfer);
 

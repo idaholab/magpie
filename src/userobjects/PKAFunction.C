@@ -6,24 +6,25 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#include "PKAConstant.h"
+#include "PKAFunction.h"
 
 template<>
-InputParameters validParams<PKAConstant>()
+InputParameters validParams<PKAFunction>()
 {
   InputParameters params = validParams<PKAEmpiricalBase>();
-  params.addParam<Real>("pka_rate", 1e-8, "PKA rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
-  params.addRequiredParam<Real>("Z", "PKA nuclear charge");
-  params.addRequiredParam<Real>("m", "PKA mass in amu");
-  params.addRequiredParam<Real>("E", "PKA energy in eV");
+  params.addParam<FunctionName>("pka_rate", 1e-8, "PKA rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
+  params.addRequiredParam<FunctionName>("Z", "PKA nuclear charge");
+  params.addRequiredParam<FunctionName>("m", "PKA mass in amu");
+  params.addRequiredParam<FunctionName>("E", "PKA energy in eV");
   return params;
 }
 
-PKAConstant::PKAConstant(const InputParameters & parameters) :
+PKAFunction::PKAFunction(const InputParameters & parameters) :
     PKAEmpiricalBase(parameters),
-    _pka_rate(getParam<Real>("pka_rate")),
-    _Z(getParam<Real>("Z")),
-    _m(getParam<Real>("m")),
-    _E(getParam<Real>("E"))
+    _pka_rate(getFunction("pka_rate")),
+    _Z(getFunction("Z")),
+    _m(getFunction("m")),
+    _E(getFunction("E")),
+    _time(_fe_problem.time())
 {
 }
