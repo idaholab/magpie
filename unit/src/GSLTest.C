@@ -12,16 +12,22 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "GSLTest.h"
 #include <cmath>
+#include <gtest/gtest.h>
 
 //GSL includes
 #include <gsl/gsl_integration.h>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( GSLTest );
+// function to integrate
+double
+function(double x, void * params)
+{
+  double alpha = *(double *) params;
+  double f = std::log(alpha*x) / std::sqrt(x);
+  return f;
+}
 
-void
-GSLTest::integrationTest()
+TEST(GSLTest, integrationTest)
 {
   gsl_integration_workspace * w
     = gsl_integration_workspace_alloc (1000);
@@ -30,24 +36,15 @@ GSLTest::integrationTest()
   double alpha = 1.0;
 
   gsl_function F;
-  F.function = &GSLTest::function;
+  F.function = &function;
   F.params = &alpha;
 
   gsl_integration_qags (&F, 0, 1, 0, 1e-7, 1000,
                         w, &result, &error);
 
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(result, -4.000000000000085265, 1e-18);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(error, 0.000000000000135447, 1e-18);
-  CPPUNIT_ASSERT(w->size == 8);
+  ASSERT_NEAR(result, -4.000000000000085265, 1e-18);
+  ASSERT_NEAR(error, 0.000000000000135447, 1e-18);
+  EXPECT_EQ(w->size, 8);
 
   gsl_integration_workspace_free (w);
-}
-
-// function to integrate
-double
-GSLTest::function(double x, void * params)
-{
-  double alpha = *(double *) params;
-  double f = std::log(alpha*x) / std::sqrt(x);
-  return f;
 }

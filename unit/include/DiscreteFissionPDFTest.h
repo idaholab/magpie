@@ -16,21 +16,31 @@
 #define DISCRETEFISSIONPDFTEST_H
 
 //CPPUnit includes
-#include "cppunit/extensions/HelperMacros.h"
 #include "DiscreteFissionPKAPDF.h"
 #include "MooseRandom.h"
 
-class DiscreteFissionPDFTest : public CppUnit::TestFixture
+#include <gtest/gtest.h>
+
+class DiscreteFissionPDFTest : public ::testing::Test
 {
-  CPPUNIT_TEST_SUITE( DiscreteFissionPDFTest );
+protected:
+  void setRandomDirection(MyTRIM_NS::IonBase & ion)
+  {
+    Real nsq, x1, x2;
 
-  CPPUNIT_TEST( sampleFissionPKA );
+    // Marsaglia's method for uniformly sampling the surface of the sphere
+    do
+    {
+      x1 = 2 * MooseRandom::rand() - 1.0;
+      x2 = 2 * MooseRandom::rand() - 1.0;
+      nsq = x1 * x1 + x2 * x2;
+    } while (nsq >= 1);
 
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-  void sampleFissionPKA();
-  void setRandomDirection(MyTRIM_NS::IonBase & ion);
+    // construct normalized direction vector
+    ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
+    ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
+    ion._dir(2) = 1.0 - 2.0 * nsq;
+  }
 };
 
 #endif  // DiscreteFissionPDFTest_H

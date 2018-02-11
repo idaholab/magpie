@@ -23,10 +23,7 @@
 #include <cmath>
 #include <iostream>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DiscreteFissionPDFTest );
-
-void
-DiscreteFissionPDFTest::sampleFissionPKA()
+TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
 {
   //add environment variable for path of sum yield data files
   setenv("ENDF_FP_DIR","../data/fission_yield/",1);
@@ -180,45 +177,26 @@ DiscreteFissionPDFTest::sampleFissionPKA()
   auto maxerror = std::max_element(error.begin(), error.end());
 
   //check if total energy is conserved
-  CPPUNIT_ASSERT( std::abs(total_energy / max - true_energy) < 1.0 );
+  ASSERT_TRUE(std::abs(total_energy / max - true_energy) < 1.0);
 
   //check if total mass is conserved
-  CPPUNIT_ASSERT( std::abs(total_mass / max - 239.0) < 1.0e-3);
+  ASSERT_TRUE(std::abs(total_mass / max - 239.0) < 1.0e-3);
 
   //check if the z number is conserved
-  CPPUNIT_ASSERT( std::abs(total_Z / max - 94.0) < 1.0e-6);
+  ASSERT_TRUE(std::abs(total_Z / max - 94.0) < 1.0e-6);
 
   //check if mu bins are uniformly distributed
-  CPPUNIT_ASSERT( std::abs(mubin1 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin2 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin3 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin4 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(mubin1 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(mubin2 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(mubin3 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(mubin4 / max - 0.25) < 1.0e-2);
 
   //check if phi bins are uniformly distributed
-  CPPUNIT_ASSERT( std::abs(phibin1 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin2 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin3 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin4 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(phibin1 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(phibin2 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(phibin3 / max - 0.25) < 1.0e-2);
+  ASSERT_TRUE(std::abs(phibin4 / max - 0.25) < 1.0e-2);
 
   //check max error of sampled distribution vs true distribution
-  CPPUNIT_ASSERT( *maxerror < 1.0e-2);
-}
-
-void
-DiscreteFissionPDFTest::setRandomDirection(MyTRIM_NS::IonBase & ion)
-{
-  Real nsq, x1, x2;
-
-  // Marsaglia's method for uniformly sampling the surface of the sphere
-  do
-  {
-    x1 = 2 * MooseRandom::rand() - 1.0;
-    x2 = 2 * MooseRandom::rand() - 1.0;
-    nsq = x1 * x1 + x2 * x2;
-  } while (nsq >= 1);
-
-  // construct normalized direction vector
-  ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
-  ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
-  ion._dir(2) = 1.0 - 2.0 * nsq;
+  ASSERT_TRUE(*maxerror < 1.0e-2);
 }

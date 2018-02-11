@@ -1,15 +1,11 @@
-#include "DiscretePDFTest.h"
-
 //Magpie includes
 #include "DiscretePKAPDF.h"
 #include "MultiIndex.h"
 
+#include <gtest/gtest.h>
 #include <cmath>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DiscretePDFTest );
-
-void
-DiscretePDFTest::samplePKA()
+TEST(DiscretePDFTest, samplePKA)
 {
   // Construct a very simple pdf: 3 ZAIDs, 2 energies, 4 azimuthal regions, 5 polar regions
   // For simplicity it'll be a product of 1-D pdfs P{ZAID} * P{E} * P{phi} * P{mu}
@@ -102,6 +98,6 @@ DiscretePDFTest::samplePKA()
   {
     index = (*it).first;
     Real width = (energies[index[1] + 1] - energies[index[1]]) * dmu * dphi;
-    CPPUNIT_ASSERT( std::abs(1.0 - mindex(index) * width / frequency(index)) < 0.1);
+    ASSERT_TRUE(std::abs(1.0 - mindex(index) * width / frequency(index)) < 0.1);
   }
 }
