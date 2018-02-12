@@ -63,10 +63,6 @@ TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
 
   DiscreteFissionPKAPDF pdf = DiscreteFissionPKAPDF(zaid, energies, mindex);
 
-  // set up a frequency counter
-  unsigned int j1, j2;
-  MultiIndex<Real> frequency = MultiIndex<Real>(shape);
-
   // test it by sampling
   Real counter = 0.0, max = 5.0e5;
   Real total_energy = 0.0;
@@ -102,13 +98,12 @@ TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
 
     //find matching bin to the sample A
     for (unsigned int i = 0; i < fproduct_A.size(); ++i)
-    {
-      if ( int(i_state[0]._m) == fproduct_A[i])
+      if (i_state[0]._m == fproduct_A[i])
         {
           tally_index = i;
           break;
         }
-    }
+
     //tally mass number in corresponding bin
     fproduct_tally[tally_index] += 1.0;
 
@@ -148,10 +143,6 @@ TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
       phibin4 += 1.0;
     else
       mooseError("phi is not between -pi and pi");
-
-    index[0] = j1;
-    index[1] = j2;
-    frequency(index) += 1.0 / max;
   }
 
   //normalize the talley to pdf
