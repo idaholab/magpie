@@ -12,21 +12,40 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "DiscreteFissionPDFTest.h"
-
 //Magpie includes
 #include "DiscreteFissionPKAPDF.h"
 #include "PKAGeneratorBase.h"
 #include "MultiIndex.h"
+#include "MooseRandom.h"
 #include "mytrim/ion.h"
 
 #include <cmath>
 #include <iostream>
 
-TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
+#include <gtest/gtest.h>
+
+void setRandomDirection(MyTRIM_NS::IonBase & ion)
+{
+  Real nsq, x1, x2;
+
+  // Marsaglia's method for uniformly sampling the surface of the sphere
+  do
+  {
+    x1 = 2 * MooseRandom::rand() - 1.0;
+    x2 = 2 * MooseRandom::rand() - 1.0;
+    nsq = x1 * x1 + x2 * x2;
+  } while (nsq >= 1);
+
+  // construct normalized direction vector
+  ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
+  ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
+  ion._dir(2) = 1.0 - 2.0 * nsq;
+}
+
+TEST(DiscreteFissionPDFTest, sampleFissionPKA)
 {
   //add environment variable for path of sum yield data files
-  setenv("ENDF_FP_DIR","../data/fission_yield/",1);
+  setenv("ENDF_FP_DIR", "../data/fission_yield/", 1);
 
   // Define vector of zaids and probabilites
   std::vector<unsigned int> zaid(2);
@@ -111,7 +130,7 @@ TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
     total_mass += i_state[0]._m + i_state[1]._m + 2.8836;
     total_Z += i_state[0]._Z + i_state[1]._Z;
 
-    DiscreteFissionPDFTest::setRandomDirection(i_state[0]);
+    setRandomDirection(i_state[0]);
     i_state[1]._dir = -i_state[0]._dir;
 
     //sampled_mu (int)
@@ -168,26 +187,26 @@ TEST_F(DiscreteFissionPDFTest, sampleFissionPKA)
   auto maxerror = std::max_element(error.begin(), error.end());
 
   //check if total energy is conserved
-  ASSERT_TRUE(std::abs(total_energy / max - true_energy) < 1.0);
+  EXPECT_TRUE(std::abs(total_energy / max - true_energy) < 1.0) << "Energy conservation violated";
 
   //check if total mass is conserved
-  ASSERT_TRUE(std::abs(total_mass / max - 239.0) < 1.0e-3);
+  EXPECT_TRUE(std::abs(total_mass / max - 239.0) < 1.0e-3) << "Mass conservation violated";
 
   //check if the z number is conserved
-  ASSERT_TRUE(std::abs(total_Z / max - 94.0) < 1.0e-6);
+  EXPECT_TRUE(std::abs(total_Z / max - 94.0) < 1.0e-6) << "Charge conservation violated";
 
   //check if mu bins are uniformly distributed
-  ASSERT_TRUE(std::abs(mubin1 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(mubin2 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(mubin3 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(mubin4 / max - 0.25) < 1.0e-2);
+  EXPECT_TRUE(std::abs(mubin1 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 1";
+  EXPECT_TRUE(std::abs(mubin2 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 2";
+  EXPECT_TRUE(std::abs(mubin3 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 3";
+  EXPECT_TRUE(std::abs(mubin4 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 4";
 
   //check if phi bins are uniformly distributed
-  ASSERT_TRUE(std::abs(phibin1 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(phibin2 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(phibin3 / max - 0.25) < 1.0e-2);
-  ASSERT_TRUE(std::abs(phibin4 / max - 0.25) < 1.0e-2);
+  EXPECT_TRUE(std::abs(phibin1 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 1";
+  EXPECT_TRUE(std::abs(phibin2 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 2";
+  EXPECT_TRUE(std::abs(phibin3 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 3";
+  EXPECT_TRUE(std::abs(phibin4 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 4";
 
   //check max error of sampled distribution vs true distribution
-  ASSERT_TRUE(*maxerror < 1.0e-2);
+  EXPECT_TRUE(*maxerror < 1.0e-2) << "Max error exceeded";
 }

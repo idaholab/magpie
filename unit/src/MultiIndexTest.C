@@ -57,7 +57,7 @@ TEST(MultiIndexTest, setUp)
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        ASSERT_TRUE(mindex1(index) == j0 + 10.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex1(index) == j0 + 10.0 * j1 + 100.0 * j2);
       }
 
   // check the two-argument constructor
@@ -79,7 +79,7 @@ TEST(MultiIndexTest, setUp)
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        ASSERT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 
   // test resize increasing and descreasing in different dimension simultaneously
@@ -96,7 +96,7 @@ TEST(MultiIndexTest, setUp)
         index[1] = j1;
         index[2] = j2;
         if (j0 < shape[0] && j1 < shape[1] && j2 < shape[2])
-        ASSERT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
         else
         EXPECT_EQ(mindex2(index), 0.0);
       }
@@ -147,7 +147,7 @@ TEST(MultiIndexTest, testIterators)
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        ASSERT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 
   // check the indices function
@@ -185,7 +185,7 @@ TEST(MultiIndexTest, testIterators)
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        ASSERT_TRUE(mindex(index) == j0 - 7.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex(index) == j0 - 7.0 * j1 + 100.0 * j2);
       }
 }
 
@@ -228,7 +228,7 @@ TEST(MultiIndexTest, dataStoreLoad)
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        ASSERT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
+        EXPECT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 }
 
@@ -266,7 +266,7 @@ TEST(MultiIndexTest, slice)
             index[0] = j0;
             index[1] = j2;
             index[2] = j3;
-            ASSERT_TRUE(sliced_mindex(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 
@@ -288,7 +288,7 @@ TEST(MultiIndexTest, slice)
             index[0] = j0;
             index[1] = j2;
             index[2] = j3;
-            ASSERT_TRUE(sliced_mindex_vec(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex_vec(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 
@@ -311,7 +311,7 @@ TEST(MultiIndexTest, slice)
             MultiIndex<unsigned int>::size_type index(sliced_mindex_vec2.dim());
             index[0] = j0;
             index[1] = j2;
-            ASSERT_TRUE(sliced_mindex_vec2(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex_vec2(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 }
