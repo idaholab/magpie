@@ -1,15 +1,25 @@
-#include "DiscretePDFTest.h"
+/****************************************************************/
+/*               DO NOT MODIFY THIS HEADER                      */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*           (c) 2010 Battelle Energy Alliance, LLC             */
+/*                   ALL RIGHTS RESERVED                        */
+/*                                                              */
+/*          Prepared by Battelle Energy Alliance, LLC           */
+/*            Under Contract No. DE-AC07-05ID14517              */
+/*            With the U. S. Department of Energy               */
+/*                                                              */
+/*            See COPYRIGHT for full restrictions               */
+/****************************************************************/
 
 //Magpie includes
 #include "DiscretePKAPDF.h"
 #include "MultiIndex.h"
 
+#include <gtest/gtest.h>
 #include <cmath>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DiscretePDFTest );
-
-void
-DiscretePDFTest::samplePKA()
+TEST(DiscretePDFTest, samplePKA)
 {
   // Construct a very simple pdf: 3 ZAIDs, 2 energies, 4 azimuthal regions, 5 polar regions
   // For simplicity it'll be a product of 1-D pdfs P{ZAID} * P{E} * P{phi} * P{mu}
@@ -102,6 +112,6 @@ DiscretePDFTest::samplePKA()
   {
     index = (*it).first;
     Real width = (energies[index[1] + 1] - energies[index[1]]) * dmu * dphi;
-    CPPUNIT_ASSERT( std::abs(1.0 - mindex(index) * width / frequency(index)) < 0.1);
+    EXPECT_TRUE(std::abs(1.0 - mindex(index) * width / frequency(index)) < 0.1);
   }
 }

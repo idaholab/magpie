@@ -12,24 +12,40 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "DiscreteFissionPDFTest.h"
-
 //Magpie includes
 #include "DiscreteFissionPKAPDF.h"
 #include "PKAGeneratorBase.h"
 #include "MultiIndex.h"
+#include "MooseRandom.h"
 #include "mytrim/ion.h"
 
 #include <cmath>
 #include <iostream>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DiscreteFissionPDFTest );
+#include <gtest/gtest.h>
 
-void
-DiscreteFissionPDFTest::sampleFissionPKA()
+void setRandomDirection(MyTRIM_NS::IonBase & ion)
+{
+  Real nsq, x1, x2;
+
+  // Marsaglia's method for uniformly sampling the surface of the sphere
+  do
+  {
+    x1 = 2 * MooseRandom::rand() - 1.0;
+    x2 = 2 * MooseRandom::rand() - 1.0;
+    nsq = x1 * x1 + x2 * x2;
+  } while (nsq >= 1);
+
+  // construct normalized direction vector
+  ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
+  ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
+  ion._dir(2) = 1.0 - 2.0 * nsq;
+}
+
+TEST(DiscreteFissionPDFTest, sampleFissionPKA)
 {
   //add environment variable for path of sum yield data files
-  setenv("ENDF_FP_DIR","../data/fission_yield/",1);
+  setenv("ENDF_FP_DIR", "../data/fission_yield/", 1);
 
   // Define vector of zaids and probabilites
   std::vector<unsigned int> zaid(2);
@@ -66,10 +82,6 @@ DiscreteFissionPDFTest::sampleFissionPKA()
 
   DiscreteFissionPKAPDF pdf = DiscreteFissionPKAPDF(zaid, energies, mindex);
 
-  // set up a frequency counter
-  unsigned int j1, j2;
-  MultiIndex<Real> frequency = MultiIndex<Real>(shape);
-
   // test it by sampling
   Real counter = 0.0, max = 5.0e5;
   Real total_energy = 0.0;
@@ -105,13 +117,12 @@ DiscreteFissionPDFTest::sampleFissionPKA()
 
     //find matching bin to the sample A
     for (unsigned int i = 0; i < fproduct_A.size(); ++i)
-    {
-      if ( int(i_state[0]._m) == fproduct_A[i])
+      if (i_state[0]._m == fproduct_A[i])
         {
           tally_index = i;
           break;
         }
-    }
+
     //tally mass number in corresponding bin
     fproduct_tally[tally_index] += 1.0;
 
@@ -119,7 +130,7 @@ DiscreteFissionPDFTest::sampleFissionPKA()
     total_mass += i_state[0]._m + i_state[1]._m + 2.8836;
     total_Z += i_state[0]._Z + i_state[1]._Z;
 
-    DiscreteFissionPDFTest::setRandomDirection(i_state[0]);
+    setRandomDirection(i_state[0]);
     i_state[1]._dir = -i_state[0]._dir;
 
     //sampled_mu (int)
@@ -151,10 +162,6 @@ DiscreteFissionPDFTest::sampleFissionPKA()
       phibin4 += 1.0;
     else
       mooseError("phi is not between -pi and pi");
-
-    index[0] = j1;
-    index[1] = j2;
-    frequency(index) += 1.0 / max;
   }
 
   //normalize the talley to pdf
@@ -180,45 +187,26 @@ DiscreteFissionPDFTest::sampleFissionPKA()
   auto maxerror = std::max_element(error.begin(), error.end());
 
   //check if total energy is conserved
-  CPPUNIT_ASSERT( std::abs(total_energy / max - true_energy) < 1.0 );
+  EXPECT_TRUE(std::abs(total_energy / max - true_energy) < 1.0) << "Energy conservation violated";
 
   //check if total mass is conserved
-  CPPUNIT_ASSERT( std::abs(total_mass / max - 239.0) < 1.0e-3);
+  EXPECT_TRUE(std::abs(total_mass / max - 239.0) < 1.0e-3) << "Mass conservation violated";
 
   //check if the z number is conserved
-  CPPUNIT_ASSERT( std::abs(total_Z / max - 94.0) < 1.0e-6);
+  EXPECT_TRUE(std::abs(total_Z / max - 94.0) < 1.0e-6) << "Charge conservation violated";
 
   //check if mu bins are uniformly distributed
-  CPPUNIT_ASSERT( std::abs(mubin1 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin2 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin3 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(mubin4 / max - 0.25) < 1.0e-2);
+  EXPECT_TRUE(std::abs(mubin1 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 1";
+  EXPECT_TRUE(std::abs(mubin2 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 2";
+  EXPECT_TRUE(std::abs(mubin3 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 3";
+  EXPECT_TRUE(std::abs(mubin4 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in mu bin 4";
 
   //check if phi bins are uniformly distributed
-  CPPUNIT_ASSERT( std::abs(phibin1 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin2 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin3 / max - 0.25) < 1.0e-2);
-  CPPUNIT_ASSERT( std::abs(phibin4 / max - 0.25) < 1.0e-2);
+  EXPECT_TRUE(std::abs(phibin1 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 1";
+  EXPECT_TRUE(std::abs(phibin2 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 2";
+  EXPECT_TRUE(std::abs(phibin3 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 3";
+  EXPECT_TRUE(std::abs(phibin4 / max - 0.25) < 1.0e-2) << "Non-uniform distribution in phi bin 4";
 
   //check max error of sampled distribution vs true distribution
-  CPPUNIT_ASSERT( *maxerror < 1.0e-2);
-}
-
-void
-DiscreteFissionPDFTest::setRandomDirection(MyTRIM_NS::IonBase & ion)
-{
-  Real nsq, x1, x2;
-
-  // Marsaglia's method for uniformly sampling the surface of the sphere
-  do
-  {
-    x1 = 2 * MooseRandom::rand() - 1.0;
-    x2 = 2 * MooseRandom::rand() - 1.0;
-    nsq = x1 * x1 + x2 * x2;
-  } while (nsq >= 1);
-
-  // construct normalized direction vector
-  ion._dir(0) = 2.0 * x1 * std::sqrt(1.0 - nsq);
-  ion._dir(1) = 2.0 * x2 * std::sqrt(1.0 - nsq);
-  ion._dir(2) = 1.0 - 2.0 * nsq;
+  EXPECT_TRUE(*maxerror < 1.0e-2) << "Max error exceeded";
 }
