@@ -72,7 +72,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
   if (isParamValid("int_vars"))
   {
     for (auto & name : getParam<std::vector<std::string> >("int_vars"))
-      _int_vars.push_back(&_fe_problem.getVariable(0, name));
+      _int_vars.push_back(&_fe_problem.getStandardVariable(0, name));
   }
   if (_int_vars.size() != _to_ivar.size())
     mooseError("Mismatch with int_vars and to_ivar");
@@ -80,7 +80,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
   if (isParamValid("double_vars"))
   {
     for (auto & name : getParam<std::vector<std::string> >("double_vars"))
-      _double_vars.push_back(&_fe_problem.getVariable(0, name));
+      _double_vars.push_back(&_fe_problem.getStandardVariable(0, name));
   }
   if (_double_vars.size() != _to_dvar.size())
     mooseError("Mismatch with double_vars and to_dvar");
@@ -88,7 +88,7 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params) :
   if (isParamValid("sol_vars"))
   {
     for (auto & name : getParam<std::vector<std::string> >("sol_vars"))
-      _sol_vars.push_back(&_fe_problem.getVariable(0, name));
+      _sol_vars.push_back(&_fe_problem.getStandardVariable(0, name));
   }
 
   _console << "\n>>>> STARTING SPPARKS <<<<\n";
