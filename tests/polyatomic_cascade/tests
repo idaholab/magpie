@@ -22,4 +22,12 @@
     abs_zero = 1e-6
     recover = false
   [../]
+  [./polyatomic_cascade_scaled]
+    type = 'Exodiff'
+    input = 'polyatomic_cascade.i'
+    exodiff = 'polyatomic_cascade_scaled_out.e'
+    abs_zero = 1e-6
+    recover = false
+    cli_args = "Outputs/file_base=polyatomic_cascade_scaled_out UserObjects/constant/pka_rate=0.01 UserObjects/rasterizer/number_pka=1000"
+  [../]
 []

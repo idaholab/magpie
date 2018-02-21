@@ -12,8 +12,6 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "MultiIndexTest.h"
-
 //Magpie includes
 #include "MultiIndex.h"
 
@@ -21,10 +19,9 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_value.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( MultiIndexTest );
+#include <gtest/gtest.h>
 
-void
-MultiIndexTest::setUp()
+TEST(MultiIndexTest, setUp)
 {
   // Construct a 3 indexed objects of Reals
   MultiIndex<Real>::size_type shape(3);
@@ -34,11 +31,11 @@ MultiIndexTest::setUp()
   MultiIndex<Real> mindex1 = MultiIndex<Real>(shape);
 
   // check dimension
-  CPPUNIT_ASSERT( mindex1.dim() == 3 );
+  EXPECT_EQ(mindex1.dim(), 3);
 
   // check size operator
   for (unsigned int j = 0; j < 3; ++j)
-    CPPUNIT_ASSERT( mindex1.size()[j] == shape[j] );
+  EXPECT_EQ(mindex1.size()[j], shape[j]);
 
   // parenthesis operator
   MultiIndex<Real>::size_type index(3);
@@ -60,7 +57,7 @@ MultiIndexTest::setUp()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( mindex1(index) == j0 + 10.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex1(index) == j0 + 10.0 * j1 + 100.0 * j2);
       }
 
   // check the two-argument constructor
@@ -82,7 +79,7 @@ MultiIndexTest::setUp()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 
   // test resize increasing and descreasing in different dimension simultaneously
@@ -99,9 +96,9 @@ MultiIndexTest::setUp()
         index[1] = j1;
         index[2] = j2;
         if (j0 < shape[0] && j1 < shape[1] && j2 < shape[2])
-          CPPUNIT_ASSERT( mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex2(index) == j0 - 3.0 * j1 + 100.0 * j2);
         else
-          CPPUNIT_ASSERT( mindex2(index) == 0.0);
+        EXPECT_EQ(mindex2(index), 0.0);
       }
 
       // test assign increasing and descreasing in different dimension simultaneously
@@ -121,13 +118,12 @@ MultiIndexTest::setUp()
               index[1] = j1;
               index[2] = j2;
               index[3] = j3;
-              CPPUNIT_ASSERT( mindex2(index) == 1.0);
+              EXPECT_EQ(mindex2(index), 1.0);
             }
 
 }
 
-void
-MultiIndexTest::testIterators()
+TEST(MultiIndexTest, testIterators)
 {
   // Create empty MultiIndex object
   MultiIndex<Real>::size_type shape(3);
@@ -151,7 +147,7 @@ MultiIndexTest::testIterators()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( mindex(index) == j0 - 3.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 
   // check the indices function
@@ -164,7 +160,9 @@ MultiIndexTest::testIterators()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( index[0] == (*it).first[0] && index[1] == (*it).first[1] && index[2] == (*it).first[2]);
+        EXPECT_EQ(index[0], (*it).first[0]);
+        EXPECT_EQ(index[1], (*it).first[1]);
+        EXPECT_EQ(index[2], (*it).first[2]);
         ++it;
       }
 
@@ -187,12 +185,11 @@ MultiIndexTest::testIterators()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( mindex(index) == j0 - 7.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex(index) == j0 - 7.0 * j1 + 100.0 * j2);
       }
 }
 
-void
-MultiIndexTest::dataStoreLoad()
+TEST(MultiIndexTest, dataStoreLoad)
 {
   // Create empty MultiIndex object
   MultiIndex<Real>::size_type shape(3);
@@ -231,12 +228,11 @@ MultiIndexTest::dataStoreLoad()
         index[0] = j0;
         index[1] = j1;
         index[2] = j2;
-        CPPUNIT_ASSERT( mindex(index) == j0 - 3.0 * j1 + 100.0 * j2 );
+        EXPECT_TRUE(mindex(index) == j0 - 3.0 * j1 + 100.0 * j2);
       }
 }
 
-void
-MultiIndexTest::slice()
+TEST(MultiIndexTest, slice)
 {
   // Create empty MultiIndex object
   MultiIndex<unsigned int>::size_type shape(4);
@@ -270,7 +266,7 @@ MultiIndexTest::slice()
             index[0] = j0;
             index[1] = j2;
             index[2] = j3;
-            CPPUNIT_ASSERT( sliced_mindex(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 
@@ -292,7 +288,7 @@ MultiIndexTest::slice()
             index[0] = j0;
             index[1] = j2;
             index[2] = j3;
-            CPPUNIT_ASSERT( sliced_mindex_vec(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex_vec(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 
@@ -315,7 +311,7 @@ MultiIndexTest::slice()
             MultiIndex<unsigned int>::size_type index(sliced_mindex_vec2.dim());
             index[0] = j0;
             index[1] = j2;
-            CPPUNIT_ASSERT( sliced_mindex_vec2(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
+            EXPECT_TRUE(sliced_mindex_vec2(index) == j0 + 10 * j1 + 100 * j2 + 1000 * j3);
           }
         }
 }
