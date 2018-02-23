@@ -51,10 +51,10 @@ PKAEmpiricalBase::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt
     // set stopping criteria
     pka.setEf();
 
-    // set location of the fission event
+    // set origin of the PKA
     setPosition(pka);
 
-    // set random direction for ion 1 and opposite direction for ion 2
+    // set a random direction for the PKA
     setRandomDirection(pka);
 
     // add PKA to list
