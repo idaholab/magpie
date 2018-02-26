@@ -103,6 +103,9 @@ public:
     /// length of pka list after rejection
     unsigned int scaled_npka;
 
+    /// a scaling factor for the reaction rates to avoid very large PKA lists
+    Real recoil_rate_scaling;
+
     /// scaling factor for the results
     Real result_scaling_factor;
 

@@ -36,10 +36,14 @@ PKAFixedPointGenerator::PKAFixedPointGenerator(const InputParameters & parameter
 }
 
 void
-PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real /*dt*/, Real /*vol*/, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real /*dt*/, Real /*vol*/, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   if (_current_elem->id() != _elem_id)
     return;
+
+  unsigned int num_pka = _num_pka;
+  if (recoil_rate_scaling != 1)
+    num_pka = std::floor(recoil_rate_scaling * _num_pka + getRandomReal());
 
   for (unsigned i = 0; i < _num_pka; ++i)
   {
