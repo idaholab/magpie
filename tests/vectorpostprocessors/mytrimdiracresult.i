@@ -1,5 +1,5 @@
 [Mesh]
-  type = GeneratedMesh
+  type = MyTRIMMesh
   dim = 2
   nx = 60
   ny = 60
@@ -7,7 +7,6 @@
   xmax = 1000
   ymin = 0
   ymax = 2000
-  elem_type = TRI3
 []
 
 [AuxVariables]
