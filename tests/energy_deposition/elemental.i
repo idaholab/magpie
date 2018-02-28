@@ -1,5 +1,5 @@
 [Mesh]
-  type = GeneratedMesh
+  type = MyTRIMMesh
   dim = 2
   nx = 50
   ny = 50
