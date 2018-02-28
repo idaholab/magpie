@@ -5,7 +5,7 @@
 \usepackage{lineno,hyperref}
 \usepackage{subcaption} 
 \usepackage{booktabs}
-
+\usepackage{multirow}
 \graphicspath{{./figures/}}
 \modulolinenumbers[5]
 
@@ -82,7 +82,7 @@ Radiation damage\sep Elastic scattering \sep Inelastic scattering
 
 \section{Introduction}
 
-The purpose of this report is to derive expressions for the elastic and inelastic neutron recoil cross sections dependent only on quantities that can be obtained easily from fundamental data such as the National Nuclear Data Center~\cite{NNDC}. Recoil cross sections are essential to compute isotope, angle and energy dependent recoil rates given detailed neutron distribution in phase space that can be computed by a radiation transport code. In particular, the recoil cross sections are used in the Rattlesnake radiation transport code~\cite{RattlesnakeTheoryManual} to compute recoil rate distributions that are passed on to the Magpie [Ref?] glue application for computing primary knock-on atom (PKA) distribution rates in turn used for coupled binary-collision Monte-Carlo/FEM calculations. Elastic and inelastic neutron scattering events are important interactions initiating radiation damage cascades especially in structural materials.
+The purpose of this report is to derive expressions for the elastic and inelastic neutron recoil cross sections dependent only on quantities that can be obtained easily from fundamental data such as the National Nuclear Data Center~\cite{NNDC}. Recoil cross sections are essential to compute isotope, angle and energy dependent recoil rates given detailed neutron distribution in phase space that can be computed by a radiation transport code. In particular, the recoil cross sections are used in the Rattlesnake radiation transport code~\cite{RattlesnakeTheoryManual} to compute recoil rate distributions that are passed on to the Magpie glue application for computing primary knock-on atom (PKA) distribution rates in turn used for coupled binary-collision Monte-Carlo/FEM calculations. Elastic and inelastic neutron scattering events are important interactions initiating radiation damage cascades especially in structural materials.
 
 
 %**********************************************************************************************************************************************************************************************%
@@ -177,7 +177,7 @@ where $E$ is the initial energy of the neutron in the LAB frame. Finally we obta
    \left( \frac{V_c}{V_c'} \right) = \left(1 + \frac{ Q_j}{E}  \frac{A+1}{A} \right)^{-1/2}.
 \end{equation}
 Introducing the threshold energy $E_t$ and the dimensionless neutron energy $\Delta$ by:
-\begin{align}
+\begin{align}\label{eq:def_threshold}
   E_t & = \frac{(A+1)}{A}\left |Q_j\right |  \nonumber \\
   \Delta &= \frac{E_t}{E},
 \end{align}
@@ -325,8 +325,8 @@ It should be noted that the fraction of the scattering processes located in the 
 Finally, the scattering process is impossible if:
 \begin{align}
    E_u & < E_t \nonumber \\
-   T_{\uparrow} & < T_l \nonumber \\
-   T_{\downarrow} & > T_u. 
+   \text{or } T_{\uparrow} & < T_l \nonumber \\
+   \text{or } T_{\downarrow} & > T_u. 
 \end{align}
 
 \begin{figure}
@@ -336,7 +336,37 @@ Finally, the scattering process is impossible if:
 	\label{fig:energy_boundaries}
 \end{figure}
 
-    
+%**********************************************************************************************************************************************************************************************%
+\subsection{Limits of the Scattering Cosine in the LAB Frame}\label{sec:mu_L_limits}
+In case of elastic scattering, $\mu_l$ is strictly monotonically decreasing with $\mu_c$ and $\mu_c$ is strictly monotonically decreasing with the ratio $T/E$. Hence, the limits of $\mu_l$ are given by the smallest and largest ratios
+$T_{\downarrow}/E_{\uparrow}$ and $T_{\downarrow}/E_{\uparrow}$, respectively:
+\begin{align}
+  \mu_{l,min} &= \mu_{l,min}(E_{\uparrow},T_{\downarrow}) \nonumber \\
+  \mu_{l,max} &= \mu_{l,min}(E_{\downarrow},T_{\uparrow}).
+\end{align}
+
+In the case of inelastic scattering, $\mu_l$ can exhibit local minima with respect to $T$ as depicted in Fig.~\ref{fig:mu_L_boundaries}.
+\begin{figure}
+	\centering
+	\includegraphics[width=1.0\linewidth]{lab_scattering_cosine_vs_T.png}
+	\caption{Scattering cosine in the LAB frame $\mu_l$ plotted versus recoil energy $T$ for various neutron energies $E$ and $Q=1$, $A=2$. For comparison, the case $Q=0$ is plotted as well.}
+	\label{fig:mu_L_boundaries}
+\end{figure}
+The minimum of the curves in Fig.~\ref{fig:mu_L_boundaries} is assumed at $T=\frac{|Q_j|}{A+1}$ and the minimum recoil cosine in the LAB frame is given by $\sqrt{\Delta}$.
+
+We now describe how to determine $\mu_{l,\downarrow}$ and $\mu_{l,\uparrow}$ if the neutron and recoil energies are limited by $E_{\downarrow}$, $E_{\uparrow}$, $T_{\downarrow}$, and $T_{\uparrow}$. It is useful to note that in Fig.~\ref{fig:mu_L_boundaries} curves with larger $E$ are located below curves with smaller $E$. Hence, in order to obtain $\mu_{l,\uparrow}$, we use $E=E_{\downarrow}$. The value at which the $\mu_{l,\uparrow}$ is assumed is then given by:
+\begin{equation}
+ \mu_{l,\uparrow} = \max \left(  \mu_l(E_{\downarrow},T_{\downarrow}), \mu_l(E_{\downarrow},T_{\uparrow}) \right).
+\end{equation}
+Determining $\mu_{l, \downarrow}$ is slightly more difficult because we need to determine if the minimum is comprised within the range $[T_{\downarrow}, T_{\uparrow}]$. If the minimum is not contained, we simply use the value is located closest to the minimum to evaluate $\mu_l$:
+\begin{equation} \label{eq:mu_L_min}       
+ \mu_{l,\downarrow}  = \left\{ \begin{array}{ll}
+         \sqrt{\frac{E_t}{E_{\uparrow}}}, & T_{\downarrow}\le \frac{|Q_j|}{A+1} \le T_{\uparrow}\\
+         \mu_l(E_{\uparrow}, T_{\downarrow}), &  T_{\downarrow} >\frac{|Q_j|}{A+1} \\
+         \mu_l(E_{\uparrow}, T_{\uparrow}), &  T_{\uparrow} <\frac{|Q_j|}{A+1} \\ 
+         \end{array}
+         \right .    .
+\end{equation}         
 %**********************************************************************************************************************************************************************************************%
 \section{Role of De-excitation Gamma Rays}
 The de-excitation gamma ray is released by the nucleus after the inelastic scattering event concludes. The process of inelastic scattering, considered from before the interaction to after the gamma is released, is a three-body problem. However, as the gamma ray is released after the neutron capture, compound nucleus formation, and neutron release it can be broken up into two two-body problems. The kinematics of the first two-body problem are discussed above, while the second two-body problem is discussed in this section. The central question is whether the momentum of the de-excitation gamma is large compared to the overall momentum in the system. 
@@ -434,13 +464,12 @@ The Legendre polynomials satisfy the following orthogonality property:
 	\int\limits_{\mu_{l,min}}^{\mu_{l,max}} d \mu_l P^*_k(\mu_l) P^*_{i}(\mu_l) = \frac{\Delta \mu_l}{2k +1} \delta_{k,i},
 \end{equation}
 where $\delta_{k,i}$ is the Kronecker delta.
-The minimum and maximum scattering cosines in the LAB frame can be determined from the smallest and largest $T / E$ ratio for pairing $g$ and $j$ as follows:
+For elastic scattering, the minimum and maximum scattering cosines in the LAB frame can be determined from the smallest and largest $T / E$ ratio for pairing $g$ and $j$ as follows:
 \begin{align}\label{eq:min_max_mu}
    \left( \frac{T}{E} \right)_{min} = \left( \frac{T_{j+1}}{E_{g}}   \right) \rightarrow \mu_{c,max} \rightarrow \mu_{l,min} \nonumber \\
     \left( \frac{T}{E} \right)_{max} = \left( \frac{T_{j}}{E_{g+1}}   \right) \rightarrow \mu_{c,min} \rightarrow \mu_{l,max},
 \end{align}
-where Eqs.~\ref{eq:muc} and~\ref{eq:muL_mu_C_elastic2} are used for elastic scattering and Eqs.~\ref{eq:T_inelastic} and~\ref{eq:mu_l_mu_c_inelastic_final} are used for inelastic scattering.
-(this is obvious for elastic, but verify this for inelastic as well).
+where Eqs.~\ref{eq:muc} and~\ref{eq:muL_mu_C_elastic2} are used for elastic scattering and Eqs.~\ref{eq:T_inelastic} and~\ref{eq:mu_l_mu_c_inelastic_final} are used for inelastic scattering. For inelastic scattering the equations in section~\ref{sec:mu_L_limits} are used.
 
 Multiplying Eq.~\ref{eq:leg_expansion_sigma} with $P_i^*$ and integrating over $\mu_l$ within $\mu_{l,min}$ and $\mu_{l,max}$ gives:
 \begin{equation}\label{eq:sigma_coefficient}
@@ -631,6 +660,65 @@ We select $A=2$ corresponding to $\gamma = 8/9$.
 
 In Fig.~\ref{fig:analytical_vs_angle}, the value of the transfer cross section is plotted vs. the LAB scattering cosine $\mu_l$. The black dotted lines are the analytical reference for $j=1,..,20$ while the colorized lines are the results from the computation for $L=20$. 
 The index $j$ of the curves increases from left to right as larger $j$ correspond to smaller energy transfer; in turn smaller energy transfer to the recoil corresponds to smaller LAB scattering cosines as shown in Eq.~\ref{eq:min_max_mu}. This behavior is reproduced in Fig.~\ref{fig:analytical_vs_angle}. The analytical results are in good agreement with the computed distributions. It should be noted that the angular distributions $p_{\mu_L}$ are not continously differentiable leading to relatively slow convergence of the numerical results to the analytical solution with increasing $L$.
+
+\section{Preliminary Cross Sections for Inelastic Scattering}
+The first test uses $^1$H, $\xi(E)=1$, $\sigma_{r,n}(E)=1$, and three values for $Q: 0.1,~0.4,~0.8$. Neutron energy groups are set to $E_0 = [1,2]$, $E_1=[0,1]$ and 
+recoil energy groups are given by $T_j=[2 - \frac{j}{20},2 - \frac{j-1}{20}]$, $j=1,..,20$. The average neutron to recoil energy group transfer cross section is depicted in Figs.~\ref{fig:inelastic_simple_1} to~\ref{fig:inelastic_simple_8} for $Q=0.1$, $Q=0.4$, and $Q=0.8$, respectively. The neutron and recoil energy limits that apply to this problem are collected in Fig.~\ref{table:energy_limits_inelastic_simple}. We observe that the results in Figs.~\ref{fig:inelastic_simple_1} to~\ref{fig:inelastic_simple_8} abide by the limits in the table. Why maximum in the middle?
+
+The second test investigates the angular distribution for $Q=0.2$, $A=2$, $E=[1.0, 1.2]$, and $T_j = [1-\frac{j}{20},  1-\frac{j-1}{20}]$, $j=1,...,10$. The results are plotted in Fig.~\ref{fig:inelastic_vs_angle}. First, the lower limit of LAB cosines in Fig.~\ref{fig:inelastic_vs_angle} is observed to be $\mu_{L,\downarrow}=0.5$. From Eq.~\ref{eq:mu_L_min} we find that in this case with $E_t=0.3$ and $E_{\uparrow}=1.2$, we have $\mu_{L,\downarrow} = \sqrt{0.3/1.2}=0.5$. 
+
+The peculiar shape of the lowest recoil energy group needs to discussed. The $E=1$ line in a plot totally equivalent to Fig.~\ref{fig:mu_L_boundaries} would be the locus of
+$\mu_{L,\uparrow}$. The curves are relatively flat for $T>\frac{|Q_j|}{A+1}$ but steep for $T<\frac{|Q_j|}{A+1}$. In our case, we have $frac{|Q_j|}{A+1}\approx 0.067$ such that only the lowest energy group is significantly to the left of the maximum. The minimum recoil energy of the lowest energy group results in the largest $\mu_{L,\uparrow}$ which in this case is $\mu_{L,\uparrow}=1$. The seemingly unexpected change in shape from the $T=[0.05,0.1]$ to the $T=[0,0.05]$ recoil energy group is caused by the steepness of the $\mu_L$  vs. $T$ curve with the additional complication of only the lowest recoil energy group having energies in this range. To resolve the steepness of the LAB recoil cosine curve, more recoil energy groups would be required, i.e. then we would see a smooth return of $\mu_{L,\uparrow}$ from low values to higher values and finally to $1$. As low recoil energy groups are inconsequential, it is recommended to cut off the recoil energies below $\frac{|Q_j|}{A+1}$. Note that the higher $A$ is the lower $Q_j$ tends to be and in this case $\frac{|Q_j|}{A+1}$ will be even smaller.
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=1\linewidth]{inelastic_simple_1.pdf}
+	\caption{Average recoil cross section of $^1$H given constant scattering cross section and spectrum, $g=0:~ 1 < E < 2,~g=1:~ 0 < E < 1,~Q=0.1$.}
+	\label{fig:inelastic_simple_1}
+\end{figure}
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=1\linewidth]{inelastic_simple_4.pdf}
+	\caption{Average recoil cross section of $^1$H given constant scattering cross section and spectrum, $g=0:~ 1 < E < 2,~g=1:~ 0 < E < 1,~Q=0.4$.}
+	\label{fig:inelastic_simple_4}
+\end{figure}
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=1\linewidth]{inelastic_simple_8.pdf}
+	\caption{Average recoil cross section of $^1$H given constant scattering cross section and spectrum, $g=0:~ 1 < E < 2,~g=1:~ 0 < E < 1,~Q=0.8$.}
+	\label{fig:inelastic_simple_8}
+\end{figure}
+
+\begin{table}[p]
+\caption{Minimum and maximum neutron and recoil energies for inelastic scattering test problem.}
+\centering
+\begin{tabular}{c c c c c}
+\toprule
+ &         $Q$   & $0.1$ & $0.4$  & $0.8$ \\
+ & $E_t$ [Eq.~\ref{eq:def_threshold}] &  $0.2$     &  $0.4$       & $1.6$ \\
+ \midrule
+ \multirow{4}{*}{$g=0$} &    $E_{min}$       &         1        &       1           &      1.6    \\
+                                     &    $E_{max}$       &        2         &       2           &       2   \\
+                                     &    $T_{min}$ [Eq.~\ref{eq:T_min_max}]       &         0.0013    & 0.025                   &    0.153      \\
+                                     &   $T_{max}$ [Eq.~\ref{eq:T_min_max}]       &         1.899    & 1.575                   &     1.047     \\
+ \midrule
+ \multirow{4}{*}{$g=0$} &      $E_{min}$     &       0.2          &     0.8             &     -     \\
+                                     &      $E_{max}$     &       1          &         1         &          - \\
+                                     &      $T_{min}$ [Eq.~\ref{eq:T_min_max}]   &          0.0028       &    0.077              &     -     \\
+                                     &     $T_{max} $ [Eq.~\ref{eq:T_min_max}]    &         0.897        &     0.524             &     -     \\
+\bottomrule
+\end{tabular}
+\label{table:energy_limits_inelastic_simple}
+\end{table}
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=1\linewidth]{inelastic_vs_angle.pdf}
+	\caption{Angular distribution of recoils for inelastic scattering events from $E=[1,1.2]$ to $T_j = [1-\frac{j}{20},  1-\frac{j-1}{20}]$, $j=1,...,10$, with $A=2$, $Q=0.2$.}
+	\label{fig:inelastic_vs_angle}
+\end{figure}
 
 %\section*{References}
 \clearpage
