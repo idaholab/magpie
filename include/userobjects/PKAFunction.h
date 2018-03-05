@@ -6,45 +6,49 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKACONSTANT_H
-#define PKACONSTANT_H
+#ifndef PKAFUNCTION_H
+#define PKAFUNCTION_H
 
 #include "PKAEmpiricalBase.h"
+#include "Function.h"
 
-class PKAConstant;
+class PKAFunction;
 
 template<>
-InputParameters validParams<PKAConstant>();
+InputParameters validParams<PKAFunction>();
 
 /**
- * PKAs with constant mass, charge, energy, and rate
+ * PKAs with time dependent mass, charge, energy, and rate
  */
-class PKAConstant : public PKAEmpiricalBase
+class PKAFunction : public PKAEmpiricalBase
 {
 public:
-  PKAConstant(const InputParameters & parameters);
+  PKAFunction(const InputParameters & parameters);
 
 protected:
   /// Fission rate (per unit volume)
-  virtual Real getPKARate() const override { return _pka_rate; };
+  virtual Real getPKARate() const override { return _pka_rate.value(_time, Point()); };
 
   ///@{ charge, mass, energy
-  virtual unsigned int getZ() const override { return _Z; };
-  virtual Real getM() const override { return _m; };
-  virtual Real getE() const override { return _E; };
+  virtual unsigned int getZ() const override { return _Z.value(_time, Point()); };
+  virtual Real getM() const override { return _m.value(_time, Point()); };
+  virtual Real getE() const override { return _E.value(_time, Point()); };
   ///@}
 
   /// Fission rate (per unit volume)
-  const Real _pka_rate;
+  Function & _pka_rate;
 
   /// PKA nuclear charge
-  const unsigned int _Z;
+  Function & _Z;
 
   /// PKA mass
-  const Real _m;
+  Function & _m;
 
   /// PKA Energy (in eV)
-  const Real _E;
+  Function & _E;
+
+  /// time
+  const Real & _time;
 };
 
-#endif // PKACONSTANT_H
+#endif // PKAFUNCTION_H
