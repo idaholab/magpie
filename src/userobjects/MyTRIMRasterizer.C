@@ -8,7 +8,6 @@
 
 #include "MyTRIMRasterizer.h"
 #include "PKAGeneratorBase.h"
-#include "MagpieParallel.h"
 #include "MooseRandom.h"
 #include "MooseMesh.h"
 
@@ -322,7 +321,7 @@ MyTRIMRasterizer::finalize()
     serialize(send_buffer);
 
     // broadcast serialized data to and receive from all processors
-    MagpieUtils::allgatherStringBuffers(_communicator, send_buffer, recv_buffers);
+    _communicator.allgather(send_buffer, recv_buffers);
 
     // unpack the received data and merge it into the local data structures
     deserialize(recv_buffers);

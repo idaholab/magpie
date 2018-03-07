@@ -8,7 +8,6 @@
 
 #include "IsotopeRecoilRate.h"
 #include "MyTRIMRasterizer.h"
-#include "MagpieParallel.h"
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "mytrim/ion.h"
 

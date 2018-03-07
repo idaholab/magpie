@@ -8,7 +8,6 @@
 
 #include "MyTRIMPKAStatistics.h"
 #include "MyTRIMRasterizer.h"
-#include "MagpieParallel.h"
 #include "mytrim/ion.h"
 
 template<>
