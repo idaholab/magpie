@@ -7,7 +7,6 @@
 /**********************************************************************/
 
 #include "MyTRIMElementRun.h"
-#include "MagpieParallel.h"
 #include "MooseMesh.h"
 
 // libmesh includes
@@ -79,7 +78,7 @@ MyTRIMElementRun::finalize()
     serialize(send_buffer);
 
     // broadcast serialized data to and receive from all processors
-    MagpieUtils::allgatherStringBuffers(_communicator, send_buffer, recv_buffers);
+    _communicator.allgather(send_buffer, recv_buffers);
 
     // unpack the received data and merge it into the local data structures
     deserialize(recv_buffers);
