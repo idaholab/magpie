@@ -10,7 +10,7 @@
 
 #include "NeutronicsSpectrumSamplerSN.h"
 #include "YakxsUtilities.h"
-#include "ElasticRecoilCrossSectionUserObject.h"
+#include "ElasticRecoil.h"
 
 // gsl includes
 #include "gsl/gsl_sf_legendre.h"
@@ -70,7 +70,7 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
     _recoil_cross_sections[j].resize(_I);
     for (unsigned int i = 0; i < _I; ++i)
     {
-      _recoil_cross_sections[j][i] = &getUserObjectByName<ElasticRecoilCrossSectionUserObject>(names[p]);
+      _recoil_cross_sections[j][i] = &getUserObjectByName<ElasticRecoil>(names[p]);
       ++p;
     }
   }

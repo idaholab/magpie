@@ -1,8 +1,0 @@
-[Tests]
-  [./erxs_analytical_test]
-    type = 'CSVDiff'
-    input = 'erxs_analytical.i'
-    csvdiff = 'erxs_analytical_out.csv'
-#    csvdiff = 'erxs_analytical_out.csv erxs_analytical_mu_L_out.csv'
-  [../]
-[]

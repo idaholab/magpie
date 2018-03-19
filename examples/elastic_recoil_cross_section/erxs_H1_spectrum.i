@@ -19,11 +19,11 @@
 
 [UserObjects]
   [./XSGenerator]
-     type = ElasticRecoilCrossSectionUserObject
+     type = ElasticRecoil
 
      # Inputs
-     erxs_output_file_name = erxs_H_simple_out.csv
-     mu_L_output_file_name = erxs_H_simple_mu_L_out.csv
+     cross_section_output_filename = erxs_H_spectrum_out.csv
+     mu_L_output_filename = erxs_H_spectrum_mu_L_out.csv
      atomic_mass = 1
      legendre_order = 7
      neutron_energy_limits = '1e7 1e6 1e5 1e4 1e3 1e2 1e1 1e0'
@@ -32,7 +32,7 @@
      # Functions
      neutron_spectrum = neutron_spectrum
      scattering_law = scattering_law
-     elastic_xs = elastic_xs
+     scattering_xs = scattering_xs
 
      execute_on = timestep_end
   [../]
@@ -42,11 +42,11 @@
 [Functions]
   [./neutron_spectrum]
      type = ParsedFunction
-     value = '1'
+     value = '1/t'
   [../]
 
   # t is equal to Ei
-  [./elastic_xs]
+  [./scattering_xs]
     type = ParsedFunction
     value = '1'
   [../]
