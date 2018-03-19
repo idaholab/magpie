@@ -8,7 +8,6 @@
 
 #include "MyTRIMPKAInfo.h"
 #include "MyTRIMRasterizer.h"
-#include "MagpieParallel.h"
 
 template<>
 InputParameters validParams<MyTRIMPKAInfo>()
