@@ -7,39 +7,57 @@
 /**********************************************************************/
 
 
-#ifndef ELASTICRECOILCROSSSECTIONUSEROBJECT_H
-#define ELASTICRECOILCROSSSECTIONUSEROBJECT_H
+#ifndef SCATTERINGRECOILCROSSSECTION_H
+#define SCATTERINGRECOILCROSSSECTION_H
 
 #include "GeneralUserObject.h"
 
-class ElasticRecoilCrossSectionUserObject;
+class ScatteringRecoilCrossSection;
 
 template <>
-InputParameters validParams<ElasticRecoilCrossSectionUserObject>();
+InputParameters validParams<ScatteringRecoilCrossSection>();
 
-class ElasticRecoilCrossSectionUserObject : public GeneralUserObject
+class ScatteringRecoilCrossSection : public GeneralUserObject
 {
 public:
-  ElasticRecoilCrossSectionUserObject(const InputParameters & parameters);
+  ScatteringRecoilCrossSection(const InputParameters & parameters);
 
   virtual void initialize() override;
 
-  virtual void execute() override;
-
   virtual void finalize() override;
 
-  ///@{ accessors for recoil cross section data
+  /// number of neutron energy groups
   unsigned int nNeutronGroups() const { return _G; }
+
+  /// number of recoil energy groups
   unsigned int nRecoilGroups() const { return _T; }
+
+  /// the order of the legendre series expansion of the recoil cross section in mu_L
   unsigned int legendreOrder() const { return _L; }
+
+  ///@{ neutron and recoil energy limits
   const std::vector<Real> & getNeutronEnergyLimits() const { return _neutron_energy_limits; };
   const std::vector<Real> & getRecoilEnergyLimits() const {return _recoil_energy_limits; };
+  ///@}
+
+  /// returns the recoil cross section Legendre expansion coefficient of order l for group g->t
   Real getSigmaRecoil(unsigned int g, unsigned int t, unsigned int l) const;
+
+  ///@{ maximum and minimum laboratory scattering cosine for g->t group combination
   Real getMaxRecoilCosine(unsigned int g, unsigned t) const;
   Real getMinRecoilCosine(unsigned int g, unsigned t) const;
   ///@}
 
+  /// is this g-> combination possible
+  bool isRecoilPossible(unsigned int g, unsigned int t) const;
+
 protected:
+  /// helper function to get mu_C from T and E
+  virtual Real getCMCosine(Real E, Real T, Real Q = 0.0) const = 0;
+
+  /// helper function to get mu_L from mu_C & neutron energy
+  virtual Real getLabCosine(Real E, Real T, Real Q = 0.0) const = 0;
+
   /// Method that finds the neutron energy group given a neutron energy
   unsigned int findNeutronEnergyGroup(Real energy);
 
@@ -54,12 +72,6 @@ protected:
 
   /// Function representing the neutron spectrum
   Function & _neutron_spectrum;
-
-  /// Function representing the scattering law
-  Function & _scattering_law;
-
-  /// Function representing the elastic cross section
-  Function & _elastic_xs;
 
   /// Order of Legendre polynomials
   unsigned int _L;
@@ -85,17 +97,20 @@ protected:
   /// Limits that characterize the recoil energy bins, must be in descending order
   const std::vector<Real> _recoil_energy_limits;
 
+  /// Function representing the elastic cross section
+  std::vector<Function *> _scattering_cross_section;
+
   /// Varible for the neutron spectrum
   std::vector<Real> _xi_g;
 
   /// Elastic recoil cross section coefficients for the expansion in Legendre polynomials
-  std::vector<std::vector<std::vector<Real>>> _erxs_coeff;
+  std::vector<std::vector<std::vector<Real>>> _recoil_coefficient;
 
   /// Varible to store the maximum and minimum possible cosines in the Lab frame
-  std::vector<std::vector<std::vector<Real>>> _save_mu_L;
+  std::vector<std::vector<std::vector<Real>>> _mu_L;
 
   /// Output file with the elastic recoil cross section coefficients for the expansion in Legendre polynomials
-  std::string _erxs_file_name;
+  std::string _recoil_xs_file_name;
 
   /// Output file with the maximum and minimum possible cosines in the Lab frame
   std::string _mu_L_file_name;

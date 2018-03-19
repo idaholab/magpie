@@ -1,0 +1,7 @@
+[Tests]
+  [./inelastic_simple]
+    type = 'CSVDiff'
+    input = 'inelastic_simple.i'
+    csvdiff = 'inelastic_simple_mu_L_out.csv inelastic_simple_out.csv'
+  [../]
+[]

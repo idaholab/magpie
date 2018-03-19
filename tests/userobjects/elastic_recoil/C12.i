@@ -19,21 +19,16 @@
 
 [UserObjects]
   [./XSGenerator]
-     type = ElasticRecoilCrossSectionUserObject
-
-     # Inputs
-     erxs_output_file_name = erxs_H_spectrum_xs_out.csv
-     mu_L_output_file_name = erxs_H_spectrum_xs_mu_L_out.csv
-     atomic_mass = 1
-     legendre_order = 7
-     # 14 group CASMO lib
-     neutron_energy_limits = '10000000  2231000  821000  5530  48.052  4  1.15  0.972  0.625  0.35  0.28  0.14  0.058  0.03  0.00001'
-     # 25 group CASMO lib
-     recoil_energy_limits = '10000000  6065500  3679000  2231000  1353000  821000  500000  111000  9118  5530  148.728  15.968  9.877
-                             4  1.855  1.15  1.097  1.02  0.972  0.625  0.35  0.28  0.14  0.058  0.03  0.00001'
+     type = ElasticRecoil
+     cross_section_output_filename = C12_out.csv
+     mu_L_output_filename = C12_mu_L_out.csv
+     atomic_mass = 12
+     legendre_order = 4
+     neutron_energy_limits = '203240 145000'
+     recoil_energy_limits = '1e4 1000 0'
      neutron_spectrum = neutron_spectrum
      scattering_law = scattering_law
-     elastic_xs = elastic_xs
+     scattering_xs = scattering_xs
      execute_on = timestep_end
   [../]
 []
@@ -46,9 +41,9 @@
   [../]
 
   # t is equal to Ei
-  [./elastic_xs]
+  [./scattering_xs]
     type = PiecewiseLinear
-    data_file = C12_input.csv
+    data_file = C12_xs.csv
     xy_in_file_only = false
     format = columns
   [../]
@@ -56,7 +51,7 @@
   # t is equal to mu_c
   [./scattering_law]
       type = ParsedFunction
-     value = '0.5'
+     value = '0.5+0.1*t'
   [../]
 []
 

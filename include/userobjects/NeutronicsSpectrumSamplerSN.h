@@ -15,7 +15,7 @@
 
 // Forward Declarations
 class NeutronicsSpectrumSamplerSN;
-class ElasticRecoilCrossSectionUserObject;
+class ElasticRecoil;
 
 template<>
 InputParameters validParams<NeutronicsSpectrumSamplerSN>();
@@ -48,7 +48,7 @@ protected:
   /// the angular flux
   std::vector<std::vector<const VariableValue *> > _angular_flux;
   /// UserObjects storing the recoil cross sections
-  std::vector<std::vector<const ElasticRecoilCrossSectionUserObject *>> _recoil_cross_sections;
+  std::vector<std::vector<const ElasticRecoil *>> _recoil_cross_sections;
 };
 
 #endif //NEUTRONICSSPECTRUMSAMPLERSN_H
