@@ -65,6 +65,8 @@ dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
   dataLoad(stream, pl._state, context);
 }
 
+registerMooseObject("MagpieApp", MyTRIMRasterizer);
+
 template<>
 InputParameters validParams<MyTRIMRasterizer>()
 {
@@ -95,8 +97,9 @@ InputParameters validParams<MyTRIMRasterizer>()
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
   params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
-  params.addParam<unsigned int>("number_pka", "Desired number of PKAs to be run during each invocation of mytrim");
-  params.addParamNamesToGroup("interval analytical_energy_cutoff number_pka", "Advanced");
+  params.addParam<Real>("recoil_rate_scaling", 1.0, "A factor to scale computed reaction rates in the the PKAGenerator objects. This is useful to avoid extremely large PKA lists.");
+  params.addParam<unsigned int>("max_pka_count", "Desired number of PKAs to be run during each invocation of mytrim");
+  params.addParamNamesToGroup("interval analytical_energy_cutoff max_pka_count", "Advanced");
 
   params.addParam<Real>("r_rec", "Recombination radius in Angstrom. Frenkel pairs with a separation distance lower than this will be removed from the cascade");
   params.addParamNamesToGroup("r_rec", "Recombination");
@@ -123,9 +126,10 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   // fill in trim parameters
   _trim_parameters.element_prototypes.resize(_nvars);
   _trim_parameters.analytical_cutoff = getParam<Real>("analytical_energy_cutoff");
+  _trim_parameters.recoil_rate_scaling = getParam<Real>("recoil_rate_scaling");
   _trim_parameters.trim_module = getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>();
-  if (isParamValid("number_pka"))
-    _trim_parameters.desired_npka = getParam<unsigned int>("number_pka");
+  if (isParamValid("max_pka_count"))
+    _trim_parameters.desired_npka = getParam<unsigned int>("max_pka_count");
   else
     _trim_parameters.desired_npka = 0;
 
@@ -276,7 +280,7 @@ MyTRIMRasterizer::execute()
 
   // add PKAs for current element
   for (auto && gen : _pka_generators)
-    gen->appendPKAs(_pka_list, _accumulated_time + _fe_problem.dt(), vol, average);
+    gen->appendPKAs(_pka_list, _accumulated_time + _fe_problem.dt(), vol, _trim_parameters.recoil_rate_scaling, average);
 }
 
 void
@@ -355,10 +359,7 @@ MyTRIMRasterizer::finalize()
   if (_trim_parameters.desired_npka == 0 || _trim_parameters.desired_npka > _trim_parameters.original_npka)
   {
     _trim_parameters.scaled_npka = _trim_parameters.original_npka;
-    _trim_parameters.result_scaling_factor = 1;
-
-    if (_trim_parameters.desired_npka > _trim_parameters.original_npka)
-      mooseDoOnce(mooseWarning("number_pka is larger than number of sampled PKAs and will be ignored!"));
+    _trim_parameters.result_scaling_factor = 1.0 / _trim_parameters.recoil_rate_scaling;
   }
   else
   {
@@ -375,7 +376,7 @@ MyTRIMRasterizer::finalize()
 
       // save the size of the PKA list after rejection & the scaling factor
       _trim_parameters.scaled_npka = _pka_list.size();
-      _trim_parameters.result_scaling_factor = Real(_trim_parameters.original_npka) / Real(_trim_parameters.scaled_npka);
+      _trim_parameters.result_scaling_factor = Real(_trim_parameters.original_npka) / Real(_trim_parameters.scaled_npka) / _trim_parameters.recoil_rate_scaling;
     }
 
     // need to broadcast the size of the PKA list after rejection & result scaling factor

@@ -15,6 +15,8 @@
 
 #include <queue>
 
+registerMooseObject("MagpieApp", MyTRIMDiracRun);
+
 template<>
 InputParameters validParams<MyTRIMDiracRun>()
 {

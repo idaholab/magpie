@@ -9,6 +9,8 @@
 #include "MyTRIMMesh.h"
 #include "PointLocatorRegularOrthogonal.h"
 
+registerMooseObject("MagpieApp", MyTRIMMesh);
+
 template<>
 InputParameters validParams<MyTRIMMesh>()
 {

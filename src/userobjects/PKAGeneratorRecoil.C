@@ -10,6 +10,8 @@
 #include "DiscreteFissionPKAPDF.h"
 #include "MultiIndex.h"
 
+registerMooseObject("MagpieApp", PKAGeneratorRecoil);
+
 template<>
 InputParameters validParams<PKAGeneratorRecoil>()
 {
@@ -61,7 +63,7 @@ PKAGeneratorRecoil::setPDF(const std::vector<unsigned int> & ZAID, const std::ve
 }
 
 void
-PKAGeneratorRecoil::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAGeneratorRecoil::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt >= 0, "Passed a negative time window into PKAGeneratorRecoil::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAGeneratorRecoil::appendPKAs");
@@ -71,7 +73,7 @@ PKAGeneratorRecoil::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real 
 
   for (unsigned int nuclide = 0; nuclide < _partial_recoil_rates.size(); ++nuclide)
   {
-    unsigned int num_recoils = std::floor(dt * vol * (*_partial_recoil_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
+    unsigned int num_recoils = std::floor(recoil_rate_scaling * dt * vol * (*_partial_recoil_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
 
     for (unsigned i = 0; i < num_recoils; ++i)
     {

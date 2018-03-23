@@ -8,6 +8,8 @@
 
 #include "PKAConstant.h"
 
+registerMooseObject("MagpieApp", PKAConstant);
+
 template<>
 InputParameters validParams<PKAConstant>()
 {

@@ -15,6 +15,8 @@
 
 #include <queue>
 
+registerMooseObject("MagpieApp", MyTRIMElementRun);
+
 template<>
 InputParameters validParams<MyTRIMElementRun>()
 {
@@ -46,6 +48,7 @@ MyTRIMElementRun::execute()
 
   // output the number of recoils being launched
   _console << "\nMyTRIM: Running " << _trim_parameters.scaled_npka << " recoils.\n"
+           << "Recoil rate scaling factor is " << _trim_parameters.recoil_rate_scaling << "\n"
            << "Sampled number of recoils: " << _trim_parameters.original_npka << "\n"
            << "Result scaling factor: " << _trim_parameters.result_scaling_factor << std::endl;
 

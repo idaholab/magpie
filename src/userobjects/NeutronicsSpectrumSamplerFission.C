@@ -11,6 +11,8 @@
 
 #include <algorithm>
 
+registerMooseObject("MagpieApp", NeutronicsSpectrumSamplerFission);
+
 template<>
 InputParameters validParams<NeutronicsSpectrumSamplerFission>()
 {

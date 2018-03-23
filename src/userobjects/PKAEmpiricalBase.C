@@ -21,7 +21,7 @@ PKAEmpiricalBase::PKAEmpiricalBase(const InputParameters & parameters) :
 }
 
 void
-PKAEmpiricalBase::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAEmpiricalBase::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt >= 0, "Passed a negative time window into PKAEmpiricalBase::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAEmpiricalBase::appendPKAs");
@@ -32,7 +32,7 @@ PKAEmpiricalBase::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt
 
   int tag = ionTag(averaged_data._Z, averaged_data._M, Z, m);
 
-  unsigned int num_pka = std::floor(dt * vol * getPKARate() + getRandomReal());
+  unsigned int num_pka = std::floor(recoil_rate_scaling * dt * vol * getPKARate() + getRandomReal());
 
   for (unsigned i = 0; i < num_pka; ++i)
   {

@@ -9,6 +9,8 @@
 #include "MyTRIMDensityAux.h"
 #include "MooseMyTRIMMaterial.h"
 
+registerMooseObject("MagpieApp", MyTRIMDensityAux);
+
 template<>
 InputParameters validParams<MyTRIMDensityAux>()
 {

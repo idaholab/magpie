@@ -8,6 +8,8 @@
 
 #include "PKAFunction.h"
 
+registerMooseObject("MagpieApp", PKAFunction);
+
 template<>
 InputParameters validParams<PKAFunction>()
 {
