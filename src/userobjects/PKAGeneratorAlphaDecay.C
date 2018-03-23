@@ -113,7 +113,7 @@ PKAGeneratorAlphaDecay::readAlphaData()
 }
 
 void
-PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentNeutronics::appendPKAs");
@@ -133,7 +133,7 @@ PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, R
     auto & decay = it->second;
     for (unsigned int l = 0; l < decay.size(); ++l)
     {
-      unsigned int num_decay = std::floor(vol * decay[l]._intensities * averaged_data._elements[nuclide]
+      unsigned int num_decay = std::floor(recoil_rate_scaling * vol * decay[l]._intensities * averaged_data._elements[nuclide]
                                               * (1.0 - std::exp(-decay[l]._decay_constants * dt)) + getRandomReal());
 
       for (unsigned i = 0; i < num_decay; ++i)

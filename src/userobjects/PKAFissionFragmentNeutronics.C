@@ -61,7 +61,7 @@ PKAFissionFragmentNeutronics::setPDF(const std::vector<unsigned int> & ZAID, con
 }
 
 void
-PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
   mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentNeutronics::appendPKAs");
@@ -71,7 +71,7 @@ PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_l
 
   for (unsigned int nuclide = 0; nuclide < _partial_fission_rates.size(); ++nuclide)
   {
-    unsigned int num_fission = std::floor(dt * vol * (*_partial_fission_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
+    unsigned int num_fission = std::floor(recoil_rate_scaling * dt * vol * (*_partial_fission_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
 
     for (unsigned i = 0; i < num_fission; ++i)
     {
