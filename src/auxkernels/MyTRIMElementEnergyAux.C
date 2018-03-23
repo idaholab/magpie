@@ -9,6 +9,8 @@
 #include "MyTRIMElementEnergyAux.h"
 #include "MyTRIMElementRun.h"
 
+registerMooseObject("MagpieApp", MyTRIMElementEnergyAux);
+
 template<>
 InputParameters validParams<MyTRIMElementEnergyAux>()
 {

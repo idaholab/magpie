@@ -11,6 +11,8 @@
 
 #include "libmesh/utility.h"
 
+registerMooseObject("MagpieApp", AtomicDensityAux);
+
 template<>
 InputParameters validParams<AtomicDensityAux>()
 {

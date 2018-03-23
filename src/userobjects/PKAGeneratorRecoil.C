@@ -10,6 +10,8 @@
 #include "DiscreteFissionPKAPDF.h"
 #include "MultiIndex.h"
 
+registerMooseObject("MagpieApp", PKAGeneratorRecoil);
+
 template<>
 InputParameters validParams<PKAGeneratorRecoil>()
 {

@@ -9,6 +9,8 @@
 #include "PKAFixedPointGenerator.h"
 #include "MooseMesh.h"
 
+registerMooseObject("MagpieApp", PKAFixedPointGenerator);
+
 template<>
 InputParameters validParams<PKAFixedPointGenerator>()
 {

@@ -12,6 +12,8 @@
 #include "libmesh/mesh_tools.h"
 #include <numeric>
 
+registerMooseObject("MagpieApp", SPPARKSUserObject);
+
 template<>
 InputParameters validParams<SPPARKSUserObject>()
 {

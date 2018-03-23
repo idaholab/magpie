@@ -10,6 +10,8 @@
 #include "MyTRIMRasterizer.h"
 #include "mytrim/ion.h"
 
+registerMooseObject("MagpieApp", MyTRIMPKAEnergyHistogram);
+
 template<>
 InputParameters validParams<MyTRIMPKAEnergyHistogram>()
 {

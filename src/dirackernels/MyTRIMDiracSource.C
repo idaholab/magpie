@@ -10,6 +10,8 @@
 #include "MyTRIMDiracRun.h"
 #include "MooseMesh.h"
 
+registerMooseObject("MagpieApp", MyTRIMDiracSource);
+
 template<>
 InputParameters validParams<MyTRIMDiracSource>()
 {

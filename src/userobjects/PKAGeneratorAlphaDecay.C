@@ -10,6 +10,8 @@
 #include "MagpieUtils.h"
 #include <algorithm>
 
+registerMooseObject("MagpieApp", PKAGeneratorAlphaDecay);
+
 template<>
 InputParameters validParams<PKAGeneratorAlphaDecay>()
 {

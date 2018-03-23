@@ -15,6 +15,8 @@
 #include "gsl/gsl_sf_legendre.h"
 #include "gsl/gsl_integration.h"
 
+registerMooseObject("MagpieApp", ElasticRecoil);
+
 template <>
 InputParameters
 validParams<ElasticRecoil>()

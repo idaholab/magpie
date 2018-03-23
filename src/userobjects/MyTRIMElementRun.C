@@ -15,6 +15,8 @@
 
 #include <queue>
 
+registerMooseObject("MagpieApp", MyTRIMElementRun);
+
 template<>
 InputParameters validParams<MyTRIMElementRun>()
 {

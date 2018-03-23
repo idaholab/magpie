@@ -11,6 +11,8 @@
 #include "PKAGeneratorNeutronicsBase.h"
 #include "MultiIndex.h"
 
+registerMooseObject("MagpieApp", PKAFissionFragmentNeutronics);
+
 template<>
 InputParameters validParams<PKAFissionFragmentNeutronics>()
 {
