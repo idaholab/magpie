@@ -22,6 +22,10 @@ validParams<MagpieApp>()
   return params;
 }
 
+// When using the new Registry system, this line is required so that
+// dependent apps know about the MagpieApp label.
+registerKnownLabel("MagpieApp");
+
 MagpieApp::MagpieApp(const InputParameters & parameters)
   : MooseApp(parameters)
 {
