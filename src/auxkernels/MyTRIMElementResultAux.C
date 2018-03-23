@@ -9,6 +9,8 @@
 #include "MyTRIMElementResultAux.h"
 #include "MyTRIMElementRun.h"
 
+registerMooseObject("MagpieApp", MyTRIMElementResultAux);
+
 template<>
 InputParameters validParams<MyTRIMElementResultAux>()
 {

@@ -9,6 +9,8 @@
 #include "MyTRIMPKAInfo.h"
 #include "MyTRIMRasterizer.h"
 
+registerMooseObject("MagpieApp", MyTRIMPKAInfo);
+
 template<>
 InputParameters validParams<MyTRIMPKAInfo>()
 {

@@ -8,6 +8,8 @@
 
 #include "PKAGun.h"
 
+registerMooseObject("MagpieApp", PKAGun);
+
 template<>
 InputParameters validParams<PKAGun>()
 {

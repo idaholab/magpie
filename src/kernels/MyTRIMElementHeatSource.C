@@ -9,6 +9,8 @@
 #include "MyTRIMElementHeatSource.h"
 #include "MyTRIMElementRun.h"
 
+registerMooseObject("MagpieApp", MyTRIMElementHeatSource);
+
 template<>
 InputParameters validParams<MyTRIMElementHeatSource>()
 {

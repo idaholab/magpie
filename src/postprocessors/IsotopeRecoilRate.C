@@ -11,6 +11,8 @@
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "mytrim/ion.h"
 
+registerMooseObject("MagpieApp", IsotopeRecoilRate);
+
 template<>
 InputParameters validParams<IsotopeRecoilRate>()
 {

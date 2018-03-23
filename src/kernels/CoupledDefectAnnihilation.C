@@ -8,6 +8,8 @@
 
 #include "CoupledDefectAnnihilation.h"
 
+registerMooseObject("MagpieApp", CoupledDefectAnnihilation);
+
 template <>
 InputParameters
 validParams<CoupledDefectAnnihilation>()

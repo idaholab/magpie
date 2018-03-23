@@ -9,6 +9,8 @@
 #include "SPPARKSAux.h"
 #include "SPPARKSUserObject.h"
 
+registerMooseObject("MagpieApp", SPPARKSAux);
+
 template<>
 InputParameters validParams<SPPARKSAux>()
 {

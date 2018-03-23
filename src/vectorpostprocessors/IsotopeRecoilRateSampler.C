@@ -21,6 +21,8 @@
 
 #include "libmesh/mesh_tools.h"
 
+registerMooseObject("MagpieApp", IsotopeRecoilRateSampler);
+
 template <>
 InputParameters
 validParams<IsotopeRecoilRateSampler>()

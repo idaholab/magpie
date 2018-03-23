@@ -8,6 +8,8 @@
 
 #include "PKAFissionFragmentEmpirical.h"
 
+registerMooseObject("MagpieApp", PKAFissionFragmentEmpirical);
+
 template<>
 InputParameters validParams<PKAFissionFragmentEmpirical>()
 {

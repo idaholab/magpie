@@ -9,6 +9,8 @@
 #include "PKAList.h"
 #include "MyTRIMRasterizer.h"
 
+registerMooseObject("MagpieApp", PKAList);
+
 template<>
 InputParameters validParams<PKAList>()
 {

@@ -11,57 +11,6 @@
 #include "Moose.h"
 #include "MooseSyntax.h"
 
-// AuxKernels
-#include "AtomicDensityAux.h"
-#include "MyTRIMDensityAux.h"
-#include "MyTRIMElementEnergyAux.h"
-#include "MyTRIMElementResultAux.h"
-#include "SPPARKSAux.h"
-
-// Kernels
-#include "CoupledDefectAnnihilation.h"
-#include "DefectAnnihilation.h"
-#include "MyTRIMElementHeatSource.h"
-#include "MyTRIMElementSource.h"
-
-// DiracKernels
-#include "MyTRIMDiracSource.h"
-
-// UserObjects
-#include "IsotopeRecoilRate.h"
-#include "MyTRIMDiracRun.h"
-#include "MyTRIMElementRun.h"
-#include "MyTRIMPKAInConeInfo.h"
-#include "MyTRIMPKAInfo.h"
-#include "MyTRIMRasterizer.h"
-#include "NeutronicsSpectrumSamplerFission.h"
-#include "NeutronicsSpectrumSamplerSN.h"
-#include "PKAConstant.h"
-#include "PKAFissionFragmentEmpirical.h"
-#include "PKAFissionFragmentNeutronics.h"
-#include "PKAFixedPointGenerator.h"
-#include "PKAFunction.h"
-#include "PKAGeneratorAlphaDecay.h"
-#include "PKAGeneratorRecoil.h"
-#include "PKAGun.h"
-#include "SPPARKSUserObject.h"
-#include "ElasticRecoil.h"
-#include "InelasticRecoil.h"
-#include "IsotopeRecoilRate.h"
-
-// Transfers
-#include "MultiAppNeutronicsSpectrumTransfer.h"
-
-// Meshes
-#include "MyTRIMMesh.h"
-
-// VectorPostprocessors
-#include "MyTRIMDiracResult.h"
-#include "MyTRIMPKAEnergyHistogram.h"
-#include "MyTRIMPKAStatistics.h"
-#include "PKAList.h"
-#include "IsotopeRecoilRateSampler.h"
-
 template <>
 InputParameters
 validParams<MagpieApp>()
@@ -72,6 +21,10 @@ validParams<MagpieApp>()
   params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
 }
+
+// When using the new Registry system, this line is required so that
+// dependent apps know about the MagpieApp label.
+registerKnownLabel("MagpieApp");
 
 MagpieApp::MagpieApp(const InputParameters & parameters)
   : MooseApp(parameters)
@@ -103,50 +56,7 @@ MagpieApp::registerApps()
 void
 MagpieApp::registerObjects(Factory & factory)
 {
-  registerAux(AtomicDensityAux);
-  registerAux(MyTRIMDensityAux);
-  registerAux(MyTRIMElementEnergyAux);
-  registerAux(MyTRIMElementResultAux);
-  registerAux(SPPARKSAux);
-
-  registerKernel(CoupledDefectAnnihilation);
-  registerKernel(DefectAnnihilation);
-  registerKernel(MyTRIMElementHeatSource);
-  registerKernel(MyTRIMElementSource);
-
-  registerDiracKernel(MyTRIMDiracSource);
-
-  registerUserObject(MyTRIMDiracRun);
-  registerUserObject(MyTRIMElementRun);
-  registerUserObject(MyTRIMPKAInConeInfo);
-  registerUserObject(MyTRIMPKAInfo);
-  registerUserObject(MyTRIMRasterizer);
-  registerUserObject(NeutronicsSpectrumSamplerFission);
-#ifdef RATTLESNAKE_ENABLED
-  registerUserObject(NeutronicsSpectrumSamplerSN);
-#endif
-  registerUserObject(PKAConstant);
-  registerUserObject(PKAFissionFragmentEmpirical);
-  registerUserObject(PKAFissionFragmentNeutronics);
-  registerUserObject(PKAFixedPointGenerator);
-  registerUserObject(PKAFunction);
-  registerUserObject(PKAGeneratorAlphaDecay);
-  registerUserObject(PKAGeneratorRecoil);
-  registerUserObject(PKAGun);
-  registerUserObject(SPPARKSUserObject);
-  registerUserObject(ElasticRecoil);
-  registerUserObject(InelasticRecoil);
-  registerUserObject(IsotopeRecoilRate);
-
-  registerTransfer(MultiAppNeutronicsSpectrumTransfer);
-
-  registerMesh(MyTRIMMesh);
-
-  registerVectorPostprocessor(MyTRIMDiracResult);
-  registerVectorPostprocessor(MyTRIMPKAEnergyHistogram);
-  registerVectorPostprocessor(MyTRIMPKAStatistics);
-  registerVectorPostprocessor(PKAList);
-  registerVectorPostprocessor(IsotopeRecoilRateSampler);
+  Registry::registerObjectsTo(factory, {"MagpieApp"});
 }
 
 void

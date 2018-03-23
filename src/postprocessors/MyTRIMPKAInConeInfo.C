@@ -8,6 +8,8 @@
 
 #include "MyTRIMPKAInConeInfo.h"
 
+registerMooseObject("MagpieApp", MyTRIMPKAInConeInfo);
+
 template<>
 InputParameters validParams<MyTRIMPKAInConeInfo>()
 {

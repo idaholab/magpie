@@ -15,6 +15,8 @@
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "PKAGeneratorNeutronicsBase.h"
 
+registerMooseObject("MagpieApp", MultiAppNeutronicsSpectrumTransfer);
+
 template<>
 InputParameters validParams<MultiAppNeutronicsSpectrumTransfer>()
 {

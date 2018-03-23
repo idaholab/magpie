@@ -65,6 +65,8 @@ dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
   dataLoad(stream, pl._state, context);
 }
 
+registerMooseObject("MagpieApp", MyTRIMRasterizer);
+
 template<>
 InputParameters validParams<MyTRIMRasterizer>()
 {
