@@ -1,0 +1,17 @@
+[Tests]
+  [./Cu_in_Cu_3D]
+    type = 'CSVDiff'
+    input = 'Cu_in_Cu_3D.i'
+    csvdiff = 'Cu_in_Cu_3D_out_vacancy_sites_0001.csv'
+    abs_zero = 1e-6
+    recover = false
+  [../]
+
+  [./Cu_in_Cu_2D]
+    type = 'CSVDiff'
+    input = 'Cu_in_Cu_2D.i'
+    csvdiff = 'Cu_in_Cu_2D_out_vacancy_sites_0001.csv'
+    abs_zero = 1e-6
+    recover = false
+  [../]
+[]

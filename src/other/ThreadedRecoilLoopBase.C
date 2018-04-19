@@ -107,10 +107,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 
       // project into xy plane
       if (_dim == 2)
-      {
         recoil->_pos(2) = 0.0;
-        recoil->_dir(2) = 0.0;
-      }
 
       // full recoil or analytical approximation
       if (recoil->_E < _trim_parameters.analytical_cutoff)
