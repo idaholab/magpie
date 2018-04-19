@@ -11,6 +11,7 @@
     exodiff = 'cascade_dirac_out.e'
     max_parallel = 1
     max_threads = 1
+    rel_err = 1e-5
   [../]
 
   [./UO2_initial]
