@@ -1,0 +1,33 @@
+Content:
+    - ${ROOT_DIR}/doc/content
+    - ${MOOSE_DIR}/framework/doc/content
+
+Renderer:
+    type: MooseDocs.base.MaterializeRenderer
+    name: Magpie
+    repo: https://github.com/idaholab/magpie
+    home: https://google.com/
+    navigation:
+        Getting Started:
+            Installation: 'getting_started/Installation.md'
+        # Development:
+        #     Capabilities: 'models_capabilities/Capabilities.md'
+        #     Requirements: 'software_quality/Requirements.md'
+        Documentation:
+            Reference Manual: documentation/systems/index.md
+
+Extensions:
+    appsyntax:
+        type: MooseDocs.extensions.appsyntax
+        executable: ${ROOT_DIR}
+        hide:
+            magpie: !include ${ROOT_DIR}/doc/hidden.yml
+            framework: !include ${MOOSE_DIR}/framework/doc/hidden.yml
+        remove:
+            framework: !include ${MOOSE_DIR}/framework/doc/remove.yml
+    globals:
+        type: MooseDocs.extensions.panoptic
+        shortcuts: !include ${MOOSE_DIR}/framework/doc/globals.yml
+    acronyms:
+        type: MooseDocs.extensions.acronym
+        acronyms: !include ${MOOSE_DIR}/framework/doc/acronyms.yml
