@@ -34,17 +34,6 @@ protected:
    * will be sampled to determine the initial state of the ions passed to MyTRIM
    */
   DiscreteFissionPKAPDF _pdf;
-
-  /**
-   * _partial_fission_rates: the fission rate per nuclide is:
-   * f_i = N_i * (sum_g sigma_{f,g,i} phi_g),
-   * where i is the nuclide ID and g is the energy group.
-   * N_i is provided as variable in the Rasterizer, but the (sum_g sigma_{f,g,i} phi_g) must
-   * be provided as partial fission rate here
-   * Note: the fission rate densities are in units of [ fissions / ( mesh-length-unit^3 sec ) ]
-   */
-  std::vector<const Real *> _partial_fission_rates;
-  std::vector<Real> _stored_pps;
 };
 
 #endif //PKAFISSIONFRAGMENTNEUTRONICS_H
