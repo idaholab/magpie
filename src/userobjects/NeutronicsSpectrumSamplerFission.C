@@ -61,19 +61,13 @@ Real
 NeutronicsSpectrumSamplerFission::totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const
 {
   Real rate = 0.0;
-  Real dim_scaling = 1.0;
-  if (_mesh.dimension() == 1)
-    dim_scaling *= 2.0 * libMesh::pi;
-  else if (_mesh.dimension() == 2)
-    dim_scaling *= 2.0;
-
   auto it = std::find(_target_isotope_names.begin(), _target_isotope_names.end(), target_isotope);
   if (it == _target_isotope_names.end())
     mooseError("Isotope ", target_isotope, "does not exist");
   unsigned int target_isotope_id = std::distance(_target_isotope_names.begin(), it);
   for (unsigned int g = 0; g < _G; ++g)
     rate += _sample_point_data[point_id]({target_isotope_id, g, 0, 0});
-  return rate * dim_scaling;
+  return rate;
 }
 
 Real
