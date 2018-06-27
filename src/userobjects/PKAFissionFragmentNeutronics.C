@@ -17,8 +17,6 @@ template<>
 InputParameters validParams<PKAFissionFragmentNeutronics>()
 {
   InputParameters params = validParams<PKAGeneratorNeutronicsBase>();
-  params.addParam<std::vector<PostprocessorName>>("partial_fission_rates", "Partial fission rates per unit volume [sum_g sigma_{f,g,i} * phi_g]. "
-                                                  "Provide number density as variable in rasterizer!");
   params.addClassDescription("PKA generator (fission) user object.\n Takes pdf and samples PKAs due to fission.");
   return params;
 }
@@ -26,32 +24,6 @@ InputParameters validParams<PKAFissionFragmentNeutronics>()
 PKAFissionFragmentNeutronics::PKAFissionFragmentNeutronics(const InputParameters & parameters):
     PKAGeneratorNeutronicsBase(parameters)
 {
-  if (isParamValid("partial_fission_rates"))
-  {
-    std::vector<PostprocessorName> names = getParam<std::vector<PostprocessorName>>("partial_fission_rates");
-    _partial_fission_rates.resize(names.size());
-    _stored_pps.resize(names.size());
-    for (unsigned int j = 0; j < names.size(); ++j)
-      if (_fe_problem.hasPostprocessor(names[j]))
-        _partial_fission_rates[j] = &getPostprocessorValueByName(names[j]);
-      else
-      {
-        Real real_value = -std::numeric_limits<Real>::max();
-        std::istringstream ss(names[j]);
-
-        if (ss >> real_value && ss.eof())
-          _stored_pps[j] = real_value;
-        else
-          mooseError("Illegal entry in partial_fission_rates: ", names[j]);
-
-        _partial_fission_rates[j] = &_stored_pps[j];
-      }
-  }
-  else
-  {
-    _stored_pps = {1.0e-8};
-    _partial_fission_rates = {&_stored_pps[0]};
-  }
 }
 
 void
@@ -66,12 +38,14 @@ PKAFissionFragmentNeutronics::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_l
   mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentNeutronics::appendPKAs");
 
-  if (averaged_data._elements.size() != _partial_fission_rates.size())
-    mooseError("Size of averaged_data and partial_fission_rates must be equal");
+  if (averaged_data._elements.size() != _partial_neutronics_reaction_rates.size())
+    mooseError("Size of averaged_data and partial_reaction_rates must be equal");
 
-  for (unsigned int nuclide = 0; nuclide < _partial_fission_rates.size(); ++nuclide)
+  for (unsigned int nuclide = 0; nuclide < _partial_neutronics_reaction_rates.size(); ++nuclide)
   {
-    unsigned int num_fission = std::floor(recoil_rate_scaling * dt * vol * (*_partial_fission_rates[nuclide]) * averaged_data._elements[nuclide] + getRandomReal());
+    unsigned int num_fission = std::floor(recoil_rate_scaling * dt * vol *
+                              (*_partial_neutronics_reaction_rates[nuclide]) / (*_averaged_number_densities[nuclide] * averaged_data._site_volume)
+                              * averaged_data._elements[nuclide] + getRandomReal());
 
     for (unsigned i = 0; i < num_fission; ++i)
     {

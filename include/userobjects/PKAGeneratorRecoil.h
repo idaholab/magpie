@@ -33,13 +33,6 @@ protected:
    * are sampled
    */
   DiscretePKAPDF _pdf;
-
-  /**
-   * The partial reaction rates [# reactions / time / volume] of the particular
-   * recoil reaction for each nuclide
-   */
-  std::vector<const Real *> _partial_recoil_rates;
-  std::vector<Real> _stored_pps;
 };
 
 #endif //PKAGeneratorRecoil_H
