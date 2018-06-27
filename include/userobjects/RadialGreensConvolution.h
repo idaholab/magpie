@@ -58,6 +58,9 @@ protected:
   /// variable field to be gathered
   const VariableValue & _v;
 
+  /// index of field variable
+  unsigned int _v_var;
+
   /// Green's function
   Function & _function;
 
@@ -71,8 +74,17 @@ protected:
   /// gathered data
   std::vector<QPData> _qp_data;
 
-  // convolution result
+  /// convolution result
   Result _convolution;
+
+  /// is the mesh translated periodic in a given cardinal direction
+  std::array<bool, LIBMESH_DIM> _periodic;
+
+  ///@{ periodic size per component
+  std::array<Real, LIBMESH_DIM> _periodic_min;
+  std::array<Real, LIBMESH_DIM> _periodic_max;
+  std::array<Point, LIBMESH_DIM> _periodic_vector;
+  ///@}
 
   using KDTreeType = nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<QPData>>,

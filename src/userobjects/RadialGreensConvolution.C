@@ -9,6 +9,8 @@
 #include "RadialGreensConvolution.h"
 #include "libmesh/nanoflann.hpp"
 
+#include <list>
+
 registerMooseObject("MagpieApp", RadialGreensConvolution);
 
 // serialization helper for parallel communication
@@ -58,10 +60,23 @@ validParams<RadialGreensConvolution>()
 RadialGreensConvolution::RadialGreensConvolution(const InputParameters & parameters)
   : ElementUserObject(parameters),
     _v(coupledValue("v")),
+    _v_var(coupled("v")),
     _function(getFunction("function")),
     _r_cut(getParam<Real>("r_cut")),
     _normalize(getParam<bool>("normalize"))
 {
+  for (unsigned int i = 0; i < _mesh.dimension(); ++i)
+  {
+    _periodic[i] = _mesh.isRegularOrthogonal() && _mesh.isTranslatedPeriodic(_v_var, i);
+
+    _periodic_min[i] = _mesh.getMinInDimension(i);
+    _periodic_max[i] = _mesh.getMaxInDimension(i);
+    _periodic_vector[i](i) = _mesh.dimensionWidth(i);
+
+    // we could allow this, but then we'd have to search over more than just the nearest periodic neighbors
+    if (_periodic[i] && 2.0 * _r_cut > _periodic_vector[i](i))
+      paramError("r_cut", "The cut-off radius cannot be larger than half the periodic size of the simulation cell");
+  }
 }
 
 void
@@ -171,14 +186,39 @@ RadialGreensConvolution::finalize()
     auto & sum = it->second[local_qp._qp];
     sum = 0.0;
 
-    // perform radius search and aggregate data
-    ret_matches.clear();
-    std::size_t n_result =
-        kd_tree->radiusSearch(&(local_qp._q_point(0)), _r_cut, ret_matches, search_params);
-    for (std::size_t j = 0; j < n_result; ++j)
+    // if the variable is periodic we need to perform extra searches translated onto
+    // the periodic neighbors
+    std::list<Point> cell_vector = { Point() };
+    for (unsigned int j = 0; j < _mesh.dimension(); ++j)
+      if (_periodic[j])
+      {
+        std::list<Point> new_cell_vector;
+
+        for (const auto & cell: cell_vector)
+        {
+          if (local_qp._q_point(j) + _periodic_vector[j](j) - _r_cut < _periodic_max[j])
+            new_cell_vector.push_back(cell + _periodic_vector[j]);
+
+          if (local_qp._q_point(j) -_periodic_vector[j](j) + _r_cut > _periodic_min[j])
+            new_cell_vector.push_back(cell - _periodic_vector[j]);
+        }
+
+        cell_vector.insert(cell_vector.end(), new_cell_vector.begin(), new_cell_vector.end());
+      }
+
+    // perform radius search and aggregate data considering potential periodicity
+    Point center;
+    for (const auto & cell: cell_vector)
     {
-      const auto & other_qp = _qp_data[ret_matches[j].first];
-      sum += _function.value(_t, Point(ret_matches[j].second, 0, 0)) * other_qp._integral;
+      ret_matches.clear();
+      center = local_qp._q_point + cell;
+      std::size_t n_result =
+          kd_tree->radiusSearch(&(center(0)), _r_cut, ret_matches, search_params);
+      for (std::size_t j = 0; j < n_result; ++j)
+      {
+        const auto & other_qp = _qp_data[ret_matches[j].first];
+        sum += _function.value(_t, Point(ret_matches[j].second, 0, 0)) * other_qp._integral;
+      }
     }
 
     // integrate the convolution result

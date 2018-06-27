@@ -13,7 +13,15 @@
   [./c]
     [./InitialCondition]
       type = FunctionIC
-      function = 'if(x^2+y^2<16,1,0)'
+      function = 'if((x+6)^2+(y-5)^2<16,1,0)'
+    [../]
+  [../]
+[]
+
+[BCs]
+  [./Periodic]
+    [./all]
+      auto_direction = 'x y'
     [../]
   [../]
 []
@@ -35,7 +43,7 @@
     execute_on = TIMESTEP_BEGIN
     v = c
     r_cut = 4
-    function = 'if(x<=1e-9,1.0,1e-5*exp(-x))'
+    function = 'if(x<=1e-9,1.0,0.5e-2*exp(-x))'
     normalize = true
   [../]
   [./green2]
@@ -43,7 +51,7 @@
     execute_on = TIMESTEP_BEGIN
     v = c
     r_cut = 6.28
-    function = 'if(x<=1e-9,1.0,1e-5*sin(x))'
+    function = 'if(x<=1e-9,1.0,0.5e-2*sin(x))'
     normalize = true
   [../]
 []
