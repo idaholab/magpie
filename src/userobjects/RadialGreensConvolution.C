@@ -54,6 +54,11 @@ validParams<RadialGreensConvolution>()
                                         "Green's function (distance is substituted for x)");
   params.addRequiredParam<Real>("r_cut", "Cut-off radius for the Green's function");
   params.addParam<bool>("normalize", false, "Normalize the Green's function integral to one");
+
+  // we run this object once at the beginning of the timestep
+  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
+  params.suppressParameter<ExecFlagEnum>("execute_on");
+
   return params;
 }
 
@@ -73,9 +78,12 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _periodic_max[i] = _mesh.getMaxInDimension(i);
     _periodic_vector[i](i) = _mesh.dimensionWidth(i);
 
-    // we could allow this, but then we'd have to search over more than just the nearest periodic neighbors
+    // we could allow this, but then we'd have to search over more than just the nearest periodic
+    // neighbors
     if (_periodic[i] && 2.0 * _r_cut > _periodic_vector[i](i))
-      paramError("r_cut", "The cut-off radius cannot be larger than half the periodic size of the simulation cell");
+      paramError(
+          "r_cut",
+          "The cut-off radius cannot be larger than half the periodic size of the simulation cell");
   }
 }
 
@@ -188,18 +196,18 @@ RadialGreensConvolution::finalize()
 
     // if the variable is periodic we need to perform extra searches translated onto
     // the periodic neighbors
-    std::list<Point> cell_vector = { Point() };
+    std::list<Point> cell_vector = {Point()};
     for (unsigned int j = 0; j < _mesh.dimension(); ++j)
       if (_periodic[j])
       {
         std::list<Point> new_cell_vector;
 
-        for (const auto & cell: cell_vector)
+        for (const auto & cell : cell_vector)
         {
           if (local_qp._q_point(j) + _periodic_vector[j](j) - _r_cut < _periodic_max[j])
             new_cell_vector.push_back(cell + _periodic_vector[j]);
 
-          if (local_qp._q_point(j) -_periodic_vector[j](j) + _r_cut > _periodic_min[j])
+          if (local_qp._q_point(j) - _periodic_vector[j](j) + _r_cut > _periodic_min[j])
             new_cell_vector.push_back(cell - _periodic_vector[j]);
         }
 
@@ -208,7 +216,7 @@ RadialGreensConvolution::finalize()
 
     // perform radius search and aggregate data considering potential periodicity
     Point center;
-    for (const auto & cell: cell_vector)
+    for (const auto & cell : cell_vector)
     {
       ret_matches.clear();
       center = local_qp._q_point + cell;
