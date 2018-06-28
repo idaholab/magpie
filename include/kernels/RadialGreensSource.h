@@ -28,30 +28,15 @@ public:
 protected:
   void precalculateResidual() override;
   virtual Real computeQpResidual() override;
-  virtual Real computeQpJacobian();
-  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-  virtual Real computeQpCJacobian();
 
   // convolution result
   const RadialGreensConvolution::Result & _convolution;
-
-  /// is the kernel used in a coupled form?
-  const bool _is_coupled;
-
-  /// int label for the Concentration
-  unsigned int _c_var;
-
-  /// Variable value for the concentration
-  const VariableValue & _c;
 
   // rate factor
   const Real _gamma;
 
   // iterator pointing to the map entry for the current element
   RadialGreensConvolution::Result::const_iterator _result;
-
-  // current timestep size
-  const Real & _dt;
 };
 
 #endif // RADIALGREENSSOURCE_H

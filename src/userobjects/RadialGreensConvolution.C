@@ -48,16 +48,15 @@ InputParameters
 validParams<RadialGreensConvolution>()
 {
   InputParameters params = validParams<ElementUserObject>();
-  params.addClassDescription("Gather data to perform a radial Green's function convolution");
+  params.addClassDescription("Perform a radial Green's function convolution");
   params.addCoupledVar("v", "Variable to gather");
   params.addRequiredParam<FunctionName>("function",
                                         "Green's function (distance is substituted for x)");
   params.addRequiredParam<Real>("r_cut", "Cut-off radius for the Green's function");
   params.addParam<bool>("normalize", false, "Normalize the Green's function integral to one");
 
-  // we run this object once at the beginning of the timestep
+  // we run this object once at the beginning of the timestep by default
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
-  params.suppressParameter<ExecFlagEnum>("execute_on");
 
   return params;
 }
@@ -251,6 +250,20 @@ RadialGreensConvolution::finalize()
     for (auto & re : _convolution)
       for (auto & ri : re.second)
         ri *= _source_integral / _convolution_integral;
+  }
+
+  // make it a differential result
+  it = end_it;
+  for (unsigned int i = 0; i < local_size; ++i)
+  {
+    const auto & local_qp = _qp_data[i];
+
+    // Look up result map iterator only if we enter a new element. this saves a bunch
+    // of map lookups because same element entries are consecutive in the _qp_data vector.
+    if (it == end_it || it->first != local_qp._elem_id)
+      it = _convolution.find(local_qp._elem_id);
+
+    it->second[local_qp._qp] -= local_qp._integral;
   }
 }
 
