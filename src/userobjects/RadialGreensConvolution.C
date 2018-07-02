@@ -21,7 +21,8 @@ dataStore(std::ostream & stream, RadialGreensConvolution::QPData & qpd, void * c
   dataStore(stream, qpd._q_point, context);
   dataStore(stream, qpd._elem_id, context);
   dataStore(stream, qpd._qp, context);
-  dataStore(stream, qpd._integral, context);
+  dataStore(stream, qpd._volume, context);
+  dataStore(stream, qpd._value, context);
 }
 
 // unserialization helper for parallel communication
@@ -32,7 +33,8 @@ dataLoad(std::istream & stream, RadialGreensConvolution::QPData & qpd, void * co
   dataLoad(stream, qpd._q_point, context);
   dataLoad(stream, qpd._elem_id, context);
   dataLoad(stream, qpd._qp, context);
-  dataLoad(stream, qpd._integral, context);
+  dataLoad(stream, qpd._volume, context);
+  dataLoad(stream, qpd._value, context);
 }
 
 // specialization for PointListAdaptor<RadialGreensConvolution::QPData>
@@ -51,7 +53,7 @@ validParams<RadialGreensConvolution>()
   params.addClassDescription("Perform a radial Green's function convolution");
   params.addCoupledVar("v", "Variable to gather");
   params.addRequiredParam<FunctionName>("function",
-                                        "Green's function (distance is substituted for x)");
+                                        "Green's function (distance is substituted for x) without geometrical attenuation");
   params.addRequiredParam<Real>("r_cut", "Cut-off radius for the Green's function");
   params.addParam<bool>("normalize", false, "Normalize the Green's function integral to one");
 
@@ -67,9 +69,10 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _v_var(coupled("v")),
     _function(getFunction("function")),
     _r_cut(getParam<Real>("r_cut")),
-    _normalize(getParam<bool>("normalize"))
+    _normalize(getParam<bool>("normalize")),
+    _dim(_mesh.dimension())
 {
-  for (unsigned int i = 0; i < _mesh.dimension(); ++i)
+  for (unsigned int i = 0; i < _dim; ++i)
   {
     _periodic[i] = _mesh.isRegularOrthogonal() && _mesh.isTranslatedPeriodic(_v_var, i);
 
@@ -99,7 +102,7 @@ RadialGreensConvolution::execute()
 
   // collect all QP data
   for (unsigned int qp = 0; qp < _qrule->n_points(); ++qp)
-    _qp_data.emplace_back(_q_point[qp], id, qp, _v[qp] * _JxW[qp] * _coord[qp]);
+    _qp_data.emplace_back(_q_point[qp], id, qp, _JxW[qp] * _coord[qp], _v[qp]);
 
   // make sure the result map entry for the current element is sized correctly
   auto i = _convolution.find(id);
@@ -158,7 +161,7 @@ RadialGreensConvolution::finalize()
   Real _source_integral = 0.0;
   if (_normalize)
     for (const auto & qpd : _qp_data)
-      _source_integral += qpd._integral;
+      _source_integral += qpd._volume * qpd._value;
 
   // build KD-Tree using data we just allgathered
   const unsigned int max_leaf_size = 20; // slightly affects runtime
@@ -196,7 +199,7 @@ RadialGreensConvolution::finalize()
     // if the variable is periodic we need to perform extra searches translated onto
     // the periodic neighbors
     std::list<Point> cell_vector = {Point()};
-    for (unsigned int j = 0; j < _mesh.dimension(); ++j)
+    for (unsigned int j = 0; j < _dim; ++j)
       if (_periodic[j])
       {
         std::list<Point> new_cell_vector;
@@ -215,16 +218,34 @@ RadialGreensConvolution::finalize()
 
     // perform radius search and aggregate data considering potential periodicity
     Point center;
+    Real geometric_attenuation;
     for (const auto & cell : cell_vector)
     {
       ret_matches.clear();
       center = local_qp._q_point + cell;
       std::size_t n_result =
-          kd_tree->radiusSearch(&(center(0)), _r_cut, ret_matches, search_params);
+          kd_tree->radiusSearch(&(center(0)), _r_cut * _r_cut, ret_matches, search_params);
       for (std::size_t j = 0; j < n_result; ++j)
       {
         const auto & other_qp = _qp_data[ret_matches[j].first];
-        sum += _function.value(_t, Point(ret_matches[j].second, 0, 0)) * other_qp._integral;
+        const Real r = std::sqrt(ret_matches[j].second);
+
+        if (r == 0.0)
+          // we calculate an effective attenuation value by integrating the ~1/r^dim
+          // term around the origin and dividing by the qp volume
+          geometric_attenuation = std::pow(other_qp._volume, 1.0/_dim - 1.0);
+        else {
+          if (_dim == 1)
+            geometric_attenuation = 1.0;
+          else if (_dim == 2)
+            geometric_attenuation = 0.5 / (libMesh::pi * r);
+          else if (_dim == 3)
+            geometric_attenuation = 0.25 / (libMesh::pi * r * r);
+          else
+            mooseError("Internal error");
+        }
+
+        sum += _function.value(_t, Point(r, 0.0, 0.0)) * geometric_attenuation * other_qp._volume * other_qp._value;
       }
     }
 
@@ -263,7 +284,7 @@ RadialGreensConvolution::finalize()
     if (it == end_it || it->first != local_qp._elem_id)
       it = _convolution.find(local_qp._elem_id);
 
-    it->second[local_qp._qp] -= local_qp._integral;
+    it->second[local_qp._qp] -= local_qp._volume * local_qp._value;
   }
 }
 

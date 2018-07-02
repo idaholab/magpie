@@ -42,11 +42,13 @@ public:
     /// index of the quadrature point
     short _qp;
     /// current value * _JxW
-    Real _integral;
+    Real _volume;
+    /// variable value
+    Real _value;
 
-    QPData() : _q_point(), _elem_id(libMesh::invalid_uint), _qp(0), _integral(0.0) {}
-    QPData(const Point & q_point, dof_id_type elem_id, short qp, Real integral)
-      : _q_point(q_point), _elem_id(elem_id), _qp(qp), _integral(integral)
+    QPData() : _q_point(), _elem_id(libMesh::invalid_uint), _qp(0), _volume(0.0), _value(0.0) {}
+    QPData(const Point & q_point, dof_id_type elem_id, short qp, Real volume, Real value)
+      : _q_point(q_point), _elem_id(elem_id), _qp(qp), _volume(volume), _value(value)
     {
     }
   };
@@ -70,6 +72,9 @@ protected:
   /// Normalize the Green's function to one to make the integral of teh convolution
   /// the same as the integral of the original data.
   const bool _normalize;
+
+  /// mesh dimension
+  unsigned int _dim;
 
   /// gathered data
   std::vector<QPData> _qp_data;
