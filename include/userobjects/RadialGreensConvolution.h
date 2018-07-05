@@ -57,6 +57,8 @@ public:
   const Result & getConvolution() const { return _convolution; }
 
 protected:
+  Real attenuationIntegral(Real h1, Real h2, Real r, unsigned int dim) const;
+
   /// variable field to be gathered
   const VariableValue & _v;
 
@@ -69,12 +71,15 @@ protected:
   /// Green's function cut-off radius
   const Real _r_cut;
 
-  /// Normalize the Green's function to one to make the integral of teh convolution
+  /// Normalize the Green's function to one to make the integral of the convolution
   /// the same as the integral of the original data.
   const bool _normalize;
 
   /// mesh dimension
   unsigned int _dim;
+
+  /// greens function integral table for correction of lower dimensional convolutions
+  std::vector<Real> _correction_integral;
 
   /// gathered data
   std::vector<QPData> _qp_data;
@@ -95,6 +100,8 @@ protected:
       nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<QPData>>,
       PointListAdaptor<QPData>,
       LIBMESH_DIM>;
+
+  Real _zero_dh;
 };
 
 template <>

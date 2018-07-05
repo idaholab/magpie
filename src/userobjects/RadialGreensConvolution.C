@@ -70,8 +70,10 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _function(getFunction("function")),
     _r_cut(getParam<Real>("r_cut")),
     _normalize(getParam<bool>("normalize")),
-    _dim(_mesh.dimension())
+    _dim(_mesh.dimension()),
+    _correction_integral(100)
 {
+  // collect mesh periodicity data
   for (unsigned int i = 0; i < _dim; ++i)
   {
     _periodic[i] = _mesh.isRegularOrthogonal() && _mesh.isTranslatedPeriodic(_v_var, i);
@@ -93,6 +95,71 @@ void
 RadialGreensConvolution::initialize()
 {
   _qp_data.clear();
+
+  /* compute the dimensional correction
+   *
+   *  |---__
+   *  |     / .
+   *  |  R/  | .
+   *  | /   h|  \ r_cut
+   *  |______|__|____
+   *         r
+   *
+   * Out of plane (2D) and out of line (1D) 3D contributions to the convolution
+   * are not naturally captured by the 1D or 2D numerical integration of QP neighborhood.
+   * At every Qp an integration in the h direction needs to be performed.
+   * We can pre-tabulate this integral.
+   */
+  if (_dim < 3)
+  {
+    const Real dr = _r_cut / _correction_integral.size();
+    for (unsigned int i = 0; i < _correction_integral.size(); ++i)
+    {
+      const Real r = i * dr;
+      const Real h = std::sqrt(_r_cut * _r_cut - r * r);
+      const unsigned int hsteps = std::ceil(h/dr);
+      const Real dh = h / hsteps;
+
+      _correction_integral[i] = 0.0;
+
+      // for r = 0 we skip the first bin of the integral!
+      if (i == 0)
+        _zero_dh = dh;
+
+      for (unsigned int j = i > 0 ? 0 : 1; j < hsteps; ++j)
+      {
+        const Real h1 = j * dh;
+        const Real h2 = h1 + dh;
+
+        // we evaluate the Green's function at the geometric middle of the height interval
+        // and assume it to be constant.
+        const Real R2 = r * r + h1 * h2;
+        const Real G = _function.value(_t, Point(std::sqrt(R2), 0.0, 0.0));
+
+        // We integrate the geometric attenuation analytically over the interval [h1, h2).
+        _correction_integral[i] += G * attenuationIntegral(h1, h2, r, _dim);
+      }
+    }
+  }
+}
+
+Real
+RadialGreensConvolution::attenuationIntegral(Real h1, Real h2, Real r, unsigned int dim) const
+{
+  if (dim == 2)
+  {
+    // in 2D we need to return the above and below plane contribution (hence 2.0 * ...)
+    if (r > 0.0)
+      // integral 1/(h^2+r^2) dh = 1/r*atan(h/r)|
+      return 2.0 * 1.0/(4.0 * libMesh::pi * r) * (std::atan(h2/r) - std::atan(h1/r));
+    else
+      // integral 1/h^2 dh = -1/h|
+      return 2.0 * 1.0/(4.0 * libMesh::pi) * (-1.0/h2 + 1.0/h1);
+  }
+  else
+    // dim = 1, we multiply the attenuation by 2pi*h (1/2 * 2pi/4pi = 0.25)
+    // integral h/(h^2+r^2) dh = 1/2 * ln(h^2+r^2)|
+    return 0.25 * (std::log(h2*h2 + r*r) - std::log(h1*h1 + r*r));
 }
 
 void
@@ -115,6 +182,8 @@ RadialGreensConvolution::execute()
 void
 RadialGreensConvolution::finalize()
 {
+  _console <<  "RadialGreensConvolution::finalize()" << std::flush;
+
   // the first chunk of data is always the local data - remember its size
   unsigned int local_size = _qp_data.size();
 
@@ -157,6 +226,8 @@ RadialGreensConvolution::finalize()
     }
   }
 
+  _console <<  "  communiction done." << std::flush;
+
   // if normalization is requested we need to integrate the current variable field
   Real _source_integral = 0.0;
   if (_normalize)
@@ -172,6 +243,8 @@ RadialGreensConvolution::finalize()
   mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
   kd_tree->buildIndex();
 
+  _console <<  "  KD-tree built." << std::flush;
+
   // result map entry
   const auto end_it = _convolution.end();
   auto it = end_it;
@@ -179,11 +252,21 @@ RadialGreensConvolution::finalize()
   // integral of the convolution (used if normalization is requested)
   Real _convolution_integral = 0.0;
 
+  // radial bin size
+  const Real dr = _r_cut / _correction_integral.size();
+
   // iterate over the local portion of the gathered QP data (TODO: make this threaded)
   std::vector<std::pair<std::size_t, Real>> ret_matches;
   nanoflann::SearchParams search_params;
+
+  _console <<  "  iterating over " << local_size << " QPs..." << std::flush;
+  const int interval = local_size / 100;
+
   for (unsigned int i = 0; i < local_size; ++i)
   {
+    if (_dim == 3 && i % interval == 0)
+      _console <<  "  " << i/interval << "%..." << std::flush;
+
     const auto & local_qp = _qp_data[i];
 
     // Look up result map iterator only if we enter a new element. this saves a bunch
@@ -218,7 +301,6 @@ RadialGreensConvolution::finalize()
 
     // perform radius search and aggregate data considering potential periodicity
     Point center;
-    Real geometric_attenuation;
     for (const auto & cell : cell_vector)
     {
       ret_matches.clear();
@@ -230,22 +312,63 @@ RadialGreensConvolution::finalize()
         const auto & other_qp = _qp_data[ret_matches[j].first];
         const Real r = std::sqrt(ret_matches[j].second);
 
-        if (r == 0.0)
-          // we calculate an effective attenuation value by integrating the ~1/r^dim
-          // term around the origin and dividing by the qp volume
-          geometric_attenuation = std::pow(other_qp._volume, 1.0/_dim - 1.0);
-        else {
-          if (_dim == 1)
-            geometric_attenuation = 1.0;
-          else if (_dim == 2)
-            geometric_attenuation = 0.5 / (libMesh::pi * r);
-          else if (_dim == 3)
-            geometric_attenuation = 0.25 / (libMesh::pi * r * r);
-          else
-            mooseError("Internal error");
-        }
+        // R is the equivalent sphere radius for the quadrature point. The spherical integral
+        // integral_0^R 1/(4pi*r^2) *4pi*r^2 = R
+        // So R is the integral over the geometric attenuation at the center quadrature point
+        switch (_dim)
+        {
+          case 1:
+          {
+            // correction integral is the integral over the geometric attenuation
+            // times the Green's function over a 2D disc inscribed into the r_cut
+            // sphere and perpendicular to the mesh.
+            Real add = _correction_integral[std::floor(r/dr)] * other_qp._volume;
 
-        sum += _function.value(_t, Point(r, 0.0, 0.0)) * geometric_attenuation * other_qp._volume * other_qp._value;
+            if (r == 0)
+            {
+              const Real R = 0.5 * other_qp._volume;
+              add += _function.value(_t, Point(0.0, 0.0, 0.0)) * (
+                // add the center sphere attenuation integral
+                R +
+                // add the section missing or overlapping between _correction_integral and center sphere
+                attenuationIntegral(R, _zero_dh, 0.0, 1) * other_qp._volume);
+            }
+            sum += add * other_qp._value;
+            break;
+          }
+
+          case 2:
+          {
+            // correction integral is the integral over the geometric attenuation
+            // times the Green's function over a 1D line segment inscribed into the r_cut
+            // sphere and perpendicular to the mesh.
+            Real add = _correction_integral[std::floor(r/dr)] * other_qp._volume;
+            if (r == 0)
+            {
+              const Real R = std::sqrt(other_qp._volume / (2.0 * libMesh::pi));
+              add += _function.value(_t, Point(0.0, 0.0, 0.0)) * (
+                // add the center sphere attenuation integral
+                R +
+                // add the section missing or overlapping between _correction_integral and center sphere
+                attenuationIntegral(R, _zero_dh, 0.0, 2) * other_qp._volume);
+            }
+            sum += add * other_qp._volume * other_qp._value;
+            break;
+          }
+
+          case 3:
+          {
+            const Real G = _function.value(_t, Point(r, 0.0, 0.0));
+            if (r == 0)
+            {
+              // R is the integral over the geometric attenuation in a sphere around the origin
+              const Real R = std::cbrt(3.0/4.0 * other_qp._volume / libMesh::pi);
+              sum += G * R * other_qp._value;
+            }
+            else
+              sum += G * 0.25 / (libMesh::pi * r * r) * other_qp._volume * other_qp._value;
+          }
+        }
       }
     }
 
