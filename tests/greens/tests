@@ -1,0 +1,27 @@
+[Tests]
+  [./test]
+    type = Exodiff
+    input = 'test.i'
+    #cli_args = 'Mesh/dim=2 Mesh/elem_type=TRI3'
+    exodiff = 'test_out.e'
+  [../]
+
+  [./dimension1]
+    type = CSVDiff
+    input = 'dimension.i'
+    cli_args = "dim=1 pbc='x'"
+    csvdiff = 'dimension1_out_c_0002.csv'
+  [../]
+  [./dimension2]
+    type = CSVDiff
+    input = 'dimension.i'
+    cli_args = "dim=2 pbc='x y'"
+    csvdiff = 'dimension2_out_c_0002.csv'
+  [../]
+  [./dimension3]
+    type = CSVDiff
+    input = 'dimension.i'
+    cli_args = "dim=3 pbc='x y z'"
+    csvdiff = 'dimension3_out_c_0002.csv'
+  [../]
+[]

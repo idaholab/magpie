@@ -5,8 +5,8 @@
   ymin = -10
   xmax = 10
   ymax = 10
-  nx = 60
-  ny = 60
+  nx = 20
+  ny = 20
 []
 
 [Variables]
@@ -31,9 +31,17 @@
     type = TimeDerivative
     variable = c
   [../]
-  [./diff]
-    type = Diffusion
+  [./cc1]
+    type = RadialGreensSource
     variable = c
+    gamma = 1
+    convolution = green1
+  [../]
+  [./cc2]
+    type = RadialGreensSource
+    variable = c
+    gamma = 1e-1
+    convolution = green2
   [../]
 []
 
@@ -42,9 +50,8 @@
     type = RadialGreensConvolution
     execute_on = TIMESTEP_BEGIN
     v = c
-    r_cut = 4
-    # function = 'if(x<=1e-9,1.0,0.5e-2*exp(-x))'
-    function = 'exp(-x)/((x+0.0)^2)'
+    r_cut = 8
+    function = 'exp(-x/2)'
     normalize = true
   [../]
   [./green2]
@@ -52,8 +59,7 @@
     execute_on = TIMESTEP_BEGIN
     v = c
     r_cut = 6.28
-    # function = 'if(x<=1e-9,1.0,0.5e-2*sin(x))'
-    function = 'sin(x)/((x+0.0)^2)'
+    function = 'sin(x)'
     normalize = true
   [../]
 []
@@ -83,12 +89,30 @@
   [../]
 []
 
+[Postprocessors]
+  [./C]
+    type = ElementIntegralVariablePostprocessor
+    execute_on = 'INITIAL TIMESTEP_END'
+    variable = c
+  [../]
+  [./CC1]
+    type = ElementIntegralVariablePostprocessor
+    execute_on = 'INITIAL TIMESTEP_END'
+    variable = cc1
+  [../]
+  [./CC2]
+    type = ElementIntegralVariablePostprocessor
+    execute_on = 'INITIAL TIMESTEP_END'
+    variable = cc2
+  [../]
+[]
+
 [Executioner]
   type = Transient
   num_steps = 1
-  dt = 1e-6
 []
 
 [Outputs]
   exodus = true
+  execute_on = FINAL
 []
