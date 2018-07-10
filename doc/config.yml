@@ -14,7 +14,7 @@ Renderer:
         #     Capabilities: 'models_capabilities/Capabilities.md'
         #     Requirements: 'software_quality/Requirements.md'
         Documentation:
-            Reference Manual: documentation/systems/index.md
+            Reference Manual: syntax/index.md
 
 Extensions:
     appsyntax:
