@@ -416,4 +416,5 @@ RadialGreensConvolution::threadJoin(const UserObject & y)
 {
   const RadialGreensConvolution & uo = static_cast<const RadialGreensConvolution &>(y);
   _qp_data.insert(_qp_data.begin(), uo._qp_data.begin(), uo._qp_data.end());
+  _convolution.insert(uo._convolution.begin(), uo._convolution.end());
 }

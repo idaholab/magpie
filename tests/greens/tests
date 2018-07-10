@@ -2,7 +2,7 @@
   [./test]
     type = Exodiff
     input = 'test.i'
-    #cli_args = 'Mesh/dim=2 Mesh/elem_type=TRI3'
+    exodiff_opts = '-tolerance 1e-9 -absolute'
     exodiff = 'test_out.e'
   [../]
 
