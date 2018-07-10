@@ -7,6 +7,7 @@
 *-opt
 *-dbg
 *-oprof
+*-devel
 *.e
 *.nav
 *.log
