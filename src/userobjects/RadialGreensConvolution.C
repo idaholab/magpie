@@ -182,8 +182,6 @@ RadialGreensConvolution::execute()
 void
 RadialGreensConvolution::finalize()
 {
-  _console <<  "RadialGreensConvolution::finalize()" << std::flush;
-
   // the first chunk of data is always the local data - remember its size
   unsigned int local_size = _qp_data.size();
 
@@ -226,8 +224,6 @@ RadialGreensConvolution::finalize()
     }
   }
 
-  _console <<  "  communiction done." << std::flush;
-
   // if normalization is requested we need to integrate the current variable field
   Real _source_integral = 0.0;
   if (_normalize)
@@ -243,8 +239,6 @@ RadialGreensConvolution::finalize()
   mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
   kd_tree->buildIndex();
 
-  _console <<  "  KD-tree built." << std::flush;
-
   // result map entry
   const auto end_it = _convolution.end();
   auto it = end_it;
@@ -259,14 +253,8 @@ RadialGreensConvolution::finalize()
   std::vector<std::pair<std::size_t, Real>> ret_matches;
   nanoflann::SearchParams search_params;
 
-  _console <<  "  iterating over " << local_size << " QPs..." << std::flush;
-  const int interval = local_size / 100;
-
   for (unsigned int i = 0; i < local_size; ++i)
   {
-    if (_dim == 3 && i % interval == 0)
-      _console <<  "  " << i/interval << "%..." << std::flush;
-
     const auto & local_qp = _qp_data[i];
 
     // Look up result map iterator only if we enter a new element. this saves a bunch

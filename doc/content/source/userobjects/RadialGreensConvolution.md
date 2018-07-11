@@ -5,7 +5,7 @@
 Given a Green's function $G(r)$ and a variable field $c(\vec r)$ this userobject calculates a convolution $c'(\vec r)$ such that
 
 \begin{equation}
-c'(\vec r) = \frac1{4\pi}\int_{\Omega(\vec{r})} \frac{G(|\vec r - \vec{r'}|)}{r^2} c(\vec{r'})\,d\vec{r'},
+c'(\vec r) = \frac1{4\pi}\int_{\Omega(\vec{r})} \frac{G(|\vec r - \vec{r'}|)}{|\vec r - \vec{r'}|^2} c(\vec{r'})\,d\vec{r'},
 \end{equation}
 
 where the integration domain $\Omega$ is defined as the ball with radius $r_{cut}$ (`r_cut`)
@@ -15,7 +15,7 @@ where the integration domain $\Omega$ is defined as the ball with radius $r_{cut
 \end{equation}
 
 !alert note
-Note that the geometrical attenuation $\frac1{4\pi r^2}$ is not part of $G$.
+Note that the geometrical attenuation $\frac1{4\pi |\vec r - \vec{r'}|^2}$ is not part of $G$.
 
 !alert note
 The convolution will always be computed in 3D, no matter what the mesh dimension is.
@@ -52,7 +52,7 @@ works in two stages.
 
     4. the results from the search are used to spatially integrate the selected
         variable field multiplied with the Green's Function $G$ and the geometric
-        attenuation $\frac1{4\pi r^2}$.
+        attenuation $\left(4\pi |\vec r - \vec{r'}|^2\right)^{-1}$.
 
     5. The integral is normalized to ensure mass conservation
 
