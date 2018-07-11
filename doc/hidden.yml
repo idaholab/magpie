@@ -21,7 +21,6 @@
 - /UserObjects/NeutronicsSpectrumSamplerFission
 - /UserObjects/PKAConstant
 - /UserObjects/PKAFissionFragmentEmpirical
-- /UserObjects/PKAFissionFragmentNeutronics
 - /UserObjects/PKAFixedPointGenerator
 - /UserObjects/PKAFunction
 - /UserObjects/PKAGeneratorAlphaDecay
