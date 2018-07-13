@@ -7,35 +7,18 @@
 /**********************************************************************/
 
 #include "RadialGreensConvolution.h"
+#include "NonlinearSystemBase.h"
+#include "FEProblemBase.h"
+
 #include "libmesh/nanoflann.hpp"
+#include "libmesh/parallel_algebra.h"
+#include "libmesh/mesh_tools.h"
 
 #include <list>
+#include <iterator>
+#include <algorithm>
 
 registerMooseObject("MagpieApp", RadialGreensConvolution);
-
-// serialization helper for parallel communication
-template <>
-void
-dataStore(std::ostream & stream, RadialGreensConvolution::QPData & qpd, void * context)
-{
-  dataStore(stream, qpd._q_point, context);
-  dataStore(stream, qpd._elem_id, context);
-  dataStore(stream, qpd._qp, context);
-  dataStore(stream, qpd._volume, context);
-  dataStore(stream, qpd._value, context);
-}
-
-// unserialization helper for parallel communication
-template <>
-void
-dataLoad(std::istream & stream, RadialGreensConvolution::QPData & qpd, void * context)
-{
-  dataLoad(stream, qpd._q_point, context);
-  dataLoad(stream, qpd._elem_id, context);
-  dataLoad(stream, qpd._qp, context);
-  dataLoad(stream, qpd._volume, context);
-  dataLoad(stream, qpd._value, context);
-}
 
 // specialization for PointListAdaptor<RadialGreensConvolution::QPData>
 template <>
@@ -52,13 +35,17 @@ validParams<RadialGreensConvolution>()
   InputParameters params = validParams<ElementUserObject>();
   params.addClassDescription("Perform a radial Green's function convolution");
   params.addCoupledVar("v", "Variable to gather");
-  params.addRequiredParam<FunctionName>("function",
-                                        "Green's function (distance is substituted for x) without geometrical attenuation");
+  params.addRequiredParam<FunctionName>(
+      "function",
+      "Green's function (distance is substituted for x) without geometrical attenuation");
   params.addRequiredParam<Real>("r_cut", "Cut-off radius for the Green's function");
   params.addParam<bool>("normalize", false, "Normalize the Green's function integral to one");
 
   // we run this object once at the beginning of the timestep by default
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
+
+  // make sure we have always have geometric point neighbors ghosted
+  params.registerRelationshipManagers("ElementPointNeighbors");
 
   return params;
 }
@@ -71,7 +58,10 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _r_cut(getParam<Real>("r_cut")),
     _normalize(getParam<bool>("normalize")),
     _dim(_mesh.dimension()),
-    _correction_integral(100)
+    _correction_integral(100),
+    _dof_map(_fe_problem.getNonlinearSystemBase().dofMap()),
+    _update_communication_lists(false),
+    _my_pid(processor_id())
 {
   // collect mesh periodicity data
   for (unsigned int i = 0; i < _dim; ++i)
@@ -89,6 +79,16 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
           "r_cut",
           "The cut-off radius cannot be larger than half the periodic size of the simulation cell");
   }
+}
+
+void
+RadialGreensConvolution::initialSetup()
+{
+  // Get a pointer to the PeriodicBoundaries buried in libMesh
+  _pbs = _fe_problem.getNonlinearSystemBase().dofMap().get_periodic_boundaries();
+
+  // set up processor boundary node list
+  meshChanged();
 }
 
 void
@@ -117,7 +117,7 @@ RadialGreensConvolution::initialize()
     {
       const Real r = i * dr;
       const Real h = std::sqrt(_r_cut * _r_cut - r * r);
-      const unsigned int hsteps = std::ceil(h/dr);
+      const unsigned int hsteps = std::ceil(h / dr);
       const Real dh = h / hsteps;
 
       _correction_integral[i] = 0.0;
@@ -151,15 +151,15 @@ RadialGreensConvolution::attenuationIntegral(Real h1, Real h2, Real r, unsigned 
     // in 2D we need to return the above and below plane contribution (hence 2.0 * ...)
     if (r > 0.0)
       // integral 1/(h^2+r^2) dh = 1/r*atan(h/r)|
-      return 2.0 * 1.0/(4.0 * libMesh::pi * r) * (std::atan(h2/r) - std::atan(h1/r));
+      return 2.0 * 1.0 / (4.0 * libMesh::pi * r) * (std::atan(h2 / r) - std::atan(h1 / r));
     else
       // integral 1/h^2 dh = -1/h|
-      return 2.0 * 1.0/(4.0 * libMesh::pi) * (-1.0/h2 + 1.0/h1);
+      return 2.0 * 1.0 / (4.0 * libMesh::pi) * (-1.0 / h2 + 1.0 / h1);
   }
   else
     // dim = 1, we multiply the attenuation by 2pi*h (1/2 * 2pi/4pi = 0.25)
     // integral h/(h^2+r^2) dh = 1/2 * ln(h^2+r^2)|
-    return 0.25 * (std::log(h2*h2 + r*r) - std::log(h1*h1 + r*r));
+    return 0.25 * (std::log(h2 * h2 + r * r) - std::log(h1 * h1 + r * r));
 }
 
 void
@@ -188,40 +188,72 @@ RadialGreensConvolution::finalize()
   // communicate the qp data list if n_proc > 1
   if (_app.n_processors() > 1)
   {
-    // pack the local qp data into a string buffer
-    std::string send_buffer;
-    std::ostringstream oss;
-    dataStore(oss, _qp_data, this);
-    send_buffer.assign(oss.str());
+    // !!!!!!!!!!!
+    // !!CAREFUL!! Is it guaranteed that _qp_data is in the same order if the mesh has not changed?
+    // !!!!!!!!!!!
 
-    // create byte buffers for the streams received from all processors
-    std::vector<std::string> recv_buffers;
+    // update after mesh changes and/or if a displaced problem exists
+    if (_update_communication_lists || _fe_problem.getDisplacedProblem())
+      updateCommunicationLists();
 
-    // broadcast serialized data to and receive from all processors
-    _communicator.allgather(send_buffer, recv_buffers);
-    mooseAssert(recv_buffers.size() == _app.n_processors(),
-                "Unexpected size of recv_buffers: " << recv_buffers.size());
+    // sparse send data (processor ID,)
+    std::vector<std::size_t> non_zero_comm;
+    for (auto i = beginIndex(_communication_lists); i < _communication_lists.size(); ++i)
+      if (!_communication_lists[i].empty())
+        non_zero_comm.push_back(i);
 
-    // Loop over all data structures for all processors to perform the gather operation
-    std::istringstream iss;
-    for (unsigned int rank = 0; rank < recv_buffers.size(); ++rank)
+    // data structures for sparse point to point communication
+    std::vector<std::vector<QPData>> send(non_zero_comm.size());
+    std::vector<Parallel::Request> send_requests(non_zero_comm.size());
+    Parallel::MessageTag send_tag = _communicator.get_unique_tag(4711);
+    std::vector<QPData> receive;
+
+    const auto item_type = StandardType<QPData>(&(_qp_data[0]));
+
+    // fill buffer and send structures
+    for (auto i = beginIndex(non_zero_comm); i < non_zero_comm.size(); ++i)
     {
-      // skip the current processor (its data is already in the structures)
-      if (rank == processor_id())
-        continue;
+      const auto pid = non_zero_comm[i];
+      const auto & list = _communication_lists[pid];
 
-      // populate the stream with a new buffer and reset stream state
-      iss.str(recv_buffers[rank]);
-      iss.clear();
+      // fill send buffer for transfer to pid
+      send[i].reserve(list.size());
+      for (const auto & item : list)
+      {
+        send[i].push_back(_qp_data[item]);
+#if 0
+        // output communicated qp locations
+        _console << name() << ' '
+                 << _qp_data[item]._q_point(0) << ' '
+                 << _qp_data[item]._q_point(1) << ' '
+                 << _qp_data[item]._q_point(2) << ' '
+                 << pid << std::flush;
+#endif
+      }
 
-      // Load the communicated data into temporary structures
-      std::vector<QPData> other_data;
-      dataLoad(iss, other_data, this);
-
-      // merging the qp data lists (by appending to the end to keep local data at the beginning of
-      // the vector)
-      _qp_data.insert(_qp_data.end(), other_data.begin(), other_data.end());
+      // issue non-blocking send
+      _communicator.send(pid, send[i], send_requests[i], send_tag);
     }
+
+    // receive messages - we assume that we receive as many messages as we send!
+    for (auto i = beginIndex(non_zero_comm); i < non_zero_comm.size(); ++i)
+    {
+      // inspect incoming message
+      Parallel::Status status(_communicator.probe(Parallel::any_source, send_tag));
+      const auto source_pid = cast_int<processor_id_type>(status.source());
+      const auto message_size = status.size(item_type);
+
+      // resize receive buffer accordingly and receive data
+      receive.resize(message_size);
+      _communicator.receive(source_pid, receive, send_tag);
+
+      // append communicated data
+      _qp_data.insert(_qp_data.end(), receive.begin(), receive.end());
+    }
+
+    // wait until all send requests are at least buffered and we can destroy
+    // the send buffers by going out of scope
+    Parallel::wait(send_requests);
   }
 
   // if normalization is requested we need to integrate the current variable field
@@ -310,16 +342,18 @@ RadialGreensConvolution::finalize()
             // correction integral is the integral over the geometric attenuation
             // times the Green's function over a 2D disc inscribed into the r_cut
             // sphere and perpendicular to the mesh.
-            Real add = _correction_integral[std::floor(r/dr)] * other_qp._volume;
+            Real add = _correction_integral[std::floor(r / dr)] * other_qp._volume;
 
             if (r == 0)
             {
               const Real R = 0.5 * other_qp._volume;
-              add += _function.value(_t, Point(0.0, 0.0, 0.0)) * (
-                // add the center sphere attenuation integral
-                R +
-                // add the section missing or overlapping between _correction_integral and center sphere
-                attenuationIntegral(R, _zero_dh, 0.0, 1) * other_qp._volume);
+              add += _function.value(_t, Point(0.0, 0.0, 0.0)) *
+                     (
+                         // add the center sphere attenuation integral
+                         R +
+                         // add the section missing or overlapping between _correction_integral and
+                         // center sphere
+                         attenuationIntegral(R, _zero_dh, 0.0, 1) * other_qp._volume);
             }
             sum += add * other_qp._value;
             break;
@@ -330,15 +364,17 @@ RadialGreensConvolution::finalize()
             // correction integral is the integral over the geometric attenuation
             // times the Green's function over a 1D line segment inscribed into the r_cut
             // sphere and perpendicular to the mesh.
-            Real add = _correction_integral[std::floor(r/dr)] * other_qp._volume;
+            Real add = _correction_integral[std::floor(r / dr)] * other_qp._volume;
             if (r == 0)
             {
               const Real R = std::sqrt(other_qp._volume / (2.0 * libMesh::pi));
-              add += _function.value(_t, Point(0.0, 0.0, 0.0)) * (
-                // add the center sphere attenuation integral
-                R +
-                // add the section missing or overlapping between _correction_integral and center sphere
-                attenuationIntegral(R, _zero_dh, 0.0, 2) * other_qp._volume);
+              add += _function.value(_t, Point(0.0, 0.0, 0.0)) *
+                     (
+                         // add the center sphere attenuation integral
+                         R +
+                         // add the section missing or overlapping between _correction_integral and
+                         // center sphere
+                         attenuationIntegral(R, _zero_dh, 0.0, 2) * other_qp._volume);
             }
             sum += add * other_qp._volume * other_qp._value;
             break;
@@ -350,7 +386,7 @@ RadialGreensConvolution::finalize()
             if (r == 0)
             {
               // R is the integral over the geometric attenuation in a sphere around the origin
-              const Real R = std::cbrt(3.0/4.0 * other_qp._volume / libMesh::pi);
+              const Real R = std::cbrt(3.0 / 4.0 * other_qp._volume / libMesh::pi);
               sum += G * R * other_qp._value;
             }
             else
@@ -405,4 +441,244 @@ RadialGreensConvolution::threadJoin(const UserObject & y)
   const RadialGreensConvolution & uo = static_cast<const RadialGreensConvolution &>(y);
   _qp_data.insert(_qp_data.begin(), uo._qp_data.begin(), uo._qp_data.end());
   _convolution.insert(uo._convolution.begin(), uo._convolution.end());
+}
+
+void
+RadialGreensConvolution::insertNotLocalPointNeighbors(dof_id_type node)
+{
+  for (const auto * elem : _nodes_to_elem_map[node])
+    if (elem->processor_id() != _my_pid)
+      _point_neighbors.insert(elem);
+}
+
+void
+RadialGreensConvolution::insertNotLocalPeriodicPointNeighbors(dof_id_type node, const Node * second)
+{
+  const Node * first = _mesh.nodePtr(node);
+
+  for (const auto * elem : _nodes_to_elem_map[node])
+    if (elem->processor_id() != _my_pid)
+      _periodic_point_neighbors.insert(std::make_pair(elem, std::make_pair(first, second)));
+}
+
+void
+RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
+{
+  auto iters = _periodic_node_map.equal_range(first->id());
+  auto it = iters.first;
+
+  // insert first periodic neighbor
+  insertNotLocalPeriodicPointNeighbors(it->second, first);
+  ++it;
+
+  // usual case, node was on the face of a periodic boundary (and not on its edge or corner)
+  if (it == iters.second)
+    return;
+
+  // number of periodic directions
+  unsigned int periodic_dirs = 1;
+  std::set<dof_id_type> nodes;
+
+  // insert remaining periodic copies
+  do
+  {
+    nodes.insert(it->second);
+    it++;
+    periodic_dirs++;
+  } while (it != iters.second);
+
+  // now jump periodic_dirs-1 times from those nodes to their periodic copies
+  for (unsigned int i = 1; i < periodic_dirs; ++i)
+  {
+    std::set<dof_id_type> new_nodes;
+    for (auto node2 : nodes)
+    {
+      // periodic copies of the set members we already inserted
+      auto new_iters = _periodic_node_map.equal_range(node2);
+
+      // insert the ids of the periodic copies of the node along with their periodic displacement
+      for (it = new_iters.first; it != new_iters.second; ++it)
+        new_nodes.insert(it->second);
+    }
+    nodes.insert(new_nodes.begin(), new_nodes.end());
+  }
+
+  // add all jumped to nodes
+  for (auto node2 : nodes)
+    insertNotLocalPeriodicPointNeighbors(node2, first);
+}
+
+void
+RadialGreensConvolution::meshChanged()
+{
+  // get underlying libMesh mesh
+  auto & mesh = _mesh.getMesh();
+
+  // get a fresh point locator
+  _point_locator = _mesh.getPointLocator();
+
+  // rebuild periodic node map (this is the heaviest part by far)
+  _mesh.buildPeriodicNodeMap(_periodic_node_map, _v_var, _pbs);
+
+  // Build a new node to element map
+  _nodes_to_elem_map.clear();
+  MeshTools::build_nodes_to_elem_map(_mesh.getMesh(), _nodes_to_elem_map);
+
+  // clear point neighbor set
+  _point_neighbors.clear();
+
+  // my processor id
+  const auto my_pid = processor_id();
+
+  // iterate over active local elements
+  const auto end = mesh.active_local_elements_end();
+  for (auto it = mesh.active_local_elements_begin(); it != end; ++it)
+  {
+    // find a face that faces either a boundary (nullptr) or a different processor
+    for (unsigned int s = 0; s < (*it)->n_sides(); ++s)
+    {
+      const auto * neighbor = (*it)->neighbor_ptr(s);
+      if (neighbor)
+      {
+        if (neighbor->processor_id() != my_pid)
+        {
+          // add all face node touching elements directly
+          for (unsigned int n = 0; n < (*it)->n_nodes(); ++n)
+            if ((*it)->is_node_on_side(n, s))
+              insertNotLocalPointNeighbors((*it)->node_id(n));
+        }
+      }
+      else
+      {
+        // find periodic node neighbors and
+        for (unsigned int n = 0; n < (*it)->n_nodes(); ++n)
+          if ((*it)->is_node_on_side(n, s))
+            findNotLocalPeriodicPointNeighbors((*it)->node_ptr(n));
+      }
+    }
+  }
+
+    // output point neighbor element centroids for debugging
+#if 0
+  for (auto * el : _point_neighbors)
+    _console << name() << ' '
+             << el->centroid()(0) << ' '
+             << el->centroid()(1) << ' '
+             << el->centroid()(2) << std::flush;
+
+  for (auto pair : _periodic_point_neighbors)
+  {
+    Point p = pair.first->centroid() - (*(pair.second.first) - *(pair.second.second));
+    _console << name() << ' ' << p(0) << ' ' << p(1) << ' ' << p(2) << std::flush;
+  }
+#endif
+
+  // request communication list update
+  _update_communication_lists = true;
+}
+
+void
+RadialGreensConvolution::updateCommunicationLists()
+{
+  // clear communication lists
+  _communication_lists.clear();
+  _communication_lists.resize(n_processors());
+
+  // build KD-Tree using local qpoint data
+  const unsigned int max_leaf_size = 20; // slightly affects runtime
+  auto point_list = PointListAdaptor<QPData>(_qp_data);
+  auto kd_tree = libmesh_make_unique<KDTreeType>(
+      LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
+  mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
+  kd_tree->buildIndex();
+
+  std::vector<std::pair<std::size_t, Real>> ret_matches;
+  nanoflann::SearchParams search_params;
+
+  // iterate over non periodic point neighbor elements
+  for (auto elem : _point_neighbors)
+  {
+    ret_matches.clear();
+    Point centroid = elem->centroid();
+    const Real r_cut2 = _r_cut + elem->hmax() / 2.0;
+    kd_tree->radiusSearch(&(centroid(0)), r_cut2 * r_cut2, ret_matches, search_params);
+    for (auto & match : ret_matches)
+      _communication_lists[elem->processor_id()].insert(match.first);
+  }
+
+  // iterate over periodic point neighbor elements
+  for (auto pair : _periodic_point_neighbors)
+  {
+    ret_matches.clear();
+    Point centroid = pair.first->centroid() - (*(pair.second.first) - *(pair.second.second));
+    const Real r_cut2 = _r_cut + pair.first->hmax() / 2.0;
+    kd_tree->radiusSearch(&(centroid(0)), r_cut2 * r_cut2, ret_matches, search_params);
+    for (auto & match : ret_matches)
+      _communication_lists[pair.first->processor_id()].insert(match.first);
+  }
+
+    // output communicated quadrature point counts for debugging
+#if 0
+  for (unsigned int i = 0; i < _communication_lists.size(); ++i)
+    _console << _communication_lists[i].size() << " / " << _qp_data.size() << '\n';
+#endif
+
+  // request fulfilled
+  _update_communication_lists = false;
+}
+
+StandardType<RadialGreensConvolution::QPData>::StandardType(
+    const RadialGreensConvolution::QPData * example)
+{
+  // We need an example for MPI_Address to use
+  static const RadialGreensConvolution::QPData p;
+  if (!example)
+    example = &p;
+
+#ifdef LIBMESH_HAVE_MPI
+
+  // Get the sub-data-types, and make sure they live long enough
+  // to construct the derived type
+  StandardType<Point> d1(&example->_q_point);
+  StandardType<dof_id_type> d2(&example->_elem_id);
+  StandardType<short> d3(&example->_qp);
+  StandardType<Real> d4(&example->_volume);
+  StandardType<Real> d5(&example->_value);
+
+  MPI_Datatype types[] = {
+      (data_type)d1, (data_type)d2, (data_type)d3, (data_type)d4, (data_type)d5};
+  int blocklengths[] = {1, 1, 1, 1, 1};
+  MPI_Aint displs[5], start;
+
+  libmesh_call_mpi(MPI_Get_address(const_cast<RadialGreensConvolution::QPData *>(example), &start));
+  libmesh_call_mpi(MPI_Get_address(const_cast<Point *>(&example->_q_point), &displs[0]));
+  libmesh_call_mpi(MPI_Get_address(const_cast<dof_id_type *>(&example->_elem_id), &displs[1]));
+  libmesh_call_mpi(MPI_Get_address(const_cast<short *>(&example->_qp), &displs[2]));
+  libmesh_call_mpi(MPI_Get_address(const_cast<Real *>(&example->_volume), &displs[3]));
+  libmesh_call_mpi(MPI_Get_address(const_cast<Real *>(&example->_value), &displs[4]));
+
+  for (std::size_t i = 0; i < 5; ++i)
+    displs[i] -= start;
+
+  // create a prototype structure
+  MPI_Datatype tmptype;
+  libmesh_call_mpi(MPI_Type_create_struct(5, blocklengths, displs, types, &tmptype));
+  libmesh_call_mpi(MPI_Type_commit(&tmptype));
+
+  // resize the structure type to account for padding, if any
+  libmesh_call_mpi(
+      MPI_Type_create_resized(tmptype, 0, sizeof(RadialGreensConvolution::QPData), &_datatype));
+  libmesh_call_mpi(MPI_Type_free(&tmptype));
+
+  this->commit();
+
+#endif // LIBMESH_HAVE_MPI
+}
+
+StandardType<RadialGreensConvolution::QPData>::StandardType(
+    const StandardType<RadialGreensConvolution::QPData> & t)
+{
+#ifdef LIBMESH_HAVE_MPI
+  libmesh_call_mpi(MPI_Type_dup(t._datatype, &_datatype));
+#endif
 }
