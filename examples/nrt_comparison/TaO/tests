@@ -1,0 +1,15 @@
+[Tests]
+  [./TaO_damage_energy]
+    type = 'RunApp'
+    input = 'pc_1981_TaO_energy.i'
+    check_input = True
+    required_objects = 'PolyatomicRecoil'
+  [../]
+
+  [./TaO_net]
+    type = 'RunApp'
+    input = 'pc_1981_TaO_net.i'
+    check_input = True
+    required_objects = 'PolyatomicRecoil'
+  [../]
+[]
