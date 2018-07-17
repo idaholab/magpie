@@ -123,6 +123,11 @@ validParams<MyTRIMRasterizer>()
                         "objects. This is useful to avoid extremely large PKA lists.");
   params.addParam<unsigned int>(
       "max_pka_count", "Desired number of PKAs to be run during each invocation of mytrim");
+  params.addRangeCheckedParam<Real>("max_nrt_difference",
+                                    0.2,
+                                    "max_nrt_difference > 0 & max_nrt_difference < 1",
+                                    "The largest max-norm difference between number fractions for "
+                                    "reusing existing polyatomic NRT.");
   params.addParamNamesToGroup("interval analytical_energy_cutoff max_pka_count", "Advanced");
 
   params.addParam<Real>("r_rec",
@@ -153,6 +158,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
   _trim_parameters.element_prototypes.resize(_nvars);
   _trim_parameters.analytical_cutoff = getParam<Real>("analytical_energy_cutoff");
   _trim_parameters.recoil_rate_scaling = getParam<Real>("recoil_rate_scaling");
+  _trim_parameters.max_nrt_distance = getParam<Real>("max_nrt_difference");
+  _trim_parameters.nrt_log_energy_spacing = 1.1;
   _trim_parameters.trim_module = getParam<MooseEnum>("trim_module").getEnum<TRIMModuleEnum>();
   if (isParamValid("max_pka_count"))
     _trim_parameters.desired_npka = getParam<unsigned int>("max_pka_count");
@@ -539,6 +546,13 @@ MyTRIMRasterizer::periodicPoint(const Point & pos) const
     }
 
   return p;
+}
+
+bool
+MyTRIMRasterizer::isTrackedSpecies(unsigned int atomic_number, Real mass_number) const
+{
+  mooseAssert(_pka_generators[0], "PKA generator is not set.");
+  return _pka_generators[0]->ionTag(_pka_parameters, atomic_number, mass_number) != -1;
 }
 
 void

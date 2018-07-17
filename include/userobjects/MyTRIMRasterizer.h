@@ -10,6 +10,8 @@
 #define MYTRIMRASTERIZER_H
 
 #include "ElementUserObject.h"
+#include "PolyatomicDisplacementFunction.h"
+#include "PolyatomicDisplacementDerivativeFunction.h"
 
 #include <map>
 #include <array>
@@ -54,6 +56,9 @@ public:
 
   /// returns a point with the periodic boundary conditions applied
   Point periodicPoint(const Point &) const;
+
+  /// checks if species exists
+  bool isTrackedSpecies(unsigned int atomic_number, Real mass_number) const;
 
   /// element averaged data
   struct AveragedData
@@ -109,6 +114,12 @@ public:
 
     /// energy cutoff below which recoils are not followed explicitly but effects are calculated analytically
     Real analytical_cutoff;
+
+    /// maximum acceptable distance for matching NRT objects in composition space
+    Real max_nrt_distance;
+
+    /// logarithmic energy spacing for NRT integration
+    Real nrt_log_energy_spacing;
 
     /// enable instantaneous recombination
     bool recombination;

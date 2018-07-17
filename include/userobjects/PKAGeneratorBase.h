@@ -37,6 +37,9 @@ public:
 
   virtual void initialize() {}
 
+  /// finds the right ion tag; -1 means that the nuclide is not tracked, otherwise the index in the rasterizer nuclide vector must be retrieved
+  int ionTag(const MyTRIMRasterizer::PKAParameters &, Real Z, Real m) const;
+
 protected:
   /// helper function to set the ion position to a random location in the current element
   void setPosition(MyTRIM_NS::IonBase & ion) const;
@@ -50,9 +53,6 @@ protected:
     const Real X = getRandomReal(), Y = getRandomReal(), Z = getRandomReal();
     return Point(X, Y, Z);
   }
-
-  /// finds the right ion tag; -1 means that the nuclide is not tracked, otherwise the index in the rasterizer nuclide vector must be retrieved
-  int ionTag(const MyTRIMRasterizer::PKAParameters &, Real Z, Real m) const;
 };
 
 #endif // PKAGENERATORBASE_H
