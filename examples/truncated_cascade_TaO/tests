@@ -1,0 +1,8 @@
+[Tests]
+  [./truncated_cascade_TaO]
+    type = 'RunApp'
+    input = 'truncated_cascade_TaO.i'
+    check_input = True
+    required_objects = 'PolyatomicRecoil'
+  [../]
+[]
