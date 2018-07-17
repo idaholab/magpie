@@ -20,5 +20,6 @@
     prereq = balance
     cli_args = 'UserObjects/rasterizer/analytical_energy_cutoff=1000 Outputs/file_base=balance_cut_out'
     abs_zero = 1e-9
+    required_objects = 'PolyatomicDamageEnergyFunction'
   [../]
 []
