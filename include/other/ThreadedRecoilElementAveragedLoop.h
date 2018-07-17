@@ -39,7 +39,7 @@ public:
 
 protected:
   /// add an interstitial or vacancy to the result list
-  void addDefectToResult(const Point & p, unsigned int var, DefectType type);
+  void addDefectToResult(const Point & p, unsigned int var, Real weight, DefectType type);
 
   /// add deposited energy to the result list
   void addEnergyToResult(const Point & p, Real edep);

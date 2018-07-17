@@ -50,7 +50,10 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
 
 void
 ThreadedRecoilElementAveragedLoop::addDefectToResult(
-    const Point & p, unsigned int var, ThreadedRecoilElementAveragedLoop::DefectType type)
+    const Point & p,
+    unsigned int var,
+    Real weight,
+    ThreadedRecoilElementAveragedLoop::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
   if (elem == nullptr || var >= _nvars)
@@ -65,7 +68,7 @@ ThreadedRecoilElementAveragedLoop::addDefectToResult(
   mooseAssert(type != NONE && type != N_DEFECTS, "Invalid defect type passed to addDefectToResult");
 
   // increase the interstitial counter for the tagged element
-  i->second._defects[var][type] += 1.0;
+  i->second._defects[var][type] += weight;
 }
 
 void

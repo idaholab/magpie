@@ -11,6 +11,7 @@
 
 #include "mytrim/trim.h"
 #include "MooseTypes.h"
+#include "ThreadedRecoilLoopBase.h"
 
 #include <list>
 
