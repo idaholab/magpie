@@ -185,15 +185,25 @@ RadialGreensConvolution::finalize()
   // the first chunk of data is always the local data - remember its size
   unsigned int local_size = _qp_data.size();
 
+  // if normalization is requested we need to integrate the current variable field
+  Real _source_integral = 0.0;
+  if (_normalize)
+  {
+    for (const auto & qpd : _qp_data)
+      _source_integral += qpd._volume * qpd._value;
+    gatherSum(_source_integral);
+  }
+
   // communicate the qp data list if n_proc > 1
   if (_app.n_processors() > 1)
   {
     // !!!!!!!!!!!
     // !!CAREFUL!! Is it guaranteed that _qp_data is in the same order if the mesh has not changed?
+    // According to @friedmud it is not guaranteed if threads are used
     // !!!!!!!!!!!
 
     // update after mesh changes and/or if a displaced problem exists
-    if (_update_communication_lists || _fe_problem.getDisplacedProblem())
+    if (_update_communication_lists || _fe_problem.getDisplacedProblem() /* || n_threads() > 1 */)
       updateCommunicationLists();
 
     // sparse send data (processor ID,)
@@ -255,12 +265,6 @@ RadialGreensConvolution::finalize()
     // the send buffers by going out of scope
     Parallel::wait(send_requests);
   }
-
-  // if normalization is requested we need to integrate the current variable field
-  Real _source_integral = 0.0;
-  if (_normalize)
-    for (const auto & qpd : _qp_data)
-      _source_integral += qpd._volume * qpd._value;
 
   // build KD-Tree using data we just allgathered
   const unsigned int max_leaf_size = 20; // slightly affects runtime
