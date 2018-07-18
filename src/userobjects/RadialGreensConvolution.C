@@ -631,7 +631,7 @@ RadialGreensConvolution::updateCommunicationLists()
   _update_communication_lists = false;
 }
 
-StandardType<RadialGreensConvolution::QPData>::StandardType(
+libMesh::Parallel::StandardType<RadialGreensConvolution::QPData>::StandardType(
     const RadialGreensConvolution::QPData * example)
 {
   // We need an example for MPI_Address to use

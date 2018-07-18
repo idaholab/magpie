@@ -152,7 +152,7 @@ protected:
 };
 
 template <>
-class StandardType<RadialGreensConvolution::QPData> : public DataType
+class libMesh::Parallel::StandardType<RadialGreensConvolution::QPData> : public DataType
 {
 public:
   explicit StandardType(const RadialGreensConvolution::QPData * example = nullptr);
