@@ -142,6 +142,10 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
   for (unsigned int i = 0; i < _nvars; ++i)
+      if (trim_Z[i] > trim_M[i])
+        mooseError("Value of Z is larger than value of M for entry ", i);
+
+  for (unsigned int i = 0; i < _nvars; ++i)
   {
     _var[i] = &coupledValue("var", i);
     _trim_parameters.element_prototypes[i]._m = trim_M[i];
