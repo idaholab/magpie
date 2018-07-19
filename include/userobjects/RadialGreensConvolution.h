@@ -149,6 +149,12 @@ protected:
   bool _update_communication_lists;
 
   processor_id_type _my_pid;
+
+  //@{ PerfGraph identifiers
+  PerfID _perf_meshchanged;
+  PerfID _perf_updatelists;
+  PerfID _perf_finalize;
+  //@}
 };
 
 template <>

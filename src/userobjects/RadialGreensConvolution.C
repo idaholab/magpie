@@ -61,7 +61,10 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _correction_integral(100),
     _dof_map(_fe_problem.getNonlinearSystemBase().dofMap()),
     _update_communication_lists(false),
-    _my_pid(processor_id())
+    _my_pid(processor_id()),
+    _perf_meshchanged(registerTimedSection("meshChanged", 3)),
+    _perf_updatelists(registerTimedSection("updateCommunicationLists", 3)),
+    _perf_finalize(registerTimedSection("finalize", 2))
 {
   // collect mesh periodicity data
   for (unsigned int i = 0; i < _dim; ++i)
@@ -182,6 +185,8 @@ RadialGreensConvolution::execute()
 void
 RadialGreensConvolution::finalize()
 {
+  TIME_SECTION(_perf_finalize);
+
   // the first chunk of data is always the local data - remember its size
   unsigned int local_size = _qp_data.size();
 
@@ -515,6 +520,8 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
 void
 RadialGreensConvolution::meshChanged()
 {
+  TIME_SECTION(_perf_meshchanged);
+
   // get underlying libMesh mesh
   auto & mesh = _mesh.getMesh();
 
@@ -584,6 +591,8 @@ RadialGreensConvolution::meshChanged()
 void
 RadialGreensConvolution::updateCommunicationLists()
 {
+  TIME_SECTION(_perf_updatelists);
+
   // clear communication lists
   _communication_lists.clear();
   _communication_lists.resize(n_processors());
