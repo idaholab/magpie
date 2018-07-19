@@ -109,6 +109,9 @@ public:
     /// scaling factor for the results
     Real result_scaling_factor;
 
+    /// the _dt for which mytrim was executed last
+    Real last_executed_dt;
+
     /// get the number of elements in the TRIM simulation
     unsigned int nVars() const { return element_prototypes.size(); }
   };

@@ -230,6 +230,7 @@ MyTRIMRasterizer::initialize()
 
   if (_execute_this_timestep)
   {
+    _trim_parameters.last_executed_dt = _fe_problem.dt();
     _material_map.clear();
     _pka_list.clear();
   }
