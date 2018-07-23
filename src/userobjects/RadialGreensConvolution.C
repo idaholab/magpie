@@ -208,7 +208,7 @@ RadialGreensConvolution::finalize()
     // !!!!!!!!!!!
 
     // update after mesh changes and/or if a displaced problem exists
-    if (_update_communication_lists || _fe_problem.getDisplacedProblem() /* || n_threads() > 1 */)
+    if (_update_communication_lists || _fe_problem.getDisplacedProblem() || libMesh::n_threads() > 1)
       updateCommunicationLists();
 
     // sparse send data (processor ID,)
@@ -291,7 +291,7 @@ RadialGreensConvolution::finalize()
     Parallel::wait(send_requests);
   }
 
-  // build KD-Tree using data we just allgathered
+  // build KD-Tree using data we just received
   const unsigned int max_leaf_size = 20; // slightly affects runtime
   auto point_list = PointListAdaptor<QPData>(_qp_data.begin(), _qp_data.end());
   auto kd_tree = libmesh_make_unique<KDTreeType>(
@@ -475,19 +475,22 @@ RadialGreensConvolution::threadJoin(const UserObject & y)
 void
 RadialGreensConvolution::insertNotLocalPointNeighbors(dof_id_type node)
 {
+  mooseAssert(!_nodes_to_elem_map[node].empty(), "Node not found in _nodes_to_elem_map");
+
   for (const auto * elem : _nodes_to_elem_map[node])
     if (elem->processor_id() != _my_pid)
       _point_neighbors.insert(elem);
 }
 
 void
-RadialGreensConvolution::insertNotLocalPeriodicPointNeighbors(dof_id_type node, const Node * second)
+RadialGreensConvolution::insertNotLocalPeriodicPointNeighbors(dof_id_type node, const Node * reference)
 {
-  const Node * first = _mesh.nodePtr(node);
+  mooseAssert(!_nodes_to_elem_map[node].empty(), "Node not found in _nodes_to_elem_map");
 
+  const Node * first = _mesh.nodePtr(node);
   for (const auto * elem : _nodes_to_elem_map[node])
     if (elem->processor_id() != _my_pid)
-      _periodic_point_neighbors.insert(std::make_pair(elem, std::make_pair(first, second)));
+      _periodic_point_neighbors.emplace(elem, first, reference);
 }
 
 void
@@ -511,7 +514,7 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
   // number of periodic directions
   unsigned int periodic_dirs = 1;
   std::set<dof_id_type> nodes;
-  // nodes.insert(iters.first->second); // probably not necessary
+  nodes.insert(iters.first->second); // probably not necessary
 
   // insert remaining periodic copies
   do
@@ -538,8 +541,8 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
   }
 
   // add all jumped to nodes
-  for (auto node2 : nodes)
-    insertNotLocalPeriodicPointNeighbors(node2, first);
+  for (auto node : nodes)
+    insertNotLocalPeriodicPointNeighbors(node, first);
 }
 
 void
@@ -594,21 +597,6 @@ RadialGreensConvolution::meshChanged()
     }
   }
 
-    // output point neighbor element centroids for debugging
-#if 0
-  for (auto * el : _point_neighbors)
-    _console << name() << ' '
-             << el->centroid()(0) << ' '
-             << el->centroid()(1) << ' '
-             << el->centroid()(2) << std::flush;
-
-  for (auto pair : _periodic_point_neighbors)
-  {
-    Point p = pair.first->centroid() - (*(pair.second.first) - *(pair.second.second));
-    _console << name() << ' ' << p(0) << ' ' << p(1) << ' ' << p(2) << std::flush;
-  }
-#endif
-
   // request communication list update
   _update_communication_lists = true;
 }
@@ -645,21 +633,22 @@ RadialGreensConvolution::updateCommunicationLists()
   }
 
   // iterate over periodic point neighbor elements
-  for (auto pair : _periodic_point_neighbors)
+  for (auto tuple : _periodic_point_neighbors)
   {
+
+    const auto * elem = std::get<0>(tuple);
+    const auto * first = std::get<1>(tuple);
+    const auto * second = std::get<2>(tuple);
+
+    Point centroid = elem->centroid() - (*first - *second);
+
+    const Real r_cut2 = _r_cut + elem->hmax() / 2.0;
+
     ret_matches.clear();
-    Point centroid = pair.first->centroid() - (*(pair.second.first) - *(pair.second.second));
-    const Real r_cut2 = _r_cut + pair.first->hmax() / 2.0;
     kd_tree->radiusSearch(&(centroid(0)), r_cut2 * r_cut2, ret_matches, search_params);
     for (auto & match : ret_matches)
-      _communication_lists[pair.first->processor_id()].insert(match.first);
+      _communication_lists[elem->processor_id()].insert(match.first);
   }
-
-    // output communicated quadrature point counts for debugging
-#if 0
-  for (unsigned int i = 0; i < _communication_lists.size(); ++i)
-    _console << _communication_lists[i].size() << " / " << _qp_data.size() << '\n';
-#endif
 
   // request fulfilled
   _update_communication_lists = false;

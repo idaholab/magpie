@@ -19,6 +19,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <tuple>
 
 using namespace libMesh::Parallel;
 
@@ -142,7 +143,7 @@ protected:
   std::set<const Elem *> _point_neighbors;
 
   // list of periodic point neighbor elements of the current processor domain
-  std::map<const Elem *, std::pair<const Node *, const Node *>> _periodic_point_neighbors;
+  std::set<std::tuple<const Elem *, const Node *, const Node *>> _periodic_point_neighbors;
 
   /// QPData indices to send to the various processors
   std::vector<std::set<std::size_t>> _communication_lists;
