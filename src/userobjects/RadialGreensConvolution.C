@@ -225,6 +225,16 @@ RadialGreensConvolution::finalize()
 
     const auto item_type = StandardType<QPData>(&(_qp_data[0]));
 
+#if 0
+    // output local qp locations
+    // _console << name() << ' ' << receive.size() << '\n' << name() << std::flush;
+    for (auto item : _qp_data)
+      _console << name() << ' ' << _my_pid << ' '
+               << item._q_point(0) << ' '
+               << item._q_point(1) << ' '
+               << item._q_point(2) << std::flush;
+#endif
+
     // fill buffer and send structures
     for (auto i = beginIndex(non_zero_comm); i < non_zero_comm.size(); ++i)
     {
@@ -237,7 +247,7 @@ RadialGreensConvolution::finalize()
       {
         send[i].push_back(_qp_data[item]);
 #if 0
-        // output communicated qp locations
+        // output sent qp locations
         _console << name() << ' '
                  << _qp_data[item]._q_point(0) << ' '
                  << _qp_data[item]._q_point(1) << ' '
@@ -261,6 +271,16 @@ RadialGreensConvolution::finalize()
       // resize receive buffer accordingly and receive data
       receive.resize(message_size);
       _communicator.receive(source_pid, receive, send_tag);
+
+#if 0
+      // output received qp locations
+      // _console << name() << ' ' << receive.size() << '\n' << name() << std::flush;
+      for (auto item : receive)
+        _console << name() << ' ' << source_pid << ' '
+                 << item._q_point(0) << ' '
+                 << item._q_point(1) << ' '
+                 << item._q_point(2) << std::flush;
+#endif
 
       // append communicated data
       _qp_data.insert(_qp_data.end(), receive.begin(), receive.end());
@@ -476,6 +496,10 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
   auto iters = _periodic_node_map.equal_range(first->id());
   auto it = iters.first;
 
+  // no periodic copies
+  if (it == iters.second)
+    return;
+
   // insert first periodic neighbor
   insertNotLocalPeriodicPointNeighbors(it->second, first);
   ++it;
@@ -487,6 +511,7 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
   // number of periodic directions
   unsigned int periodic_dirs = 1;
   std::set<dof_id_type> nodes;
+  // nodes.insert(iters.first->second); // probably not necessary
 
   // insert remaining periodic copies
   do
@@ -500,12 +525,12 @@ RadialGreensConvolution::findNotLocalPeriodicPointNeighbors(const Node * first)
   for (unsigned int i = 1; i < periodic_dirs; ++i)
   {
     std::set<dof_id_type> new_nodes;
-    for (auto node2 : nodes)
+    for (auto node : nodes)
     {
       // periodic copies of the set members we already inserted
-      auto new_iters = _periodic_node_map.equal_range(node2);
+      auto new_iters = _periodic_node_map.equal_range(node);
 
-      // insert the ids of the periodic copies of the node along with their periodic displacement
+      // insert the ids of the periodic copies of the node
       for (it = new_iters.first; it != new_iters.second; ++it)
         new_nodes.insert(it->second);
     }
