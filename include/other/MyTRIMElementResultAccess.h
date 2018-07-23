@@ -10,6 +10,7 @@
 #define MYTRIMELEMENTRESULTACCESS_H
 
 #include "MyTRIMElementRun.h"
+#include "MyTRIMRasterizer.h"
 
 /**
  * Interface class ("Veneer") to provide encapsulate fetching defect production
@@ -26,6 +27,7 @@ public:
 
 protected:
   const MyTRIMElementRun & _mytrim;
+  const MyTRIMRasterizer & _rasterizer;
   const unsigned int _ivar;
   const unsigned int _defect;
 
@@ -39,6 +41,7 @@ template <class T>
 MyTRIMElementResultAccess<T>::MyTRIMElementResultAccess(const InputParameters & parameters) :
     T(parameters),
     _mytrim(this->template getUserObject<MyTRIMElementRun>("runner")),
+    _rasterizer(_mytrim.rasterizer()),
     _ivar(this->template getParam<unsigned int>("ivar")),
     _defect(this->template getParam<MooseEnum>("defect"))
 {

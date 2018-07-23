@@ -8,6 +8,7 @@
 
 #include "MyTRIMDiracSource.h"
 #include "MyTRIMDiracRun.h"
+#include "MyTRIMRasterizer.h"
 #include "MooseMesh.h"
 
 registerMooseObject("MagpieApp", MyTRIMDiracSource);
@@ -30,6 +31,7 @@ InputParameters validParams<MyTRIMDiracSource>()
 MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters) :
     DiracKernel(parameters),
     _mytrim(getUserObject<MyTRIMDiracRun>("runner")),
+    _rasterizer(_mytrim.rasterizer()),
     _ivar(getParam<unsigned int>("ivar")),
     _defect(getParam<MooseEnum>("defect"))
 {
@@ -52,5 +54,5 @@ MyTRIMDiracSource::addPoints()
 Real
 MyTRIMDiracSource::computeQpResidual()
 {
-  return -_test[_i][_qp];
+  return -_test[_i][_qp] / _rasterizer.getTrimParameters().last_executed_dt;
 }

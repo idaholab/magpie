@@ -21,13 +21,12 @@ InputParameters validParams<MyTRIMElementSource>()
 
 MyTRIMElementSource::MyTRIMElementSource(const InputParameters & parameters) :
     MyTRIMElementResultAccess<Kernel>(parameters),
-    _prefactor(getParam<Real>("prefactor")),
-    _dt(_fe_problem.dt())
+    _prefactor(getParam<Real>("prefactor"))
 {
 }
 
 Real
 MyTRIMElementSource::computeQpResidual()
 {
-  return -_prefactor * getDefectRate() / _dt * _test[_i][_qp];
+  return -_prefactor * getDefectRate() / _rasterizer.getTrimParameters().last_executed_dt * _test[_i][_qp];
 }
