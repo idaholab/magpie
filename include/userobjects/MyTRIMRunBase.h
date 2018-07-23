@@ -35,6 +35,9 @@ public:
   // get the name of the rasterizer object (this is to add an artificial dependence in an AuxKernel)
   UserObjectName getRasterizerName() const { return getParam<UserObjectName>("rasterizer"); }
 
+  // get const reference to the rasterizer object
+  const MyTRIMRasterizer & rasterizer() const { return _rasterizer; }
+
 protected:
   /// Rasterizer object to provide the material data
   const MyTRIMRasterizer & _rasterizer;

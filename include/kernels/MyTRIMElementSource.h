@@ -28,9 +28,6 @@ protected:
   virtual Real computeQpResidual();
 
   const Real _prefactor;
-
-  // current timestep size
-  const Real & _dt;
 };
 
 #endif //MYTRIMELEMENTSOURCE_H

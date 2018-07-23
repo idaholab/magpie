@@ -14,6 +14,7 @@
 // forward declarations
 class MyTRIMDiracRun;
 class MyTRIMDiracSource;
+class MyTRIMRasterizer;
 
 template<>
 InputParameters validParams<MyTRIMDiracSource>();
@@ -28,6 +29,7 @@ public:
 
 protected:
   const MyTRIMDiracRun & _mytrim;
+  const MyTRIMRasterizer & _rasterizer;
   const unsigned int _ivar;
   const unsigned int _defect;
 };
