@@ -6,6 +6,14 @@
     exodiff = 'test_out.e'
   [../]
 
+  [./parallel]
+    type = CSVDiff
+    input = 'parallel.i'
+    csvdiff = 'parallel_out.csv'
+    # finer partitioning will require second nearest neighbor processor comm!
+    max_parallel = 6
+  [../]
+
   [./dimension1]
     type = CSVDiff
     input = 'dimension.i'
