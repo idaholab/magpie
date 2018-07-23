@@ -23,9 +23,9 @@ registerMooseObject("MagpieApp", RadialGreensConvolution);
 // specialization for PointListAdaptor<RadialGreensConvolution::QPData>
 template <>
 inline const Point &
-PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(const size_t idx) const
+PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(const RadialGreensConvolution::QPData & item) const
 {
-  return _pts[idx]._q_point;
+  return item._q_point;
 }
 
 template <>
@@ -293,7 +293,7 @@ RadialGreensConvolution::finalize()
 
   // build KD-Tree using data we just allgathered
   const unsigned int max_leaf_size = 20; // slightly affects runtime
-  auto point_list = PointListAdaptor<QPData>(_qp_data);
+  auto point_list = PointListAdaptor<QPData>(_qp_data.begin(), _qp_data.end());
   auto kd_tree = libmesh_make_unique<KDTreeType>(
       LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
 
@@ -624,7 +624,7 @@ RadialGreensConvolution::updateCommunicationLists()
 
   // build KD-Tree using local qpoint data
   const unsigned int max_leaf_size = 20; // slightly affects runtime
-  auto point_list = PointListAdaptor<QPData>(_qp_data);
+  auto point_list = PointListAdaptor<QPData>(_qp_data.begin(), _qp_data.end());
   auto kd_tree = libmesh_make_unique<KDTreeType>(
       LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
   mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
