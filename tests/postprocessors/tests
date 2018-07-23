@@ -1,0 +1,7 @@
+[Tests]
+  [./rms_distance_pp]
+    type = 'CSVDiff'
+    input = 'rms_distance.i'
+    csvdiff = 'rms_distance_out.csv'
+  [../]
+[]
