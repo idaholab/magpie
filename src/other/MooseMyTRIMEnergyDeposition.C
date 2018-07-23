@@ -24,6 +24,7 @@ MooseMyTRIMEnergyDeposition::checkPKAState()
   {
     // PKA is gone, and with it all energy
     case MyTRIM_NS::IonBase::LOST:
+    case MyTRIM_NS::IonBase::DELETE:
       return;
 
     // only deposit electronic stopping (PKA is moving on)

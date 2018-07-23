@@ -170,7 +170,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
       kd_tree->buildIndex();
 
-      const Real r_rec = _trim_parameters.r_rec;
+      const Real r_rec2 = _trim_parameters.r_rec * _trim_parameters.r_rec;
       nanoflann::SearchParams params;
 
       // 2. iterate over interstitials and recombine them if they are with r_rec of a vacancy
@@ -178,7 +178,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       for (auto & i: _interstitial_buffer)
       {
         ret_matches.clear();
-        std::size_t n_result = kd_tree->radiusSearch(&(i.first(0)), r_rec, ret_matches, params);
+        std::size_t n_result = kd_tree->radiusSearch(&(i.first(0)), r_rec2, ret_matches, params);
 
         for (std::size_t j = 0; j < n_result; ++j)
         {
