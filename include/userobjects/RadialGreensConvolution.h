@@ -24,6 +24,7 @@
 using namespace libMesh::Parallel;
 
 class RadialGreensConvolution;
+class ThreadedRadialGreensConvolutionLoop;
 
 template <>
 InputParameters validParams<RadialGreensConvolution>();
@@ -119,6 +120,9 @@ protected:
       PointListAdaptor<QPData>,
       LIBMESH_DIM>;
 
+  /// spatial index (nanoflann guarantees this to be threadsafe under read-only operations)
+  std::unique_ptr<KDTreeType> _kd_tree;
+
   Real _zero_dh;
 
   /// DOF map
@@ -156,7 +160,13 @@ protected:
   PerfID _perf_updatelists;
   PerfID _perf_finalize;
   //@}
+
+  friend class ThreadedRadialGreensConvolutionLoop;
 };
+
+template <>
+const Point & PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
+    const RadialGreensConvolution::QPData & item) const;
 
 template <>
 class libMesh::Parallel::StandardType<RadialGreensConvolution::QPData> : public DataType

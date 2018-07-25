@@ -7,6 +7,7 @@
 /**********************************************************************/
 
 #include "RadialGreensConvolution.h"
+#include "ThreadedRadialGreensConvolutionLoop.h"
 #include "NonlinearSystemBase.h"
 #include "FEProblemBase.h"
 
@@ -22,8 +23,9 @@ registerMooseObject("MagpieApp", RadialGreensConvolution);
 
 // specialization for PointListAdaptor<RadialGreensConvolution::QPData>
 template <>
-inline const Point &
-PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(const RadialGreensConvolution::QPData & item) const
+const Point &
+PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
+    const RadialGreensConvolution::QPData & item) const
 {
   return item._q_point;
 }
@@ -191,12 +193,12 @@ RadialGreensConvolution::finalize()
   unsigned int local_size = _qp_data.size();
 
   // if normalization is requested we need to integrate the current variable field
-  Real _source_integral = 0.0;
+  Real source_integral = 0.0;
   if (_normalize)
   {
     for (const auto & qpd : _qp_data)
-      _source_integral += qpd._volume * qpd._value;
-    gatherSum(_source_integral);
+      source_integral += qpd._volume * qpd._value;
+    gatherSum(source_integral);
   }
 
   // communicate the qp data list if n_proc > 1
@@ -208,7 +210,8 @@ RadialGreensConvolution::finalize()
     // !!!!!!!!!!!
 
     // update after mesh changes and/or if a displaced problem exists
-    if (_update_communication_lists || _fe_problem.getDisplacedProblem() || libMesh::n_threads() > 1)
+    if (_update_communication_lists || _fe_problem.getDisplacedProblem() ||
+        libMesh::n_threads() > 1)
       updateCommunicationLists();
 
     // sparse send data (processor ID,)
@@ -294,151 +297,37 @@ RadialGreensConvolution::finalize()
   // build KD-Tree using data we just received
   const unsigned int max_leaf_size = 20; // slightly affects runtime
   auto point_list = PointListAdaptor<QPData>(_qp_data.begin(), _qp_data.end());
-  auto kd_tree = libmesh_make_unique<KDTreeType>(
+  _kd_tree = libmesh_make_unique<KDTreeType>(
       LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
 
-  mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
-  kd_tree->buildIndex();
+  mooseAssert(_kd_tree != nullptr, "KDTree was not properly initialized.");
+  _kd_tree->buildIndex();
 
   // result map entry
   const auto end_it = _convolution.end();
   auto it = end_it;
 
-  // integral of the convolution (used if normalization is requested)
-  Real _convolution_integral = 0.0;
+  // build thread loop functor
+  ThreadedRadialGreensConvolutionLoop rgcl(*this);
 
-  // radial bin size
-  const Real dr = _r_cut / _correction_integral.size();
+  // run threads
+  auto local_range_begin = _qp_data.begin();
+  auto local_range_end = local_range_begin;
+  std::advance(local_range_end, local_size);
+  Threads::parallel_reduce(QPDataRange(local_range_begin, local_range_end), rgcl);
 
-  // iterate over the local portion of the gathered QP data (TODO: make this threaded)
-  std::vector<std::pair<std::size_t, Real>> ret_matches;
-  nanoflann::SearchParams search_params;
-
-  for (unsigned int i = 0; i < local_size; ++i)
-  {
-    const auto & local_qp = _qp_data[i];
-
-    // Look up result map iterator only if we enter a new element. this saves a bunch
-    // of map lookups because same element entries are consecutive in the _qp_data vector.
-    if (it == end_it || it->first != local_qp._elem_id)
-      it = _convolution.find(local_qp._elem_id);
-
-    // initialize result entry
-    mooseAssert(it != end_it, "Current element id not found in result set.");
-    auto & sum = it->second[local_qp._qp];
-    sum = 0.0;
-
-    // if the variable is periodic we need to perform extra searches translated onto
-    // the periodic neighbors
-    std::list<Point> cell_vector = {Point()};
-    for (unsigned int j = 0; j < _dim; ++j)
-      if (_periodic[j])
-      {
-        std::list<Point> new_cell_vector;
-
-        for (const auto & cell : cell_vector)
-        {
-          if (local_qp._q_point(j) + _periodic_vector[j](j) - _r_cut < _periodic_max[j])
-            new_cell_vector.push_back(cell + _periodic_vector[j]);
-
-          if (local_qp._q_point(j) - _periodic_vector[j](j) + _r_cut > _periodic_min[j])
-            new_cell_vector.push_back(cell - _periodic_vector[j]);
-        }
-
-        cell_vector.insert(cell_vector.end(), new_cell_vector.begin(), new_cell_vector.end());
-      }
-
-    // perform radius search and aggregate data considering potential periodicity
-    Point center;
-    for (const auto & cell : cell_vector)
-    {
-      ret_matches.clear();
-      center = local_qp._q_point + cell;
-      std::size_t n_result =
-          kd_tree->radiusSearch(&(center(0)), _r_cut * _r_cut, ret_matches, search_params);
-      for (std::size_t j = 0; j < n_result; ++j)
-      {
-        const auto & other_qp = _qp_data[ret_matches[j].first];
-        const Real r = std::sqrt(ret_matches[j].second);
-
-        // R is the equivalent sphere radius for the quadrature point. The spherical integral
-        // integral_0^R 1/(4pi*r^2) *4pi*r^2 = R
-        // So R is the integral over the geometric attenuation at the center quadrature point
-        switch (_dim)
-        {
-          case 1:
-          {
-            // correction integral is the integral over the geometric attenuation
-            // times the Green's function over a 2D disc inscribed into the r_cut
-            // sphere and perpendicular to the mesh.
-            Real add = _correction_integral[std::floor(r / dr)] * other_qp._volume;
-
-            if (r == 0)
-            {
-              const Real R = 0.5 * other_qp._volume;
-              add += _function.value(_t, Point(0.0, 0.0, 0.0)) *
-                     (
-                         // add the center sphere attenuation integral
-                         R +
-                         // add the section missing or overlapping between _correction_integral and
-                         // center sphere
-                         attenuationIntegral(R, _zero_dh, 0.0, 1) * other_qp._volume);
-            }
-            sum += add * other_qp._value;
-            break;
-          }
-
-          case 2:
-          {
-            // correction integral is the integral over the geometric attenuation
-            // times the Green's function over a 1D line segment inscribed into the r_cut
-            // sphere and perpendicular to the mesh.
-            Real add = _correction_integral[std::floor(r / dr)] * other_qp._volume;
-            if (r == 0)
-            {
-              const Real R = std::sqrt(other_qp._volume / (2.0 * libMesh::pi));
-              add += _function.value(_t, Point(0.0, 0.0, 0.0)) *
-                     (
-                         // add the center sphere attenuation integral
-                         R +
-                         // add the section missing or overlapping between _correction_integral and
-                         // center sphere
-                         attenuationIntegral(R, _zero_dh, 0.0, 2) * other_qp._volume);
-            }
-            sum += add * other_qp._volume * other_qp._value;
-            break;
-          }
-
-          case 3:
-          {
-            const Real G = _function.value(_t, Point(r, 0.0, 0.0));
-            if (r == 0)
-            {
-              // R is the integral over the geometric attenuation in a sphere around the origin
-              const Real R = std::cbrt(3.0 / 4.0 * other_qp._volume / libMesh::pi);
-              sum += G * R * other_qp._value;
-            }
-            else
-              sum += G * 0.25 / (libMesh::pi * r * r) * other_qp._volume * other_qp._value;
-          }
-        }
-      }
-    }
-
-    // integrate the convolution result
-    _convolution_integral += sum;
-  }
+  Real convolution_integral = rgcl.convolutionIntegral();
 
   // if normalization is requested we need to communicate the convolution result
   // and normalize the result entries
   if (_normalize)
   {
-    gatherSum(_convolution_integral);
+    gatherSum(convolution_integral);
 
     // we may not need to or may not be able to normalize
-    if (_convolution_integral == 0.0)
+    if (convolution_integral == 0.0)
     {
-      if (_source_integral == 0.0)
+      if (source_integral == 0.0)
         return;
       mooseError("Unable to normalize Green's function. Is it all zero?");
     }
@@ -446,7 +335,7 @@ RadialGreensConvolution::finalize()
     // normalize result entries
     for (auto & re : _convolution)
       for (auto & ri : re.second)
-        ri *= _source_integral / _convolution_integral;
+        ri *= source_integral / convolution_integral;
   }
 
   // make it a differential result
@@ -483,7 +372,8 @@ RadialGreensConvolution::insertNotLocalPointNeighbors(dof_id_type node)
 }
 
 void
-RadialGreensConvolution::insertNotLocalPeriodicPointNeighbors(dof_id_type node, const Node * reference)
+RadialGreensConvolution::insertNotLocalPeriodicPointNeighbors(dof_id_type node,
+                                                              const Node * reference)
 {
   mooseAssert(!_nodes_to_elem_map[node].empty(), "Node not found in _nodes_to_elem_map");
 
