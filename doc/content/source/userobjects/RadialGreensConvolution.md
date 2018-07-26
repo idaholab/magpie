@@ -2,7 +2,8 @@
 
 !syntax description /UserObjects/RadialGreensConvolution
 
-Given a Green's function $G(r)$ and a variable field $c(\vec r)$ this userobject calculates a convolution $c'(\vec r)$ such that
+Given a Green's function $G(r)$ and a variable field $c(\vec r)$ this userobject
+calculates a convolution $c'(\vec r)$ such that
 
 \begin{equation}
 c'(\vec r) = \frac1{4\pi}\int_{\Omega(\vec{r})} \frac{G(|\vec r - \vec{r'}|)}{|\vec r - \vec{r'}|^2} c(\vec{r'})\,d\vec{r'},

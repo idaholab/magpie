@@ -18,7 +18,7 @@
 // Specialization for PointListAdaptor<MyTRIMDefectBufferItem>
 template <>
 inline const Point &
-PointListAdaptor<ThreadedRecoilLoopBase::MyTRIMDefectBufferItem>::getPoint(const size_t idx) const { return _pts[idx].first; }
+PointListAdaptor<ThreadedRecoilLoopBase::MyTRIMDefectBufferItem>::getPoint(const ThreadedRecoilLoopBase::MyTRIMDefectBufferItem & item) const { return item.first; }
 
 ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
     _rasterizer(rasterizer),
@@ -162,7 +162,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
     {
       // 1. build kd-tree for the vacancies
       const unsigned int max_leaf_size = 50; // slightly affects runtime
-      auto point_list = PointListAdaptor<MyTRIMDefectBufferItem>(_vacancy_buffer);
+      auto point_list = PointListAdaptor<MyTRIMDefectBufferItem>(_vacancy_buffer.begin(), _vacancy_buffer.end());
       auto kd_tree = libmesh_make_unique<KDTreeType>(
           LIBMESH_DIM, point_list,
           nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));

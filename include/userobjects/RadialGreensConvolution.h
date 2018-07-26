@@ -12,7 +12,19 @@
 #include "ElementUserObject.h"
 #include "DataIO.h"
 
+#include "libmesh/data_type.h"
+
+#include <set>
+#include <map>
+#include <vector>
+#include <array>
+#include <memory>
+#include <tuple>
+
+using namespace libMesh::Parallel;
+
 class RadialGreensConvolution;
+class ThreadedRadialGreensConvolutionLoop;
 
 template <>
 InputParameters validParams<RadialGreensConvolution>();
@@ -27,10 +39,13 @@ class RadialGreensConvolution : public ElementUserObject
 public:
   RadialGreensConvolution(const InputParameters & parameters);
 
+  virtual void initialSetup() override;
+
   virtual void initialize() override;
   virtual void execute() override;
   virtual void finalize() override;
   virtual void threadJoin(const UserObject & y) override;
+  virtual void meshChanged() override;
 
   /// quaddrature point data
   struct QPData
@@ -58,6 +73,10 @@ public:
 
 protected:
   Real attenuationIntegral(Real h1, Real h2, Real r, unsigned int dim) const;
+  void insertNotLocalPointNeighbors(dof_id_type);
+  void insertNotLocalPeriodicPointNeighbors(dof_id_type, const Node *);
+  void findNotLocalPeriodicPointNeighbors(const Node *);
+  void updateCommunicationLists();
 
   /// variable field to be gathered
   const VariableValue & _v;
@@ -101,13 +120,61 @@ protected:
       PointListAdaptor<QPData>,
       LIBMESH_DIM>;
 
+  /// spatial index (nanoflann guarantees this to be threadsafe under read-only operations)
+  std::unique_ptr<KDTreeType> _kd_tree;
+
   Real _zero_dh;
+
+  /// DOF map
+  const DofMap & _dof_map;
+
+  /// A pointer to the periodic boundary constraints object
+  PeriodicBoundaries * _pbs;
+
+  /// PointLocator for finding topological neighbors
+  std::unique_ptr<PointLocatorBase> _point_locator;
+
+  /**
+   * The data structure which is a list of nodes that are constrained to other nodes
+   * based on the imposed periodic boundary conditions.
+   */
+  std::multimap<dof_id_type, dof_id_type> _periodic_node_map;
+
+  /// The data structure used to find neighboring elements give a node ID
+  std::vector<std::vector<const Elem *>> _nodes_to_elem_map;
+
+  // list of direct point neighbor elements of the current processor domain
+  std::set<const Elem *> _point_neighbors;
+
+  // list of periodic point neighbor elements of the current processor domain
+  std::set<std::tuple<const Elem *, const Node *, const Node *>> _periodic_point_neighbors;
+
+  /// QPData indices to send to the various processors
+  std::vector<std::set<std::size_t>> _communication_lists;
+  bool _update_communication_lists;
+
+  processor_id_type _my_pid;
+
+  //@{ PerfGraph identifiers
+  PerfID _perf_meshchanged;
+  PerfID _perf_updatelists;
+  PerfID _perf_finalize;
+  //@}
+
+  friend class ThreadedRadialGreensConvolutionLoop;
 };
 
 template <>
-void dataStore(std::ostream &, RadialGreensConvolution::QPData &, void *);
+const Point & PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
+    const RadialGreensConvolution::QPData & item) const;
 
 template <>
-void dataLoad(std::istream &, RadialGreensConvolution::QPData &, void *);
+class libMesh::Parallel::StandardType<RadialGreensConvolution::QPData> : public DataType
+{
+public:
+  explicit StandardType(const RadialGreensConvolution::QPData * example = nullptr);
+  StandardType(const StandardType<RadialGreensConvolution::QPData> & t);
+  ~StandardType() { this->free(); }
+};
 
 #endif // RADIALGREENSCONVOLUTION_H
