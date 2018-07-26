@@ -46,7 +46,7 @@ validParams<RadialGreensConvolution>()
   // we run this object once at the beginning of the timestep by default
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
 
-  // make sure we have always have geometric point neighbors ghosted
+  // make sure we always have geometric point neighbors ghosted
   params.registerRelationshipManagers("ElementPointNeighbors");
 
   return params;
@@ -462,7 +462,6 @@ RadialGreensConvolution::meshChanged()
   // iterate over active local elements
   const auto end = mesh.active_local_elements_end();
   for (auto it = mesh.active_local_elements_begin(); it != end; ++it)
-  {
     // find a face that faces either a boundary (nullptr) or a different processor
     for (unsigned int s = 0; s < (*it)->n_sides(); ++s)
     {
@@ -485,7 +484,6 @@ RadialGreensConvolution::meshChanged()
             findNotLocalPeriodicPointNeighbors((*it)->node_ptr(n));
       }
     }
-  }
 
   // request communication list update
   _update_communication_lists = true;
@@ -525,7 +523,6 @@ RadialGreensConvolution::updateCommunicationLists()
   // iterate over periodic point neighbor elements
   for (auto tuple : _periodic_point_neighbors)
   {
-
     const auto * elem = std::get<0>(tuple);
     const auto * first = std::get<1>(tuple);
     const auto * second = std::get<2>(tuple);
