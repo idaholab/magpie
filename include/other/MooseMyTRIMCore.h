@@ -22,14 +22,11 @@ class MooseMyTRIMSample;
 class MooseMyTRIMCore : public MyTRIM_NS::TrimBase
 {
 public:
-  MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample, std::list<std::pair<Point, unsigned int> > & vac_list);
+  MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample);
 
   virtual void vacancyCreation();
 
 protected:
-  /// list of vacancies generated during the recoil
-  std::list<std::pair<Point, unsigned int> > & _vac_list;
-
   // dimension of the mesh
   const unsigned int _dim;
 };

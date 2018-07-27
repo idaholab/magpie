@@ -10,9 +10,8 @@
 #include "MooseMyTRIMSample.h"
 
 MooseMyTRIMEnergyDeposition::MooseMyTRIMEnergyDeposition(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample,
-                                                         std::list<std::pair<Point, unsigned int> > & vac_list,
                                                          std::list<std::pair<Point, Real> > & edep_list) :
-    MooseMyTRIMCore(simconf, sample, vac_list),
+    MooseMyTRIMCore(simconf, sample),
     _edep_list(edep_list)
 {
 }
@@ -41,6 +40,9 @@ MooseMyTRIMEnergyDeposition::checkPKAState()
       // deposit residual energy of the stopped PKA, electronic stopping, and binding energy to the new lattice site
       depositEnergy(_pka, _pka->_E + _element->_Elbind + _dee);
       return ;
+
+    case MyTRIM_NS::IonBase::VACANCY:
+      mooseError("PKA should never be in this state");
   }
 }
 
@@ -49,13 +51,6 @@ MooseMyTRIMEnergyDeposition::dissipateRecoilEnergy()
 {
   // new recoil is not leaving its lattice site, reimburse binding energy
   depositEnergy(_recoil, _recoil->_E + _element->_Elbind);
-}
-
-void
-MooseMyTRIMEnergyDeposition::vacancyCreation()
-{
-  // TODO: lattice relaxation around the vacancy?
-  MooseMyTRIMCore::vacancyCreation();
 }
 
 bool
