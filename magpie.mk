@@ -17,3 +17,4 @@ ifneq ($(wildcard $(MYTRIM_DIR)/trim.h),)
 endif
 
 include $(MAGPIE_DIR)/contrib/gsl.mk
+include $(MAGPIE_DIR)/contrib/fftw3.mk
