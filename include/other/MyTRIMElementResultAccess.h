@@ -11,6 +11,7 @@
 
 #include "MyTRIMElementRun.h"
 #include "MyTRIMRasterizer.h"
+#include "ThreadedRecoilLoopBase.h"
 
 /**
  * Interface class ("Veneer") to provide encapsulate fetching defect production
@@ -29,7 +30,7 @@ protected:
   const MyTRIMElementRun & _mytrim;
   const MyTRIMRasterizer & _rasterizer;
   const unsigned int _ivar;
-  const unsigned int _defect;
+  ThreadedRecoilLoopBase::DefectType _defect;
 
 private:
   /// calculate values only for qp 0 and cache them here
@@ -43,7 +44,7 @@ MyTRIMElementResultAccess<T>::MyTRIMElementResultAccess(const InputParameters & 
     _mytrim(this->template getUserObject<MyTRIMElementRun>("runner")),
     _rasterizer(_mytrim.rasterizer()),
     _ivar(this->template getParam<unsigned int>("ivar")),
-    _defect(this->template getParam<MooseEnum>("defect"))
+    _defect(this->template getParam<MooseEnum>("defect").template getEnum<ThreadedRecoilLoopBase::DefectType>())
 {
   if (this->isNodal())
     mooseError("MyTRIMElementResultAccess needs to be applied to an elemental AuxVariable.");
@@ -59,7 +60,7 @@ MyTRIMElementResultAccess<T>::validParams()
   InputParameters params = ::validParams<T>();
   params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
-  MooseEnum defectType("VAC INT", "VAC");
+  MooseEnum defectType("VAC=0 INT REPLACEMENT_IN REPLACEMENT_OUT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
   return params;
 }
@@ -74,20 +75,7 @@ MyTRIMElementResultAccess<T>::getDefectRate()
     mooseAssert(_ivar < result._defects.size(), "Result set does not contain the requested element.");
 
     const Real volume = this->_current_elem->volume();
-
-    switch (_defect)
-    {
-      case 0: // vacancy
-        _value_cache = result._defects[_ivar]._vacancies / volume;
-        break;
-
-      case 1: // interstitial
-        _value_cache = result._defects[_ivar]._interstitials / volume;
-        break;
-
-      default:
-        mooseError("Internal error.");
-    }
+    _value_cache = result._defects[_ivar][_defect] / volume;
   }
 
   return _value_cache;

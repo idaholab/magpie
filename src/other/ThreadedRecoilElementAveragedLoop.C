@@ -24,9 +24,12 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
 {
   for (auto && i : rl._result_map)
   {
-    auto j = _result_map.find(i.first);
-    if (j == _result_map.end())
-      j = _result_map.insert(_result_map.begin(), std::make_pair(i.first, MyTRIMResult(_nvars)));
+    // find the result map entry corresponding to teh other thred's position
+    // lower_bound gives the first element that os _not_ less than the searched elemen.
+    // This is either a match, or the right position for a hinted insertion (fast)
+    auto j = _result_map.lower_bound(i.first);
+    if (j == _result_map.end() || j->first != i.first)
+      j = _result_map.emplace_hint(j, i.first, MyTRIMResult(_nvars));
 
     const MyTRIMResult & src = i.second;
     MyTRIMResult & dst = j->second;
@@ -34,12 +37,10 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
     mooseAssert(dst._defects.size() == src._defects.size(), "Defect vector sizes inconsistent.");
     mooseAssert(dst._defects.size() == _nvars, "Defect vector size must be _nvars.");
 
-    for (unsigned int k = 0; k < _nvars; ++k)
-    {
-      // accumulate vacancies and interstitials
-      dst._defects[k]._vacancies += src._defects[k]._vacancies;
-      dst._defects[k]._interstitials += src._defects[k]._interstitials;
-    }
+    // accumulate vacancies, interstitials, and replcaements
+    for (auto k = beginIndex(dst._defects); k < _nvars; ++k)
+      for (std::size_t l = 0; l < N_DEFECTS; ++l)
+        dst._defects[k][l] += src._defects[k][l];
 
     dst._energy += src._energy;
   }
@@ -53,24 +54,15 @@ ThreadedRecoilElementAveragedLoop::addDefectToResult(const Point & p, unsigned i
     return;
 
   // store into _result_map
-  auto i = _result_map.find(elem->id());
-  if (i == _result_map.end())
-    i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars)));
+  auto i = _result_map.lower_bound(elem->id());
+  if (i == _result_map.end() || i->first != elem->id())
+    i = _result_map.emplace_hint(i, elem->id(), MyTRIMResult(_nvars));
+
+  // check for invalid types
+  mooseAssert(type != NONE && type != N_DEFECTS, "Invalid defect type passed to addDefectToResult");
 
   // increase the interstitial counter for the tagged element
-  switch (type)
-  {
-    case VACANCY:
-      i->second._defects[var]._vacancies += 1.0;
-      break;
-
-    case INTERSTITIAL:
-      i->second._defects[var]._interstitials += 1.0;
-      break;
-
-    default:
-      mooseError("Internal error");
-  }
+  i->second._defects[var][type] += 1.0;
 }
 
 void
@@ -81,9 +73,9 @@ ThreadedRecoilElementAveragedLoop::addEnergyToResult(const Point & p, Real edep)
     return;
 
   // store into _result_map
-  auto i = _result_map.find(elem->id());
-  if (i == _result_map.end())
-    i = _result_map.insert(_result_map.begin(), std::make_pair(elem->id(), MyTRIMResult(_nvars)));
+  auto i = _result_map.lower_bound(elem->id());
+  if (i == _result_map.end() || i->first != elem->id())
+    i = _result_map.emplace_hint(i, elem->id(), MyTRIMResult(_nvars));
 
   i->second._energy += edep;
 }

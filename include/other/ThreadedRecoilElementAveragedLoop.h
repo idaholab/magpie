@@ -53,12 +53,7 @@ struct ThreadedRecoilElementAveragedLoop::MyTRIMResult
   MyTRIMResult() : _defects(), _energy(0.0) {}
 
   // numbers of point defects per chemical element
-  struct Defect
-  {
-    Defect() : _interstitials(0.0), _vacancies(0.0) {}
-    Real _interstitials;
-    Real _vacancies;
-  };
+  using Defect = std::array<Real, 4>;
   std::vector<Defect> _defects;
 
   /// this will hold the matrix of replacement collisions

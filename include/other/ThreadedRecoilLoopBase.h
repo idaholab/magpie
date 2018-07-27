@@ -43,10 +43,10 @@ public:
 
   using MyTRIMDefectBufferItem = std::pair<Point, unsigned int>;
 
-protected:
   /// defect type enum (vacancies, interstitials, and incoming and outgoing replacements)
-  enum DefectType { VACANCY, INTERSTITIAL, REPLACEMENT_IN, REPLACEMENT_OUT, NONE };
+  enum DefectType {  NONE = -1, VACANCY = 0, INTERSTITIAL, REPLACEMENT_IN, REPLACEMENT_OUT, N_DEFECTS };
 
+protected:
   /// add an interstitial or vacancy to the result list
   virtual void addDefectToResult(const Point & p, unsigned int var, DefectType type) = 0;
 
