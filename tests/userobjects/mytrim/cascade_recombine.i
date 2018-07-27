@@ -72,7 +72,7 @@
     Z = 20
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = thermal_fission
-    r_rec = 25
+    r_rec = 5
   [../]
   [./runner]
     type = MyTRIMElementRun
