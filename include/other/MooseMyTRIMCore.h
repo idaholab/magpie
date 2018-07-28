@@ -25,6 +25,7 @@ public:
   MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample);
 
   virtual void vacancyCreation();
+  virtual void replacementCollision();
 
 protected:
   // dimension of the mesh
