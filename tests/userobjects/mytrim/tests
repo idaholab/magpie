@@ -33,4 +33,10 @@
     input = 'cascade_function.i'
     csvdiff = 'cascade_function_out.csv'
   [../]
+
+  [./cascade_replace]
+    type = 'Exodiff'
+    input = 'cascade_replace.i'
+    exodiff = 'cascade_replace_out.e'
+  [../]
 []
