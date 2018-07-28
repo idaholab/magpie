@@ -19,7 +19,7 @@ InputParameters validParams<MyTRIMDiracSource>()
   InputParameters params = validParams<DiracKernel>();
   params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMDiracRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
-  MooseEnum defectType("VAC INT", "VAC");
+  MooseEnum defectType("VAC=0 INT REPLACEMENT_IN REPLACEMENT_OUT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
 
   // this needs multiplicity enabled to give meaningful results
@@ -33,7 +33,8 @@ MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters) :
     _mytrim(getUserObject<MyTRIMDiracRun>("runner")),
     _rasterizer(_mytrim.rasterizer()),
     _ivar(getParam<unsigned int>("ivar")),
-    _defect(getParam<MooseEnum>("defect"))
+    _defect(getParam<MooseEnum>("defect").getEnum<ThreadedRecoilLoopBase::DefectType>()),
+    _trim_parameters(_rasterizer.getTrimParameters())
 {
   if (getParam<bool>("drop_duplicate_points") == true)
     mooseWarning("Explicitly setting drop_duplicate_points to true will cause overlapping defects to be miscounted.");
@@ -54,5 +55,5 @@ MyTRIMDiracSource::addPoints()
 Real
 MyTRIMDiracSource::computeQpResidual()
 {
-  return -_test[_i][_qp] / _rasterizer.getTrimParameters().last_executed_dt;
+  return -_test[_i][_qp] / _trim_parameters.last_executed_dt;
 }
