@@ -21,12 +21,10 @@ class MooseMyTRIMEnergyDeposition : public MooseMyTRIMCore
 {
 public:
   MooseMyTRIMEnergyDeposition(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample,
-                              std::list<std::pair<Point, unsigned int> > & vac_list,
                               std::list<std::pair<Point, Real> > & edep_list);
 
   virtual void checkPKAState();
   virtual void dissipateRecoilEnergy();
-  virtual void vacancyCreation();
   virtual bool followRecoil();
 
 protected:

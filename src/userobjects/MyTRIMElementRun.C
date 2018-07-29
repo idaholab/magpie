@@ -87,15 +87,14 @@ MyTRIMElementRun::finalize()
     deserialize(recv_buffers);
   }
 
+  // scale result
   for (auto & result : _result_map)
   {
     result.second._energy *= _trim_parameters.result_scaling_factor;
 
-    for (unsigned int k = 0; k < _nvars; ++k)
-    {
-      result.second._defects[k]._vacancies *= _trim_parameters.result_scaling_factor;
-      result.second._defects[k]._interstitials *= _trim_parameters.result_scaling_factor;
-    }
+    for (auto k = beginIndex(result.second._defects); k < _nvars; ++k)
+      for (std::size_t l = 0; l < ThreadedRecoilDiracSourceLoop::N_DEFECTS; ++l)
+        result.second._defects[k][l] *= _trim_parameters.result_scaling_factor;
   }
 }
 
@@ -148,23 +147,19 @@ MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
     // merge the data in with the current processor's data
     for (auto & other_result : other_result_map)
     {
-      auto j = _result_map.find(other_result.first);
+      auto j = _result_map.lower_bound(other_result.first);
 
       // if no entry in the map was found then set it, otherwise add value
-      if (j == _result_map.end())
-        _result_map.insert(other_result);
+      if (j == _result_map.end() || j->first != other_result.first)
+        _result_map.emplace_hint(j, other_result);
       else
       {
-
         mooseAssert(other_result.second._defects.size() == j->second._defects.size(), "Inconsistent TRIM defect vector sizes across processors.");
         mooseAssert( j->second._defects.size() == _nvars, "Defect vector size must be _nvars.");
 
         for (unsigned int k = 0; k < _nvars; ++k)
-        {
-          // sum vacancy and interstitial production
-          j->second._defects[k]._vacancies += other_result.second._defects[k]._vacancies;
-          j->second._defects[k]._interstitials += other_result.second._defects[k]._interstitials;
-        }
+          for (std::size_t l = 0; l < ThreadedRecoilDiracSourceLoop::N_DEFECTS; ++l)
+            j->second._defects[k][l] += other_result.second._defects[k][l];
 
         // sum energy contributions
         j->second._energy += other_result.second._energy;
