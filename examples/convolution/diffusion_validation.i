@@ -1,7 +1,7 @@
 #
 # Validate the Green's Function convolution user object by comparing the
 # time integration of the Diffusion equation using the TimeDerivative and Diffusion
-# Kernels (c1) to the repeated application of teh Green's Function of the Diffusion
+# Kernels (c1) to the repeated application of the Green's Function of the Diffusion
 # equation (c2).
 #
 # Compare the results in gnuplot using

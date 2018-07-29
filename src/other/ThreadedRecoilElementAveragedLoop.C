@@ -24,8 +24,8 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
 {
   for (auto && i : rl._result_map)
   {
-    // find the result map entry corresponding to teh other thred's position
-    // lower_bound gives the first element that os _not_ less than the searched elemen.
+    // find the result map entry corresponding to the other thread's position
+    // lower_bound gives the first element that os _not_ less than the searched element.
     // This is either a match, or the right position for a hinted insertion (fast)
     auto j = _result_map.lower_bound(i.first);
     if (j == _result_map.end() || j->first != i.first)
@@ -37,7 +37,7 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
     mooseAssert(dst._defects.size() == src._defects.size(), "Defect vector sizes inconsistent.");
     mooseAssert(dst._defects.size() == _nvars, "Defect vector size must be _nvars.");
 
-    // accumulate vacancies, interstitials, and replcaements
+    // accumulate vacancies, interstitials, and replacements
     for (auto k = beginIndex(dst._defects); k < _nvars; ++k)
       for (std::size_t l = 0; l < N_DEFECTS; ++l)
         dst._defects[k][l] += src._defects[k][l];
