@@ -56,9 +56,6 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   // create a FIFO for recoils
   std::queue<MyTRIM_NS::IonBase *> recoils;
 
-  // create a list for vacancies created
-  std::list<MyTRIMDefectBufferItem> vac_list;
-
   // create a list potentially used for energy deposition
   std::list<std::pair<Point, Real> > edep_list;
 
@@ -68,12 +65,12 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   {
     // basic module with interstitial and vacancy generation
     case MyTRIMRasterizer::MYTRIM_CORE:
-      TRIM.reset(new MooseMyTRIMCore(&_simconf, &sample, vac_list));
+      TRIM.reset(new MooseMyTRIMCore(&_simconf, &sample));
       break;
 
     // record energy deposited to the lattice
     case MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION:
-      TRIM.reset(new MooseMyTRIMEnergyDeposition(&_simconf, &sample, vac_list, edep_list));
+      TRIM.reset(new MooseMyTRIMEnergyDeposition(&_simconf, &sample, edep_list));
       break;
 
     default:
@@ -109,44 +106,56 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       if (_dim == 2)
         recoil->_pos(2) = 0.0;
 
-      // full recoil or analytical approximation
-      if (recoil->_E < _trim_parameters.analytical_cutoff)
+      // deal with what this recoil left behind
+      if (recoil->_state == MyTRIM_NS::IonBase::VACANCY)
+        _vacancy_buffer.push_back(std::make_pair(recoil->_pos, recoil->_tag));
+      else if (recoil->_state == MyTRIM_NS::IonBase::REPLACEMENT)
+        addDefectToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->_tag, REPLACEMENT_OUT);
+      // ignore like-for-like substitutions
+
+      // remove zero energy recoils
+      if (recoil->_E > 0.0)
       {
-        const auto pp = _rasterizer.periodicPoint(recoil->_pos);
-        // const auto elem = (*_pl)(pp);
+        // full recoil or analytical approximation
+        if (recoil->_E < _trim_parameters.analytical_cutoff)
+        {
+          const auto pp = _rasterizer.periodicPoint(recoil->_pos);
+          // const auto elem = (*_pl)(pp);
 
-        mooseDoOnce(mooseWarning("Skipping detailed cascade calculation below cutoff energy."));
+          mooseDoOnce(mooseWarning("Skipping detailed cascade calculation below cutoff energy."));
 
-        // Parkin, Don M., and C. Alton Coulter. “Total and Net Displacement
-        // Functions for Polyatomic Materials.” Journal of Nuclear Materials
-        // 101, no. 3 (October 1, 1981): 261–76. doi:10.1016/0022-3115(81)90169-0.
+          // Parkin, Don M., and C. Alton Coulter. “Total and Net Displacement
+          // Functions for Polyatomic Materials.” Journal of Nuclear Materials
+          // 101, no. 3 (October 1, 1981): 261–76. doi:10.1016/0022-3115(81)90169-0.
 
-        // get the composition
-        // const auto & material_data = _rasterizer.material(elem);
-        // mooseAssert(material_data.size() == _nvars, "Unexpected material data size");
+          // get the composition
+          // const auto & material_data = _rasterizer.material(elem);
+          // mooseAssert(material_data.size() == _nvars, "Unexpected material data size");
 
-        // add remaining recoil energy
-        if (_trim_parameters.trim_module == MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION)
-          addEnergyToResult(pp, recoil->_E);
-      }
-      else
-      {
-        // follow this ion's trajectory and store recoils
-        TRIM->trim(recoil, recoils);
+          // add remaining recoil energy
+          if (_trim_parameters.trim_module == MyTRIMRasterizer::MYTRIM_ENERGY_DEPOSITION)
+            addEnergyToResult(pp, recoil->_E);
+        }
+        else
+        {
+          // follow this ion's trajectory and store recoils
+          TRIM->trim(recoil, recoils);
 
-        // store interstitials
-        if (recoil->_tag >= 0 && recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
-          _interstitial_buffer.push_back(std::make_pair(recoil->_pos, recoil->_tag));
+          // are we tracking atoms of this type?
+          if (recoil->_tag >= 0)
+          {
+            if (recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
+              _interstitial_buffer.push_back(std::make_pair(recoil->_pos, recoil->_tag));
+            else if (recoil->_state == MyTRIM_NS::IonBase::REPLACEMENT)
+              addDefectToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->_tag, REPLACEMENT_IN);
+            // BUG: untracked PKAs in replacement collisions will cause a REPLACEMENT_OUT without a REPLACEMENT_IN!
+          }
 
-        // store vacancies
-        for (auto & vac: vac_list)
-          _vacancy_buffer.push_back(vac);
-        vac_list.clear();
-
-        // store energy deposition
-        for (auto & edep: edep_list)
-          addEnergyToResult(_rasterizer.periodicPoint(edep.first), edep.second);
-        edep_list.clear();
+          // store energy deposition
+          for (auto & edep: edep_list)
+            addEnergyToResult(_rasterizer.periodicPoint(edep.first), edep.second);
+          edep_list.clear();
+        }
       }
 
       // done with this recoil

@@ -10,11 +10,12 @@
 #define MYTRIMDIRACSOURCE_H
 
 #include "DiracKernel.h"
+#include "ThreadedRecoilLoopBase.h"
+#include "MyTRIMRasterizer.h"
 
 // forward declarations
 class MyTRIMDiracRun;
 class MyTRIMDiracSource;
-class MyTRIMRasterizer;
 
 template<>
 InputParameters validParams<MyTRIMDiracSource>();
@@ -30,8 +31,15 @@ public:
 protected:
   const MyTRIMDiracRun & _mytrim;
   const MyTRIMRasterizer & _rasterizer;
+
+  /// rasterizer variable index
   const unsigned int _ivar;
-  const unsigned int _defect;
+
+  // defect type to select from the result set for insertion as a source term
+  ThreadedRecoilLoopBase::DefectType _defect;
+
+  /// Simulation parameters
+  const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
 
 #endif //MYTRIMDIRACSOURCE_H
