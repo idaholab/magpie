@@ -83,7 +83,7 @@ ThreadedRadialGreensConvolutionLoop::operator()(const QPDataRange & qpdata_range
             new_cell_vector.push_back(cell - _green._periodic_vector[j]);
         }
 
-        cell_vector.insert(cell_vector.end(), new_cell_vector.begin(), new_cell_vector.end());
+        cell_vector.splice(cell_vector.end(), new_cell_vector);
       }
 
     // perform radius search and aggregate data considering potential periodicity
