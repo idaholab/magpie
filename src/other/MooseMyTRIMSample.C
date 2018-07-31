@@ -8,10 +8,11 @@
 
 #include "MooseMyTRIMSample.h"
 #include "MooseMesh.h"
-#include "MyTRIMMesh.h"
 
-MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh, MyTRIM_NS::SimconfType * simconf) :
-    MyTRIM_NS::SampleBase(),
+MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer,
+                                     const MooseMesh & mesh,
+                                     MyTRIM_NS::SimconfType * simconf)
+  : MyTRIM_NS::SampleBase(),
     _rasterizer(rasterizer),
     _trim_parameters(_rasterizer.getTrimParameters()),
     _nvars(_trim_parameters.nVars()),
@@ -28,7 +29,7 @@ MooseMyTRIMSample::MooseMyTRIMSample(const MyTRIMRasterizer & rasterizer, const 
 }
 
 void
-MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase  * pka)
+MooseMyTRIMSample::averages(const MyTRIM_NS::IonBase * pka)
 {
   _current_ion = pka;
 
@@ -86,7 +87,8 @@ MooseMyTRIMSample::lookupMaterial(Point & pos)
 
       // prepare material
       material.prepare();
-      j = _materials_master_cache.insert(_materials_master_cache.begin(), std::make_pair(elem, material));
+      j = _materials_master_cache.insert(_materials_master_cache.begin(),
+                                         std::make_pair(elem, material));
     }
 
     // create a copy from the master cache entry, average it and file it
