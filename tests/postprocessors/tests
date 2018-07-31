@@ -4,4 +4,18 @@
     input = 'rms_distance.i'
     csvdiff = 'rms_distance_out.csv'
   [../]
+
+  [./fourierlengthscale1]
+    type = 'CSVDiff'
+    input = 'fourierlengthscale.i'
+    csvdiff = 'fourierlengthscale_out.csv'
+    cli_args = 'Mesh/nx=30 Mesh/ny=30'
+  [../]
+  [./fourierlengthscale2]
+    type = 'CSVDiff'
+    input = 'fourierlengthscale.i'
+    csvdiff = 'fourierlengthscale_out.csv'
+    cli_args = 'Mesh/nx=25 Mesh/ny=50'
+    prereq = fourierlengthscale1
+  [../]
 []
