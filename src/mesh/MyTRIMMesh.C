@@ -11,8 +11,9 @@
 
 registerMooseObject("MagpieApp", MyTRIMMesh);
 
-template<>
-InputParameters validParams<MyTRIMMesh>()
+template <>
+InputParameters
+validParams<MyTRIMMesh>()
 {
   InputParameters params = validParams<GeneratedMesh>();
   params.suppressParameter<Real>("bias_x");
@@ -21,8 +22,8 @@ InputParameters validParams<MyTRIMMesh>()
   return params;
 }
 
-MyTRIMMesh::MyTRIMMesh(const InputParameters & parameters) :
-    GeneratedMesh(parameters),
+MyTRIMMesh::MyTRIMMesh(const InputParameters & parameters)
+  : GeneratedMesh(parameters),
     _cell_count({_nx, _ny, _nz}),
     _min_corner(_xmin, _ymin, _zmin),
     _max_corner(_xmax, _ymax, _zmax)
@@ -59,9 +60,8 @@ MyTRIMMesh::MyTRIMMesh(const InputParameters & parameters) :
     mooseError("Biased meshes are not supported.");
 }
 
-MyTRIMMesh::MyTRIMMesh(const MyTRIMMesh & other_mesh) :
-    GeneratedMesh(other_mesh),
-    _cell_count(other_mesh._cell_count)
+MyTRIMMesh::MyTRIMMesh(const MyTRIMMesh & other_mesh)
+  : GeneratedMesh(other_mesh), _cell_count(other_mesh._cell_count)
 {
 }
 
@@ -79,5 +79,26 @@ MyTRIMMesh::getPointLocator() const
     _point_locator.reset(new PointLocatorRegularOrthogonal(getMesh()));
     _point_locator->init(_cell_count, _min_corner, _max_corner);
   }
-  return std::unique_ptr<PointLocatorBase>(new PointLocatorRegularOrthogonal(getMesh(), _point_locator.get()));
+  return std::unique_ptr<PointLocatorBase>(
+      new PointLocatorRegularOrthogonal(getMesh(), _point_locator.get()));
+}
+
+Real
+MyTRIMMesh::getMinInDimension(unsigned int component) const
+{
+  return _min_corner(component);
+}
+
+Real
+MyTRIMMesh::getMaxInDimension(unsigned int component) const
+{
+  return _max_corner(component);
+}
+
+unsigned int
+MyTRIMMesh::getCellCountInDimension(unsigned int component)
+{
+  mooseAssert(component < dimension(),
+              "Querying invalid component in MyTRIMMesh::getCellCountInDimension");
+  return _cell_count[component];
 }
