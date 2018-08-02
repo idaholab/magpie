@@ -14,7 +14,7 @@
 
 class MyTRIMMesh;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMMesh>();
 
 class MyTRIMMesh : public GeneratedMesh
@@ -25,10 +25,16 @@ public:
 
   // No copy assignment
   MooseMesh & operator=(const MooseMesh & other_mesh) = delete;
-  virtual MooseMesh & clone() const override;
+  MooseMesh & clone() const override;
 
   /// obtain a specialized PointLocator for the current mesh
-  virtual std::unique_ptr<PointLocatorBase> getPointLocator() const override;
+  std::unique_ptr<PointLocatorBase> getPointLocator() const override;
+
+  Real getMinInDimension(unsigned int component) const override;
+  Real getMaxInDimension(unsigned int component) const override;
+
+  /// since this is a regular mesh we can report the grid size in each dimension
+  unsigned int getCellCountInDimension(unsigned int component);
 
 protected:
   std::vector<unsigned int> _cell_count;
@@ -38,4 +44,4 @@ protected:
   mutable std::unique_ptr<PointLocatorRegularOrthogonal> _point_locator;
 };
 
-#endif //MYTRIMMESH_H
+#endif // MYTRIMMESH_H
