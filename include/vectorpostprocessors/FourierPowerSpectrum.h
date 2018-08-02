@@ -33,9 +33,7 @@ public:
   virtual void finalize() override;
 
 protected:
-  void computePowerSpectrum(std::vector<int> & c,
-                            std::vector<Real> & F,
-                            std::size_t i);
+  void computePowerSpectrum(std::vector<int> & c, std::vector<Real> & F, std::size_t i);
 
   /// Fourier Transform to provide the data
   const FourierTransform & _fourier_transform;

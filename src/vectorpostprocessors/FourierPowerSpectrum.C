@@ -49,7 +49,7 @@ FourierPowerSpectrum::FourierPowerSpectrum(const InputParameters & parameters)
   }
 
   _max_frequency = std::sqrt(_max_frequency);
-  _spectrum_size = std::sqrt(_spectrum_size);
+  _spectrum_size = std::sqrt(_spectrum_size) + 1;
 
   // resize power spectrum vector
   _power_spectrum.resize(_spectrum_size);
@@ -58,7 +58,7 @@ FourierPowerSpectrum::FourierPowerSpectrum(const InputParameters & parameters)
 
   // set frequencies
   for (auto i = beginIndex(_frequency); i < _spectrum_size; ++i)
-    _frequency[i] = (i * _max_frequency) / _spectrum_size;
+    _frequency[i] = (i * _max_frequency) / (_spectrum_size - 1);
 }
 
 void
@@ -84,7 +84,7 @@ FourierPowerSpectrum::computePowerSpectrum(std::vector<int> & c,
         index = index * _grid[j] + c[j];
 
       // find bin and add to spectrum
-      const std::size_t bin = std::floor((std::sqrt(sum) * _spectrum_size) / _max_frequency);
+      const std::size_t bin = std::floor((std::sqrt(sum) * (_spectrum_size - 1)) / _max_frequency);
       mooseAssert(bin < _power_spectrum.size(), "Bin out of bounds in power spectrum");
       _power_spectrum[bin] += Utility::pow<2>(_buffer[index]);
       ++_n_samples[bin];

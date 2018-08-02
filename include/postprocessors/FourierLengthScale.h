@@ -35,9 +35,7 @@ public:
   virtual PostprocessorValue getValue() override { return _length_scale; }
 
 protected:
-  void computeLengthScale(std::vector<int> & c,
-                          std::vector<Real> & F,
-                          std::size_t i);
+  void computeLengthScale(std::vector<int> & c, std::vector<Real> & F, std::size_t i);
 
   /// Fourier Transform to provide the data
   const FourierTransform & _fourier_transform;
