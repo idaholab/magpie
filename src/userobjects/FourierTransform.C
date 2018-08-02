@@ -81,7 +81,7 @@ FourierTransform::FourierTransform(const InputParameters & parameters)
 
   // initialize FFTW buffer and plan
   _buffer.resize(_buffer_size);
-  std::vector<const fftw_r2r_kind> kind(_dim, FFTW_R2HC);
+  std::vector<fftw_r2r_kind> kind(_dim, FFTW_R2HC);
   {
     TIME_SECTION(_perf_plan);
     _plan = fftw_plan_r2r(
