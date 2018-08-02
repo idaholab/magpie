@@ -21,9 +21,8 @@ InputParameters
 validParams<FourierTransform>()
 {
   InputParameters params = validParams<ElementUserObject>();
-  params.addClassDescription("Compute the power spectrum of a given fast fourier transform. The "
-                             "resulting frequency is in reciprocal length units.");
-  params.addCoupledVar("variable", "Variable field to compute the FFT of");
+  params.addClassDescription("Compute the Fourier transform of a given variable field.");
+  params.addCoupledVar("variable", "Variable field to compute the transform of");
   params.addRangeCheckedParam<std::vector<int>>(
       "grid",
       "grid > 0",

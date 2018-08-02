@@ -21,7 +21,7 @@ template <>
 InputParameters validParams<FourierTransform>();
 
 /**
- * Compute the power spectrum of the fast fourier transform of a selected variable field.
+ * Compute the fourier transform of a selected variable field.
  */
 class FourierTransform : public ElementUserObject
 {

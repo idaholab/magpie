@@ -23,7 +23,7 @@ validParams<FourierLengthScale>()
 {
   InputParameters params = validParams<GeneralPostprocessor>();
   params.addClassDescription(
-      "Compute the average length scale form a fast fourier transform in length units.");
+      "Compute the average length scale form a given Fourier transform in length units.");
   params.addRequiredParam<UserObjectName>(
       "fourier_transform", "FourierTransform user object to compute the length scale of");
   return params;

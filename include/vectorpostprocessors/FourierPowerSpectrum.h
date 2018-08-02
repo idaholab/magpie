@@ -21,7 +21,7 @@ template <>
 InputParameters validParams<FourierPowerSpectrum>();
 
 /**
- * Compute the power spectrum of the fast fourier transform of a selected variable field.
+ * Compute the power spectrum from the data of a FourierTransform object.
  */
 class FourierPowerSpectrum : public GeneralVectorPostprocessor
 {

@@ -22,10 +22,10 @@ InputParameters
 validParams<FourierPowerSpectrum>()
 {
   InputParameters params = validParams<GeneralVectorPostprocessor>();
-  params.addClassDescription("Compute the power spectrum of a given fast fourier transform. The "
+  params.addClassDescription("Compute the power spectrum of a given fourier transform. The "
                              "resulting frequency is in reciprocal length units.");
   params.addRequiredParam<UserObjectName>(
-      "fourier_transform", "FourierTransform user object to compute teh power spectrum of");
+      "fourier_transform", "FourierTransform user object to compute the power spectrum of");
   return params;
 }
 
