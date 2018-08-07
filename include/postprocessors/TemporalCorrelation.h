@@ -9,7 +9,7 @@
 #ifndef TEMPORALCORRELATION_H
 #define TEMPORALCORRELATION_H
 
-#include "ElementIntegralVariablePostprocessor.h"
+#include "ElementAverageValue.h"
 
 class TemporalCorrelation;
 
@@ -17,17 +17,18 @@ template <>
 InputParameters validParams<TemporalCorrelation>();
 
 /**
- * Integrate over the L2 norm of a variable time derivative as a measure of the
+ * Compute average of the L2 norm of a variable time derivative as a measure of the
  * correlation between timesteps. Small values indicate slow, gradual change, large
  * values indicate strong fluctuations.
  */
-class TemporalCorrelation : public ElementIntegralVariablePostprocessor
+class TemporalCorrelation : public ElementAverageValue
 {
 public:
   TemporalCorrelation(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral() override;
+  virtual Real getValue() override;
 };
 
 #endif // TEMPORALCORRELATION_H
