@@ -1,8 +1,14 @@
 [Tests]
-  [./rms_distance_pp]
+  [./rms_distance]
     type = 'CSVDiff'
     input = 'rms_distance.i'
     csvdiff = 'rms_distance_out.csv'
+  [../]
+
+  [./temporalcorrelation]
+    type = 'CSVDiff'
+    input = 'temporalcorrelation.i'
+    csvdiff = 'temporalcorrelation_out.csv'
   [../]
 
   [./fourierlengthscale1]
