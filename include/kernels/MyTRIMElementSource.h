@@ -17,7 +17,7 @@
 class MyTRIMElementRun;
 class MyTRIMElementSource;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMElementSource>();
 
 class MyTRIMElementSource : public MyTRIMElementResultAccess<Kernel>
@@ -35,4 +35,4 @@ protected:
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
 
-#endif //MYTRIMELEMENTSOURCE_H
+#endif // MYTRIMELEMENTSOURCE_H

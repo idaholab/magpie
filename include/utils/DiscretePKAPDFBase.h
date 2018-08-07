@@ -40,7 +40,8 @@ protected:
 
   ///@{ helper function to draw a sample from a marginal probability function, returns "bin" id
   unsigned int sampleHelper(const MultiIndex<Real> & marginal_pdf) const;
-  unsigned int sampleHelper(const MultiIndex<Real> & marginal_pdf, const std::vector<unsigned int> indices) const;
+  unsigned int sampleHelper(const MultiIndex<Real> & marginal_pdf,
+                            const std::vector<unsigned int> indices) const;
   unsigned int sampleHelper(const std::vector<Real> & marginal_pdf) const;
   ///@}
 

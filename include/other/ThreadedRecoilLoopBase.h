@@ -39,12 +39,20 @@ public:
   virtual ~ThreadedRecoilLoopBase() {}
 
   /// parens operator with the code that is executed in threads
-  void operator() (const PKARange & range);
+  void operator()(const PKARange & range);
 
   using MyTRIMDefectBufferItem = std::pair<Point, unsigned int>;
 
   /// defect type enum (vacancies, interstitials, and incoming and outgoing replacements)
-  enum DefectType {  NONE = -1, VACANCY = 0, INTERSTITIAL, REPLACEMENT_IN, REPLACEMENT_OUT, N_DEFECTS };
+  enum DefectType
+  {
+    NONE = -1,
+    VACANCY = 0,
+    INTERSTITIAL,
+    REPLACEMENT_IN,
+    REPLACEMENT_OUT,
+    N_DEFECTS
+  };
 
 protected:
   /// add an interstitial or vacancy to the result list
@@ -95,4 +103,4 @@ private:
       LIBMESH_DIM>;
 };
 
-#endif //THREADEDRECOILLOOPBASE_H
+#endif // THREADEDRECOILLOOPBASE_H

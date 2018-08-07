@@ -25,7 +25,9 @@ public:
   DiscreteFissionPKAPDF();
 
   /// the actual constructor
-  DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID,
+                        const std::vector<Real> & energies,
+                        const MultiIndex<Real> & probabilities);
 
   /// override drawSample
   virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
@@ -56,8 +58,8 @@ protected:
    * vector of maps of fission product zaids and cdf
    * energy type enum -> map (zaid -> vector)
    */
-  std::vector<std::map<unsigned int, std::vector<unsigned int> > >  _fission_zaids;
-  std::vector<std::map<unsigned int, std::vector<Real> > >  _fission_cdf;
+  std::vector<std::map<unsigned int, std::vector<unsigned int>>> _fission_zaids;
+  std::vector<std::map<unsigned int, std::vector<Real>>> _fission_cdf;
 };
 
-#endif //DISCRETEFISSIONPKAPDF_H
+#endif // DISCRETEFISSIONPKAPDF_H

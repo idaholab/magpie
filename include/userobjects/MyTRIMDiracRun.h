@@ -14,7 +14,7 @@
 
 class MyTRIMDiracRun;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMDiracRun>();
 
 /**
@@ -48,4 +48,4 @@ protected:
   MyTRIMResultList _result_list;
 };
 
-#endif //MYTRIMDIRACRUN_H
+#endif // MYTRIMDIRACRUN_H

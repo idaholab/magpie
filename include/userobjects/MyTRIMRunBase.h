@@ -18,7 +18,7 @@
 class MyTRIMRunBase;
 class MooseMesh;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMRunBase>();
 
 /**
@@ -58,4 +58,4 @@ protected:
   const unsigned int _dim;
 };
 
-#endif //MYTRIMRUNBASE_H
+#endif // MYTRIMRUNBASE_H

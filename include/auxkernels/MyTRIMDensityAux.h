@@ -16,7 +16,7 @@
 // forward declarations
 class MyTRIMDensityAux;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMDensityAux>();
 
 class MyTRIMDensityAux : public AuxKernel
@@ -42,4 +42,4 @@ private:
   Real _value_cache;
 };
 
-#endif //MYTRIMDENSITYAUX_H
+#endif // MYTRIMDENSITYAUX_H

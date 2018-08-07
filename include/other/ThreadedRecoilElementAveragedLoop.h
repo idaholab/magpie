@@ -22,7 +22,8 @@ public:
   ThreadedRecoilElementAveragedLoop(const MyTRIMRasterizer &, const MooseMesh &);
 
   /// Splitting constructor
-  ThreadedRecoilElementAveragedLoop(const ThreadedRecoilElementAveragedLoop & x, Threads::split split);
+  ThreadedRecoilElementAveragedLoop(const ThreadedRecoilElementAveragedLoop & x,
+                                    Threads::split split);
 
   /// thread join method
   virtual void join(const ThreadedRecoilElementAveragedLoop &);
@@ -63,10 +64,10 @@ struct ThreadedRecoilElementAveragedLoop::MyTRIMResult
   Real _energy;
 };
 
-template<>
+template <>
 void dataStore(std::ostream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &, void *);
 
-template<>
+template <>
 void dataLoad(std::istream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &, void *);
 
-#endif //THREADEDRECOILELEMENTAVERAGEDLOOP_H
+#endif // THREADEDRECOILELEMENTAVERAGEDLOOP_H

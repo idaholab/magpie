@@ -30,11 +30,18 @@ Point randomElementPoint(const Elem & el, const Point & rnd);
 
 ///@{ ZAID (ZZAAA) conversion helper
 unsigned int getZFromZAID(unsigned int zaid);
-unsigned int getAFromZAID(unsigned int  zaid);
+unsigned int getAFromZAID(unsigned int zaid);
 ///@}
 
 /// enum of different neutron energy groups (thermal, epithermal, fast, high)
-enum NeutronEnergyType {Thermal = 0, Epithermal, Fast, High, NET_MAX};
+enum NeutronEnergyType
+{
+  Thermal = 0,
+  Epithermal,
+  Fast,
+  High,
+  NET_MAX
+};
 
 /// vector of strings for each neutron energy type
 const std::string & neutronEnergyName(unsigned int i);
@@ -68,22 +75,28 @@ public:
   void set(T & rhs) { _ptr = &rhs; }
 
   /// write access to the wrapped value
-  T & operator= (const T & value) { *_ptr = value; return *_ptr; }
+  T & operator=(const T & value)
+  {
+    *_ptr = value;
+    return *_ptr;
+  }
 
   /// we need to delete this assignement ioperator as it will have an unexpected effect
-  T & operator= (const reference_wrapper<T> & ref) = delete; // Error: cast to value type explicitly before assigning a reference_wrapper to another reference_wrapper!
+  T & operator=(const reference_wrapper<T> & ref) = delete; // Error: cast to value type explicitly
+                                                            // before assigning a reference_wrapper
+                                                            // to another reference_wrapper!
 
   ///@{ compound assignment operators for modification of the value
-  T & operator+= (const T & rhs) { return *_ptr += rhs; }
-  T & operator-= (const T & rhs) { return *_ptr -= rhs; }
-  T & operator*= (const T & rhs) { return *_ptr *= rhs; }
-  T & operator/= (const T & rhs) { return *_ptr /= rhs; }
-  T & operator%= (const T & rhs) { return *_ptr %= rhs; }
-  T & operator<<= (const T & rhs) { return *_ptr <<= rhs; }
-  T & operator>>= (const T & rhs) { return *_ptr >>= rhs; }
-  T & operator^= (const T & rhs) { return *_ptr ^= rhs; }
-  T & operator&= (const T & rhs) { return *_ptr &= rhs; }
-  T & operator|= (const T & rhs) { return *_ptr |= rhs; }
+  T & operator+=(const T & rhs) { return *_ptr += rhs; }
+  T & operator-=(const T & rhs) { return *_ptr -= rhs; }
+  T & operator*=(const T & rhs) { return *_ptr *= rhs; }
+  T & operator/=(const T & rhs) { return *_ptr /= rhs; }
+  T & operator%=(const T & rhs) { return *_ptr %= rhs; }
+  T & operator<<=(const T & rhs) { return *_ptr <<= rhs; }
+  T & operator>>=(const T & rhs) { return *_ptr >>= rhs; }
+  T & operator^=(const T & rhs) { return *_ptr ^= rhs; }
+  T & operator&=(const T & rhs) { return *_ptr &= rhs; }
+  T & operator|=(const T & rhs) { return *_ptr |= rhs; }
   ///@}
 
 private:
@@ -93,4 +106,4 @@ private:
 
 } // namespace MagpieUtils
 
-#endif //MAGPIEUTILS_H
+#endif // MAGPIEUTILS_H

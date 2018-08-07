@@ -16,7 +16,7 @@
 // Forward Declarations
 class NeutronicsSpectrumSamplerBase;
 
-template<>
+template <>
 InputParameters validParams<NeutronicsSpectrumSamplerBase>();
 
 /**
@@ -56,7 +56,8 @@ protected:
   virtual void preComputeRadiationDamagePDF();
 
   /// computes the PKA for isotope i, group g, and angular indieces p [mu] and q [phi]
-  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q) = 0;
+  virtual Real
+  computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q) = 0;
 
   /// a subsitute to convert isotope names to zaid if RSN is not available
   unsigned int localStringToZaid(std::string s) const;
@@ -91,7 +92,7 @@ protected:
   bool _qp_is_cached;
 
   /// a map from a local existing element to contained points (there can be more than one!)
-  std::map<const Elem *, std::vector<unsigned int> > _local_elem_to_contained_points;
+  std::map<const Elem *, std::vector<unsigned int>> _local_elem_to_contained_points;
 
   /// determines which process owns this point
   std::vector<unsigned int> _owner;
@@ -100,7 +101,7 @@ protected:
   std::vector<unsigned int> _qp_cache;
 
   /// stores the radiation damage PDF
-  std::vector<MultiIndex<Real> > _sample_point_data;
+  std::vector<MultiIndex<Real>> _sample_point_data;
 
   /// the current quadrature point
   unsigned int _qp;
@@ -112,4 +113,4 @@ protected:
   std::vector<unsigned int> _zaids;
 };
 
-#endif //NEUTRONICSSPECTRUMSAMPLERBASE_H
+#endif // NEUTRONICSSPECTRUMSAMPLERBASE_H

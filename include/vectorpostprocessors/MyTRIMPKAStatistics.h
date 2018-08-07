@@ -15,7 +15,7 @@
 class MyTRIMPKAStatistics;
 class MyTRIMRasterizer;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMPKAStatistics>();
 
 class MyTRIMPKAStatistics : public GeneralVectorPostprocessor
@@ -32,7 +32,11 @@ protected:
   const MyTRIMRasterizer & _rasterizer;
 
   /// which property is to be aggregated;
-  enum ValueType { MASS=0, ZAID } _value_type;
+  enum ValueType
+  {
+    MASS = 0,
+    ZAID
+  } _value_type;
 
   /// map selected PKA property to the number of PKA with this property
   std::map<unsigned int, unsigned int> _count_map;
@@ -44,4 +48,4 @@ protected:
   VectorPostprocessorValue & _count;
 };
 
-#endif //MYTRIMPKASTATISTICS_H
+#endif // MYTRIMPKASTATISTICS_H

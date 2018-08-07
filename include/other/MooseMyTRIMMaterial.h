@@ -32,4 +32,4 @@ public:
   virtual void calculateDensity(Real site_volume);
 };
 
-#endif //MOOSEMYTRIMMATERIAL_H
+#endif // MOOSEMYTRIMMATERIAL_H

@@ -20,7 +20,7 @@
 class MyTRIMRasterizer;
 class PKAGeneratorBase;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMRasterizer>();
 
 /**
@@ -55,8 +55,12 @@ public:
   Point periodicPoint(const Point &) const;
 
   /// element averaged data
-  struct AveragedData {
-    AveragedData(unsigned int nvars = 0) : _elements(nvars, 0.0), _Z(nvars, 0.0), _M(nvars, 0.0), _site_volume(0.0) {}
+  struct AveragedData
+  {
+    AveragedData(unsigned int nvars = 0)
+      : _elements(nvars, 0.0), _Z(nvars, 0.0), _M(nvars, 0.0), _site_volume(0.0)
+    {
+    }
 
     std::vector<Real> _elements;
     std::vector<Real> _Z;
@@ -64,18 +68,21 @@ public:
     Real _site_volume;
   };
 
-  enum TRIMModuleEnum {
+  enum TRIMModuleEnum
+  {
     MYTRIM_CORE = 0,
     MYTRIM_ENERGY_DEPOSITION = 1
   };
 
-  enum Unit {
+  enum Unit
+  {
     ANGSTROM = 0,
     NANOMETER,
     MICROMETER
   };
 
-  struct TrimParameters {
+  struct TrimParameters
+  {
     // Element prototype data (charge, mass, displacement and binding energies)
     std::vector<MyTRIM_NS::Element> element_prototypes;
 
@@ -175,4 +182,4 @@ private:
   bool _execute_this_timestep;
 };
 
-#endif //MYTRIMRASTERIZER_H
+#endif // MYTRIMRASTERIZER_H

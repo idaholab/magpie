@@ -14,7 +14,7 @@
 // Forward Declarations
 class NeutronicsSpectrumSamplerFission;
 
-template<>
+template <>
 InputParameters validParams<NeutronicsSpectrumSamplerFission>();
 
 /**
@@ -31,17 +31,21 @@ public:
   /// returns a MultiIndex<Real> PDF at a given point ID
   virtual MultiIndex<Real> getPDF(unsigned int point_id) const override;
 
-  virtual Real totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const override;
+  virtual Real totalRecoilRate(unsigned int point_id,
+                               const std::string & target_isotope) const override;
 
 protected:
   /// computes the PDF for isotope i, group g, and SH indices p
   /// NOTE: for fission p does not mateter
-  virtual Real computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int /*p*/, unsigned int /*q*/) override;
+  virtual Real computeRadiationDamagePDF(unsigned int i,
+                                         unsigned int g,
+                                         unsigned int /*p*/,
+                                         unsigned int /*q*/) override;
 
   /// the scalar flux
   std::vector<const VariableValue *> _scalar_flux;
   /// stores the fission cross sections
-  std::vector<std::vector<std::vector<Real> > > _fission_cross_section;
+  std::vector<std::vector<std::vector<Real>>> _fission_cross_section;
 };
 
-#endif //NEUTRONCSSPECTRUMSAMPLERFISSION_H
+#endif // NEUTRONCSSPECTRUMSAMPLERFISSION_H

@@ -15,7 +15,7 @@
 class MyTRIMPKAEnergyHistogram;
 class MyTRIMRasterizer;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMPKAEnergyHistogram>();
 
 class MyTRIMPKAEnergyHistogram : public GeneralVectorPostprocessor
@@ -44,4 +44,4 @@ protected:
   VectorPostprocessorValue & _count;
 };
 
-#endif //MYTRIMPKAENERGYHISTOGRAM_H
+#endif // MYTRIMPKAENERGYHISTOGRAM_H
