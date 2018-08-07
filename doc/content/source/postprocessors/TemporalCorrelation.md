@@ -3,7 +3,7 @@
 !syntax description /Postprocessors/TemporalCorrelation
 
 \begin{equation}
-  \Delta U = \sqrt{\frac1\Omaga\int_\Omega |\dot u|^2 dr},
+  \Delta U = \sqrt{\frac1\Omega\int_\Omega |\dot u|^2 dr},
 \end{equation}
 
 where $\Omega$ is the simulation cell volume, and $\Delta U$ can be taken as a
