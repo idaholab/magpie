@@ -53,7 +53,7 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
     mooseError("recoil_isotope_names have wrong length.");
   unsigned int Z, A;
   for (unsigned int i = 0; i < _I; ++i)
-    YAKXS::Utility::getAZFromIsotopeName(_recoil_isotope_names[i], A, Z);
+    YAKXS::Utility::getAZ(_recoil_isotope_names[i], A, Z);
 
   // get angular fluxes
   _angular_flux.resize(_G);
