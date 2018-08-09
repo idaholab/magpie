@@ -23,13 +23,15 @@ public:
   /// default constructor
   DiscretePKAPDF();
 
-  DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities);
+  DiscretePKAPDF(const std::vector<unsigned int> & ZAID,
+                 const std::vector<Real> & energies,
+                 const MultiIndex<Real> & probabilities);
 
   /// override drawSample
   virtual void drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const override;
 
   /// overload the outstream operator
-  friend std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf);
+  friend std::ostream & operator<<(std::ostream & out, const DiscretePKAPDF & pdf);
 
 protected:
   /// NOTE: we pass by value here because we modify probabilities in the function for convenience

@@ -15,7 +15,7 @@
 class IsotopeRecoilRate;
 class NeutronicsSpectrumSamplerBase;
 
-template<>
+template <>
 InputParameters validParams<IsotopeRecoilRate>();
 
 class IsotopeRecoilRate : public GeneralPostprocessor
@@ -33,4 +33,4 @@ protected:
   const PostprocessorValue & _scaling_factor;
 };
 
-#endif //IsotopeRecoilRate_H
+#endif // IsotopeRecoilRate_H

@@ -14,7 +14,7 @@
 
 class PKAFunction;
 
-template<>
+template <>
 InputParameters validParams<PKAFunction>();
 
 /**

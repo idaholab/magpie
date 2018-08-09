@@ -6,7 +6,6 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-
 #ifndef INELASTICRECOIL_H
 #define INELASTICRECOIL_H
 

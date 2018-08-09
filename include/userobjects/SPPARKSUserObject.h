@@ -19,7 +19,7 @@
 // forward declarations
 class SPPARKSUserObject;
 
-template<>
+template <>
 InputParameters validParams<SPPARKSUserObject>();
 
 class SPPARKSUserObject : public GeneralUserObject
@@ -36,7 +36,7 @@ public:
   virtual void execute();
   virtual void finalize() {}
 
-  int  getIntValue(unsigned int fem_node_id, unsigned int index) const;
+  int getIntValue(unsigned int fem_node_id, unsigned int index) const;
   Real getDoubleValue(unsigned int fem_node_id, unsigned int index) const;
 
 protected:
@@ -50,7 +50,9 @@ protected:
   Real getSPPARKSTime(Real dt) { return dt / _time_ratio; }
 
   template <typename T>
-  Real getValue(const std::map<unsigned int, std::map<unsigned int, T> > & data, unsigned int fem_node_id, unsigned int index) const;
+  Real getValue(const std::map<unsigned int, std::map<unsigned int, T>> & data,
+                unsigned int fem_node_id,
+                unsigned int index) const;
 
   template <typename T>
   void getSPPARKSDataPointer(T *& ptr, const std::string & name, unsigned int index);
@@ -62,7 +64,8 @@ protected:
   void setSPPARKSData();
 
   template <typename T>
-  void getSPPARKSData(std::map<unsigned int, T> & storage, const std::string & name, unsigned int index);
+  void
+  getSPPARKSData(std::map<unsigned int, T> & storage, const std::string & name, unsigned int index);
 
   template <typename T>
   void sendRecvSPPARKSData(const T * const data, std::map<unsigned int, T> & storage);
@@ -104,22 +107,22 @@ protected:
 
   int _dim;
 
-  std::vector<MooseVariable*> _int_vars;
-  std::vector<MooseVariable*> _double_vars;
-  std::vector<MooseVariable*> _sol_vars; //added by YF
+  std::vector<MooseVariable *> _int_vars;
+  std::vector<MooseVariable *> _double_vars;
+  std::vector<MooseVariable *> _sol_vars; // added by YF
 
   //
   // Communication maps
   //
 
   /// SPPARKSID to vector of procs that need the value
-  std::map<SPPARKSID, std::vector<unsigned int> > _spparks_to_proc;
+  std::map<SPPARKSID, std::vector<unsigned int>> _spparks_to_proc;
   /// Processor to list of MOOSE FEM ids
-  std::map<unsigned int, std::vector<libMesh::dof_id_type> > _sending_proc_to_fem_id;
+  std::map<unsigned int, std::vector<libMesh::dof_id_type>> _sending_proc_to_fem_id;
   /// FEMID to vector of procs that need the value
-  std::map<FEMID, std::vector<unsigned int> > _fem_to_proc;
+  std::map<FEMID, std::vector<unsigned int>> _fem_to_proc;
   /// Processor to list of SPPARKS ids
-  std::map<unsigned int, std::vector<unsigned int> > _sending_proc_to_spparks_id;
+  std::map<unsigned int, std::vector<unsigned int>> _sending_proc_to_spparks_id;
 
   unsigned int _num_local_fem_nodes;
   unsigned int _num_local_spparks_nodes;
@@ -131,22 +134,19 @@ protected:
   std::multimap<FEMID, SPPARKSID> _fem_to_spparks;
 
   /// Maps from variable index to MOOSE FEM node id to value
-  std::map<unsigned int, std::map<unsigned int, int> > _int_data_for_fem;
-  std::map<unsigned int, std::map<unsigned int, double> > _double_data_for_fem;
+  std::map<unsigned int, std::map<unsigned int, int>> _int_data_for_fem;
+  std::map<unsigned int, std::map<unsigned int, double>> _double_data_for_fem;
 
   // Maps from variable index to value (vector index is array index)
-  std::map<unsigned int, std::vector<int> > _int_data_for_spparks;
-  std::map<unsigned int, std::vector<double> > _double_data_for_spparks;
+  std::map<unsigned int, std::vector<int>> _int_data_for_spparks;
+  std::map<unsigned int, std::vector<double>> _double_data_for_spparks;
 
   Real _last_time;
 };
 
 struct SPPARKSUserObject::FEMID
 {
-  FEMID(libMesh::dof_id_type ident, const Point & p) :
-    id(ident), coor(p)
-  {
-  }
+  FEMID(libMesh::dof_id_type ident, const Point & p) : id(ident), coor(p) {}
 
   libMesh::dof_id_type id;
   Point coor;
@@ -167,15 +167,14 @@ struct SPPARKSUserObject::FEMID
   }
 
 private:
-  bool fuzzyEqual(Real f, Real s, Real tol) const
-  {
-    return f < (s+tol) && (f > s-tol);
-  }
+  bool fuzzyEqual(Real f, Real s, Real tol) const { return f < (s + tol) && (f > s - tol); }
 };
 
 template <typename T>
 Real
-SPPARKSUserObject::getValue(const std::map<unsigned int, std::map<unsigned int, T> > & data, unsigned int fem_node_id, unsigned int index) const
+SPPARKSUserObject::getValue(const std::map<unsigned int, std::map<unsigned int, T>> & data,
+                            unsigned int fem_node_id,
+                            unsigned int index) const
 {
   // Extract the data
   const auto it = data.find(index);
@@ -209,12 +208,14 @@ SPPARKSUserObject::getSPPARKSPointer(T *& ptr, const std::string & name) const
   void * p = spparks_extract(_spparks, name.c_str());
   if (!p)
     mooseError("SPPARKS returned NULL pointer for ", name);
-  ptr = static_cast<T*>(p);
+  ptr = static_cast<T *>(p);
 }
 
 template <typename T>
 void
-SPPARKSUserObject::getSPPARKSData(std::map<unsigned int, T> & storage, const std::string & name, unsigned int index)
+SPPARKSUserObject::getSPPARKSData(std::map<unsigned int, T> & storage,
+                                  const std::string & name,
+                                  unsigned int index)
 {
   T * data;
   getSPPARKSDataPointer(data, name.c_str(), index);
@@ -238,7 +239,8 @@ SPPARKSUserObject::sendRecvSPPARKSData(const T * const data, std::map<unsigned i
   const unsigned int num_recvs = _sending_proc_to_fem_id.size();
   std::vector<Parallel::Request> recv_request(num_recvs);
 
-  std::map<unsigned int, std::vector<T> > data_to_me; // sending proc, vector of SPPARKS values (one value per SPPARKS node)
+  std::map<unsigned int, std::vector<T>>
+      data_to_me; // sending proc, vector of SPPARKS values (one value per SPPARKS node)
   unsigned int offset = 0;
   for (auto & proc_id : _sending_proc_to_fem_id)
   {
@@ -247,7 +249,7 @@ SPPARKSUserObject::sendRecvSPPARKSData(const T * const data, std::map<unsigned i
     ++offset;
   }
 
-  std::map<unsigned int, std::vector<T> > data_from_me; // Processor, list of SPPARKS values
+  std::map<unsigned int, std::vector<T>> data_from_me; // Processor, list of SPPARKS values
   for (auto & procs : _spparks_to_proc)
     for (auto & proc : procs.second)
       data_from_me[proc].push_back(data[procs.first.id]);
@@ -271,7 +273,10 @@ SPPARKSUserObject::sendRecvSPPARKSData(const T * const data, std::map<unsigned i
 
 template <typename T>
 void
-SPPARKSUserObject::setSPPARKSData(T * data, const std::string & name, unsigned int index, MooseVariable & var)
+SPPARKSUserObject::setSPPARKSData(T * data,
+                                  const std::string & name,
+                                  unsigned int index,
+                                  MooseVariable & var)
 {
   getSPPARKSDataPointer(data, name, index);
 
@@ -312,7 +317,8 @@ SPPARKSUserObject::setFEMData(const std::string & name, unsigned int index, Moos
 
 // template <typename T>
 // void
-// SPPARKSUserObject::setFEMData(T * data, const std::string & name, unsigned int index, MooseVariable & var)
+// SPPARKSUserObject::setFEMData(T * data, const std::string & name, unsigned int index,
+// MooseVariable & var)
 // {
 //   getSPPARKSDataPointer(data, name, index);
 //
@@ -324,7 +330,8 @@ SPPARKSUserObject::setFEMData(const std::string & name, unsigned int index, Moos
 //   ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
 //
 //   // Index into data is SPPARKS node id.
-//   for (std::multimap<FEMID, SPPARKSID>::const_iterator i = _spparks_to_fem.begin(); i != _spparks_to_fem.end(); ++i)
+//   for (std::multimap<FEMID, SPPARKSID>::const_iterator i = _spparks_to_fem.begin(); i !=
+//   _spparks_to_fem.end(); ++i)
 //     spparks_data[i->first.id] = data[i->second.id];
 //
 //   // set data
@@ -338,7 +345,8 @@ SPPARKSUserObject::setFEMData(const std::string & name, unsigned int index, Moos
 
 template <typename T>
 void
-SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & storage, T * const data)
+SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & storage,
+                                   T * const data)
 {
   Parallel::MessageTag comm_tag(101);
 
@@ -346,7 +354,7 @@ SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & sto
   std::vector<Parallel::Request> recv_request(num_recvs);
 
   // sending proc, vector of MOOSE values (one value per MOOSE FEM node)
-  std::map<unsigned int, std::vector<T> > data_to_me;
+  std::map<unsigned int, std::vector<T>> data_to_me;
   unsigned int offset = 0;
   for (auto & proc_id : _sending_proc_to_spparks_id)
   {
@@ -356,7 +364,7 @@ SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & sto
   }
 
   // Processor, list of MOOSE values
-  std::map<unsigned int, std::vector<T> > data_from_me;
+  std::map<unsigned int, std::vector<T>> data_from_me;
   for (auto & id_proc : _fem_to_proc)
     for (unsigned int j = 0; j < id_proc.second.size(); ++j)
       data_from_me[id_proc.second[j]].push_back(storage.find(id_proc.first.id)->second);

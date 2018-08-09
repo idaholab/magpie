@@ -17,7 +17,7 @@
 class MyTRIMDiracRun;
 class MyTRIMDiracSource;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMDiracSource>();
 
 class MyTRIMDiracSource : public DiracKernel
@@ -42,4 +42,4 @@ protected:
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
 
-#endif //MYTRIMDIRACSOURCE_H
+#endif // MYTRIMDIRACSOURCE_H

@@ -14,7 +14,7 @@
 
 class MyTRIMElementRun;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMElementRun>();
 
 /**
@@ -51,4 +51,4 @@ private:
   MyTRIMResult _zero;
 };
 
-#endif //MYTRIMELEMENTRUN_H
+#endif // MYTRIMELEMENTRUN_H

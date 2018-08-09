@@ -16,7 +16,7 @@
 class MyTRIMPKAInfo;
 class MyTRIMRasterizer;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMPKAInfo>();
 
 class MyTRIMPKAInfo : public GeneralPostprocessor
@@ -38,10 +38,16 @@ protected:
   const MyTRIMRasterizer & _rasterizer;
 
   /// which quantity is to be aggregated;
-  enum ValueType { TOTAL_MASS=0, TOTAL_ENERGY, TOTAL_CHARGE, TOTAL_NUMBER } _value_type;
+  enum ValueType
+  {
+    TOTAL_MASS = 0,
+    TOTAL_ENERGY,
+    TOTAL_CHARGE,
+    TOTAL_NUMBER
+  } _value_type;
 
   /// the value this PP computes (determined by the value_type parameter)
   Real _value;
 };
 
-#endif //MYTRIMPKAINFO_H
+#endif // MYTRIMPKAINFO_H

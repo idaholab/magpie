@@ -15,7 +15,7 @@
 class SPPARKSUserObject;
 class SPPARKSAux;
 
-template<>
+template <>
 InputParameters validParams<SPPARKSAux>();
 
 class SPPARKSAux : public AuxKernel
@@ -32,4 +32,4 @@ protected:
   const unsigned int _array;
 };
 
-#endif //SPPARKSAUX_H
+#endif // SPPARKSAUX_H
