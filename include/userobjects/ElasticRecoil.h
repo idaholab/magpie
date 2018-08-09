@@ -6,7 +6,6 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-
 #ifndef ELASTICRECOIL_H
 #define ELASTICRECOIL_H
 

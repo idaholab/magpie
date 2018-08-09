@@ -14,7 +14,7 @@
 class AtomicDensityAux;
 class MyTRIMRasterizer;
 
-template<>
+template <>
 InputParameters validParams<AtomicDensityAux>();
 
 /**

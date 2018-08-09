@@ -32,4 +32,4 @@ protected:
   const unsigned int _dim;
 };
 
-#endif //MOOSEMYTRIMCORE_H
+#endif // MOOSEMYTRIMCORE_H

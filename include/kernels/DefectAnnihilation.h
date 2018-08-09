@@ -13,7 +13,7 @@
 
 class DefectAnnihilation;
 
-template<>
+template <>
 InputParameters validParams<DefectAnnihilation>();
 
 /**

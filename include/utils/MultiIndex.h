@@ -18,12 +18,13 @@
  * Implements a container class for multi-indexed objects
  * with an arbitrary number of indices.
  */
-template<class T>
+template <class T>
 class MultiIndex
 {
 public:
   /// MultiIndex container iterator
-  template<bool is_const = false> class const_noconst_iterator;
+  template <bool is_const = false>
+  class const_noconst_iterator;
 
   ///@{ container related types and categories
   typedef T value_type;
@@ -39,8 +40,8 @@ public:
   MultiIndex(const size_type & shape, const std::vector<T> & data);
 
   ///@{ element access operators
-  T & operator() (const size_type & indices);
-  const T & operator() (const size_type & indices) const;
+  T & operator()(const size_type & indices);
+  const T & operator()(const size_type & indices) const;
   ///@}
 
   ///@{ accesses a slice of the multi index object
@@ -116,12 +117,11 @@ template <bool is_const>
 class MultiIndex<T>::const_noconst_iterator
 {
 public:
-  typedef typename std::conditional<is_const, const MultiIndex<T> &, MultiIndex<T> &>::type reference_type;
+  typedef typename std::conditional<is_const, const MultiIndex<T> &, MultiIndex<T> &>::type
+      reference_type;
 
-  const_noconst_iterator(reference_type multi_index, unsigned int position) :
-      _multi_index(multi_index),
-      _flat_index(position),
-      _shape(multi_index.size())
+  const_noconst_iterator(reference_type multi_index, unsigned int position)
+    : _multi_index(multi_index), _flat_index(position), _shape(multi_index.size())
   {
     _multi_index.findIndexVector(position, _indices);
   }
@@ -131,7 +131,7 @@ public:
   reference_type getMultiIndexObject() const { return _multi_index; }
 
   // assignment =
-  const_noconst_iterator & operator= (const const_noconst_iterator & other)
+  const_noconst_iterator & operator=(const const_noconst_iterator & other)
   {
     _multi_index = other.getMultiIndexObject();
     _flat_index = other.flatIndex();
@@ -140,13 +140,14 @@ public:
   }
 
   // prefix ++
-  const_noconst_iterator & operator++ ()
+  const_noconst_iterator & operator++()
   {
     ++_flat_index;
     // increment indices
     for (unsigned int j = 0; j < _indices.size(); ++j)
     {
-      _indices[_indices.size() - j - 1] = (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
+      _indices[_indices.size() - j - 1] =
+          (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
       if (_indices[_indices.size() - j - 1] != 0)
         break;
     }
@@ -154,14 +155,15 @@ public:
   }
 
   // postfix ++
-  const_noconst_iterator & operator++ (int)
+  const_noconst_iterator & operator++(int)
   {
     const_noconst_iterator clone(*this);
     ++_flat_index;
     // increment indices
     for (unsigned int j = 0; j < _indices.size(); ++j)
     {
-      _indices[_indices.size() - j - 1] = (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
+      _indices[_indices.size() - j - 1] =
+          (_indices[_indices.size() - j - 1] + 1) % _shape[_indices.size() - j - 1];
       if (_indices[_indices.size() - j - 1] != 0)
         break;
     }
@@ -169,7 +171,7 @@ public:
   }
 
   // prefix --
-  const_noconst_iterator & operator-- ()
+  const_noconst_iterator & operator--()
   {
     --_flat_index;
     // decrement indices
@@ -187,7 +189,7 @@ public:
   }
 
   // postfix --
-  const_noconst_iterator & operator-- (int)
+  const_noconst_iterator & operator--(int)
   {
     const_noconst_iterator clone(*this);
     --_flat_index;
@@ -206,12 +208,21 @@ public:
   }
 
   /// to be equal both iterators must hold a reference to the same MultiIndexObject and be at the same _flat_index
-  bool operator== (const const_noconst_iterator & other) const { return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject(); }
-  bool operator!= (const const_noconst_iterator & other) const { return !(*this == other); }
+  bool operator==(const const_noconst_iterator & other) const
+  {
+    return _flat_index == other.flatIndex() && &_multi_index == &other.getMultiIndexObject();
+  }
+  bool operator!=(const const_noconst_iterator & other) const { return !(*this == other); }
 
   /// dereferencing operator
-  std::pair<const size_type &, T &> operator* () { return std::pair<const size_type &, T &>(_indices, _multi_index._data[_flat_index]); }
-  std::pair<const size_type &, const T &> operator* ()  const { return std::pair<const size_type &, const T &>(_indices, _multi_index._data[_flat_index]); }
+  std::pair<const size_type &, T &> operator*()
+  {
+    return std::pair<const size_type &, T &>(_indices, _multi_index._data[_flat_index]);
+  }
+  std::pair<const size_type &, const T &> operator*() const
+  {
+    return std::pair<const size_type &, const T &>(_indices, _multi_index._data[_flat_index]);
+  }
 
 protected:
   reference_type _multi_index;
@@ -239,14 +250,14 @@ MultiIndex<T>::MultiIndex(const size_type & shape, const std::vector<T> & data)
 
 template <class T>
 T &
-MultiIndex<T>::operator() (const size_type & indices)
+MultiIndex<T>::operator()(const size_type & indices)
 {
   return _data[flatIndex(indices)];
 }
 
 template <class T>
 const T &
-MultiIndex<T>::operator() (const size_type & indices) const
+MultiIndex<T>::operator()(const size_type & indices) const
 {
   return _data[flatIndex(indices)];
 }
@@ -276,7 +287,12 @@ MultiIndex<T>::slice(size_type dimension, size_type index) const
     if (dimension[d] >= _dim)
       mooseError("dimension is set to ", dimension[d], " which is larger than _dim ", _dim);
     if (index[d] >= _shape[dimension[d]])
-      mooseError("index= ", index[d], " at dimension=", dimension[d], " is larger than ", _shape[dimension[d]]);
+      mooseError("index= ",
+                 index[d],
+                 " at dimension=",
+                 dimension[d],
+                 " is larger than ",
+                 _shape[dimension[d]]);
   }
 #endif
 
@@ -430,12 +446,13 @@ template <class T>
 unsigned int
 MultiIndex<T>::flatIndex(const size_type & indices) const
 {
-  mooseAssert(indices.size() == _dim, "Indices vector has wrong size. size=" << indices.size() << " vs. dim=" << _dim);
-  #if DEBUG
+  mooseAssert(indices.size() == _dim,
+              "Indices vector has wrong size. size=" << indices.size() << " vs. dim=" << _dim);
+#if DEBUG
   for (unsigned int j = 0; j < indices.size(); ++j)
     if (indices[j] >= _shape[j])
       mooseError("Indices vector at entry ", j, " is ", indices[j], " vs. shape ", _shape[j]);
-  #endif
+#endif
 
   // implement the index
   // index = i_M + i_{M-1} * I_M + i_{M-1} * I_M * I_{M-1} ...
@@ -446,18 +463,18 @@ MultiIndex<T>::flatIndex(const size_type & indices) const
   return index;
 }
 
-template<class T>
+template <class T>
 void
 dataStore(std::ostream & stream, MultiIndex<T> & mi, void * context)
 {
   mi.dataStore(stream, context);
 }
 
-template<class T>
+template <class T>
 void
 dataLoad(std::istream & stream, MultiIndex<T> & mi, void * context)
 {
   mi.dataLoad(stream, context);
 }
 
-#endif //MULTIINDEX_H
+#endif // MULTIINDEX_H

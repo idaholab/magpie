@@ -32,26 +32,25 @@ private:
   Real _value_cache;
 };
 
-
 template <class T>
-MyTRIMElementEnergyAccess<T>::MyTRIMElementEnergyAccess(const InputParameters & parameters) :
-    T(parameters),
-    _mytrim(this->template getUserObject<MyTRIMElementRun>("runner"))
+MyTRIMElementEnergyAccess<T>::MyTRIMElementEnergyAccess(const InputParameters & parameters)
+  : T(parameters), _mytrim(this->template getUserObject<MyTRIMElementRun>("runner"))
 {
   if (this->isNodal())
     mooseError("MyTRIMElementEnergyAccess needs to be applied to an elemental AuxVariable.");
 }
 
-template<typename T>
+template <typename T>
 InputParameters
 MyTRIMElementEnergyAccess<T>::validParams()
 {
   InputParameters params = ::validParams<T>();
-  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMElementRun userobject to pull data from.");
+  params.addRequiredParam<UserObjectName>(
+      "runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   return params;
 }
 
-template<typename T>
+template <typename T>
 Real
 MyTRIMElementEnergyAccess<T>::getEnergyDensity()
 {
@@ -68,4 +67,4 @@ MyTRIMElementEnergyAccess<T>::getEnergyDensity()
   return _value_cache;
 }
 
-#endif //MYTRIMELEMENTENERGYACCESS_H
+#endif // MYTRIMELEMENTENERGYACCESS_H

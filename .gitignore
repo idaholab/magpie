@@ -160,6 +160,3 @@ peacock_*.e
 
 include/base/MagpieRevision.h
 tests/userobjects/spparks/log.spparks
-
-# ignore changes (this allows me to keep a full clang format file locally for new contributions)
-.clang-format

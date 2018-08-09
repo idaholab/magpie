@@ -16,7 +16,7 @@
 class MyTRIMElementRun;
 class MyTRIMElementHeatSource;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMElementHeatSource>();
 
 class MyTRIMElementHeatSource : public MyTRIMElementEnergyAccess<Kernel>
@@ -31,4 +31,4 @@ protected:
   const Real & _dt;
 };
 
-#endif //MYTRIMELEMENTHEATSOURCE_H
+#endif // MYTRIMELEMENTHEATSOURCE_H

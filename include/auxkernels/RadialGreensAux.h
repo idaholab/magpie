@@ -14,7 +14,7 @@
 
 class RadialGreensAux;
 
-template<>
+template <>
 InputParameters validParams<RadialGreensAux>();
 
 /**

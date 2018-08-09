@@ -16,7 +16,7 @@
 class MyTRIMElementRun;
 class MyTRIMElementEnergyAux;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMElementEnergyAux>();
 
 class MyTRIMElementEnergyAux : public MyTRIMElementEnergyAccess<AuxKernel>
@@ -28,4 +28,4 @@ public:
   virtual Real computeValue();
 };
 
-#endif //MYTRIMELEMENTENERGYAUX_H
+#endif // MYTRIMELEMENTENERGYAUX_H

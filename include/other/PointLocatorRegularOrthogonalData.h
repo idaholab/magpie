@@ -15,9 +15,10 @@
 
 class PointLocatorRegularOrthogonalData;
 
-namespace libMesh {
-  class MeshBase;
-  class Elem;
+namespace libMesh
+{
+class MeshBase;
+class Elem;
 }
 
 /**
@@ -27,8 +28,8 @@ namespace libMesh {
  * The lookup data is a regular orthogonal matrix of element pointers that correspond to
  * the level 0 elements in the regular orthogonal mesh.
  */
-class PointLocatorRegularOrthogonalData :
-  public ReferenceCountedObject<PointLocatorRegularOrthogonalData>
+class PointLocatorRegularOrthogonalData
+  : public ReferenceCountedObject<PointLocatorRegularOrthogonalData>
 {
 public:
   PointLocatorRegularOrthogonalData(const std::vector<unsigned int> & cell_count,
@@ -59,4 +60,4 @@ protected:
   std::vector<Elem *> _root_elems;
 };
 
-#endif //POINTLOCATORREGULARORTHOGONALDATA_H
+#endif // POINTLOCATORREGULARORTHOGONALDATA_H

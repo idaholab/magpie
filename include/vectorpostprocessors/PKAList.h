@@ -14,7 +14,7 @@
 
 class PKAList;
 
-template<>
+template <>
 InputParameters validParams<PKAList>();
 
 /**
@@ -45,4 +45,4 @@ protected:
   ///@}
 };
 
-#endif //PKALIST_H
+#endif // PKALIST_H

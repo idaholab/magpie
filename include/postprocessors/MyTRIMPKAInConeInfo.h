@@ -14,7 +14,7 @@
 // forward declarations
 class MyTRIMPKAInConeInfo;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMPKAInConeInfo>();
 
 class MyTRIMPKAInConeInfo : public MyTRIMPKAInfo
@@ -29,4 +29,4 @@ protected:
   const Real _min_cosine;
 };
 
-#endif //MyTRIMPKAInConeInfo_H
+#endif // MyTRIMPKAInConeInfo_H

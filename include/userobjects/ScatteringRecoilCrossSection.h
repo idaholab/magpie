@@ -6,7 +6,6 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-
 #ifndef SCATTERINGRECOILCROSSSECTION_H
 #define SCATTERINGRECOILCROSSSECTION_H
 
@@ -37,7 +36,7 @@ public:
 
   ///@{ neutron and recoil energy limits
   const std::vector<Real> & getNeutronEnergyLimits() const { return _neutron_energy_limits; };
-  const std::vector<Real> & getRecoilEnergyLimits() const {return _recoil_energy_limits; };
+  const std::vector<Real> & getRecoilEnergyLimits() const { return _recoil_energy_limits; };
   ///@}
 
   /// returns the recoil cross section Legendre expansion coefficient of order l for group g->t

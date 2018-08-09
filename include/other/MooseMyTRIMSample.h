@@ -31,7 +31,7 @@ public:
   MooseMyTRIMSample(const MyTRIMRasterizer &, const MooseMesh &, MyTRIM_NS::SimconfType *);
 
   /// average crossections for current ion
-  virtual void averages(const MyTRIM_NS::IonBase  * pka);
+  virtual void averages(const MyTRIM_NS::IonBase * pka);
 
   /// interface called by MyTRIM to look up material data
   virtual MyTRIM_NS::MaterialBase * lookupMaterial(Point & pos);
@@ -40,7 +40,6 @@ public:
   unsigned int getDim() { return _dim; }
 
 protected:
-
   /// the rasterizer provides average concentrations for each element
   const MyTRIMRasterizer & _rasterizer;
 
@@ -72,4 +71,4 @@ protected:
   MyTRIM_NS::SimconfType * _simconf;
 };
 
-#endif //MOOSEMYTRIMSAMPLE_H
+#endif // MOOSEMYTRIMSAMPLE_H

@@ -13,7 +13,7 @@
 
 class MagpieApp;
 
-template<>
+template <>
 InputParameters validParams<MagpieApp>();
 
 class MagpieApp : public MooseApp

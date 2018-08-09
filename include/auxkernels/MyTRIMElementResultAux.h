@@ -16,7 +16,7 @@
 class MyTRIMElementRun;
 class MyTRIMElementResultAux;
 
-template<>
+template <>
 InputParameters validParams<MyTRIMElementResultAux>();
 
 class MyTRIMElementResultAux : public MyTRIMElementResultAccess<AuxKernel>
@@ -28,4 +28,4 @@ public:
   virtual Real computeValue();
 };
 
-#endif //MYTRIMELEMENTRESULTAUX_H
+#endif // MYTRIMELEMENTRESULTAUX_H

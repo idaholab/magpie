@@ -13,7 +13,7 @@
 
 class PKAGun;
 
-template<>
+template <>
 InputParameters validParams<PKAGun>();
 
 /**

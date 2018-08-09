@@ -13,7 +13,7 @@
 
 class PKAConstant;
 
-template<>
+template <>
 InputParameters validParams<PKAConstant>();
 
 /**
