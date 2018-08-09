@@ -58,7 +58,7 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
 #ifdef RATTLESNAKE_ENABLED
     unsigned int Z, A;
     // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
-    YAKXS::Utility::getAZFromIsotopeName(_target_isotope_names[i], A, Z);
+    YAKXS::Utility::getAZ(_target_isotope_names[i], A, Z);
     // convert from name to ZAID
     _zaids[i] = YAKXS::Utility::stringToZaid(_target_isotope_names[i]);
 #else
