@@ -23,10 +23,8 @@ class PKAGeneratorRecoil : public PKAGeneratorNeutronicsBase
 public:
   PKAGeneratorRecoil(const InputParameters & parameters);
 
-  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
-                          Real dt,
-                          Real vol,
-                          Real recoil_rate_scaling,
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
+                          const MyTRIMRasterizer::PKAParameters &,
                           const MyTRIMRasterizer::AveragedData &) const;
 
   virtual void setPDF(const std::vector<unsigned int> & ZAID,

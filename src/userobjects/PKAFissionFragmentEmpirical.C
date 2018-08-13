@@ -10,29 +10,42 @@
 
 registerMooseObject("MagpieApp", PKAFissionFragmentEmpirical);
 
-template<>
-InputParameters validParams<PKAFissionFragmentEmpirical>()
+template <>
+InputParameters
+validParams<PKAFissionFragmentEmpirical>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addParam<PostprocessorName>("fission_rate", 1e-8, "Fission rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
-  params.addRequiredCoupledVar("relative_density", "Relative UO2 density (1 is fully dense, 0 is no UO2");
+  params.addParam<PostprocessorName>("fission_rate",
+                                     1e-8,
+                                     "Fission rate per unit volume (uses mesh units defined in the "
+                                     "rasterizer and moose time units)");
+  params.addRequiredCoupledVar("relative_density",
+                               "Relative UO2 density (1 is fully dense, 0 is no UO2");
   return params;
 }
 
-PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters & parameters) :
-    PKAGeneratorBase(parameters),
+PKAFissionFragmentEmpirical::PKAFissionFragmentEmpirical(const InputParameters & parameters)
+  : PKAGeneratorBase(parameters),
     _fission_rate(getPostprocessorValue("fission_rate")),
     _relative_density(coupledValue("relative_density"))
 {
 }
 
 void
-PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
+                                        const MyTRIMRasterizer::PKAParameters & pka_parameters,
+                                        const MyTRIMRasterizer::AveragedData &) const
 {
-  mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
+  const auto dt = pka_parameters._dt;
+  const auto vol = pka_parameters._volume;
+  const auto recoil_rate_scaling = pka_parameters._recoil_rate_scaling;
+
+  mooseAssert(dt >= 0,
+              "Passed a negative time window into PKAFissionFragmentEmpirical::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentEmpirical::appendPKAs");
 
-  unsigned int num_fission = std::floor(recoil_rate_scaling * dt * vol * _fission_rate * _relative_density[0] + getRandomReal());
+  unsigned int num_fission = std::floor(
+      recoil_rate_scaling * dt * vol * _fission_rate * _relative_density[0] + getRandomReal());
 
   /// Mass inverter to sample PKA mass distribution
   MyTRIM_NS::MassInverter mass_inverter;
@@ -64,8 +77,8 @@ PKAFissionFragmentEmpirical::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_li
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    ion1._tag = ionTag(averaged_data._Z, averaged_data._M, ion1._Z, ion1._m);
-    ion2._tag = ionTag(averaged_data._Z, averaged_data._M, ion2._Z, ion2._m);
+    ion1._tag = ionTag(pka_parameters, ion1._Z, ion1._m);
+    ion2._tag = ionTag(pka_parameters, ion2._Z, ion2._m);
 
     // set location of the fission event
     setPosition(ion1);

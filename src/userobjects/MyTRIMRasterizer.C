@@ -15,15 +15,17 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/parallel_algebra.h"
 
+#include <type_traits>
+
 // custom data load and data store methods for a struct with an std::vector member
-template<>
+template <>
 inline void
 dataStore(std::ostream & stream, MyTRIMRasterizer::AveragedData & ad, void * context)
 {
   dataStore(stream, ad._elements, context);
   dataStore(stream, ad._site_volume, context);
 }
-template<>
+template <>
 inline void
 dataLoad(std::istream & stream, MyTRIMRasterizer::AveragedData & ad, void * context)
 {
@@ -31,8 +33,9 @@ dataLoad(std::istream & stream, MyTRIMRasterizer::AveragedData & ad, void * cont
   dataLoad(stream, ad._site_volume, context);
 }
 
-// custom data load and data store methods for a class with virtual members (vtable pointer must not be (un)serialized)
-template<>
+// custom data load and data store methods for a class with virtual members (vtable pointer must not
+// be (un)serialized)
+template <>
 inline void
 dataStore(std::ostream & stream, MyTRIM_NS::IonBase & pl, void * context)
 {
@@ -48,7 +51,7 @@ dataStore(std::ostream & stream, MyTRIM_NS::IonBase & pl, void * context)
   dataStore(stream, pl._Ef, context);
   dataStore(stream, pl._state, context);
 }
-template<>
+template <>
 inline void
 dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
 {
@@ -67,19 +70,25 @@ dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
 
 registerMooseObject("MagpieApp", MyTRIMRasterizer);
 
-template<>
-InputParameters validParams<MyTRIMRasterizer>()
+template <>
+InputParameters
+validParams<MyTRIMRasterizer>()
 {
   InputParameters params = validParams<ElementUserObject>();
-  params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM binary collision Monte Carlo simulation");
+  params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM "
+                             "binary collision Monte Carlo simulation");
   params.addRequiredCoupledVar("var", "Variables to rasterize");
-  params.addCoupledVar("periodic_var", "Optional variables that determines the periodicity. If not supplied the first argument of 'var' will be used.");
+  params.addCoupledVar("periodic_var",
+                       "Optional variables that determines the periodicity. If not supplied the "
+                       "first argument of 'var' will be used.");
   params.addRequiredParam<std::vector<Real>>("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real>>("Z", "Nuclear charge in e");
   params.addParam<std::vector<Real>>("Ebind", "Binding energy in eV");
   params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
-  params.addRequiredParam<MaterialPropertyName>("site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
-  params.addRequiredParam<std::vector<UserObjectName>>("pka_generator", "List of PKA generating user objects");
+  params.addRequiredParam<MaterialPropertyName>(
+      "site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
+  params.addRequiredParam<std::vector<UserObjectName>>("pka_generator",
+                                                       "List of PKA generating user objects");
   ExecFlagEnum setup_options(MooseUtils::getDefaultExecFlagEnum());
 
   // we run this object once a timestep
@@ -88,27 +97,42 @@ InputParameters validParams<MyTRIMRasterizer>()
 
   // which TRIM Module to run for optional capabilities like energy deposition
   MooseEnum trim_module_options("CORE=0 ENERGY_DEPOSITION=1", "CORE");
-  params.addParam<MooseEnum>("trim_module", trim_module_options, "TRIM Module to run for optional capabilities like energy deposition");
+  params.addParam<MooseEnum>("trim_module",
+                             trim_module_options,
+                             "TRIM Module to run for optional capabilities like energy deposition");
 
   // which units of length to use
   MooseEnum length_unit_options("ANGSTROM=0 NANOMETER MICROMETER", "ANGSTROM");
-  params.addParam<MooseEnum>("length_unit", length_unit_options, "Length units of the MOOSE mesh. MyTRIM contains pretabulated crossection data with units so this option must be set correctly to obtain physical results.");
+  params.addParam<MooseEnum>("length_unit",
+                             length_unit_options,
+                             "Length units of the MOOSE mesh. MyTRIM contains pretabulated "
+                             "crossection data with units so this option must be set correctly to "
+                             "obtain physical results.");
 
   // Advanced options
   params.addParam<unsigned int>("interval", 1, "The time step interval at which TRIM BCMC is run");
-  params.addParam<Real>("analytical_energy_cutoff", 0.0, "Energy cutoff in eV below which recoils are not followed explicitly but effects are calculated analytically.");
-  params.addParam<Real>("recoil_rate_scaling", 1.0, "A factor to scale computed reaction rates in the the PKAGenerator objects. This is useful to avoid extremely large PKA lists.");
-  params.addParam<unsigned int>("max_pka_count", "Desired number of PKAs to be run during each invocation of mytrim");
+  params.addParam<Real>("analytical_energy_cutoff",
+                        0.0,
+                        "Energy cutoff in eV below which recoils are not followed explicitly but "
+                        "effects are calculated analytically.");
+  params.addParam<Real>("recoil_rate_scaling",
+                        1.0,
+                        "A factor to scale computed reaction rates in the the PKAGenerator "
+                        "objects. This is useful to avoid extremely large PKA lists.");
+  params.addParam<unsigned int>(
+      "max_pka_count", "Desired number of PKAs to be run during each invocation of mytrim");
   params.addParamNamesToGroup("interval analytical_energy_cutoff max_pka_count", "Advanced");
 
-  params.addParam<Real>("r_rec", "Recombination radius in Angstrom. Frenkel pairs with a separation distance lower than this will be removed from the cascade");
+  params.addParam<Real>("r_rec",
+                        "Recombination radius in Angstrom. Frenkel pairs with a separation "
+                        "distance lower than this will be removed from the cascade");
   params.addParamNamesToGroup("r_rec", "Recombination");
 
   return params;
 }
 
-MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
-    ElementUserObject(parameters),
+MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
+  : ElementUserObject(parameters),
     _nvars(coupledComponents("var")),
     _dim(_mesh.dimension()),
     _var(_nvars),
@@ -141,9 +165,17 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
   if (trim_Z.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
+  // error check masses and charges
   for (unsigned int i = 0; i < _nvars; ++i)
-      if (trim_Z[i] > trim_M[i])
-        mooseError("Value of Z is larger than value of M for entry ", i);
+  {
+    if (trim_Z[i] > trim_M[i])
+      mooseError("Value of Z is larger than value of M for entry ", i);
+    if (trim_Z[i] >= _pka_parameters._index_Z.size())
+      mooseError("Value of Z is too large. Maximum Z supported is ",
+                 _pka_parameters._index_Z.size() - 1,
+                 " but one element has Z=",
+                 i);
+  }
 
   for (unsigned int i = 0; i < _nvars; ++i)
   {
@@ -160,7 +192,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     for (unsigned int i = 0; i < _nvars; ++i)
       _trim_parameters.element_prototypes[i]._Elbind = 3.0;
   else
-    mooseError("Parameter 'Ebind' must have as many components as coupled variables (or left empty for a default of 3eV).");
+    mooseError("Parameter 'Ebind' must have as many components as coupled variables (or left empty "
+               "for a default of 3eV).");
 
   auto trim_Edisp = getParam<std::vector<Real>>("Edisp");
   if (trim_Edisp.size() == _nvars)
@@ -170,7 +203,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     for (unsigned int i = 0; i < _nvars; ++i)
       _trim_parameters.element_prototypes[i]._Edisp = 25.0;
   else
-    mooseError("Parameter 'Edisp' must have as many components as coupled variables (or left empty for a default of 25eV).");
+    mooseError("Parameter 'Edisp' must have as many components as coupled variables (or left empty "
+               "for a default of 25eV).");
 
   if (isParamValid("r_rec"))
   {
@@ -214,6 +248,28 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters) :
     default:
       mooseError("Unknown length unit.");
   }
+
+  // setup invariant PKA generation parameters
+  for (auto & nZ : _pka_parameters._index_Z)
+    nZ = std::make_pair(0, 0);
+  _pka_parameters._mass_charge_pair.resize(_nvars);
+  _pka_parameters._recoil_rate_scaling = _trim_parameters.recoil_rate_scaling;
+  for (unsigned int i = 0; i < _nvars; ++i)
+  {
+    const auto Z = _trim_parameters.element_prototypes[i]._Z;
+
+    // insert (mass, charge) pair
+    _pka_parameters._mass_charge_pair[i] =
+        std::make_pair(_trim_parameters.element_prototypes[i]._m, Z);
+
+    // increase the count of elements with the same Z
+    auto & index_Z = _pka_parameters._index_Z[Z];
+    index_Z.first++;
+
+    // only set this to the first index (important for ionTag())
+    if (index_Z.first == 1)
+      index_Z.second = i;
+  }
 }
 
 bool
@@ -238,6 +294,9 @@ MyTRIMRasterizer::initialize()
     _material_map.clear();
     _pka_list.clear();
   }
+
+  /// setup global PKA parameters for the current timestep
+  _pka_parameters._dt = _accumulated_time + _fe_problem.dt();
 }
 
 void
@@ -260,12 +319,7 @@ MyTRIMRasterizer::execute()
 
     // average compositions on the element
     for (unsigned int i = 0; i < _nvars; ++i)
-    {
-
       average._elements[i] += qpvol * (*_var[i])[qp];
-      average._M[i] = _trim_parameters.element_prototypes[i]._m;
-      average._Z[i] = _trim_parameters.element_prototypes[i]._Z;
-    }
 
     // average site volume property
     average._site_volume += qpvol * _site_volume_prop[qp];
@@ -283,13 +337,16 @@ MyTRIMRasterizer::execute()
   // store in map
   _material_map[_current_elem->id()] = average;
 
+  // update corrent element volume
+  _pka_parameters._volume = vol;
+
   // add PKAs for current element
   for (auto && gen : _pka_generators)
-    gen->appendPKAs(_pka_list, _accumulated_time + _fe_problem.dt(), vol, _trim_parameters.recoil_rate_scaling, average);
+    gen->appendPKAs(_pka_list, _pka_parameters, average);
 }
 
 void
-MyTRIMRasterizer::threadJoin(const UserObject &y)
+MyTRIMRasterizer::threadJoin(const UserObject & y)
 {
   // if the map needs to be updated we merge the maps from all threads
   if (_execute_this_timestep)
@@ -348,8 +405,7 @@ MyTRIMRasterizer::finalize()
 
     // sort PKA list only on processor 0 & assign random number seeds
     std::sort(_pka_list.begin(), _pka_list.end(), [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b) {
-      return (a._pos < b._pos) ||
-             (a._pos == b._pos && a._m < b._m) ||
+      return (a._pos < b._pos) || (a._pos == b._pos && a._m < b._m) ||
              (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
              (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
     });
@@ -361,7 +417,8 @@ MyTRIMRasterizer::finalize()
 
   // rejection is performed in processor 0 only
   _trim_parameters.original_npka = _pka_list.size();
-  if (_trim_parameters.desired_npka == 0 || _trim_parameters.desired_npka > _trim_parameters.original_npka)
+  if (_trim_parameters.desired_npka == 0 ||
+      _trim_parameters.desired_npka > _trim_parameters.original_npka)
   {
     _trim_parameters.scaled_npka = _trim_parameters.original_npka;
     _trim_parameters.result_scaling_factor = 1.0 / _trim_parameters.recoil_rate_scaling;
@@ -370,7 +427,8 @@ MyTRIMRasterizer::finalize()
   {
     if (processor_id() == 0)
     {
-      Real acceptance_probability = Real(_trim_parameters.desired_npka) / Real(_trim_parameters.original_npka);
+      Real acceptance_probability =
+          Real(_trim_parameters.desired_npka) / Real(_trim_parameters.original_npka);
 
       // most straight-forward but probably inefficient implementation of rejection
       std::vector<MyTRIM_NS::IonBase> old_pka_list = _pka_list;
@@ -381,7 +439,9 @@ MyTRIMRasterizer::finalize()
 
       // save the size of the PKA list after rejection & the scaling factor
       _trim_parameters.scaled_npka = _pka_list.size();
-      _trim_parameters.result_scaling_factor = Real(_trim_parameters.original_npka) / Real(_trim_parameters.scaled_npka) / _trim_parameters.recoil_rate_scaling;
+      _trim_parameters.result_scaling_factor = Real(_trim_parameters.original_npka) /
+                                               Real(_trim_parameters.scaled_npka) /
+                                               _trim_parameters.recoil_rate_scaling;
     }
 
     // need to broadcast the size of the PKA list after rejection & result scaling factor
@@ -417,7 +477,7 @@ MyTRIMRasterizer::finalize()
     // split PKAs into per-processor ranges
     std::vector<unsigned int> interval(_app.n_processors() + 1, 0);
     for (unsigned int i = 0; i < _app.n_processors(); ++i)
-      interval[i+1] = (_pka_list.size() - interval[i]) / (_app.n_processors() - i) + interval[i];
+      interval[i + 1] = (_pka_list.size() - interval[i]) / (_app.n_processors() - i) + interval[i];
 
     auto begin = interval[processor_id()];
     auto end = interval[processor_id() + 1];
@@ -486,7 +546,8 @@ MyTRIMRasterizer::serialize(std::string & serialized_buffer)
 void
 MyTRIMRasterizer::deserialize(std::vector<std::string> & serialized_buffers)
 {
-  mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
+  mooseAssert(serialized_buffers.size() == _app.n_processors(),
+              "Unexpected size of serialized_buffers: " << serialized_buffers.size());
 
   // The input string stream used for deserialization
   std::istringstream iss;

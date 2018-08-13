@@ -24,10 +24,8 @@ class PKAGeneratorAlphaDecay : public PKAGeneratorBase
 public:
   PKAGeneratorAlphaDecay(const InputParameters & parameters);
 
-  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
-                          Real dt,
-                          Real vol,
-                          Real recoil_rate_scaling,
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
+                          const MyTRIMRasterizer::PKAParameters &,
                           const MyTRIMRasterizer::AveragedData &) const override;
 
   /// this stores the decay information for a single alpha decaying nuclide
