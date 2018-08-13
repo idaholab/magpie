@@ -38,4 +38,19 @@
     recover = false
     cli_args = "Outputs/file_base=polyatomic_cascade_recoil_scaled_out UserObjects/constant/pka_rate=0.01 UserObjects/rasterizer/max_pka_count=1000 UserObjects/rasterizer/recoil_rate_scaling=0.8"
   [../]
+  [./tagging_default]
+    type = 'Exodiff'
+    input = 'tagging.i'
+    exodiff = 'tagging_out.e'
+    abs_zero = 1e-6
+    recover = false
+  [../]
+  [./tagging_all_Xe]
+    type = 'Exodiff'
+    input = 'tagging.i'
+    exodiff = 'tagging_all_Xe_out.e'
+    abs_zero = 1e-6
+    cli_args = "Outputs/file_base=tagging_all_Xe_out UserObjects/rasterizer/Mtol='0.5 0.5 4'"
+    recover = false
+  [../]
 []
