@@ -53,11 +53,8 @@ PKAGeneratorBase::ionTag(const MyTRIMRasterizer::PKAParameters & pka_parameters,
     if (mZ[i].second == Z && mZ[i].first == m)
       return i;
 
-  mooseError("Unexpectedly did not find the element with Z=",
-             Z,
-             " m=",
-             m,
-             ". Inconsistency in _numZ and _single_Z_index.");
+  // no matching mass (isotope) found for the given Z
+  return -1;
 }
 
 void
