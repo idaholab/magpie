@@ -11,12 +11,15 @@
 
 registerMooseObject("MagpieApp", PKAFixedPointGenerator);
 
-template<>
-InputParameters validParams<PKAFixedPointGenerator>()
+template <>
+InputParameters
+validParams<PKAFixedPointGenerator>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addClassDescription("This PKAGenerator starts particle from a fixed point in a random direction (isotropically).");
-  params.addParam<unsigned int>("num_pkas", 1000, "The number of PKAs to be started from this position");
+  params.addClassDescription("This PKAGenerator starts particle from a fixed point in a random "
+                             "direction (isotropically).");
+  params.addParam<unsigned int>(
+      "num_pkas", 1000, "The number of PKAs to be started from this position");
   params.addRequiredParam<Point>("point", "The point from which the PKAs are started");
   params.addRequiredParam<Real>("Z", "PKA nuclear charge");
   params.addRequiredParam<Real>("m", "PKA mass in amu");
@@ -24,8 +27,8 @@ InputParameters validParams<PKAFixedPointGenerator>()
   return params;
 }
 
-PKAFixedPointGenerator::PKAFixedPointGenerator(const InputParameters & parameters) :
-    PKAGeneratorBase(parameters),
+PKAFixedPointGenerator::PKAFixedPointGenerator(const InputParameters & parameters)
+  : PKAGeneratorBase(parameters),
     _num_pka(getParam<unsigned int>("num_pkas")),
     _point(getParam<Point>("point")),
     _Z(getParam<Real>("Z")),
@@ -38,14 +41,16 @@ PKAFixedPointGenerator::PKAFixedPointGenerator(const InputParameters & parameter
 }
 
 void
-PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real /*dt*/, Real /*vol*/, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
+                                   const MyTRIMRasterizer::PKAParameters & pka_parameters,
+                                   const MyTRIMRasterizer::AveragedData &) const
 {
   if (_current_elem->id() != _elem_id)
     return;
 
   unsigned int num_pka = _num_pka;
-  if (recoil_rate_scaling != 1)
-    num_pka = std::floor(recoil_rate_scaling * _num_pka + getRandomReal());
+  if (pka_parameters._recoil_rate_scaling != 1)
+    num_pka = std::floor(pka_parameters._recoil_rate_scaling * _num_pka + getRandomReal());
 
   for (unsigned i = 0; i < _num_pka; ++i)
   {
@@ -59,7 +64,8 @@ PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, R
 
     // the tag is the element this PKA get registered as upon stopping
     // -1 means the PKA will be ignored
-    pka._tag = ionTag(averaged_data._Z, averaged_data._M, pka._Z, pka._m);;
+    pka._tag = ionTag(pka_parameters, pka._Z, pka._m);
+    ;
 
     // set stopping criteria
     pka.setEf();

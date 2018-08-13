@@ -12,20 +12,24 @@
 
 registerMooseObject("MagpieApp", PKAGeneratorAlphaDecay);
 
-template<>
-InputParameters validParams<PKAGeneratorAlphaDecay>()
+template <>
+InputParameters
+validParams<PKAGeneratorAlphaDecay>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addClassDescription("A PKAGenerator for starting alpha particles from decay\nDecay data is retrieved from file data/alpha_decay/alpha_decay.txt");
-  params.addRequiredParam<std::vector<unsigned int>>("ZAID", "The Z/A ids corresponding to the var arguments in the rasterizer [1e4 * A + 10 * Z + state]");
+  params.addClassDescription("A PKAGenerator for starting alpha particles from decay\nDecay data "
+                             "is retrieved from file data/alpha_decay/alpha_decay.txt");
+  params.addRequiredParam<std::vector<unsigned int>>("ZAID",
+                                                     "The Z/A ids corresponding to the var "
+                                                     "arguments in the rasterizer [1e4 * A + 10 * "
+                                                     "Z + state]");
   MooseEnum timeUnit("second=0 millisecond=1 microsecond=2", "second");
   params.addParam<MooseEnum>("time_unit", timeUnit, "Unit of time used in this model");
   return params;
 }
 
-PKAGeneratorAlphaDecay::PKAGeneratorAlphaDecay(const InputParameters & parameters) :
-    PKAGeneratorBase(parameters),
-    _zaids(getParam<std::vector<unsigned int>>("ZAID"))
+PKAGeneratorAlphaDecay::PKAGeneratorAlphaDecay(const InputParameters & parameters)
+  : PKAGeneratorBase(parameters), _zaids(getParam<std::vector<unsigned int>>("ZAID"))
 {
   switch (getParam<MooseEnum>("time_unit"))
   {
@@ -97,25 +101,32 @@ PKAGeneratorAlphaDecay::readAlphaData()
     }
   }
 
-  // in debug mode we want some info on what is stored in _decay_data_sets
-  #if DEBUG
-    _console << "\nAlpha decay read from file\n";
-    for (auto & d : _decay_data_sets)
-    {
-      _console << "ZAID: " << d.first << " has " << d.second.size() << " decay channels:\n";
-      for (unsigned int j = 0; j < d.second.size(); ++j)
-        _console << "lambda = " << d.second[j]._decay_constants << " "
-                 << "energy = " << d.second[j]._alpha_energies << " "
-                 << "intensity = " << d.second[j]._intensities << "\n";
-    }
-    _console << std::endl;
-  #endif
+// in debug mode we want some info on what is stored in _decay_data_sets
+#if DEBUG
+  _console << "\nAlpha decay read from file\n";
+  for (auto & d : _decay_data_sets)
+  {
+    _console << "ZAID: " << d.first << " has " << d.second.size() << " decay channels:\n";
+    for (unsigned int j = 0; j < d.second.size(); ++j)
+      _console << "lambda = " << d.second[j]._decay_constants << " "
+               << "energy = " << d.second[j]._alpha_energies << " "
+               << "intensity = " << d.second[j]._intensities << "\n";
+  }
+  _console << std::endl;
+#endif
 }
 
 void
-PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, Real dt, Real vol, Real recoil_rate_scaling, const MyTRIMRasterizer::AveragedData & averaged_data) const
+PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
+                                   const MyTRIMRasterizer::PKAParameters & pka_parameters,
+                                   const MyTRIMRasterizer::AveragedData & averaged_data) const
 {
-  mooseAssert(dt >= 0, "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
+  const auto dt = pka_parameters._dt;
+  const auto vol = pka_parameters._volume;
+  const auto recoil_rate_scaling = pka_parameters._recoil_rate_scaling;
+
+  mooseAssert(dt >= 0,
+              "Passed a negative time window into PKAFissionFragmentNeutronics::appendPKAs");
   mooseAssert(vol >= 0, "Passed a negative volume into PKAFissionFragmentNeutronics::appendPKAs");
 
   if (averaged_data._elements.size() != _zaids.size())
@@ -133,8 +144,10 @@ PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, R
     auto & decay = it->second;
     for (unsigned int l = 0; l < decay.size(); ++l)
     {
-      unsigned int num_decay = std::floor(recoil_rate_scaling * vol * decay[l]._intensities * averaged_data._elements[nuclide]
-                                              * (1.0 - std::exp(-decay[l]._decay_constants * dt)) + getRandomReal());
+      unsigned int num_decay = std::floor(recoil_rate_scaling * vol * decay[l]._intensities *
+                                              averaged_data._elements[nuclide] *
+                                              (1.0 - std::exp(-decay[l]._decay_constants * dt)) +
+                                          getRandomReal());
 
       for (unsigned i = 0; i < num_decay; ++i)
       {
@@ -155,8 +168,8 @@ PKAGeneratorAlphaDecay::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list, R
         ion[1]._Z = parent_Z - 2;
         ion[1]._m = parent_A - 4;
 
-        ion[0]._tag = ionTag(averaged_data._Z, averaged_data._M, ion[0]._Z, ion[0]._m);
-        ion[1]._tag = ionTag(averaged_data._Z, averaged_data._M, ion[1]._Z, ion[1]._m);
+        ion[0]._tag = ionTag(pka_parameters, ion[0]._Z, ion[0]._m);
+        ion[1]._tag = ionTag(pka_parameters, ion[1]._Z, ion[1]._m);
 
         // set the energies; use momentum conservation
         ion[0]._E = decay[l]._alpha_energies;

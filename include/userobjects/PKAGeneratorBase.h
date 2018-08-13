@@ -31,10 +31,8 @@ public:
    * Append the ions for the current element and time window dt.
    * The element volume is passed in as it is computed in the MyTRIMRasterizer anyways.
    */
-  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
-                          Real dt,
-                          Real vol,
-                          Real recoil_rate_scaling,
+  virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
+                          const MyTRIMRasterizer::PKAParameters &,
                           const MyTRIMRasterizer::AveragedData &) const = 0;
 
   virtual void initialize() {}
@@ -54,10 +52,7 @@ protected:
   }
 
   /// finds the right ion tag; -1 means that the nuclide is not tracked, otherwise the index in the rasterizer nuclide vector must be retrieved
-  int ionTag(const std::vector<Real> & rasterizer_Z,
-             const std::vector<Real> & rasterizer_m,
-             Real Z,
-             Real m) const;
+  int ionTag(const MyTRIMRasterizer::PKAParameters &, Real Z, Real m) const;
 };
 
 #endif // PKAGENERATORBASE_H
