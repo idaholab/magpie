@@ -10,16 +10,18 @@
 #include "MagpieUtils.h"
 #include <algorithm>
 
-template<>
-InputParameters validParams<PKAGeneratorBase>()
+template <>
+InputParameters
+validParams<PKAGeneratorBase>()
 {
   InputParameters params = validParams<DiscreteElementUserObject>();
-  params.addClassDescription("PKA generator user object base class.\n Takes pdf and samples PKAs due to various interactions.");
+  params.addClassDescription("PKA generator user object base class.\n Takes pdf and samples PKAs "
+                             "due to various interactions.");
   return params;
 }
 
-PKAGeneratorBase::PKAGeneratorBase(const InputParameters & parameters) :
-    DiscreteElementUserObject(parameters)
+PKAGeneratorBase::PKAGeneratorBase(const InputParameters & parameters)
+  : DiscreteElementUserObject(parameters)
 {
   setRandomResetFrequency(EXEC_TIMESTEP_END);
 }
@@ -31,23 +33,31 @@ PKAGeneratorBase::setPosition(MyTRIM_NS::IonBase & ion) const
 }
 
 int
-PKAGeneratorBase::ionTag(const std::vector<Real> & rasterizer_Z, const std::vector<Real> & rasterizer_m, Real Z, Real m) const
+PKAGeneratorBase::ionTag(const MyTRIMRasterizer::PKAParameters & pka_parameters,
+                         Real Z,
+                         Real m) const
 {
-  // this function relies on the exact representation of whole numbers in IEEE floating point numbers
-  // up to a reasonable upper limit [Z < m < 300]
-  unsigned int count = std::count(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
-  if (count == 1)
-  {
-    const auto & it = std::find(rasterizer_Z.begin(), rasterizer_Z.end(), Z);
-    mooseAssert(it != rasterizer_Z.end(), "Z position in rasterizer_Z was unexpectedly not found");
-    unsigned int index = std::distance(rasterizer_Z.begin(), it);
-    return index;
-  }
-  else if (count > 1)
-    for (unsigned int j = 0; j < rasterizer_Z.size(); ++j)
-      if (rasterizer_Z[j] == Z && rasterizer_m[j] == m)
-        return j;
-  return -1;
+  // this function relies on the exact representation of whole numbers in IEEE floating point
+  // numbers up to a reasonable upper limit [Z < m < 300]
+
+  // element not found in rasterizer table
+  if (pka_parameters._num_Z[Z] == 0)
+    return -1;
+
+  if (pka_parameters._num_Z[Z] == 1)
+    return pka_parameters._single_Z_index[Z];
+
+  const auto & mZ = pka_parameters._mass_charge_pair;
+  // start the search at the firsat matching Z
+  for (auto i = pka_parameters._single_Z_index[Z]; i < mZ.size(); ++i)
+    if (mZ[i].second == Z && mZ[i].first == m)
+      return i;
+
+  mooseError("Unexpectedly did not find the element with Z=",
+             Z,
+             " m=",
+             m,
+             ". Inconsistency in _numZ and _single_Z_index.");
 }
 
 void

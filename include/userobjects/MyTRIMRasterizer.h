@@ -12,6 +12,7 @@
 #include "ElementUserObject.h"
 
 #include <map>
+#include <array>
 #include <vector>
 
 #include "mytrim/ion.h"
@@ -57,15 +58,31 @@ public:
   /// element averaged data
   struct AveragedData
   {
-    AveragedData(unsigned int nvars = 0)
-      : _elements(nvars, 0.0), _Z(nvars, 0.0), _M(nvars, 0.0), _site_volume(0.0)
-    {
-    }
+    AveragedData(unsigned int nvars = 0) : _elements(nvars, 0.0), _site_volume(0.0) {}
 
     std::vector<Real> _elements;
-    std::vector<Real> _Z;
-    std::vector<Real> _M;
     Real _site_volume;
+  };
+
+  struct PKAParameters
+  {
+    /// masses charges (m_i, Z_i) of the matrix elements
+    std::vector<std::pair<Real, Real>> _mass_charge_pair;
+
+    /// how many isotopes to we have for each element? (only support up to Z=119!)
+    std::array<unsigned int, 120> _num_Z;
+
+    /// if only one element with a specific Z is present point to its rasterizer index here for fast lookup
+    std::array<std::size_t, 120> _single_Z_index;
+
+    /// time interval over which the PKAs are added
+    Real _dt;
+
+    /// recoil rate scaling
+    Real _recoil_rate_scaling;
+
+    /// current element volume
+    Real _volume;
   };
 
   enum TRIMModuleEnum
@@ -141,6 +158,9 @@ protected:
   /// Simulation parameters
   TrimParameters _trim_parameters;
 
+  /// Global (non-spatial dependent) parameters required for PKA generation
+  PKAParameters _pka_parameters;
+
   /// coupled variable values
   std::vector<const VariableValue *> _var;
 
@@ -152,7 +172,7 @@ protected:
   std::vector<const PKAGeneratorBase *> _pka_generators;
   /// @}
 
-  /// @{ material map for the TRIM simulation
+  /// @{ material map for the TRIM simulation (spatial dependent)
   typedef std::map<dof_id_type, AveragedData> MaterialMap;
   MaterialMap _material_map;
   /// @}
