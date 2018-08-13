@@ -15,6 +15,8 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/parallel_algebra.h"
 
+#include <type_traits>
+
 // custom data load and data store methods for a struct with an std::vector member
 template <>
 inline void
@@ -163,9 +165,17 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
   if (trim_Z.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
 
+  // error check masses and charges
   for (unsigned int i = 0; i < _nvars; ++i)
+  {
     if (trim_Z[i] > trim_M[i])
       mooseError("Value of Z is larger than value of M for entry ", i);
+    if (trim_Z[i] >= _pka_parameters._index_Z.size())
+      mooseError("Value of Z is too large. Maximum Z supported is ",
+                 _pka_parameters._index_Z.size() - 1,
+                 " but one element has Z=",
+                 i);
+  }
 
   for (unsigned int i = 0; i < _nvars; ++i)
   {
@@ -240,8 +250,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
   }
 
   // setup invariant PKA generation parameters
-  for (auto & nZ : _pka_parameters._num_Z)
-    nZ = 0;
+  for (auto & nZ : _pka_parameters._index_Z)
+    nZ = std::make_pair(0, 0);
   _pka_parameters._mass_charge_pair.resize(_nvars);
   _pka_parameters._recoil_rate_scaling = _trim_parameters.recoil_rate_scaling;
   for (unsigned int i = 0; i < _nvars; ++i)
@@ -253,12 +263,12 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
         std::make_pair(_trim_parameters.element_prototypes[i]._m, Z);
 
     // increase the count of elements with the same Z
-    auto & num_Z = _pka_parameters._num_Z[Z];
-    num_Z++;
+    auto & index_Z = _pka_parameters._index_Z[Z];
+    index_Z.first++;
 
     // only set this to the first index (important for ionTag())
-    if (num_Z == 1)
-      _pka_parameters._single_Z_index[Z] = i;
+    if (index_Z.first == 1)
+      index_Z.second = i;
   }
 }
 

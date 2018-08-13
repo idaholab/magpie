@@ -69,11 +69,9 @@ public:
     /// masses charges (m_i, Z_i) of the matrix elements
     std::vector<std::pair<Real, Real>> _mass_charge_pair;
 
-    /// how many isotopes to we have for each element? (only support up to Z=119!)
-    std::array<unsigned int, 120> _num_Z;
-
-    /// if only one element with a specific Z is present point to its rasterizer index here for fast lookup
-    std::array<std::size_t, 120> _single_Z_index;
+    /// how many isotopes to we have for each element and which index contains the
+    /// first Z match? (only support up to Z=119!)
+    std::array<std::pair<unsigned int, std::size_t>, 120> _index_Z;
 
     /// time interval over which the PKAs are added
     Real _dt;

@@ -41,15 +41,15 @@ PKAGeneratorBase::ionTag(const MyTRIMRasterizer::PKAParameters & pka_parameters,
   // numbers up to a reasonable upper limit [Z < m < 300]
 
   // element not found in rasterizer table
-  if (pka_parameters._num_Z[Z] == 0)
+  if (pka_parameters._index_Z[Z].first == 0)
     return -1;
 
-  if (pka_parameters._num_Z[Z] == 1)
-    return pka_parameters._single_Z_index[Z];
+  if (pka_parameters._index_Z[Z].first == 1)
+    return pka_parameters._index_Z[Z].second;
 
   const auto & mZ = pka_parameters._mass_charge_pair;
   // start the search at the firsat matching Z
-  for (auto i = pka_parameters._single_Z_index[Z]; i < mZ.size(); ++i)
+  for (auto i = pka_parameters._index_Z[Z].second; i < mZ.size(); ++i)
     if (mZ[i].second == Z && mZ[i].first == m)
       return i;
 
