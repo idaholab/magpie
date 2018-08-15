@@ -9,16 +9,15 @@ ifeq ($(wildcard $(GSL_DIR)/Makefile.am),)
 endif
 
 #
-# Set gsl as a dependency for magpie
+# Symlink GSL includes
 #
 
-$(APPLICATION_DIR)/lib/libmagpie-$(METHOD).la: $(GSL_DIR)/libgsl.la
-
-#
-# compile and build gsl first! (if no command line target was specified)
-#
-
-ifeq ($(MAKECMDGOALS),)
+ADDITIONAL_INCLUDES += -I$(MAGPIE_DIR)/contrib/gsl
+ADDITIONAL_CPPFLAGS += -DGSL_ENABLED
+contrib/gsl/gsl/.linked : $(MAGPIE_DIR)/.git/modules/contrib/gsl/HEAD
+	@ln -sf `find $(GSL_DIR) -name gsl_\*.h -not -path $(GSL_DIR)/gsl` $(GSL_DIR)/gsl
+	@touch $(MAGPIE_DIR)/contrib/gsl/gsl/.linked
+all:: contrib/gsl/gsl/.linked
 
 # configure GSL
 ifeq ($(shell [ ! -s $(GSL_DIR)/Makefile -o $(GSL_DIR)/configure -nt $(GSL_DIR)/Makefile ] && echo go),go)
@@ -26,14 +25,10 @@ $(info Configuring GSL...)
 $(info $(shell cd $(GSL_DIR) && ./configure))
 endif
 
-# make GSL
-ifeq ($(shell [ ! -s $(GSL_DIR)/libgsl.la -o $(GSL_DIR)/Makefile -nt $(GSL_DIR)/libgsl.la ] && echo go),go)
-$(info Building GSL...)
-$(info $(shell $(MAKE) -C $(GSL_DIR)))
-endif
-endif
-
-ADDITIONAL_INCLUDES += -I$(GSL_DIR)
-ADDITIONAL_CPPFLAGS += -DGSL_ENABLED
-ADDITIONAL_LIBS += -L$(GSL_DIR) -lgsl -L$(GSL_DIR)/cblas -lgslcblas -I$(GSL_DIR)
-ADDITIONAL_APP_DEPS += $(APPLICATION_DIR)/contrib/gsl.d
+# make gsl modules
+define GSL_MODULE_RULE
+ADDITIONAL_APP_OBJECTS += $(GSL_DIR)/$(strip $(1))/libgsl$(strip $(1)).la
+$(GSL_DIR)/$(strip $(1))/libgsl$(strip $(1)).la: $(shell find $(GSL_DIR)/$(strip $(1)) -name "*.c" -or -name "*.h")
+	$(MAKE) -C $(GSL_DIR)/$(strip $(1))
+endef
+$(foreach module,sys specfunc integration err eigen complex vector linalg matrix block blas permutation cblas, $(eval $(call GSL_MODULE_RULE, $(module))))
