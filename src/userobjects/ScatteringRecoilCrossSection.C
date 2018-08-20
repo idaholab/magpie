@@ -71,15 +71,17 @@ ScatteringRecoilCrossSection::ScatteringRecoilCrossSection(const InputParameters
     _scattering_cross_section[j] = &getFunctionByName(xs_names[j]);
 
   // set up integration rule
-  const gsl_integration_fixed_type * qtpe = gsl_integration_fixed_legendre;
-  gsl_integration_fixed_workspace * workspace =
-      gsl_integration_fixed_alloc(qtpe, _quad_order, -1.0, 1.0, 0.0, 0.0);
-  for (unsigned int j = 0; j < _quad_order; ++j)
+  auto * qp_table = gsl_integration_glfixed_table_alloc(_quad_order);
+  _quad_points.resize(_quad_order);
+  _quad_weights.resize(_quad_order);
+  for (std::size_t j = 0; j < _quad_order; ++j)
   {
-    _quad_points.push_back(workspace->x[j]);
-    _quad_weights.push_back(workspace->weights[j]);
+    double point, weight;
+    gsl_integration_glfixed_point(-1.0, 1.0, j, &point, &weight, qp_table);
+    _quad_points[j] = point;
+    _quad_weights[j] = weight;
   }
-  gsl_integration_fixed_free(workspace);
+  gsl_integration_glfixed_table_free(qp_table);
 
   _alpha = std::pow(((_atomic_mass - 1) / (_atomic_mass + 1)), 2);
   _gamma = 4 * _atomic_mass / std::pow((_atomic_mass + 1), 2);
