@@ -5,7 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
-
+#ifdef GSL_ENABLED
 
 #include "ScatteringRecoilCrossSection.h"
 #include "MagpieUtils.h"
@@ -20,28 +20,33 @@ InputParameters
 validParams<ScatteringRecoilCrossSection>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params.addClassDescription("Base class for computing recoil scattering cross sections for a single isotope."
-      "It outputs the coefficients for the Legendre expansion of the cross section up to the specified Legendre expansion order"
-      "polynomials l, neutron energy groups g and recoil energy bins t. It also outputs the maximum and mininum"
+  params.addClassDescription(
+      "Base class for computing recoil scattering cross sections for a single isotope."
+      "It outputs the coefficients for the Legendre expansion of the cross section up to the "
+      "specified Legendre expansion order"
+      "polynomials l, neutron energy groups g and recoil energy bins t. It also outputs the "
+      "maximum and mininum"
       "cosines of the recoil atom in the laboratory frame.");
-  params.addParam<unsigned int>(
-      "quadrature_order", 400, "Quadrature order for integration");
-  params.addParam<Real>(
-      "atomic_mass", 1, "Atomic Mass of the isotope. Default to Hydrogen A = 1");
+  params.addParam<unsigned int>("quadrature_order", 400, "Quadrature order for integration");
+  params.addParam<Real>("atomic_mass", 1, "Atomic Mass of the isotope. Default to Hydrogen A = 1");
   params.addRequiredParam<std::vector<Real>>(
-      "neutron_energy_limits", "Energy limits of the incident neutron in [eV] and descending order");
+      "neutron_energy_limits",
+      "Energy limits of the incident neutron in [eV] and descending order");
   params.addRequiredParam<std::vector<Real>>(
       "recoil_energy_limits", "Energy limits of the recoil atom in [eV] and descending order");
-  params.addRequiredParam<FunctionName>(
-      "neutron_spectrum","Function representing the reactor neutron spectrum");
-  params.addRequiredParam<std::vector<FunctionName>>(
-      "scattering_xs", "Functions representing the neutron cross sections. NOTE: this is a vector to allow separate inputs for inelastic modes.");
+  params.addRequiredParam<FunctionName>("neutron_spectrum",
+                                        "Function representing the reactor neutron spectrum");
+  params.addRequiredParam<std::vector<FunctionName>>("scattering_xs",
+                                                     "Functions representing the neutron cross "
+                                                     "sections. NOTE: this is a vector to allow "
+                                                     "separate inputs for inelastic modes.");
   params.addParam<unsigned int>(
       "legendre_order", 10, "Order of Legendre polynomials where n = 0, ..., 10. Default to P10");
   params.addParam<std::string>(
-      "cross_section_output_filename", "Name of the output file with the cross section coefficients (.csv)");
-  params.addParam<std::string>(
-      "mu_L_output_filename", "Name of the output file with the mininum and maximum mu_L (.csv)");
+      "cross_section_output_filename",
+      "Name of the output file with the cross section coefficients (.csv)");
+  params.addParam<std::string>("mu_L_output_filename",
+                               "Name of the output file with the mininum and maximum mu_L (.csv)");
   return params;
 }
 
@@ -56,7 +61,8 @@ ScatteringRecoilCrossSection::ScatteringRecoilCrossSection(const InputParameters
     _recoil_energy_limits(getParam<std::vector<Real>>("recoil_energy_limits"))
 {
   if (isParamValid("cross_section_output_filename") ^ isParamValid("mu_L_output_filename"))
-    mooseError("cross_section_output_filename and mu_L_output_filename must either both be present or absent");
+    mooseError("cross_section_output_filename and mu_L_output_filename must either both be present "
+               "or absent");
 
   // get scattering cross sections
   std::vector<FunctionName> xs_names = getParam<std::vector<FunctionName>>("scattering_xs");
@@ -65,17 +71,20 @@ ScatteringRecoilCrossSection::ScatteringRecoilCrossSection(const InputParameters
     _scattering_cross_section[j] = &getFunctionByName(xs_names[j]);
 
   // set up integration rule
-  const gsl_integration_fixed_type * qtpe = gsl_integration_fixed_legendre;
-  gsl_integration_fixed_workspace * workspace = gsl_integration_fixed_alloc(qtpe, _quad_order, -1.0, 1.0, 0.0, 0.0);
-  for (unsigned int j = 0; j < _quad_order; ++j)
+  auto * qp_table = gsl_integration_glfixed_table_alloc(_quad_order);
+  _quad_points.resize(_quad_order);
+  _quad_weights.resize(_quad_order);
+  for (std::size_t j = 0; j < _quad_order; ++j)
   {
-    _quad_points.push_back(workspace->x[j]);
-    _quad_weights.push_back(workspace->weights[j]);
+    double point, weight;
+    gsl_integration_glfixed_point(-1.0, 1.0, j, &point, &weight, qp_table);
+    _quad_points[j] = point;
+    _quad_weights[j] = weight;
   }
-  gsl_integration_fixed_free(workspace);
+  gsl_integration_glfixed_table_free(qp_table);
 
   _alpha = std::pow(((_atomic_mass - 1) / (_atomic_mass + 1)), 2);
-  _gamma = 4 * _atomic_mass / std::pow(( _atomic_mass + 1), 2);
+  _gamma = 4 * _atomic_mass / std::pow((_atomic_mass + 1), 2);
   _G = _neutron_energy_limits.size() - 1;
   _T = _recoil_energy_limits.size() - 1;
 }
@@ -178,7 +187,8 @@ ScatteringRecoilCrossSection::finalize()
   output_file2 << "Neutron group,";
   for (unsigned int t = 0; t < _T; ++t)
   {
-    output_file2 << "Recoil group t = " << t << " mu_min," << "Recoil group t = " << t << " mu_max";
+    output_file2 << "Recoil group t = " << t << " mu_min,"
+                 << "Recoil group t = " << t << " mu_max";
     if (t != _T - 1)
       output_file2 << ",";
   }
@@ -250,3 +260,5 @@ ScatteringRecoilCrossSection::isRecoilPossible(unsigned int g, unsigned int t) c
 {
   return !(_mu_L[t][g][0] == -1 && _mu_L[t][g][1] == -1);
 }
+
+#endif

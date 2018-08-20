@@ -3,41 +3,48 @@
     type = 'RunApp'
     input = 'erxs_H1_simple.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./erxs_H1_spectrum]
     type = 'RunApp'
     input = 'erxs_H1_spectrum.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./erxs_H1_spectrum_xs]
     type = 'RunApp'
     input = 'erxs_H1_spectrum_xs.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./erxs_C12_simple]
     type = 'RunApp'
     input = 'erxs_C12_simple.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./erxs_C12_spectrum]
     type = 'RunApp'
     input = 'erxs_C12_spectrum.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./erxs_C12_spectrum_xs]
     type = 'RunApp'
     input = 'erxs_C12_spectrum_xs.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 
   [./angular_distribution_benchmark]
     type = 'RunApp'
     input = 'angular_distribution_benchmark.i'
     check_input = True
+    required_objects = ElasticRecoil
   [../]
 []

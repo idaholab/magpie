@@ -5,7 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
-
+#ifdef GSL_ENABLED
 
 #include "InelasticRecoil.h"
 #include "MagpieUtils.h"
@@ -22,8 +22,10 @@ InputParameters
 validParams<InelasticRecoil>()
 {
   InputParameters params = validParams<ScatteringRecoilCrossSection>();
-  params.addClassDescription("Computes recoil cross sections for inelastic scattering events. Allows output to csv.");
-  params.addRequiredParam<std::vector<Real>>("Q", "The Q values for all inelastic reaction channels.");
+  params.addClassDescription(
+      "Computes recoil cross sections for inelastic scattering events. Allows output to csv.");
+  params.addRequiredParam<std::vector<Real>>("Q",
+                                             "The Q values for all inelastic reaction channels.");
   return params;
 }
 
@@ -33,7 +35,8 @@ InelasticRecoil::InelasticRecoil(const InputParameters & parameters)
     _n_levels(_q_values.size())
 {
   if (_n_levels != _scattering_cross_section.size())
-    mooseError("Number of scattering_xs entries must be equal to number of Q values. Each inelastic mode is represented by one Q value.");
+    mooseError("Number of scattering_xs entries must be equal to number of Q values. Each "
+               "inelastic mode is represented by one Q value.");
 }
 
 Real
@@ -46,8 +49,9 @@ InelasticRecoil::getLabCosine(Real E, Real T, Real Q) const
    * this routine returns one; this is consistent with the case Q = 0, E = 0 => mu_C = -1
    *
    * We also need to guard against the case mu_C > 1 which can occur when mu_L_max is computed
-   * Both P1 = (E_l, T_l) and P2 = (E_l, T_u) can correspond to impermissible states; compare Fig. 3 in writeup.
-   * P1 and P2 can be outside of the permissible range of energies given by the green and blue curves.
+   * Both P1 = (E_l, T_l) and P2 = (E_l, T_u) can correspond to impermissible states; compare Fig. 3
+   * in writeup. P1 and P2 can be outside of the permissible range of energies given by the green
+   * and blue curves.
    */
   Real Eth = std::abs(Q) * (_atomic_mass + 1.0) / _atomic_mass;
   if (E <= Eth || mu_C >= 1)
@@ -189,17 +193,16 @@ InelasticRecoil::execute()
 
               /*
                * Calculate contribution to cross section coefficients
-               * mu_L is scaled from its possible range of values [mu_L_min, mu_L_max] to fit the interval [-1,1]
-               * of the Legendre polynomials
+               * mu_L is scaled from its possible range of values [mu_L_min, mu_L_max] to fit the
+               * interval [-1,1] of the Legendre polynomials
                */
               Real scaled_mu_L = 2 * (mu_L - mu_L_min) / (mu_L_max - mu_L_min) - 1;
 
               Real jacobian_determinant = 2.0 / (_gamma * E * std::sqrt(1 - delta));
-              _recoil_coefficient[l][t][g] += 1 / _xi_g[g] *
-                                      _scattering_cross_section[level]->value(E,Point()) *
-                                      _neutron_spectrum.value(E, Point()) *
-                                      scattering_law * jacobian_determinant *
-                                      gsl_sf_legendre_Pl(l, scaled_mu_L) * w_T * w_E;
+              _recoil_coefficient[l][t][g] +=
+                  1 / _xi_g[g] * _scattering_cross_section[level]->value(E, Point()) *
+                  _neutron_spectrum.value(E, Point()) * scattering_law * jacobian_determinant *
+                  gsl_sf_legendre_Pl(l, scaled_mu_L) * w_T * w_E;
             }
           }
         }
@@ -207,3 +210,5 @@ InelasticRecoil::execute()
     }
   }
 }
+
+#endif
