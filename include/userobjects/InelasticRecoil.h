@@ -5,6 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
+#ifdef GSL_ENABLED
 
 #ifndef INELASTICRECOIL_H
 #define INELASTICRECOIL_H
@@ -43,4 +44,5 @@ protected:
   const unsigned int _n_levels;
 };
 
-#endif
+#endif // INELASTICRECOIL_H
+#endif // GSL_ENABLED
