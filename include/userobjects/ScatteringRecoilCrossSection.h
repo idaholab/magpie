@@ -5,6 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
+#ifdef GSL_ENABLED
 
 #ifndef SCATTERINGRECOILCROSSSECTION_H
 #define SCATTERINGRECOILCROSSSECTION_H
@@ -120,4 +121,5 @@ protected:
   ///@}
 };
 
-#endif
+#endif // SCATTERINGRECOILCROSSSECTION_H
+#endif // GSL_ENABLED

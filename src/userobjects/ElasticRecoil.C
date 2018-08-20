@@ -5,7 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
-
+#ifdef GSL_ENABLED
 
 #include "ElasticRecoil.h"
 #include "MagpieUtils.h"
@@ -22,18 +22,19 @@ InputParameters
 validParams<ElasticRecoil>()
 {
   InputParameters params = validParams<ScatteringRecoilCrossSection>();
-  params.addClassDescription("Computes recoil cross sections for elastic scattering events. Allows output to csv.");
-  params.addRequiredParam<FunctionName>(
-      "scattering_law", "Function representing the scattering law for neutrons");
+  params.addClassDescription(
+      "Computes recoil cross sections for elastic scattering events. Allows output to csv.");
+  params.addRequiredParam<FunctionName>("scattering_law",
+                                        "Function representing the scattering law for neutrons");
   return params;
 }
 
 ElasticRecoil::ElasticRecoil(const InputParameters & parameters)
-  : ScatteringRecoilCrossSection(parameters),
-    _scattering_law(getFunction("scattering_law"))
+  : ScatteringRecoilCrossSection(parameters), _scattering_law(getFunction("scattering_law"))
 {
   if (_scattering_cross_section.size() != 1)
-    mooseError("ElasticRecoil only allows a single input for scattering_xs parameter. Multiple entries are reserved for inelastic scattering modes.");
+    mooseError("ElasticRecoil only allows a single input for scattering_xs parameter. Multiple "
+               "entries are reserved for inelastic scattering modes.");
 }
 
 Real
@@ -104,7 +105,8 @@ ElasticRecoil::execute()
 
           /*
            * Elastic scaterring case III: T_max < T_l, stop
-           * When the maximum recoil energy is lower than the lowest energy of the recoil energy bin t
+           * When the maximum recoil energy is lower than the lowest energy of the recoil energy bin
+           * t
            */
           if (T_max < T_l)
             continue;
@@ -119,8 +121,8 @@ ElasticRecoil::execute()
 
           /*
            * Elastic scaterring case I: T_max > interval, ok
-           * When the maximum recoil energy is greater than the highest energy of the recoil energy bin t
-           * Case II also utilizes this piece of code with T_u = T_max
+           * When the maximum recoil energy is greater than the highest energy of the recoil energy
+           * bin t Case II also utilizes this piece of code with T_u = T_max
            */
           for (unsigned int i_T = 0; i_T < _quad_points.size(); ++i_T)
           {
@@ -129,7 +131,8 @@ ElasticRecoil::execute()
 
             Real w_T = 0.5 * _quad_weights[i_T] * (T_u - T_l);
 
-            // Calculate cosine of recoil angle in the CM frame given the neutron and recoil atom energies
+            // Calculate cosine of recoil angle in the CM frame given the neutron and recoil atom
+            // energies
             Real mu_C = getCMCosine(E, T);
 
             // Calculate cosine of recoil angle in the Lab frame according to geometry rules
@@ -137,19 +140,19 @@ ElasticRecoil::execute()
 
             /*
              * Calculate contribution to cross section coefficients
-             * mu_L is scaled from its possible range of values [mu_L_min, mu_L_max] to fit the interval [-1,1]
-             * of the Legendre polynomials
+             * mu_L is scaled from its possible range of values [mu_L_min, mu_L_max] to fit the
+             * interval [-1,1] of the Legendre polynomials
              */
-             Real scaled_mu_L = 2 * (mu_L - mu_L_min) / (mu_L_max - mu_L_min) - 1;
-            _recoil_coefficient[l][t][g] += 1 / _xi_g[g] *
-                                    _scattering_cross_section[0]->value(E,Point()) *
-                                    _neutron_spectrum.value(E, Point()) *
-                                    _scattering_law.value(mu_C, Point()) *
-                                    2.0 / _gamma / E *
-                                    gsl_sf_legendre_Pl(l, scaled_mu_L) * w_T * w_E;
+            Real scaled_mu_L = 2 * (mu_L - mu_L_min) / (mu_L_max - mu_L_min) - 1;
+            _recoil_coefficient[l][t][g] +=
+                1 / _xi_g[g] * _scattering_cross_section[0]->value(E, Point()) *
+                _neutron_spectrum.value(E, Point()) * _scattering_law.value(mu_C, Point()) * 2.0 /
+                _gamma / E * gsl_sf_legendre_Pl(l, scaled_mu_L) * w_T * w_E;
           }
         }
       }
     }
   }
 }
+
+#endif

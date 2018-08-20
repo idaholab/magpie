@@ -5,6 +5,7 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
+#ifdef GSL_ENABLED
 
 #ifndef ELASTICRECOIL_H
 #define ELASTICRECOIL_H
@@ -34,4 +35,5 @@ protected:
   Function & _scattering_law;
 };
 
+#endif // ELASTICRECOIL_H
 #endif
