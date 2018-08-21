@@ -15,6 +15,7 @@ InputParameters
 validParams<PKAConstant>()
 {
   InputParameters params = validParams<PKAEmpiricalBase>();
+  params.addClassDescription("PKAs with constant mass, charge, energy, and rate");
   params.addParam<Real>(
       "pka_rate",
       1e-8,

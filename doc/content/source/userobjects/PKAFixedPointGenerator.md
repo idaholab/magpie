@@ -1,14 +1,15 @@
-<!-- MOOSE Documentation Stub: Remove this when content is added. -->
-
 # PKAFixedPointGenerator
 
-!alert construction title=Undocumented Class
-The PKAFixedPointGenerator has not been documented, if you would like to contribute to MOOSE by
-writing documentation, please see [/generate.md]. The content contained on this page explains
-the typical documentation associated with a MooseObject; however, what is contained is ultimately
-determined by what is necessary to make the documentation clear for users.
-
 !syntax description /UserObjects/PKAFixedPointGenerator
+
+Launches a given *number* of PKAs from a specified point. Each PKA is assigned a
+random direction. For a generator with a uniform spatial distribution see
+[PKAConstant](/PKAConstant.md).
+
+!alert note
+The number of PKAs inserted by this generator is *independent* of the simulation timestep!
+
+For a generator with a specified PKA direction see [PKAGun](/PKAGun.md).
 
 !syntax parameters /UserObjects/PKAFixedPointGenerator
 

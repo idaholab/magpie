@@ -18,7 +18,7 @@ template <>
 InputParameters validParams<PKAFissionFragmentEmpirical>();
 
 /**
- *
+ * Fission fragment PKA generator usimg an empirical mass and energy distribution.
  */
 class PKAFissionFragmentEmpirical : public PKAGeneratorBase
 {

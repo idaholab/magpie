@@ -15,6 +15,7 @@ InputParameters
 validParams<PKAFunction>()
 {
   InputParameters params = validParams<PKAEmpiricalBase>();
+  params.addClassDescription("PKAs with time dependent mass, charge, energy, and rate");
   params.addParam<FunctionName>(
       "pka_rate",
       1e-8,

@@ -16,6 +16,8 @@ InputParameters
 validParams<MyTRIMMesh>()
 {
   InputParameters params = validParams<GeneratedMesh>();
+  params.addClassDescription(
+      "Regular orthogonal generated mesh with restrictions to simple elements.");
   params.suppressParameter<Real>("bias_x");
   params.suppressParameter<Real>("bias_y");
   params.suppressParameter<Real>("bias_z");
