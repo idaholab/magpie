@@ -70,9 +70,9 @@ MyTRIMPKAStatistics::execute()
         mooseError("Internal error");
     }
 
-    auto i = _count_map.find(prop);
-    if (i == _count_map.end())
-      i = _count_map.insert(_count_map.begin(), std::make_pair(prop, 1));
+    auto i = _count_map.lower_bound(prop);
+    if (i == _count_map.end() || i->first != prop)
+      _count_map.emplace_hint(i, prop, 1);
     else
       i->second++;
   }
