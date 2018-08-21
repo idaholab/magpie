@@ -11,23 +11,30 @@
 #include "MultiIndex.h"
 #include "DiscreteFissionPKAPDF.h"
 
-template<>
-InputParameters validParams<PKAGeneratorNeutronicsBase>()
+template <>
+InputParameters
+validParams<PKAGeneratorNeutronicsBase>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addParam<std::vector<PostprocessorName>>("partial_reaction_rates", "Partial neutronic reaction rates per unit volume [sum_g xs_{r,g,i} * phi_g], "
-                                                  "r: reaction type, g: energy group, i: nuclide id.Provide number density as variable in rasterizer!");
-  params.addParam<std::vector<PostprocessorName>>("averaged_number_densities", "The number density of the species averaged over the domain.");
-  params.addClassDescription("PKA generator (neutronics) user object base class.\n Takes pdf and samples PKAs due to various interactions.");
+  params.addParam<std::vector<PostprocessorName>>(
+      "partial_reaction_rates",
+      "Partial neutronic reaction rates per unit volume [sum_g xs_{r,g,i} * phi_g], "
+      "r: reaction type, g: energy group, i: nuclide id.Provide number density as variable in "
+      "rasterizer!");
+  params.addParam<std::vector<PostprocessorName>>(
+      "averaged_number_densities", "The number density of the species averaged over the domain.");
+  params.addClassDescription("PKA generator (neutronics) user object base class.\n Takes pdf and "
+                             "samples PKAs due to various interactions.");
   return params;
 }
 
-PKAGeneratorNeutronicsBase::PKAGeneratorNeutronicsBase(const InputParameters & parameters) :
-    PKAGeneratorBase(parameters)
+PKAGeneratorNeutronicsBase::PKAGeneratorNeutronicsBase(const InputParameters & parameters)
+  : PKAGeneratorBase(parameters)
 {
   if (isParamValid("partial_reaction_rates"))
   {
-    std::vector<PostprocessorName> names = getParam<std::vector<PostprocessorName>>("partial_reaction_rates");
+    std::vector<PostprocessorName> names =
+        getParam<std::vector<PostprocessorName>>("partial_reaction_rates");
     _partial_neutronics_reaction_rates.resize(names.size());
     _stored_reaction_rates.resize(names.size());
     for (unsigned int j = 0; j < names.size(); ++j)
@@ -54,7 +61,8 @@ PKAGeneratorNeutronicsBase::PKAGeneratorNeutronicsBase(const InputParameters & p
 
   if (isParamValid("averaged_number_densities"))
   {
-    std::vector<PostprocessorName> names = getParam<std::vector<PostprocessorName>>("averaged_number_densities");
+    std::vector<PostprocessorName> names =
+        getParam<std::vector<PostprocessorName>>("averaged_number_densities");
     _averaged_number_densities.resize(names.size());
     _stored_densities.resize(names.size());
     for (unsigned int j = 0; j < names.size(); ++j)
@@ -85,5 +93,6 @@ PKAGeneratorNeutronicsBase::PKAGeneratorNeutronicsBase(const InputParameters & p
   }
 
   if (_averaged_number_densities.size() != _partial_neutronics_reaction_rates.size())
-    mooseError("partial_reaction_rates and averaged_number_densities must have the same number of entries.");
+    mooseError("partial_reaction_rates and averaged_number_densities must have the same number of "
+               "entries.");
 }

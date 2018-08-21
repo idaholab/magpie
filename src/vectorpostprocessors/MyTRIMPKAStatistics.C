@@ -12,19 +12,23 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAStatistics);
 
-template<>
-InputParameters validParams<MyTRIMPKAStatistics>()
+template <>
+InputParameters
+validParams<MyTRIMPKAStatistics>()
 {
   InputParameters params = validParams<GeneralVectorPostprocessor>();
-  params.addClassDescription("Compile a table of the number of PKA with the same value of a chosen property (e.g. a mass histogram)");
-  params.addRequiredParam<UserObjectName>("rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
+  params.addClassDescription("Compile a table of the number of PKA with the same value of a chosen "
+                             "property (e.g. a mass histogram)");
+  params.addRequiredParam<UserObjectName>(
+      "rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
   MooseEnum value_type_options("MASS=0 ZAID");
-  params.addParam<MooseEnum>("value_type", value_type_options, "The common property to bin the PKA set according to");
+  params.addParam<MooseEnum>(
+      "value_type", value_type_options, "The common property to bin the PKA set according to");
   return params;
 }
 
-MyTRIMPKAStatistics::MyTRIMPKAStatistics(const InputParameters & params) :
-    GeneralVectorPostprocessor(params),
+MyTRIMPKAStatistics::MyTRIMPKAStatistics(const InputParameters & params)
+  : GeneralVectorPostprocessor(params),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _value_type(getParam<MooseEnum>("value_type").getEnum<ValueType>()),
     _property(declareVector(getParam<MooseEnum>("value_type"))),
@@ -49,7 +53,8 @@ MyTRIMPKAStatistics::execute()
   for (auto & pka : pka_list)
   {
     const unsigned int Z = pka._Z;
-    const unsigned int M = std::round(pka._m);;
+    const unsigned int M = std::round(pka._m);
+    ;
 
     switch (_value_type)
     {
@@ -65,9 +70,9 @@ MyTRIMPKAStatistics::execute()
         mooseError("Internal error");
     }
 
-    auto i = _count_map.find(prop);
-    if (i == _count_map.end())
-      i = _count_map.insert(_count_map.begin(), std::make_pair(prop, 1));
+    auto i = _count_map.lower_bound(prop);
+    if (i == _count_map.end() || i->first != prop)
+      _count_map.emplace_hint(i, prop, 1);
     else
       i->second++;
   }
@@ -87,7 +92,7 @@ MyTRIMPKAStatistics::finalize()
 
     // reconstitute the map
     _count_map.clear();
-    for (auto & count_pair: count_flat)
+    for (auto & count_pair : count_flat)
     {
       auto i = _count_map.find(count_pair.first);
       if (i == _count_map.end())
@@ -100,7 +105,7 @@ MyTRIMPKAStatistics::finalize()
   // copy count map into count vector (ordering according to key is guaranteed)
   _property.reserve(_count_map.size());
   _count.reserve(_count_map.size());
-  for (auto & count_pair: _count_map)
+  for (auto & count_pair : _count_map)
   {
     _property.push_back(count_pair.first);
     _count.push_back(count_pair.second);

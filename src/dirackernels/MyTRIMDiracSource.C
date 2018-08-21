@@ -13,11 +13,13 @@
 
 registerMooseObject("MagpieApp", MyTRIMDiracSource);
 
-template<>
-InputParameters validParams<MyTRIMDiracSource>()
+template <>
+InputParameters
+validParams<MyTRIMDiracSource>()
 {
   InputParameters params = validParams<DiracKernel>();
-  params.addRequiredParam<UserObjectName>("runner", "Name of the MyTRIMDiracRun userobject to pull data from.");
+  params.addRequiredParam<UserObjectName>(
+      "runner", "Name of the MyTRIMDiracRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
   MooseEnum defectType("VAC=0 INT REPLACEMENT_IN REPLACEMENT_OUT", "VAC");
   params.addParam<MooseEnum>("defect", defectType, "Defect type to read out");
@@ -28,8 +30,8 @@ InputParameters validParams<MyTRIMDiracSource>()
   return params;
 }
 
-MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters) :
-    DiracKernel(parameters),
+MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters)
+  : DiracKernel(parameters),
     _mytrim(getUserObject<MyTRIMDiracRun>("runner")),
     _rasterizer(_mytrim.rasterizer()),
     _ivar(getParam<unsigned int>("ivar")),
@@ -37,7 +39,8 @@ MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters) :
     _trim_parameters(_rasterizer.getTrimParameters())
 {
   if (getParam<bool>("drop_duplicate_points") == true)
-    mooseWarning("Explicitly setting drop_duplicate_points to true will cause overlapping defects to be miscounted.");
+    mooseWarning("Explicitly setting drop_duplicate_points to true will cause overlapping defects "
+                 "to be miscounted.");
 }
 
 void

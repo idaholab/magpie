@@ -1,14 +1,11 @@
-<!-- MOOSE Documentation Stub: Remove this when content is added. -->
-
 # PKAGeneratorRecoil
 
-!alert construction title=Undocumented Class
-The PKAGeneratorRecoil has not been documented, if you would like to contribute to MOOSE by
-writing documentation, please see [/generate.md]. The content contained on this page explains
-the typical documentation associated with a MooseObject; however, what is contained is ultimately
-determined by what is necessary to make the documentation clear for users.
-
 !syntax description /UserObjects/PKAGeneratorRecoil
+
+This generator will receive a multidimensional probability distribution from a
+[MultiAppNeutronicsSpectrumTransfer](/MultiAppNeutronicsSpectrumTransfer.md).
+This probability distribution is sampled to insert PKAs with the right mass,
+energy, and direction distribution.
 
 !syntax parameters /UserObjects/PKAGeneratorRecoil
 

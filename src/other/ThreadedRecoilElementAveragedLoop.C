@@ -8,14 +8,16 @@
 
 #include "ThreadedRecoilElementAveragedLoop.h"
 
-ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
-    ThreadedRecoilLoopBase(rasterizer, mesh)
+ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(
+    const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh)
+  : ThreadedRecoilLoopBase(rasterizer, mesh)
 {
 }
 
 // Splitting Constructor
-ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(const ThreadedRecoilElementAveragedLoop & x, Threads::split /*split*/) :
-    ThreadedRecoilLoopBase(x, Threads::split())
+ThreadedRecoilElementAveragedLoop::ThreadedRecoilElementAveragedLoop(
+    const ThreadedRecoilElementAveragedLoop & x, Threads::split /*split*/)
+  : ThreadedRecoilLoopBase(x, Threads::split())
 {
 }
 
@@ -47,7 +49,8 @@ ThreadedRecoilElementAveragedLoop::join(const ThreadedRecoilElementAveragedLoop 
 }
 
 void
-ThreadedRecoilElementAveragedLoop::addDefectToResult(const Point & p, unsigned int var, ThreadedRecoilElementAveragedLoop::DefectType type)
+ThreadedRecoilElementAveragedLoop::addDefectToResult(
+    const Point & p, unsigned int var, ThreadedRecoilElementAveragedLoop::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
   if (elem == nullptr || var >= _nvars)
@@ -80,17 +83,21 @@ ThreadedRecoilElementAveragedLoop::addEnergyToResult(const Point & p, Real edep)
   i->second._energy += edep;
 }
 
-template<>
+template <>
 void
-dataStore(std::ostream & stream, ThreadedRecoilElementAveragedLoop::MyTRIMResult & eal, void * context)
+dataStore(std::ostream & stream,
+          ThreadedRecoilElementAveragedLoop::MyTRIMResult & eal,
+          void * context)
 {
   dataStore(stream, eal._defects, context);
   dataStore(stream, eal._energy, context);
 }
 
-template<>
+template <>
 void
-dataLoad(std::istream & stream, ThreadedRecoilElementAveragedLoop::MyTRIMResult & eal, void * context)
+dataLoad(std::istream & stream,
+         ThreadedRecoilElementAveragedLoop::MyTRIMResult & eal,
+         void * context)
 {
   dataLoad(stream, eal._defects, context);
   dataLoad(stream, eal._energy, context);
