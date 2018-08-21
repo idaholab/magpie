@@ -10,7 +10,7 @@
 #include "MooseMesh.h"
 
 #ifdef RATTLESNAKE_ENABLED
-  #include "YakxsUtilities.h"
+#include "YakxsUtilities.h"
 #endif
 
 // C++ includes
@@ -18,28 +18,35 @@
 #include <algorithm>
 #include <limits>
 
-template<>
-InputParameters validParams<NeutronicsSpectrumSamplerBase>()
+template <>
+InputParameters
+validParams<NeutronicsSpectrumSamplerBase>()
 {
   InputParameters params = validParams<ElementUserObject>();
-  params.addRequiredParam<std::vector<std::string> >("target_isotope_names", "The list of target isotope names e.g. U235.");
+  params.addRequiredParam<std::vector<std::string>>("target_isotope_names",
+                                                    "The list of target isotope names e.g. U235.");
   params.addRequiredCoupledVar("number_densities", "Number densities for each isotope.");
-  params.addRequiredParam<std::vector<Real> >("energy_group_boundaries", "The energy group boundaries in units of eV orderd "
-                                                                         "from high to low [natural neutronics ordering].");
-  params.addRequiredParam<unsigned int>("L", "The maximum order of Legendre terms for expanding the recoil XS in mu_lab.");
-  params.addRequiredParam<std::vector<Point> >("points", "The points where you want to evaluate the variables");
-  params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from neutronics calculations that are used to sample PKAs in BCMC simulations.");
+  params.addRequiredParam<std::vector<Real>>("energy_group_boundaries",
+                                             "The energy group boundaries in units of eV orderd "
+                                             "from high to low [natural neutronics ordering].");
+  params.addRequiredParam<unsigned int>(
+      "L", "The maximum order of Legendre terms for expanding the recoil XS in mu_lab.");
+  params.addRequiredParam<std::vector<Point>>(
+      "points", "The points where you want to evaluate the variables");
+  params.addClassDescription("Radiation Damage user object base class.\n Computes PDFs from "
+                             "neutronics calculations that are used to sample PKAs in BCMC "
+                             "simulations.");
   return params;
 }
 
-NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParameters & parameters) :
-    ElementUserObject(parameters),
-    _target_isotope_names(getParam<std::vector<std::string> >("target_isotope_names")),
-    _energy_group_boundaries(getParam<std::vector<Real> >("energy_group_boundaries")),
+NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParameters & parameters)
+  : ElementUserObject(parameters),
+    _target_isotope_names(getParam<std::vector<std::string>>("target_isotope_names")),
+    _energy_group_boundaries(getParam<std::vector<Real>>("energy_group_boundaries")),
     _I(_target_isotope_names.size()),
     _G(_energy_group_boundaries.size() - 1),
     _L(getParam<unsigned int>("L")),
-    _points(getParam<std::vector<Point> >("points")),
+    _points(getParam<std::vector<Point>>("points")),
     _npoints(_points.size()),
     _qp_is_cached(false)
 {
@@ -50,7 +57,7 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
   // get the number density variables
   _number_densities.resize(_I);
   for (unsigned int i = 0; i < _I; ++i)
-    _number_densities[i] = & coupledValue("number_densities", i);
+    _number_densities[i] = &coupledValue("number_densities", i);
 
   _zaids.resize(_I);
   for (unsigned int i = 0; i < _I; ++i)
@@ -116,7 +123,8 @@ NeutronicsSpectrumSamplerBase::execute()
         for (unsigned int g = 0; g < _G; ++g)
           for (unsigned int p = 0; p < _nphi; ++p)
             for (unsigned int q = 0; q < _nmu; ++q)
-              _sample_point_data[_current_point]({i, g, p, q}) = computeRadiationDamagePDF(i, g, p, q);
+              _sample_point_data[_current_point]({i, g, p, q}) =
+                  computeRadiationDamagePDF(i, g, p, q);
     }
   }
 }
@@ -142,7 +150,8 @@ NeutronicsSpectrumSamplerBase::meshChanged()
     if (candidate_elem && candidate_elem->processor_id() == processor_id())
     {
       _owner[j] = processor_id();
-      if (_local_elem_to_contained_points.find(candidate_elem) != _local_elem_to_contained_points.end())
+      if (_local_elem_to_contained_points.find(candidate_elem) !=
+          _local_elem_to_contained_points.end())
         _local_elem_to_contained_points[candidate_elem].push_back(j);
       else
         _local_elem_to_contained_points[candidate_elem] = {j};
@@ -248,6 +257,7 @@ NeutronicsSpectrumSamplerBase::localStringToZaid(std::string s) const
     return 942390;
   else if (s == "Pu240")
     return 942400;
-  mooseError("Isotope name ", s, " cannot be converted with the localStringToZaid conversion method.");
+  mooseError(
+      "Isotope name ", s, " cannot be converted with the localStringToZaid conversion method.");
   return 0;
 }

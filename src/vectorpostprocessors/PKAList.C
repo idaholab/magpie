@@ -11,16 +11,18 @@
 
 registerMooseObject("MagpieApp", PKAList);
 
-template<>
-InputParameters validParams<PKAList>()
+template <>
+InputParameters
+validParams<PKAList>()
 {
   InputParameters params = validParams<GeneralVectorPostprocessor>();
-  params.addRequiredParam<UserObjectName>("rasterizer", "Name of the MyTRIMRasterizer userobject that provides the PKA list.");
+  params.addRequiredParam<UserObjectName>(
+      "rasterizer", "Name of the MyTRIMRasterizer userobject that provides the PKA list.");
   return params;
 }
 
-PKAList::PKAList(const InputParameters & parameters) :
-    GeneralVectorPostprocessor(parameters),
+PKAList::PKAList(const InputParameters & parameters)
+  : GeneralVectorPostprocessor(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _pka_list(_rasterizer.getPKAList()),
     _x(declareVector("x")),

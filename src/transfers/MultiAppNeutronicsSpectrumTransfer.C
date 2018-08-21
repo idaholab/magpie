@@ -17,22 +17,26 @@
 
 registerMooseObject("MagpieApp", MultiAppNeutronicsSpectrumTransfer);
 
-template<>
-InputParameters validParams<MultiAppNeutronicsSpectrumTransfer>()
+template <>
+InputParameters
+validParams<MultiAppNeutronicsSpectrumTransfer>()
 {
   InputParameters params = validParams<MultiAppTransfer>();
   params.addRequiredParam<UserObjectName>("pka_neutronics", "PKA generator object name.");
-  params.addRequiredParam<UserObjectName>("radiation_damage_sampler", "Neutronics user object providing the PDF data.");
+  params.addRequiredParam<UserObjectName>("radiation_damage_sampler",
+                                          "Neutronics user object providing the PDF data.");
   return params;
 }
 
-MultiAppNeutronicsSpectrumTransfer::MultiAppNeutronicsSpectrumTransfer(const InputParameters & parameters) :
-    MultiAppTransfer(parameters),
+MultiAppNeutronicsSpectrumTransfer::MultiAppNeutronicsSpectrumTransfer(
+    const InputParameters & parameters)
+  : MultiAppTransfer(parameters),
     _pka_generator_name(getParam<UserObjectName>("pka_neutronics")),
     _neutronics_pdf_name(getParam<UserObjectName>("radiation_damage_sampler"))
 {
   if (_direction != TO_MULTIAPP)
-    mooseError("MultiAppNeutronicsSpectrumTransfer can only send data from a neutronics master app to a mesoscale multiapp.");
+    mooseError("MultiAppNeutronicsSpectrumTransfer can only send data from a neutronics master app "
+               "to a mesoscale multiapp.");
 }
 
 void
@@ -40,7 +44,8 @@ MultiAppNeutronicsSpectrumTransfer::execute()
 {
   // get the neutronics PDF user object
   FEProblemBase & from_problem = _multi_app->problemBase();
-  const NeutronicsSpectrumSamplerBase & neutronics_pdf = from_problem.getUserObject<NeutronicsSpectrumSamplerBase>(_neutronics_pdf_name);
+  const NeutronicsSpectrumSamplerBase & neutronics_pdf =
+      from_problem.getUserObject<NeutronicsSpectrumSamplerBase>(_neutronics_pdf_name);
 
   // loop over all sub apps and copy over the neutronics data
   for (unsigned int i = 0; i < _multi_app->numGlobalApps(); ++i)
@@ -52,7 +57,9 @@ MultiAppNeutronicsSpectrumTransfer::execute()
 
       for (THREAD_ID tid = 0; tid < libMesh::n_threads(); ++tid)
       {
-        PKAGeneratorNeutronicsBase & pka_uo = const_cast<PKAGeneratorNeutronicsBase &>(_multi_app->appProblem(i).getUserObject<PKAGeneratorNeutronicsBase>(_pka_generator_name, tid));
+        PKAGeneratorNeutronicsBase & pka_uo = const_cast<PKAGeneratorNeutronicsBase &>(
+            _multi_app->appProblem(i).getUserObject<PKAGeneratorNeutronicsBase>(_pka_generator_name,
+                                                                                tid));
         pka_uo.setPDF(zaids, energies, probabilities);
       }
     }
