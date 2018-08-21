@@ -40,17 +40,25 @@ PKAGeneratorBase::ionTag(const MyTRIMRasterizer::PKAParameters & pka_parameters,
   // this function relies on the exact representation of whole numbers in IEEE floating point
   // numbers up to a reasonable upper limit [Z < m < 300]
 
+  const auto & mZ = pka_parameters._mass_charge_tuple;
+
   // element not found in rasterizer table
   if (pka_parameters._index_Z[Z].first == 0)
     return -1;
 
+  // only one isotope of this element is present
   if (pka_parameters._index_Z[Z].first == 1)
-    return pka_parameters._index_Z[Z].second;
+  {
+    auto & t = mZ[pka_parameters._index_Z[Z].second];
+    if (std::abs(m - std::get<0>(t)) < std::get<2>(t))
+      return pka_parameters._index_Z[Z].second;
+    else
+      return -1;
+  }
 
-  const auto & mZ = pka_parameters._mass_charge_pair;
-  // start the search at the firsat matching Z
+  // start the search at the first matching Z
   for (auto i = pka_parameters._index_Z[Z].second; i < mZ.size(); ++i)
-    if (mZ[i].second == Z && mZ[i].first == m)
+    if (std::get<1>(mZ[i]) == Z && std::abs(m - std::get<0>(mZ[i])) < std::get<2>(mZ[i]))
       return i;
 
   // no matching mass (isotope) found for the given Z
