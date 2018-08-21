@@ -16,6 +16,7 @@ InputParameters
 validParams<PKAList>()
 {
   InputParameters params = validParams<GeneralVectorPostprocessor>();
+  params.addClassDescription("Dumps the entire PKA list");
   params.addRequiredParam<UserObjectName>(
       "rasterizer", "Name of the MyTRIMRasterizer userobject that provides the PKA list.");
   return params;

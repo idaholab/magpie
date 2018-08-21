@@ -21,5 +21,3 @@
 - /VectorPostprocessors/IsotopeRecoilRateSampler
 - /VectorPostprocessors/MyTRIMDiracResult
 - /VectorPostprocessors/MyTRIMPKAEnergyHistogram
-- /VectorPostprocessors/MyTRIMPKAStatistics
-- /VectorPostprocessors/PKAList
