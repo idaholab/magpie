@@ -37,5 +37,6 @@
     type = CSVDiff
     input = 'fourierpowerspectrum.i'
     csvdiff = 'fourierpowerspectrum_out_power_0000.csv'
+    required_objects = 'FourierTransform FourierPowerSpectrum'
   [../]
 []
