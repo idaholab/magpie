@@ -9,6 +9,6 @@ The mass, charge, and energy are constants given by the user.
 
 !syntax inputs /UserObjects/PKAConstant
 
-!syntax children /UserObjects/PKkAConstant
+!syntax children /UserObjects/PKAConstant
 
 !bibtex bibliography
