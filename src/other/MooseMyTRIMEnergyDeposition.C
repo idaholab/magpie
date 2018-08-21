@@ -9,10 +9,11 @@
 #include "MooseMyTRIMEnergyDeposition.h"
 #include "MooseMyTRIMSample.h"
 
-MooseMyTRIMEnergyDeposition::MooseMyTRIMEnergyDeposition(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample,
-                                                         std::list<std::pair<Point, Real> > & edep_list) :
-    MooseMyTRIMCore(simconf, sample),
-    _edep_list(edep_list)
+MooseMyTRIMEnergyDeposition::MooseMyTRIMEnergyDeposition(
+    MyTRIM_NS::SimconfType * simconf,
+    MooseMyTRIMSample * sample,
+    std::list<std::pair<Point, Real>> & edep_list)
+  : MooseMyTRIMCore(simconf, sample), _edep_list(edep_list)
 {
 }
 
@@ -38,9 +39,10 @@ MooseMyTRIMEnergyDeposition::checkPKAState()
 
     case MyTRIM_NS::IonBase::REPLACEMENT:
     case MyTRIM_NS::IonBase::SUBSTITUTIONAL:
-      // deposit residual energy of the stopped PKA, electronic stopping, and binding energy to the new lattice site
+      // deposit residual energy of the stopped PKA, electronic stopping, and binding energy to the
+      // new lattice site
       depositEnergy(_pka, _pka->_E + _element->_Elbind + _dee);
-      return ;
+      return;
 
     case MyTRIM_NS::IonBase::VACANCY:
       mooseError("PKA should never be in this state");
@@ -64,5 +66,6 @@ MooseMyTRIMEnergyDeposition::followRecoil()
 void
 MooseMyTRIMEnergyDeposition::depositEnergy(MyTRIM_NS::IonBase * ion, Real E)
 {
-  _edep_list.push_back(std::make_pair(Point(ion->_pos(0), ion->_pos(1), _dim == 2 ? 0.0 :  ion->_pos(2)), E));
+  _edep_list.push_back(
+      std::make_pair(Point(ion->_pos(0), ion->_pos(1), _dim == 2 ? 0.0 : ion->_pos(2)), E));
 }

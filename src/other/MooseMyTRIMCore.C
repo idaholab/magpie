@@ -9,9 +9,8 @@
 #include "MooseMyTRIMCore.h"
 #include "MooseMyTRIMSample.h"
 
-MooseMyTRIMCore::MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample) :
-    MyTRIM_NS::TrimBase(simconf, sample),
-    _dim(sample->getDim())
+MooseMyTRIMCore::MooseMyTRIMCore(MyTRIM_NS::SimconfType * simconf, MooseMyTRIMSample * sample)
+  : MyTRIM_NS::TrimBase(simconf, sample), _dim(sample->getDim())
 {
 }
 

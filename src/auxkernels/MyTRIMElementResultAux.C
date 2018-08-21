@@ -11,15 +11,16 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementResultAux);
 
-template<>
-InputParameters validParams<MyTRIMElementResultAux>()
+template <>
+InputParameters
+validParams<MyTRIMElementResultAux>()
 {
   InputParameters params = MyTRIMElementResultAccess<AuxKernel>::validParams();
   return params;
 }
 
-MyTRIMElementResultAux::MyTRIMElementResultAux(const InputParameters & parameters) :
-    MyTRIMElementResultAccess<AuxKernel>(parameters)
+MyTRIMElementResultAux::MyTRIMElementResultAux(const InputParameters & parameters)
+  : MyTRIMElementResultAccess<AuxKernel>(parameters)
 {
   /**
    * having this AuxKernel also depend on the rasterizer bumps the rasterizer into

@@ -15,7 +15,8 @@ InputParameters
 validParams<DefectAnnihilation>()
 {
   InputParameters params = validParams<Kernel>();
-  params.addClassDescription("Annihilation rate kernel that is proportional to the product of the kernel variable and the coupled variable");
+  params.addClassDescription("Annihilation rate kernel that is proportional to the product of the "
+                             "kernel variable and the coupled variable");
   params.addRequiredCoupledVar("v", "Other defect concentration");
   params.addParam<Real>("prefactor", 1.0, "Annihilation rate");
   return params;
