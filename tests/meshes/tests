@@ -75,10 +75,11 @@
     input = 'cascade_3d.i'
     cli_args = 'Mesh/type=GeneratedMesh'
     #
-    # this fails in parallel. Need to figure put why!
+    # this fails in parallel. Need to figure out why!
     #
     max_parallel = 1
     max_threads = 1
+    valgrind = 'HEAVY'
   [../]
   # copy the resulting output into the gold directory
   [./point_locator_copy_gold_3d]

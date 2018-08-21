@@ -88,6 +88,12 @@ FourierTransform::FourierTransform(const InputParameters & parameters)
   }
 }
 
+FourierTransform::~FourierTransform()
+{
+  // destroy FFTW plan
+  fftw_destroy_plan(_plan);
+}
+
 void
 FourierTransform::initialize()
 {

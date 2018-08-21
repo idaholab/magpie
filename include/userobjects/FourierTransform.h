@@ -27,6 +27,7 @@ class FourierTransform : public ElementUserObject
 {
 public:
   FourierTransform(const InputParameters & parameters);
+  ~FourierTransform();
 
   virtual void initialize() override;
   virtual void execute() override;
