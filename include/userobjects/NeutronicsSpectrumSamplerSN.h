@@ -5,8 +5,9 @@
 /*            Copyright 2017 Battelle Energy Alliance, LLC            */
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
-
+#ifdef GSL_ENABLED
 #ifdef RATTLESNAKE_ENABLED
+
 #ifndef NEUTRONICSSPECTRUMSAMPLERSN_H
 #define NEUTRONICSSPECTRUMSAMPLERSN_H
 
@@ -56,4 +57,6 @@ protected:
 };
 
 #endif // NEUTRONICSSPECTRUMSAMPLERSN_H
+
 #endif // RATTLESNAKE_ENABLED
+#endif // GSL_ENABLED

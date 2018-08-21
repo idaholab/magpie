@@ -6,6 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
+#ifdef GSL_ENABLED
 #ifdef RATTLESNAKE_ENABLED
 
 #include "NeutronicsSpectrumSamplerSN.h"
@@ -19,23 +20,32 @@
 
 registerMooseObject("MagpieApp", NeutronicsSpectrumSamplerSN);
 
-template<>
-InputParameters validParams<NeutronicsSpectrumSamplerSN>()
+template <>
+InputParameters
+validParams<NeutronicsSpectrumSamplerSN>()
 {
   InputParameters params = validParams<NeutronicsSpectrumSamplerBase>();
-  params.addRequiredCoupledVar("angular_variables", "Angular fluxes, dimension G x M (# angular directions).");
-  params.addRequiredParam<std::vector<std::string> >("recoil_isotope_names", "The list of recoil isotope names e.g. U235.");
+  params.addRequiredCoupledVar("angular_variables",
+                               "Angular fluxes, dimension G x M (# angular directions).");
+  params.addRequiredParam<std::vector<std::string>>("recoil_isotope_names",
+                                                    "The list of recoil isotope names e.g. U235.");
   params.addRequiredParam<UserObjectName>("aqdata", "Angular quadrature user data.");
-  params.addRequiredParam<std::vector<UserObjectName> >("recoil_cross_sections", "Recoil cross section UserObject names. Size = npoints x nisotopes");
-  params.addParam<unsigned int>("nmu", 10, "Number of polar subdivisions for angular dependence of PDF");
-  params.addParam<unsigned int>("nphi", 10, "Number of azimuthal subdivisions for angular dependence of PDF");
-  params.addClassDescription("Computes PDFs for reactions except fission that can be used for sampling PKAs in coupled BCMC simulations.\n User match match target isotopes with recoil isotopes and provide transfer-like recoil cross section data.");
+  params.addRequiredParam<std::vector<UserObjectName>>(
+      "recoil_cross_sections", "Recoil cross section UserObject names. Size = npoints x nisotopes");
+  params.addParam<unsigned int>(
+      "nmu", 10, "Number of polar subdivisions for angular dependence of PDF");
+  params.addParam<unsigned int>(
+      "nphi", 10, "Number of azimuthal subdivisions for angular dependence of PDF");
+  params.addClassDescription("Computes PDFs for reactions except fission that can be used for "
+                             "sampling PKAs in coupled BCMC simulations.\n User match match target "
+                             "isotopes with recoil isotopes and provide transfer-like recoil cross "
+                             "section data.");
   return params;
 }
 
-NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters & parameters) :
-    NeutronicsSpectrumSamplerBase(parameters),
-    _recoil_isotope_names(getParam<std::vector<std::string> >("recoil_isotope_names")),
+NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters & parameters)
+  : NeutronicsSpectrumSamplerBase(parameters),
+    _recoil_isotope_names(getParam<std::vector<std::string>>("recoil_isotope_names")),
     _aq(getUserObject<AQData>("aqdata").aq()),
     _ndir(_aq.getNQuadratures()),
     _shm(SHCoefficients(_aq, _L))
@@ -44,9 +54,11 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
   _nphi = getParam<unsigned int>("nphi");
 
   // check recoil cross section length
-  std::vector<UserObjectName> names = getParam<std::vector<UserObjectName>>("recoil_cross_sections");
+  std::vector<UserObjectName> names =
+      getParam<std::vector<UserObjectName>>("recoil_cross_sections");
   if (names.size() != _npoints * _I)
-    mooseError("recoil_cross_sections must be a vector of length npoints x nisotopes of UserObjectNames");
+    mooseError(
+        "recoil_cross_sections must be a vector of length npoints x nisotopes of UserObjectNames");
 
   // check recoil ZAIDs
   if (_recoil_isotope_names.size() != _I)
@@ -79,7 +91,8 @@ NeutronicsSpectrumSamplerSN::NeutronicsSpectrumSamplerSN(const InputParameters &
 }
 
 Real
-NeutronicsSpectrumSamplerSN::totalRecoilRate(unsigned int point_id, const std::string & target_isotope) const
+NeutronicsSpectrumSamplerSN::totalRecoilRate(unsigned int point_id,
+                                             const std::string & target_isotope) const
 {
   Real rate = 0.0;
   Real dmu = 2.0 / Real(_nmu);
@@ -96,7 +109,10 @@ NeutronicsSpectrumSamplerSN::totalRecoilRate(unsigned int point_id, const std::s
 }
 
 Real
-NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned int g, unsigned int p, unsigned int q)
+NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i,
+                                                       unsigned int g,
+                                                       unsigned int p,
+                                                       unsigned int q)
 {
   Real a = 0.0;
 
@@ -110,8 +126,8 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
   // for now the midpoint is good enough
   Real mu = 0.5 * (lower_mu + upper_mu);
   Real phi = 0.5 * (lower_phi + upper_phi);
-  RealVectorValue omega_T(mu, std::cos(phi) * std::sqrt(1 - mu * mu),
-                          std::sin(phi) * std::sqrt(1 - mu * mu));
+  RealVectorValue omega_T(
+      mu, std::cos(phi) * std::sqrt(1 - mu * mu), std::sin(phi) * std::sqrt(1 - mu * mu));
 
   for (unsigned int gp = 0; gp < _G; ++gp)
     for (unsigned int dir = 0; dir < _ndir; ++dir)
@@ -131,10 +147,13 @@ NeutronicsSpectrumSamplerSN::computeRadiationDamagePDF(unsigned int i, unsigned 
         mooseDoOnce(mooseWarning("L is larger than the legendre order of the provided data"));
 
       for (unsigned int l = 0; l <= std::min(_L, L_data); ++l)
-        a += (*_number_densities[i])[_qp] * _aq.getWeight(dir) * gsl_sf_legendre_Pl(l, mu_transformed)
-             * _recoil_cross_sections[_current_point][i]->getSigmaRecoil(gp, g, l) * (*_angular_flux[gp][dir])[_qp];
+        a += (*_number_densities[i])[_qp] * _aq.getWeight(dir) *
+             gsl_sf_legendre_Pl(l, mu_transformed) *
+             _recoil_cross_sections[_current_point][i]->getSigmaRecoil(gp, g, l) *
+             (*_angular_flux[gp][dir])[_qp];
     }
   return a;
 }
 
-#endif //RATTLESNAKE_ENABLED
+#endif // RATTLESNAKE_ENABLED
+#endif // GSL_ENABLED
