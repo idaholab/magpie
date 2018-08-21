@@ -83,6 +83,8 @@ validParams<MyTRIMRasterizer>()
                        "first argument of 'var' will be used.");
   params.addRequiredParam<std::vector<Real>>("M", "Element mass in amu");
   params.addRequiredParam<std::vector<Real>>("Z", "Nuclear charge in e");
+  params.addParam<std::vector<Real>>("Mtol",
+                                     "Tolerance on mass number for tagging PKAs with var id.");
   params.addParam<std::vector<Real>>("Ebind", "Binding energy in eV");
   params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
   params.addRequiredParam<MaterialPropertyName>(
@@ -160,10 +162,18 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
   auto trim_M = getParam<std::vector<Real>>("M");
   auto trim_Z = getParam<std::vector<Real>>("Z");
 
+  std::vector<Real> mtol;
+  if (isParamValid("Mtol"))
+    mtol = getParam<std::vector<Real>>("Mtol");
+  else
+    mtol.assign(_nvars, 0.5);
+
   if (trim_M.size() != _nvars)
     mooseError("Parameter 'M' must have as many components as coupled variables.");
   if (trim_Z.size() != _nvars)
     mooseError("Parameter 'Z' must have as many components as coupled variables.");
+  if (mtol.size() != _nvars)
+    mooseError("Parameter 'mtol' must have as many components as coupled variables.");
 
   // error check masses and charges
   for (unsigned int i = 0; i < _nvars; ++i)
@@ -252,15 +262,15 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
   // setup invariant PKA generation parameters
   for (auto & nZ : _pka_parameters._index_Z)
     nZ = std::make_pair(0, 0);
-  _pka_parameters._mass_charge_pair.resize(_nvars);
+  _pka_parameters._mass_charge_tuple.resize(_nvars);
   _pka_parameters._recoil_rate_scaling = _trim_parameters.recoil_rate_scaling;
   for (unsigned int i = 0; i < _nvars; ++i)
   {
     const auto Z = _trim_parameters.element_prototypes[i]._Z;
 
     // insert (mass, charge) pair
-    _pka_parameters._mass_charge_pair[i] =
-        std::make_pair(_trim_parameters.element_prototypes[i]._m, Z);
+    _pka_parameters._mass_charge_tuple[i] =
+        std::make_tuple(_trim_parameters.element_prototypes[i]._m, Z, mtol[i]);
 
     // increase the count of elements with the same Z
     auto & index_Z = _pka_parameters._index_Z[Z];

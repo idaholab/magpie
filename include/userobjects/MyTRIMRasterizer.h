@@ -66,8 +66,8 @@ public:
 
   struct PKAParameters
   {
-    /// masses charges (m_i, Z_i) of the matrix elements
-    std::vector<std::pair<Real, Real>> _mass_charge_pair;
+    /// masses, charges, and mass number tolerances (m_i, Z_i, mtol_i) of the matrix elements
+    std::vector<std::tuple<Real, Real, Real>> _mass_charge_tuple;
 
     /// how many isotopes to we have for each element and which index contains the
     /// first Z match? (only support up to Z=119!)
