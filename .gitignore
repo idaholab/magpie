@@ -158,5 +158,12 @@ peacock_*.e
 *.cpa-*
 *.cpr-*
 
+build
+
 include/base/MagpieRevision.h
 tests/userobjects/spparks/log.spparks
+
+.failed_tests
+.previous_test_results.json
+
+compile_commands.json
