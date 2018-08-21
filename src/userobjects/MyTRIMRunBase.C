@@ -9,11 +9,13 @@
 #include "MyTRIMRunBase.h"
 #include "MooseMesh.h"
 
-template<>
-InputParameters validParams<MyTRIMRunBase>()
+template <>
+InputParameters
+validParams<MyTRIMRunBase>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
+  params.addRequiredParam<UserObjectName>("rasterizer",
+                                          "MyTRIMRasterizer object to provide material data");
 
   // we run this object once a timestep
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
@@ -22,8 +24,8 @@ InputParameters validParams<MyTRIMRunBase>()
   return params;
 }
 
-MyTRIMRunBase::MyTRIMRunBase(const InputParameters & parameters) :
-    GeneralUserObject(parameters),
+MyTRIMRunBase::MyTRIMRunBase(const InputParameters & parameters)
+  : GeneralUserObject(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _trim_parameters(_rasterizer.getTrimParameters()),
     _nvars(_trim_parameters.nVars()),

@@ -26,8 +26,7 @@ validParams<MagpieApp>()
 // dependent apps know about the MagpieApp label.
 registerKnownLabel("MagpieApp");
 
-MagpieApp::MagpieApp(const InputParameters & parameters)
-  : MooseApp(parameters)
+MagpieApp::MagpieApp(const InputParameters & parameters) : MooseApp(parameters)
 {
   srand(processor_id());
 
@@ -38,9 +37,7 @@ MagpieApp::MagpieApp(const InputParameters & parameters)
   MagpieApp::associateSyntax(_syntax, _action_factory);
 }
 
-MagpieApp::~MagpieApp()
-{
-}
+MagpieApp::~MagpieApp() {}
 
 extern "C" void
 MagpieApp__registerApps()

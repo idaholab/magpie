@@ -10,20 +10,19 @@
 #include "MooseError.h"
 #include "MooseRandom.h"
 
-
-DiscretePKAPDFBase::DiscretePKAPDFBase(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies) :
-    _zaids(ZAID),
-    _nZA(_zaids.size()),
-    _energies(energies),
-    _ng(_energies.size() - 1)
+DiscretePKAPDFBase::DiscretePKAPDFBase(const std::vector<unsigned int> & ZAID,
+                                       const std::vector<Real> & energies)
+  : _zaids(ZAID), _nZA(_zaids.size()), _energies(energies), _ng(_energies.size() - 1)
 {
 }
 
 unsigned int
-DiscretePKAPDFBase::sampleHelper(const MultiIndex<Real> & marginal_pdf, const MultiIndex<Real>::size_type indices) const
+DiscretePKAPDFBase::sampleHelper(const MultiIndex<Real> & marginal_pdf,
+                                 const MultiIndex<Real>::size_type indices) const
 {
   if (marginal_pdf.dim() - indices.size() != 1)
-    mooseError("For sampling the indices vector must reduce the marginal_pdf to a one-dimensional ladder function.");
+    mooseError("For sampling the indices vector must reduce the marginal_pdf to a one-dimensional "
+               "ladder function.");
   MultiIndex<Real>::size_type dimension(indices.size());
   for (unsigned int j = 0; j < indices.size(); ++j)
     dimension[j] = j;

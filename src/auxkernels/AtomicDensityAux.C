@@ -13,17 +13,21 @@
 
 registerMooseObject("MagpieApp", AtomicDensityAux);
 
-template<>
-InputParameters validParams<AtomicDensityAux>()
+template <>
+InputParameters
+validParams<AtomicDensityAux>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addClassDescription("Compute the atomic density as Atoms/volume at an element using data from a MyTRIMRasterizer. Volume is in the Mesh units set in the rasterizer.");
-  params.addRequiredParam<UserObjectName>("rasterizer", "MyTRIMRasterizer object to provide material data");
+  params.addClassDescription("Compute the atomic density as Atoms/volume at an element using data "
+                             "from a MyTRIMRasterizer. Volume is in the Mesh units set in the "
+                             "rasterizer.");
+  params.addRequiredParam<UserObjectName>("rasterizer",
+                                          "MyTRIMRasterizer object to provide material data");
   return params;
 }
 
-AtomicDensityAux::AtomicDensityAux(const InputParameters & parameters) :
-    AuxKernel(parameters),
+AtomicDensityAux::AtomicDensityAux(const InputParameters & parameters)
+  : AuxKernel(parameters),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _volume_scale(Utility::pow<3>(_rasterizer.getTrimParameters().length_scale / 1000.0))
 {

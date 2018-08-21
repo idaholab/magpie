@@ -14,9 +14,11 @@
 
 #include <sstream>
 
-namespace MagpieUtils {
+namespace MagpieUtils
+{
 
-Point randomElementPoint(const Elem & el, const Point & rnd)
+Point
+randomElementPoint(const Elem & el, const Point & rnd)
 {
   FEType fe_type(el.default_order());
 
@@ -62,11 +64,11 @@ Point randomElementPoint(const Elem & el, const Point & rnd)
         break;
 
       // three more tets in the corners of the cube
-      else if (ref(0) + 1 - ref(1) + 1- ref(2) < 1)
+      else if (ref(0) + 1 - ref(1) + 1 - ref(2) < 1)
         ref = Point(ref(0), 1.0 - ref(1), 1.0 - ref(2));
-      else if (1 - ref(0) + ref(1) + 1- ref(2) < 1)
+      else if (1 - ref(0) + ref(1) + 1 - ref(2) < 1)
         ref = Point(1.0 - ref(0), ref(1), 1.0 - ref(2));
-      else if (1- ref(0) + 1 - ref(1) + ref(2) < 1)
+      else if (1 - ref(0) + 1 - ref(1) + ref(2) < 1)
         ref = Point(1.0 - ref(0), 1.0 - ref(1), ref(2));
 
       // internal tet pair

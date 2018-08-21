@@ -18,10 +18,15 @@
 // Specialization for PointListAdaptor<MyTRIMDefectBufferItem>
 template <>
 inline const Point &
-PointListAdaptor<ThreadedRecoilLoopBase::MyTRIMDefectBufferItem>::getPoint(const ThreadedRecoilLoopBase::MyTRIMDefectBufferItem & item) const { return item.first; }
+PointListAdaptor<ThreadedRecoilLoopBase::MyTRIMDefectBufferItem>::getPoint(
+    const ThreadedRecoilLoopBase::MyTRIMDefectBufferItem & item) const
+{
+  return item.first;
+}
 
-ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
-    _rasterizer(rasterizer),
+ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasterizer,
+                                               const MooseMesh & mesh)
+  : _rasterizer(rasterizer),
     _trim_parameters(_rasterizer.getTrimParameters()),
     _nvars(_trim_parameters.nVars()),
     _mesh(mesh),
@@ -31,8 +36,9 @@ ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const MyTRIMRasterizer & rasteriz
 }
 
 // Splitting Constructor
-ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x, Threads::split /*split*/) :
-    _rasterizer(x._rasterizer),
+ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x,
+                                               Threads::split /*split*/)
+  : _rasterizer(x._rasterizer),
     _trim_parameters(x._trim_parameters),
     _nvars(x._nvars),
     _mesh(x._mesh),
@@ -42,7 +48,7 @@ ThreadedRecoilLoopBase::ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x,
 }
 
 void
-ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
+ThreadedRecoilLoopBase::operator()(const PKARange & pka_list)
 {
   // fetch a point locator
   _pl = _mesh.getPointLocator();
@@ -57,7 +63,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   std::queue<MyTRIM_NS::IonBase *> recoils;
 
   // create a list potentially used for energy deposition
-  std::list<std::pair<Point, Real> > edep_list;
+  std::list<std::pair<Point, Real>> edep_list;
 
   // build the requested TRIM module
   std::unique_ptr<MooseMyTRIMCore> TRIM;
@@ -85,7 +91,8 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
   // copy the pka list into the recoil queue
   for (auto && pka : pka_list)
   {
-    // seed the RNG with the seed assigned to the primary knock on atom (for parallel reproducibility)
+    // seed the RNG with the seed assigned to the primary knock on atom (for parallel
+    // reproducibility)
     _simconf.seed(pka._seed);
 
     // push primary knock on atom onto the recoil queue
@@ -147,12 +154,14 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
             if (recoil->_state == MyTRIM_NS::IonBase::INTERSTITIAL)
               _interstitial_buffer.push_back(std::make_pair(recoil->_pos, recoil->_tag));
             else if (recoil->_state == MyTRIM_NS::IonBase::REPLACEMENT)
-              addDefectToResult(_rasterizer.periodicPoint(recoil->_pos), recoil->_tag, REPLACEMENT_IN);
-            // BUG: untracked PKAs in replacement collisions will cause a REPLACEMENT_OUT without a REPLACEMENT_IN!
+              addDefectToResult(
+                  _rasterizer.periodicPoint(recoil->_pos), recoil->_tag, REPLACEMENT_IN);
+            // BUG: untracked PKAs in replacement collisions will cause a REPLACEMENT_OUT without a
+            // REPLACEMENT_IN!
           }
 
           // store energy deposition
-          for (auto & edep: edep_list)
+          for (auto & edep : edep_list)
             addEnergyToResult(_rasterizer.periodicPoint(edep.first), edep.second);
           edep_list.clear();
         }
@@ -171,10 +180,10 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
     {
       // 1. build kd-tree for the vacancies
       const unsigned int max_leaf_size = 50; // slightly affects runtime
-      auto point_list = PointListAdaptor<MyTRIMDefectBufferItem>(_vacancy_buffer.begin(), _vacancy_buffer.end());
+      auto point_list =
+          PointListAdaptor<MyTRIMDefectBufferItem>(_vacancy_buffer.begin(), _vacancy_buffer.end());
       auto kd_tree = libmesh_make_unique<KDTreeType>(
-          LIBMESH_DIM, point_list,
-          nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
+          LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
 
       mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
       kd_tree->buildIndex();
@@ -184,7 +193,7 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
 
       // 2. iterate over interstitials and recombine them if they are with r_rec of a vacancy
       std::vector<std::pair<std::size_t, Real>> ret_matches;
-      for (auto & i: _interstitial_buffer)
+      for (auto & i : _interstitial_buffer)
       {
         ret_matches.clear();
         std::size_t n_result = kd_tree->radiusSearch(&(i.first(0)), r_rec2, ret_matches, params);
@@ -205,12 +214,11 @@ ThreadedRecoilLoopBase::operator() (const PKARange & pka_list)
       }
     }
 
-
     // add remaining defects to result
-    for (auto & i: _interstitial_buffer) // the should happen above
+    for (auto & i : _interstitial_buffer) // the should happen above
       if (i.second != libMesh::invalid_uint)
         addDefectToResult(_rasterizer.periodicPoint(i.first), i.second, INTERSTITIAL);
-    for (auto & v: _vacancy_buffer)
+    for (auto & v : _vacancy_buffer)
       if (v.second != libMesh::invalid_uint)
         addDefectToResult(_rasterizer.periodicPoint(v.first), v.second, VACANCY);
   }
