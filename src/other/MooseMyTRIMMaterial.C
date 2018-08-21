@@ -8,8 +8,8 @@
 
 #include "MooseMyTRIMMaterial.h"
 
-MooseMyTRIMMaterial::MooseMyTRIMMaterial(MyTRIM_NS::SimconfType * simconf) :
-    MyTRIM_NS::MaterialBase(simconf, 0.0)
+MooseMyTRIMMaterial::MooseMyTRIMMaterial(MyTRIM_NS::SimconfType * simconf)
+  : MyTRIM_NS::MaterialBase(simconf, 0.0)
 {
 }
 

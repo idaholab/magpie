@@ -13,27 +13,34 @@
 
 registerMooseObject("MagpieApp", IsotopeRecoilRate);
 
-template<>
-InputParameters validParams<IsotopeRecoilRate>()
+template <>
+InputParameters
+validParams<IsotopeRecoilRate>()
 {
   InputParameters params = validParams<GeneralPostprocessor>();
-  params.addRequiredParam<std::string>("target_isotope", "The isotope name that you want to get the total recoil rate for");
+  params.addRequiredParam<std::string>(
+      "target_isotope", "The isotope name that you want to get the total recoil rate for");
   params.addRequiredParam<unsigned int>("point_id", "The index of the point in neutronics_sampler");
-  params.addRequiredParam<UserObjectName>("neutronics_sampler", "The neutronics sampler object that the data is retrieved from");
-  params.addParam<PostprocessorName>("scaling_factor", 1, "A scaling factor multiplying the isotope recoil rate");
-  params.addClassDescription("Gets the total recoil rate from target_isotope at point point_id contained in the neutronics_sampler");
+  params.addRequiredParam<UserObjectName>(
+      "neutronics_sampler", "The neutronics sampler object that the data is retrieved from");
+  params.addParam<PostprocessorName>(
+      "scaling_factor", 1, "A scaling factor multiplying the isotope recoil rate");
+  params.addClassDescription("Gets the total recoil rate from target_isotope at point point_id "
+                             "contained in the neutronics_sampler");
   return params;
 }
 
-IsotopeRecoilRate::IsotopeRecoilRate(const InputParameters & params) :
-    GeneralPostprocessor(params),
+IsotopeRecoilRate::IsotopeRecoilRate(const InputParameters & params)
+  : GeneralPostprocessor(params),
     _target_isotope(getParam<std::string>("target_isotope")),
     _point_id(getParam<unsigned int>("point_id")),
     _neutronics_sampler(getUserObject<NeutronicsSpectrumSamplerBase>("neutronics_sampler")),
     _scaling_factor(getPostprocessorValue("scaling_factor"))
 {
   if (_neutronics_sampler.getNumberOfPoints() < _point_id)
-    mooseError("The provided neutronics sampler object only has", _neutronics_sampler.getNumberOfPoints(), " points");
+    mooseError("The provided neutronics sampler object only has",
+               _neutronics_sampler.getNumberOfPoints(),
+               " points");
 
   if (!_neutronics_sampler.hasIsotope(_target_isotope))
     mooseError("Target isotope ", _target_isotope, " not preset in neutronics sampler object");

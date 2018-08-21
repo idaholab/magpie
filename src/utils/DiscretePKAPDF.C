@@ -11,8 +11,8 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
-DiscretePKAPDF::DiscretePKAPDF() :
-    DiscretePKAPDFBase(),
+DiscretePKAPDF::DiscretePKAPDF()
+  : DiscretePKAPDFBase(),
     _probability_density_function(MultiIndex<Real>({1})),
     _marginal_cdf_mu(MultiIndex<Real>({1})),
     _marginal_cdf_phi(MultiIndex<Real>({1})),
@@ -21,8 +21,10 @@ DiscretePKAPDF::DiscretePKAPDF() :
 {
 }
 
-DiscretePKAPDF::DiscretePKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
-    DiscretePKAPDFBase(ZAID, energies),
+DiscretePKAPDF::DiscretePKAPDF(const std::vector<unsigned int> & ZAID,
+                               const std::vector<Real> & energies,
+                               const MultiIndex<Real> & probabilities)
+  : DiscretePKAPDFBase(ZAID, energies),
     _na(probabilities.size()[2]),
     _dphi(2.0 * libMesh::pi / _na),
     _np(probabilities.size()[3]),
@@ -53,7 +55,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
    */
   MultiIndex<Real>::size_type shape(4);
   MultiIndex<Real>::size_type index(4);
-  for (auto it: probabilities)
+  for (auto it : probabilities)
   {
     index = it.first;
     Real wt = _dmu * _dphi * (_energies[index[1]] - _energies[index[1] + 1]);
@@ -78,7 +80,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 2: Compute cdf
-  for (auto zaid: _marginal_cdf_zaid)
+  for (auto zaid : _marginal_cdf_zaid)
   {
     index = zaid.first;
     index[0] -= 1;
@@ -87,7 +89,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (auto zaid: _marginal_cdf_zaid)
+  for (auto zaid : _marginal_cdf_zaid)
   {
     index = zaid.first;
     index[0] = _nZA - 1;
@@ -114,7 +116,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
     }
 
   // Step 2: Compute cdf
-  for (auto energy: _marginal_cdf_energy)
+  for (auto energy : _marginal_cdf_energy)
   {
     index = energy.first;
     index[1] -= 1;
@@ -123,7 +125,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (auto energy: _marginal_cdf_energy)
+  for (auto energy : _marginal_cdf_energy)
   {
     index = energy.first;
     index[1] = _ng - 1;
@@ -151,7 +153,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
       }
 
   // Step 2: Compute cdf
-  for (auto phi: _marginal_cdf_phi)
+  for (auto phi : _marginal_cdf_phi)
   {
     index = phi.first;
     index[2] -= 1;
@@ -160,7 +162,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (auto phi: _marginal_cdf_phi)
+  for (auto phi : _marginal_cdf_phi)
   {
     index = phi.first;
     index[2] = _na - 1;
@@ -174,7 +176,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   _marginal_cdf_mu = probabilities;
 
   // Step 2: Compute cdf
-  for (auto mu: _marginal_cdf_mu)
+  for (auto mu : _marginal_cdf_mu)
   {
     index = mu.first;
     index[3] -= 1;
@@ -183,7 +185,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 3: Renormalize to ensure that cdf[-1] == 1
-  for (auto mu: _marginal_cdf_mu)
+  for (auto mu : _marginal_cdf_mu)
   {
     index = mu.first;
     index[3] = _np - 1;
@@ -194,7 +196,7 @@ DiscretePKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
 void
 DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const
 {
-  //resize initial_state
+  // resize initial_state
   initial_state.resize(1);
 
   /**
@@ -214,7 +216,9 @@ DiscretePKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) cons
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  initial_state[0]._E = (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() + _energies[sampled_indices[1] + 1];
+  initial_state[0]._E =
+      (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() +
+      _energies[sampled_indices[1] + 1];
 
   // NOTE: we need to sample the direction in this class because the direction is anisotropic
   Real sampled_phi = _dphi * MooseRandom::rand() + _dphi * sampled_indices[2];
@@ -237,7 +241,8 @@ DiscretePKAPDF::computeMagnitude(MultiIndex<Real> probabilities)
   }
 }
 
-std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf)
+std::ostream &
+operator<<(std::ostream & out, const DiscretePKAPDF & pdf)
 {
   out << "Magnitude " << pdf._magnitude << "\n";
   out << "ZAIDs ";
@@ -256,10 +261,10 @@ std::ostream & operator<< (std::ostream & out, const DiscretePKAPDF & pdf)
         {
           Real mu = (Real(jM) + 0.5) * pdf._dmu - 1.0;
           Real phi = (Real(jP) + 0.5) * pdf._dphi;
-          RealVectorValue omega(mu, std::cos(phi) * std::sqrt(1 - mu * mu),
-                                std::sin(phi) * std::sqrt(1 - mu * mu));
-          out << "Zaid: " << pdf._zaids[jZA]
-              << " Energies: [" << pdf._energies[jE + 1] << ", " << pdf._energies[jE] << "] "
+          RealVectorValue omega(
+              mu, std::cos(phi) * std::sqrt(1 - mu * mu), std::sin(phi) * std::sqrt(1 - mu * mu));
+          out << "Zaid: " << pdf._zaids[jZA] << " Energies: [" << pdf._energies[jE + 1] << ", "
+              << pdf._energies[jE] << "] "
               << " phi [" << jP * pdf._dphi << ", " << (jP + 1) * pdf._dphi << "] "
               << " mu: [" << jM * pdf._dmu - 1.0 << ", " << (jM + 1) * pdf._dmu - 1.0 << "] "
               << " omega " << omega

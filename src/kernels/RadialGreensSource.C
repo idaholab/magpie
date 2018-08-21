@@ -40,5 +40,5 @@ RadialGreensSource::precalculateResidual()
 Real
 RadialGreensSource::computeQpResidual()
 {
-  return - _gamma * _result->second[_qp] / (_JxW[_qp] * _coord[_qp]) * _test[_i][_qp];
+  return -_gamma * _result->second[_qp] / (_JxW[_qp] * _coord[_qp]) * _test[_i][_qp];
 }

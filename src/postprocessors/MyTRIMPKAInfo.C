@@ -11,19 +11,25 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAInfo);
 
-template<>
-InputParameters validParams<MyTRIMPKAInfo>()
+template <>
+InputParameters
+validParams<MyTRIMPKAInfo>()
 {
   InputParameters params = validParams<GeneralPostprocessor>();
-  params.addClassDescription("Aggregate a global property of the primary knock-on atom (PKA) list (e.g. total energy or number of PKA)");
-  params.addRequiredParam<UserObjectName>("rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
+  params.addClassDescription("Aggregate a global property of the primary knock-on atom (PKA) list "
+                             "(e.g. total energy or number of PKA)");
+  params.addRequiredParam<UserObjectName>(
+      "rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
   MooseEnum value_type_options("TOTAL_MASS=0 TOTAL_ENERGY TOTAL_CHARGE TOTAL_NUMBER");
-  params.addParam<MooseEnum>("value_type", value_type_options, "The property of the PKA set which is aggregated by this postprocessor");
+  params.addParam<MooseEnum>(
+      "value_type",
+      value_type_options,
+      "The property of the PKA set which is aggregated by this postprocessor");
   return params;
 }
 
-MyTRIMPKAInfo::MyTRIMPKAInfo(const InputParameters & params) :
-    GeneralPostprocessor(params),
+MyTRIMPKAInfo::MyTRIMPKAInfo(const InputParameters & params)
+  : GeneralPostprocessor(params),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _value_type(getParam<MooseEnum>("value_type").getEnum<ValueType>())
 {

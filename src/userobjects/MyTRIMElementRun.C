@@ -17,17 +17,19 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementRun);
 
-template<>
-InputParameters validParams<MyTRIMElementRun>()
+template <>
+InputParameters
+validParams<MyTRIMElementRun>()
 {
   InputParameters params = validParams<MyTRIMRunBase>();
-  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample and gather the results for use with an element averaged source Kernel.");
+  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire "
+                             "sample and gather the results for use with an element averaged "
+                             "source Kernel.");
   return params;
 }
 
-MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters) :
-    MyTRIMRunBase(parameters),
-    _zero(_nvars)
+MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters)
+  : MyTRIMRunBase(parameters), _zero(_nvars)
 {
 }
 
@@ -124,7 +126,8 @@ MyTRIMElementRun::serialize(std::string & serialized_buffer)
 void
 MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
 {
-  mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
+  mooseAssert(serialized_buffers.size() == _app.n_processors(),
+              "Unexpected size of serialized_buffers: " << serialized_buffers.size());
 
   // The input string stream used for deserialization
   std::istringstream iss;
@@ -154,8 +157,9 @@ MyTRIMElementRun::deserialize(std::vector<std::string> & serialized_buffers)
         _result_map.emplace_hint(j, other_result);
       else
       {
-        mooseAssert(other_result.second._defects.size() == j->second._defects.size(), "Inconsistent TRIM defect vector sizes across processors.");
-        mooseAssert( j->second._defects.size() == _nvars, "Defect vector size must be _nvars.");
+        mooseAssert(other_result.second._defects.size() == j->second._defects.size(),
+                    "Inconsistent TRIM defect vector sizes across processors.");
+        mooseAssert(j->second._defects.size() == _nvars, "Defect vector size must be _nvars.");
 
         for (unsigned int k = 0; k < _nvars; ++k)
           for (std::size_t l = 0; l < ThreadedRecoilDiracSourceLoop::N_DEFECTS; ++l)
