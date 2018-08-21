@@ -8,14 +8,16 @@
 
 #include "ThreadedRecoilDiracSourceLoop.h"
 
-ThreadedRecoilDiracSourceLoop::ThreadedRecoilDiracSourceLoop(const MyTRIMRasterizer & rasterizer, const MooseMesh & mesh) :
-    ThreadedRecoilLoopBase(rasterizer, mesh)
+ThreadedRecoilDiracSourceLoop::ThreadedRecoilDiracSourceLoop(const MyTRIMRasterizer & rasterizer,
+                                                             const MooseMesh & mesh)
+  : ThreadedRecoilLoopBase(rasterizer, mesh)
 {
 }
 
 // Splitting Constructor
-ThreadedRecoilDiracSourceLoop::ThreadedRecoilDiracSourceLoop(const ThreadedRecoilDiracSourceLoop & x, Threads::split /*split*/) :
-    ThreadedRecoilLoopBase(x, Threads::split())
+ThreadedRecoilDiracSourceLoop::ThreadedRecoilDiracSourceLoop(
+    const ThreadedRecoilDiracSourceLoop & x, Threads::split /*split*/)
+  : ThreadedRecoilLoopBase(x, Threads::split())
 {
 }
 
@@ -26,14 +28,16 @@ ThreadedRecoilDiracSourceLoop::join(const ThreadedRecoilDiracSourceLoop & rl)
 }
 
 void
-ThreadedRecoilDiracSourceLoop::addDefectToResult(const Point & p, unsigned int var, ThreadedRecoilDiracSourceLoop::DefectType type)
+ThreadedRecoilDiracSourceLoop::addDefectToResult(const Point & p,
+                                                 unsigned int var,
+                                                 ThreadedRecoilDiracSourceLoop::DefectType type)
 {
   const Elem * elem = (*_pl)(p);
   if (elem != nullptr && var < _nvars)
     _result_list.push_back(MyTRIMResult(p, var, type, elem->id()));
 }
 
-template<>
+template <>
 void
 dataStore(std::ostream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & dsl, void * context)
 {
@@ -43,7 +47,7 @@ dataStore(std::ostream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & d
   dataStore(stream, dsl._elem_id, context);
 }
 
-template<>
+template <>
 void
 dataLoad(std::istream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & dsl, void * context)
 {

@@ -11,11 +11,12 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
 
-PointLocatorRegularOrthogonalData::PointLocatorRegularOrthogonalData(const std::vector<unsigned int> & cell_count,
-                                                                     const Point & min_corner,
-                                                                     const Point & max_corner,
-                                                                     const MeshBase & mesh) :
-    _dim(cell_count.size()),
+PointLocatorRegularOrthogonalData::PointLocatorRegularOrthogonalData(
+    const std::vector<unsigned int> & cell_count,
+    const Point & min_corner,
+    const Point & max_corner,
+    const MeshBase & mesh)
+  : _dim(cell_count.size()),
     _cell_count(cell_count),
     _min_corner(min_corner),
     _cell_size(max_corner - min_corner)
@@ -35,7 +36,7 @@ PointLocatorRegularOrthogonalData::PointLocatorRegularOrthogonalData(const std::
   _root_elems.assign(num_root_elems, nullptr);
 
   // sort all level 0 elements into the table
-  auto  el = mesh.level_elements_begin(0);
+  auto el = mesh.level_elements_begin(0);
   const auto end_el = mesh.level_elements_end(0);
   for (; el != end_el; ++el)
   {

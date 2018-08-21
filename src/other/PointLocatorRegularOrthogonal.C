@@ -14,15 +14,13 @@
 #include "libmesh/mesh_base.h"
 
 PointLocatorRegularOrthogonal::PointLocatorRegularOrthogonal(const MeshBase & mesh,
-                                                             const PointLocatorBase * master) :
-    PointLocatorBase(mesh, master),
-    _out_of_mesh_mode(false),
-    _data(nullptr)
+                                                             const PointLocatorBase * master)
+  : PointLocatorBase(mesh, master), _out_of_mesh_mode(false), _data(nullptr)
 {
   if (master != nullptr)
   {
     const PointLocatorRegularOrthogonal * my_master =
-      cast_ptr<const PointLocatorRegularOrthogonal *>(master);
+        cast_ptr<const PointLocatorRegularOrthogonal *>(master);
 
     if (!my_master->initialized())
       mooseError("Linking a slave point locator to an uninitialized master is not allowed.");
@@ -32,10 +30,7 @@ PointLocatorRegularOrthogonal::PointLocatorRegularOrthogonal(const MeshBase & me
   }
 }
 
-PointLocatorRegularOrthogonal::~PointLocatorRegularOrthogonal()
-{
-  this->clear ();
-}
+PointLocatorRegularOrthogonal::~PointLocatorRegularOrthogonal() { this->clear(); }
 
 void
 PointLocatorRegularOrthogonal::clear()
@@ -57,7 +52,8 @@ PointLocatorRegularOrthogonal::clear()
 void
 PointLocatorRegularOrthogonal::init()
 {
-  mooseError("PointLocatorRegularOrthogonal needs to be explicitly initialized with mesh meta data.");
+  mooseError(
+      "PointLocatorRegularOrthogonal needs to be explicitly initialized with mesh meta data.");
 }
 
 void
@@ -73,8 +69,8 @@ PointLocatorRegularOrthogonal::init(const std::vector<unsigned int> & cell_count
 }
 
 const Elem *
-PointLocatorRegularOrthogonal::operator() (const Point & p,
-                                           const std::set<subdomain_id_type> * /* allowed_subdomains */) const
+PointLocatorRegularOrthogonal::
+operator()(const Point & p, const std::set<subdomain_id_type> * /* allowed_subdomains */) const
 {
   Point el_pos;
   const Elem * el = _data->rootElement(p, el_pos);
@@ -90,7 +86,8 @@ PointLocatorRegularOrthogonal::operator() (const Point & p,
     for (unsigned int i = 0; i < _data->_dim; ++i)
       if (el_pos(i) >= 0.5)
       {
-        // fortunately the libMesh child ordering is this simple (bit 0/1 for left right of center point, etc.)
+        // fortunately the libMesh child ordering is this simple (bit 0/1 for left right of center
+        // point, etc.)
         child += 1 << i;
         el_pos(i) = (el_pos(i) - 0.5) * 2.0;
       }
@@ -102,11 +99,13 @@ PointLocatorRegularOrthogonal::operator() (const Point & p,
 }
 
 void
-PointLocatorRegularOrthogonal::operator() (const Point & p,
-                                           std::set<const Elem *> & candidate_elements,
-                                           const std::set<subdomain_id_type> * /* allowed_subdomains */) const
+PointLocatorRegularOrthogonal::
+operator()(const Point & p,
+           std::set<const Elem *> & candidate_elements,
+           const std::set<subdomain_id_type> * /* allowed_subdomains */) const
 {
-  // return just one match, the exact one TODO: return all neighbors if we are fuzzily on a face/edge/node
+  // return just one match, the exact one TODO: return all neighbors if we are fuzzily on a
+  // face/edge/node
   candidate_elements.insert((*this)(p));
   return;
 }

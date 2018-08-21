@@ -16,7 +16,8 @@ validParams<RMSDistance>()
 {
   InputParameters params = validParams<ElementIntegralVariablePostprocessor>();
   params.addRequiredParam<Point>("point", "Point to which the RMS distance is computed");
-  params.addClassDescription("Computes the RMS distance of a distribution with respect to a fixed point.");
+  params.addClassDescription(
+      "Computes the RMS distance of a distribution with respect to a fixed point.");
   return params;
 }
 

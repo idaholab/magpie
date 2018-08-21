@@ -10,19 +10,24 @@
 
 registerMooseObject("MagpieApp", PKAConstant);
 
-template<>
-InputParameters validParams<PKAConstant>()
+template <>
+InputParameters
+validParams<PKAConstant>()
 {
   InputParameters params = validParams<PKAEmpiricalBase>();
-  params.addParam<Real>("pka_rate", 1e-8, "PKA rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
+  params.addClassDescription("PKAs with constant mass, charge, energy, and rate");
+  params.addParam<Real>(
+      "pka_rate",
+      1e-8,
+      "PKA rate per unit volume (uses mesh units defined in the rasterizer and moose time units)");
   params.addRequiredParam<Real>("Z", "PKA nuclear charge");
   params.addRequiredParam<Real>("m", "PKA mass in amu");
   params.addRequiredParam<Real>("E", "PKA energy in eV");
   return params;
 }
 
-PKAConstant::PKAConstant(const InputParameters & parameters) :
-    PKAEmpiricalBase(parameters),
+PKAConstant::PKAConstant(const InputParameters & parameters)
+  : PKAEmpiricalBase(parameters),
     _pka_rate(getParam<Real>("pka_rate")),
     _Z(getParam<Real>("Z")),
     _m(getParam<Real>("m")),

@@ -12,19 +12,23 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAEnergyHistogram);
 
-template<>
-InputParameters validParams<MyTRIMPKAEnergyHistogram>()
+template <>
+InputParameters
+validParams<MyTRIMPKAEnergyHistogram>()
 {
   InputParameters params = validParams<GeneralVectorPostprocessor>();
-  params.addClassDescription("Generate an energy histogram for the primary knock-on atom (PKA) list");
-  params.addRequiredParam<UserObjectName>("rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
+  params.addClassDescription(
+      "Generate an energy histogram for the primary knock-on atom (PKA) list");
+  params.addRequiredParam<UserObjectName>(
+      "rasterizer", "Name of the MyTRIMRasterizer userobject to pull data from");
   params.addParam<unsigned int>("channel_number", 50, "Number of energy channels");
-  params.addRangeCheckedParam<Real>("channel_width", 5.0e6, "channel_width > 0", "Energy channel width in eV");
+  params.addRangeCheckedParam<Real>(
+      "channel_width", 5.0e6, "channel_width > 0", "Energy channel width in eV");
   return params;
 }
 
-MyTRIMPKAEnergyHistogram::MyTRIMPKAEnergyHistogram(const InputParameters & params) :
-    GeneralVectorPostprocessor(params),
+MyTRIMPKAEnergyHistogram::MyTRIMPKAEnergyHistogram(const InputParameters & params)
+  : GeneralVectorPostprocessor(params),
     _rasterizer(getUserObject<MyTRIMRasterizer>("rasterizer")),
     _nchannels(getParam<unsigned int>("channel_number")),
     _deltaE(getParam<Real>("channel_width")),

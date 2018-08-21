@@ -17,15 +17,17 @@
 #include <fstream>
 #include <map>
 
-DiscreteFissionPKAPDF::DiscreteFissionPKAPDF() :
-    DiscretePKAPDFBase(),
+DiscreteFissionPKAPDF::DiscreteFissionPKAPDF()
+  : DiscretePKAPDFBase(),
     _marginal_cdf_target(MultiIndex<Real>({1})),
     _conditional_cdf_energy(MultiIndex<Real>({1}))
 {
 }
 
-DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID, const std::vector<Real> & energies, const MultiIndex<Real> & probabilities) :
-    DiscretePKAPDFBase(ZAID, energies),
+DiscreteFissionPKAPDF::DiscreteFissionPKAPDF(const std::vector<unsigned int> & ZAID,
+                                             const std::vector<Real> & energies,
+                                             const MultiIndex<Real> & probabilities)
+  : DiscretePKAPDFBase(ZAID, energies),
     _marginal_cdf_target(probabilities),
     _conditional_cdf_energy(probabilities)
 {
@@ -60,7 +62,7 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   }
 
   // Step 2: Compute cdf
-  for (auto target: _marginal_cdf_target)
+  for (auto target : _marginal_cdf_target)
   {
     index = target.first;
     index[0] -= 1;
@@ -71,14 +73,14 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   // Step 3: Renormalize to ensure that cdf[-1] == 1
   index[0] = _nZA - 1;
   Real last_value = _marginal_cdf_target(index);
-  for (auto target: _marginal_cdf_target)
+  for (auto target : _marginal_cdf_target)
     target.second /= last_value;
 
   // Step 1: Compute the conditional distribution of the target w.r.t the sampled energy
   _conditional_cdf_energy = probabilities;
 
   // Step 2: Compute cdf
-  for (auto energy: _conditional_cdf_energy)
+  for (auto energy : _conditional_cdf_energy)
   {
     index = energy.first;
     index[1] -= 1;
@@ -90,14 +92,14 @@ DiscreteFissionPKAPDF::precomputeCDF(MultiIndex<Real> probabilities)
   std::vector<Real> last_element_per_target;
   for (unsigned int j = 0; j < _conditional_cdf_energy.size()[0]; ++j)
     last_element_per_target.push_back(_conditional_cdf_energy({j, _ng - 1}));
-  for (auto energy: _conditional_cdf_energy)
+  for (auto energy : _conditional_cdf_energy)
     energy.second /= last_element_per_target[energy.first[0]];
 }
 
 void
 DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_state) const
 {
-  //resize initial_state
+  // resize initial_state
   initial_state.resize(2);
 
   // first sample the target ZAID and the energy group of the incident neutron
@@ -111,7 +113,9 @@ DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_stat
 
   // the real random variables also need to be resampled uniformly
   // within bin index[j]
-  auto neutron_energy = (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() + _energies[sampled_indices[1] + 1];
+  auto neutron_energy =
+      (_energies[sampled_indices[1]] - _energies[sampled_indices[1] + 1]) * MooseRandom::rand() +
+      _energies[sampled_indices[1] + 1];
 
   // pull the right fission yield table and sample Z, A, and energy
   auto energy = MagpieUtils::determineNeutronType(neutron_energy);
@@ -123,7 +127,10 @@ DiscreteFissionPKAPDF::drawSample(std::vector<MyTRIM_NS::IonBase> & initial_stat
 
   /// check if key exists
   if (zaid_map.find(key) == zaid_map.end())
-    mooseError("Fission product ZAID's not found for this target isotope, ", key, " at this energy, ", energy);
+    mooseError("Fission product ZAID's not found for this target isotope, ",
+               key,
+               " at this energy, ",
+               energy);
 
   if (cdf_map.find(key) == cdf_map.end())
     mooseError("Sum yield not found for this target isotope, ", key, " at this energy, ", energy);
@@ -163,9 +170,9 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
   for (unsigned int energy = 0; energy < MagpieUtils::NET_MAX; ++energy)
   {
     // Dummy maps
-    std::map<unsigned int, std::vector<unsigned int> > zaid_map;
-    std::map<unsigned int, std::vector<Real> > cdf_map;
-    for (auto & zaid: zaid_list)
+    std::map<unsigned int, std::vector<unsigned int>> zaid_map;
+    std::map<unsigned int, std::vector<Real>> cdf_map;
+    for (auto & zaid : zaid_list)
     {
       // check if $ENDF_FP_DIR is set
       auto path = std::getenv("ENDF_FP_DIR");
@@ -173,7 +180,8 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
         mooseError("Set $ENDF_FP_DIR to the directory holding the sum yield data files.");
 
       // check if file exists, if not continue
-      std::string filename = path + std::to_string(zaid) + "_" + MagpieUtils::neutronEnergyName(energy) + ".txt";
+      std::string filename =
+          path + std::to_string(zaid) + "_" + MagpieUtils::neutronEnergyName(energy) + ".txt";
       if (!MooseUtils::checkFileReadable(filename, false, false))
       {
         // most isotopes have fission data for High but not for Fast wich is weird
@@ -208,7 +216,7 @@ DiscreteFissionPKAPDF::readFissionData(const std::vector<unsigned int> & zaid_li
       // renormalize to ensure that cdf[-1] == 1
       unsigned int last_index = fission_probabilities.size() - 1;
       Real last_value = fission_probabilities[last_index];
-      for (auto & probability: fission_probabilities)
+      for (auto & probability : fission_probabilities)
         probability /= last_value;
 
       // Step 4: Store std::vectors into maps

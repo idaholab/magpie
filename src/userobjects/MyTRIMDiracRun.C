@@ -17,16 +17,17 @@
 
 registerMooseObject("MagpieApp", MyTRIMDiracRun);
 
-template<>
-InputParameters validParams<MyTRIMDiracRun>()
+template <>
+InputParameters
+validParams<MyTRIMDiracRun>()
 {
   InputParameters params = validParams<MyTRIMRunBase>();
-  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire sample and gather the results for use with a source DiracKernel.");
+  params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire "
+                             "sample and gather the results for use with a source DiracKernel.");
   return params;
 }
 
-MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) :
-    MyTRIMRunBase(parameters)
+MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) : MyTRIMRunBase(parameters)
 {
   if (_trim_parameters.desired_npka != 0)
     mooseError("Result scaling not supported in MyTRIMDiracRun");
@@ -102,7 +103,8 @@ MyTRIMDiracRun::serialize(std::string & serialized_buffer)
 void
 MyTRIMDiracRun::deserialize(std::vector<std::string> & serialized_buffers)
 {
-  mooseAssert(serialized_buffers.size() == _app.n_processors(), "Unexpected size of serialized_buffers: " << serialized_buffers.size());
+  mooseAssert(serialized_buffers.size() == _app.n_processors(),
+              "Unexpected size of serialized_buffers: " << serialized_buffers.size());
 
   // The input string stream used for deserialization
   std::istringstream iss;
