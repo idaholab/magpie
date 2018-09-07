@@ -198,6 +198,9 @@ protected:
 
 private:
   bool _execute_this_timestep;
+
+  /// timers
+  PerfID _perf_finalize;
 };
 
 #endif // MYTRIMRASTERIZER_H

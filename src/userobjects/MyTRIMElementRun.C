@@ -29,7 +29,10 @@ validParams<MyTRIMElementRun>()
 }
 
 MyTRIMElementRun::MyTRIMElementRun(const InputParameters & parameters)
-  : MyTRIMRunBase(parameters), _zero(_nvars)
+  : MyTRIMRunBase(parameters),
+    _perf_trim(registerTimedSection("trim", 2)),
+    _perf_finalize(registerTimedSection("finalize", 2)),
+    _zero(_nvars)
 {
 }
 
@@ -55,10 +58,10 @@ MyTRIMElementRun::execute()
            << "Result scaling factor: " << _trim_parameters.result_scaling_factor << std::endl;
 
   // run threads
-  Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");
-  Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
-
-  Moose::perf_log.pop("MyTRIMRecoilLoop", "Solve");
+  {
+    TIME_SECTION(_perf_trim);
+    Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
+  }
 
   // fetch the joined data from thread 0
   _result_map = rl.getResultMap();
@@ -67,6 +70,8 @@ MyTRIMElementRun::execute()
 void
 MyTRIMElementRun::finalize()
 {
+  TIME_SECTION(_perf_finalize);
+
   if (!_rasterizer.executeThisTimestep())
     return;
 

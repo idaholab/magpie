@@ -144,7 +144,8 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _accumulated_time(0.0),
     _accumulated_time_old(0.0),
-    _interval(getParam<unsigned int>("interval"))
+    _interval(getParam<unsigned int>("interval")),
+    _perf_finalize(registerTimedSection("finalize", 2))
 {
   if (_nvars == 0)
     mooseError("Must couple variables to MyTRIMRasterizer.");
@@ -370,6 +371,8 @@ MyTRIMRasterizer::threadJoin(const UserObject & y)
 void
 MyTRIMRasterizer::finalize()
 {
+  TIME_SECTION(_perf_finalize);
+
   // save the accumulated time so that we can properly roll back if the step does not converge
   _accumulated_time_old = _accumulated_time;
 
