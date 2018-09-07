@@ -46,6 +46,11 @@ protected:
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultMap _result_map;
 
+  ///@{ timers
+  PerfID _perf_trim;
+  PerfID _perf_finalize;
+  ///@}
+
 private:
   /// zero result to return for elements that have not been touched by the cascades
   MyTRIMResult _zero;
