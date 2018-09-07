@@ -27,7 +27,10 @@ validParams<MyTRIMDiracRun>()
   return params;
 }
 
-MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters) : MyTRIMRunBase(parameters)
+MyTRIMDiracRun::MyTRIMDiracRun(const InputParameters & parameters)
+  : MyTRIMRunBase(parameters),
+    _perf_trim(registerTimedSection("trim", 2)),
+    _perf_finalize(registerTimedSection("finalize", 2))
 {
   if (_trim_parameters.desired_npka != 0)
     mooseError("Result scaling not supported in MyTRIMDiracRun");
@@ -52,9 +55,10 @@ MyTRIMDiracRun::execute()
   _console << "\nMyTRIM: Running " << _trim_parameters.original_npka << " recoils." << std::endl;
 
   // run threads
-  Moose::perf_log.push("MyTRIMRecoilLoop", "Solve");
-  Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
-  Moose::perf_log.pop("MyTRIMRecoilLoop", "Solve");
+  {
+    TIME_SECTION(_perf_trim);
+    Threads::parallel_reduce(PKARange(_pka_list.begin(), _pka_list.end()), rl);
+  }
 
   // fetch the joined data from thread 0
   _result_list = rl.getResultList();
@@ -63,6 +67,11 @@ MyTRIMDiracRun::execute()
 void
 MyTRIMDiracRun::finalize()
 {
+  TIME_SECTION(_perf_finalize);
+
+  if (!_rasterizer.executeThisTimestep())
+    return;
+
   // for single processor runs we do not need to do anything here
   if (_app.n_processors() == 1)
     return;
