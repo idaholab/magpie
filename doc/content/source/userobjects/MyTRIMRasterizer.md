@@ -12,10 +12,19 @@ as $\gamma_j(\vec{r})$, $M_j$, and $Z_j$, respectively. Loosely speaking
 $\gamma_j(\vec{r})$ represents the number density of isotope $j$ at point
 $\vec{r}$, $M_j$ is the atomic mass, and $Z_j$ is the charge in units of $e$.
 
-The physical meaning of the `var` argument depends on what the user provides for
-the `site_volume` parameter. `site_volume` is a material property and can vary
-with space; it is denoted by $\Omega(\vec{r})$. MyTRIM computes the mass density
-$\rho$ of the material by:
+The physical meaning of the `var` argument is specified in the
+`var_physical_meaning` parameter: it can be either number density
+(atoms / volume) or stoichiometric content (number of atoms in compound). The
+number density should be given in the rasterizer's length units specified by the
+`length_unit` parameter (defaults to Angstrom). If the physical meaning of the
+var parameter is stoichiometric content `site_volume` must be provided.
+`site_volume` is a material property and can hence vary with space; it is
+denoted by $\Omega(\vec{r})$ and its physical meaning is the volume of the
+compound related to the stoichiometric specification in var, e.g. $UO_2$. Note
+that `site_volume` must always be specified in nanometers regardless of
+`length_unit`.
+
+MyTRIM computes the mass density $\rho$ of the material by:
 
 \begin{equation}
   \rho = \sum\limits_{j=1}^J \frac{\gamma_j(\vec{r}) M_j}{N_A \Omega(\vec{r})},
@@ -25,16 +34,15 @@ where $N_A$ is Avogadro's number. We identify $\gamma_j / \Omega$ as the number
 density $N_j$ defined as the number of atoms of species $j$ per unit volume. The
 following choices for $\Omega$ may be usage of the `site_volume` parameter:
 
-$\Omega = 1$: $\gamma_j = N_j$ so that the user should store number densities in
-the variables specified in `var`.
+$\Omega = s$ where $s$: $1$ if `length_unit` is nanometer, $10^{-3}$ if
+`length_unit` is Angstrom, $10^{9}$ if `length_unit` is micro-meter:
+$\gamma_j = N_j$ so that the user should store number densities in the variables
+specified in `var`. Note that `site_volume` will be set automatically in this
+case.
 
 $\Omega \equiv \text{compound volume, e.g. volume of UO}_2$: $\gamma_j$ should
 be the stoichiometric content of species $j$. Using the $\text{UO}_2$ example:
 $\gamma_U = 1$, $\gamma_O=2$.
-
-$\Omega \equiv \text{average volume per atoms, i.e. }
-\frac{\text{volume}}{\text{number of atoms}}$: $\gamma_j$ should be the number
-fraction. In this case $\sum\limits_{j=1}^J \gamma_j=1$.
 
 ## Computing the PKA list
 
