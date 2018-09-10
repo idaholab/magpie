@@ -77,6 +77,12 @@ validParams<MyTRIMRasterizer>()
   InputParameters params = validParams<ElementUserObject>();
   params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM "
                              "binary collision Monte Carlo simulation");
+
+  MooseEnum var_physical_meaning("STOICHIOMETRY NUMBER_DENSITY", "STOICHIOMETRY");
+  params.addParam<MooseEnum>("var_physical_meaning",
+                             var_physical_meaning,
+                             "The physical meaning of the rasterizer variables.");
+
   params.addRequiredCoupledVar("var", "Variables to rasterize");
   params.addCoupledVar("periodic_var",
                        "Optional variables that determines the periodicity. If not supplied the "
@@ -87,7 +93,7 @@ validParams<MyTRIMRasterizer>()
                                      "Tolerance on mass number for tagging PKAs with var id.");
   params.addParam<std::vector<Real>>("Ebind", "Binding energy in eV");
   params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
-  params.addRequiredParam<MaterialPropertyName>(
+  params.addParam<MaterialPropertyName>(
       "site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
   params.addRequiredParam<std::vector<UserObjectName>>("pka_generator",
                                                        "List of PKA generating user objects");
@@ -143,13 +149,14 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
     _nvars(coupledComponents("var")),
     _dim(_mesh.dimension()),
     _var(_nvars),
-    _site_volume_prop(getMaterialProperty<Real>("site_volume")),
+    _site_volume_prop(nullptr),
     _pka_generator_names(getParam<std::vector<UserObjectName>>("pka_generator")),
     _pka_generators(),
     _periodic(isCoupled("periodic_var") ? coupled("periodic_var", 0) : coupled("var", 0)),
     _accumulated_time(0.0),
     _accumulated_time_old(0.0),
-    _interval(getParam<unsigned int>("interval"))
+    _interval(getParam<unsigned int>("interval")),
+    _perf_finalize(registerTimedSection("finalize", 2))
 {
   if (_nvars == 0)
     mooseError("Must couple variables to MyTRIMRasterizer.");
@@ -266,6 +273,15 @@ MyTRIMRasterizer::MyTRIMRasterizer(const InputParameters & parameters)
       mooseError("Unknown length unit.");
   }
 
+  if (getParam<MooseEnum>("var_physical_meaning") == "STOICHIOMETRY")
+  {
+    if (!isParamValid("site_volume"))
+      mooseError("Rasterizer variables are stoiciometric contents, site_volume must be provided.");
+    _site_volume_prop = &getMaterialProperty<Real>("site_volume");
+  }
+  else
+    _site_volume_conversion = Utility::pow<3>(_trim_parameters.length_scale) * 1e-3;
+
   // setup invariant PKA generation parameters
   for (auto & nZ : _pka_parameters._index_Z)
     nZ = std::make_pair(0, 0);
@@ -339,7 +355,10 @@ MyTRIMRasterizer::execute()
       average._elements[i] += qpvol * (*_var[i])[qp];
 
     // average site volume property
-    average._site_volume += qpvol * _site_volume_prop[qp];
+    if (_site_volume_prop)
+      average._site_volume += qpvol * (*_site_volume_prop)[qp];
+    else
+      average._site_volume += qpvol * _site_volume_conversion;
   }
 
   // divide by total element volume
@@ -377,6 +396,8 @@ MyTRIMRasterizer::threadJoin(const UserObject & y)
 void
 MyTRIMRasterizer::finalize()
 {
+  TIME_SECTION(_perf_finalize);
+
   // save the accumulated time so that we can properly roll back if the step does not converge
   _accumulated_time_old = _accumulated_time;
 

@@ -62,5 +62,28 @@
     max_threads = 1
     recover = false
     required_objects = 'PolyatomicRecoil'
+  [./carbon_block_number_density_A]
+    type = 'Exodiff'
+    input = 'carbon_block_number_dens.i'
+    exodiff = 'carbon_block_nd_A.e'
+    abs_zero = 1e-6
+    cli_args = "UserObjects/rasterizer/var_physical_meaning=NUMBER_DENSITY Outputs/file_base=carbon_block_nd_A AuxVariables/cC/initial_condition=0.09"
+    recover = false
+  [../]
+  [./carbon_block_number_density_micron]
+    type = 'Exodiff'
+    input = 'carbon_block_number_dens.i'
+    exodiff = 'carbon_block_nd_micron.e'
+    abs_zero = 1e-6
+    cli_args = "UserObjects/rasterizer/var_physical_meaning=NUMBER_DENSITY Outputs/file_base=carbon_block_nd_micron AuxVariables/cC/initial_condition=9e10 UserObjects/rasterizer/length_unit=MICROMETER"
+    recover = false
+  [../]
+  [./carbon_block_stoichiometry]
+    type = 'Exodiff'
+    input = 'carbon_block_number_dens.i'
+    exodiff = 'carbon_block_st.e'
+    abs_zero = 1e-6
+    cli_args = "Outputs/file_base=carbon_block_st AuxVariables/cC/initial_condition=1 UserObjects/rasterizer/site_volume=11.11111111111111111111111e-3"
+    recover = false
   [../]
 []

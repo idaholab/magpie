@@ -6,10 +6,11 @@ Renderer:
     type: MooseDocs.base.MaterializeRenderer
     name: Magpie
     repo: https://github.com/idaholab/magpie
-    home: https://google.com/
+    home: http://mooseframework.org/magpie
     navigation:
         Getting Started:
             Installation: 'getting_started/Installation.md'
+            Marmot coupling: 'getting_started/Marmot.md'
         # Development:
         #     Capabilities: 'models_capabilities/Capabilities.md'
         #     Requirements: 'software_quality/Requirements.md'

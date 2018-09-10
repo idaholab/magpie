@@ -46,6 +46,11 @@ protected:
 
   /// data such as interstitials and vacancies produced will be stored here
   MyTRIMResultList _result_list;
+
+  ///@{ timers
+  PerfID _perf_trim;
+  PerfID _perf_finalize;
+  ///@}
 };
 
 #endif // MYTRIMDIRACRUN_H
