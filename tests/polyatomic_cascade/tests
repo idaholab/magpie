@@ -62,6 +62,7 @@
     max_threads = 1
     recover = false
     required_objects = 'PolyatomicRecoil'
+  [../]
   [./carbon_block_number_density_A]
     type = 'Exodiff'
     input = 'carbon_block_number_dens.i'
