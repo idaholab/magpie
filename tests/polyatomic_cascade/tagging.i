@@ -77,7 +77,6 @@
     site_volume = 0.0404
     pka_generator = ffe
     periodic_var = dummy
-    analytical_energy_cutoff = 1e5
   [../]
   [./runner]
     type = MyTRIMElementRun

@@ -1,0 +1,15 @@
+[Tests]
+  [./UC_damage_energy]
+    type = 'RunApp'
+    input = 'pc_1981_UC_damage_energy.i'
+    check_input = True
+    required_objects = 'PolyatomicRecoil'
+  [../]
+
+  [./UC_net]
+    type = 'RunApp'
+    input = 'pc_1981_UC_net.i'
+    check_input = True
+    required_objects = 'PolyatomicRecoil'
+  [../]
+[]
