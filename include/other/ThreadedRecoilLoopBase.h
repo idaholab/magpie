@@ -35,13 +35,30 @@ public:
   /// Splitting constructor
   ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x, Threads::split split);
 
-  /// dummy virtual destructor
-  virtual ~ThreadedRecoilLoopBase() {}
-
   /// parens operator with the code that is executed in threads
   void operator()(const PKARange & range);
 
-  using MyTRIMDefectBufferItem = std::pair<Point, unsigned int>;
+  struct MyTRIMDefectBufferItem
+  {
+    MyTRIMDefectBufferItem(Point pt, unsigned int var, Real w = 1)
+      : point(pt), variable_id(var), weight(w)
+    {
+    }
+
+    Point point;
+    unsigned int variable_id;
+    Real weight;
+  };
+
+#ifdef GSL_ENABLED
+  /// adds an NRT entry using provided number densities
+  unsigned int addNRTEntry(const std::vector<Real> & number_fractions);
+
+  /// given a vector of number densities finds the index of the NRT entry w/ smallest distance
+  void findBestNRTMatch(const std::vector<Real> & number_fractions,
+                        unsigned int & index,
+                        Real & distance) const;
+#endif
 
   /// defect type enum (vacancies, interstitials, and incoming and outgoing replacements)
   enum DefectType
@@ -56,7 +73,8 @@ public:
 
 protected:
   /// add an interstitial or vacancy to the result list
-  virtual void addDefectToResult(const Point & p, unsigned int var, DefectType type) = 0;
+  virtual void
+  addDefectToResult(const Point & p, unsigned int var, Real weight, DefectType type) = 0;
 
   /// add deposited energy to the result list
   virtual void addEnergyToResult(const Point & p, Real edep) = 0;
@@ -84,6 +102,14 @@ protected:
 
   /// ID number of the current thread
   THREAD_ID _tid;
+
+#ifdef GSL_ENABLED
+  /// polyatomic NRT data
+  std::vector<std::unique_ptr<PolyatomicDisplacementFunction>> _pa_nrt;
+
+  /// derivative information for NRT data
+  std::vector<std::unique_ptr<PolyatomicDisplacementDerivativeFunction>> _pa_derivative_nrt;
+#endif
 
 private:
   ///@{ Buffer vacancies and interstitials from the same cascade for instantaneous recombination

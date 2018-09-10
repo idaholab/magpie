@@ -1,0 +1,27 @@
+Verification cases considered here
+==================================
+
+ Al2O2:
+-------
+* Damage energy efficiency from [1]. The reference data was created using Eq. (9) and the
+  coefficients in Table 1.
+* Damage efficiency kij computed by Eq. (8) from [2] using Ecap_ij = (18, 45, 45, 72).
+  Edisp_j = (18, 72).
+
+U_xZr_1-x_C:
+------------
+* Damage energy efficiency from [1].
+
+TaO:
+----
+* Damage efficiency kij from [2] using Ecap_ij = (60, 60, 60, 60).
+
+UC:
+---
+* Damage efficiency kif from [2] at 1e7 eV.
+
+
+[1] Parkin & Coulter, "Damage Energy Functions in Polyatomic Materials",
+    Journal of Nucl. Materials, 88, (1980).
+[2] Parkin & Coulter, "Total and Net Dispacement Functions for Polyatomic Materials",
+    Journal of Nucl. Materials, 101, (1981).

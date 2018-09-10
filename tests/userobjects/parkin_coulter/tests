@@ -1,0 +1,33 @@
+[Tests]
+  [./huang_ghoniem_92_nrt]
+    type = 'CSVDiff'
+    input = 'huang_ghoniem_92.i'
+    csvdiff = 'huang_ghoniem_n_ij.csv'
+    required_objects = 'PolyatomicRecoil'
+  [../]
+
+  [./parkin_coulter_1981_Al2O3_nrt]
+    type = 'CSVDiff'
+    input = 'parkin_coulter_Al2O3.i'
+    csvdiff = 'parkin_coulter_Al2O3.csv'
+    required_objects = 'PolyatomicRecoil'
+  [../]
+
+  [./parkin_coulter_1981_net_derivative_Al2O3_nrt]
+    type = 'CSVDiff'
+    input = 'parkin_coulter_Al2O3.i'
+    csvdiff = 'parkin_coulter_net_derivative_Al2O3.csv'
+    cli_args = 'UserObjects/parkin_coulter/damage_type=NET_DERIVATIVE
+                UserObjects/parkin_coulter/displacement_file_base=parkin_coulter_net_derivative_Al2O3'
+    required_objects = 'PolyatomicRecoil'
+  [../]
+
+  [./parkin_coulter_1981_energy_Al2O3_nrt]
+    type = 'CSVDiff'
+    input = 'parkin_coulter_Al2O3.i'
+    csvdiff = 'parkin_coulter_energy_Al2O3.csv'
+    cli_args = 'UserObjects/parkin_coulter/damage_type=ENERGY
+                UserObjects/parkin_coulter/displacement_file_base=parkin_coulter_energy_Al2O3'
+    required_objects = 'PolyatomicRecoil'
+  [../]
+[]
