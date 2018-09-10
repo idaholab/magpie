@@ -163,7 +163,10 @@ protected:
   std::vector<const VariableValue *> _var;
 
   /// lattice site volume material property
-  const MaterialProperty<Real> & _site_volume_prop;
+  const MaterialProperty<Real> * _site_volume_prop;
+
+  /// conversion of site volume if mesh units are not nm and vars are number densities
+  Real _site_volume_conversion;
 
   /// @{ PKA generators
   const std::vector<UserObjectName> _pka_generator_names;
