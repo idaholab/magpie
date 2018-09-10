@@ -44,6 +44,7 @@
     exodiff = 'tagging_out.e'
     abs_zero = 1e-6
     recover = false
+    valgrind = 'HEAVY'
   [../]
   [./tagging_all_Xe]
     type = 'Exodiff'
@@ -52,6 +53,7 @@
     abs_zero = 1e-6
     cli_args = "Outputs/file_base=tagging_all_Xe_out UserObjects/rasterizer/Mtol='0.5 0.5 4'"
     recover = false
+    valgrind = 'HEAVY'
   [../]
   [./truncated_polyatomic_recoil]
     type = 'Exodiff'
