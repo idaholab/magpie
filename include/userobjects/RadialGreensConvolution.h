@@ -168,13 +168,20 @@ template <>
 const Point & PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
     const RadialGreensConvolution::QPData & item) const;
 
+namespace libMesh
+{
+namespace Parallel
+{
+
 template <>
-class libMesh::Parallel::StandardType<RadialGreensConvolution::QPData> : public DataType
+class StandardType<RadialGreensConvolution::QPData> : public DataType
 {
 public:
   explicit StandardType(const RadialGreensConvolution::QPData * example = nullptr);
   StandardType(const StandardType<RadialGreensConvolution::QPData> & t);
   ~StandardType() { this->free(); }
 };
+}
+}
 
 #endif // RADIALGREENSCONVOLUTION_H
