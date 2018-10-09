@@ -6,9 +6,9 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#include "AppFactory.h"
 #include "MagpieApp.h"
 #include "Moose.h"
+#include "AppFactory.h"
 #include "MooseSyntax.h"
 
 template <>
@@ -16,9 +16,6 @@ InputParameters
 validParams<MagpieApp>()
 {
   InputParameters params = validParams<MooseApp>();
-
-  params.set<bool>("use_legacy_uo_initialization") = false;
-  params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
 }
 
@@ -29,12 +26,7 @@ registerKnownLabel("MagpieApp");
 MagpieApp::MagpieApp(const InputParameters & parameters) : MooseApp(parameters)
 {
   srand(processor_id());
-
-  Moose::registerObjects(_factory);
-  MagpieApp::registerObjects(_factory);
-
-  Moose::associateSyntax(_syntax, _action_factory);
-  MagpieApp::associateSyntax(_syntax, _action_factory);
+  MagpieApp::registerAll(_factory, _action_factory, _syntax);
 }
 
 MagpieApp::~MagpieApp() {}
@@ -50,15 +42,20 @@ MagpieApp::registerApps()
   registerApp(MagpieApp);
 }
 
+// External entry point for object registration
+extern "C" void
+MagpieApp__registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax)
+{
+  MagpieApp::registerAll(factory, action_factory, syntax);
+}
 void
-MagpieApp::registerObjects(Factory & factory)
+MagpieApp::registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax)
 {
   Registry::registerObjectsTo(factory, {"MagpieApp"});
-}
+  Registry::registerActionsTo(action_factory, {"MagpieApp"});
+  MagpieApp::associateSyntax(syntax, action_factory);
 
-void
-MagpieApp::associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/)
-{
+  Moose::registerAll(factory, action_factory, syntax);
 }
 
 void
