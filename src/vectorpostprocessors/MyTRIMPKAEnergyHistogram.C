@@ -37,7 +37,7 @@ MyTRIMPKAEnergyHistogram::MyTRIMPKAEnergyHistogram(const InputParameters & param
 {
   // initialize the channel energy vector
   _channel_center.resize(_nchannels);
-  for (unsigned i = 0; i < _nchannels; ++i)
+  for (std::size_t i = 0; i < _nchannels; ++i)
     _channel_center[i] = (i + 0.5) * _deltaE;
 }
 
@@ -56,7 +56,7 @@ MyTRIMPKAEnergyHistogram::execute()
   {
     int channel = pka._E / _deltaE;
 
-    if (channel >= 0 && channel < _nchannels)
+    if (channel >= 0 && static_cast<unsigned int>(channel) < _nchannels)
       _count[channel]++;
   }
 }
