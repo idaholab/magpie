@@ -49,7 +49,8 @@ void
 MyTRIMDiracResult::execute()
 {
   for (auto && defect : _mytrim.result())
-    if (defect._type == _defect && defect._var == _ivar)
+    if (defect._type >= 0 && static_cast<unsigned int>(defect._type) == _defect &&
+        defect._var == _ivar)
     {
       _x.push_back(defect._location(0));
       _y.push_back(defect._location(1));
