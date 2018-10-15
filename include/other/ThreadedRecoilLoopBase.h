@@ -35,6 +35,8 @@ public:
   /// Splitting constructor
   ThreadedRecoilLoopBase(const ThreadedRecoilLoopBase & x, Threads::split split);
 
+  virtual ~ThreadedRecoilLoopBase() {}
+
   /// parens operator with the code that is executed in threads
   void operator()(const PKARange & range);
 
