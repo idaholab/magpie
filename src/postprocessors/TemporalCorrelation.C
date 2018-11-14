@@ -20,7 +20,7 @@ validParams<TemporalCorrelation>()
 }
 
 TemporalCorrelation::TemporalCorrelation(const InputParameters & parameters)
-  : ElementAverageValue(parameters)
+  : ElementAverageValue(parameters), _u_dot(dot())
 {
 }
 

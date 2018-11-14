@@ -29,6 +29,7 @@ public:
 protected:
   virtual Real computeQpIntegral() override;
   virtual Real getValue() override;
+  const VariableValue & _u_dot;
 };
 
 #endif // TEMPORALCORRELATION_H
