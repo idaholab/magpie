@@ -7,28 +7,29 @@ Renderer:
     name: Magpie
     repo: https://github.com/idaholab/magpie
     home: http://mooseframework.org/magpie
-    navigation:
-        Getting Started:
-            Installation: 'getting_started/Installation.md'
-            Marmot coupling: 'getting_started/Marmot.md'
-        # Development:
-        #     Capabilities: 'models_capabilities/Capabilities.md'
-        #     Requirements: 'software_quality/Requirements.md'
-        Documentation:
-            Reference Manual: syntax/index.md
 
 Extensions:
-    appsyntax:
-        type: MooseDocs.extensions.appsyntax
+    MooseDocs.extensions.navigation:
+        menu:
+            Getting Started:
+                Installation: 'getting_started/Installation.md'
+                Marmot coupling: 'getting_started/Marmot.md'
+            # Development:
+                #     Capabilities: 'models_capabilities/Capabilities.md'
+                #     Requirements: 'software_quality/Requirements.md'
+            Documentation:
+                Reference Manual: syntax/index.md
+
+    MooseDocs.extensions.appsyntax:
         executable: ${ROOT_DIR}
         hide:
             magpie: !include ${ROOT_DIR}/doc/hidden.yml
             framework: !include ${MOOSE_DIR}/framework/doc/hidden.yml
         remove:
             framework: !include ${MOOSE_DIR}/framework/doc/remove.yml
-    globals:
-        type: MooseDocs.extensions.panoptic
+
+    MooseDocs.extensions.common:
         shortcuts: !include ${MOOSE_DIR}/framework/doc/globals.yml
-    acronyms:
-        type: MooseDocs.extensions.acronym
+
+    MooseDocs.extensions.acronym:
         acronyms: !include ${MOOSE_DIR}/framework/doc/acronyms.yml
