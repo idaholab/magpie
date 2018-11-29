@@ -1,4 +1,4 @@
-!config renderer breadcrumbs=False scrollspy=False
+!config navigation breadcrumbs=False scrollspy=False
 
 <div style="text-align: center">
 <img src="media/magpie_logo.svg"/>
