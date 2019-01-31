@@ -17,9 +17,9 @@ inline void
 dataStore(std::ostream & stream, MDRunBase::MDParticles & pl, void * context)
 {
   dataStore(stream, pl.pos, context);
-  dataStore(stream, pl.vel, context);
   dataStore(stream, pl.id, context);
   dataStore(stream, pl.elem_id, context);
+  dataStore(stream, pl.properties, context);
 }
 
 template <>
@@ -27,9 +27,9 @@ inline void
 dataLoad(std::istream & stream, MDRunBase::MDParticles & pl, void * context)
 {
   dataLoad(stream, pl.pos, context);
-  dataLoad(stream, pl.vel, context);
   dataLoad(stream, pl.id, context);
   dataLoad(stream, pl.elem_id, context);
+  dataLoad(stream, pl.properties, context);
 }
 
 template <>
@@ -39,7 +39,9 @@ validParams<MDRunBase>()
   InputParameters params = validParams<GeneralUserObject>();
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
   params.suppressParameter<ExecFlagEnum>("execute_on");
-
+  params.addParam<MultiMooseEnum>("md_particle_properties",
+                                  MDRunBase::mdParticleProperties(),
+                                  "Properties of MD particles to be obtained and stored.");
   params.addClassDescription(
       "Base class for execution of coupled molecular dynamics MOOSE calculations.");
   return params;
@@ -47,16 +49,30 @@ validParams<MDRunBase>()
 
 MDRunBase::MDRunBase(const InputParameters & parameters)
   : GeneralUserObject(parameters),
+    _properties(getParam<MultiMooseEnum>("md_particle_properties")),
+    _granular(_properties.contains("radius")),
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
     _nproc(_app.n_processors()),
     _bbox(_nproc)
 {
+  // check _properties array and MooseEnum for consistency
+  if (N_MD_PROPERTIES != mdParticleProperties().getNames().size())
+    mooseError("Mismatch of MD particle property enum and property array. Report on github.");
+
+  for (auto & id : mdParticleProperties().getIDs())
+    if (id < 0 || id >= N_MD_PROPERTIES)
+      mooseError("Property id ", id, " is either < 0 or larger than array size.");
 }
 
 void
 MDRunBase::initialSetup()
 {
+  // TODO: need to inflate the bounding box for granular particles
+  if (_granular)
+    mooseDoOnce(mooseWarning("Granular particles can lead to wrong answers in parallel runs "
+                             "because processor bounding boxes do not account for particle size."));
+
   for (unsigned int j = 0; j < _nproc; ++j)
     _bbox[j] = MeshTools::create_processor_bounding_box(_mesh, j);
 }
@@ -78,12 +94,37 @@ MDRunBase::updateKDTree()
   _kd_tree = libmesh_make_unique<KDTree>(_md_particles.pos, 50);
 }
 
-const std::vector<unsigned int>
-MDRunBase::elemParticles(unique_id_type elem_id) const
+void
+MDRunBase::elemParticles(unique_id_type elem_id, std::vector<unsigned int> & elem_particles) const
 {
   if (_elem_particles.find(elem_id) != _elem_particles.end())
-    return _elem_particles.find(elem_id)->second;
-  return std::vector<unsigned int>(0);
+    elem_particles = _elem_particles.find(elem_id)->second;
+  else
+    elem_particles = {};
+}
+
+void
+MDRunBase::granularElementVolumes(unique_id_type elem_id,
+                                  std::vector<std::pair<unsigned int, Real>> & gran_vol) const
+{
+  mooseAssert(_granular,
+              "Radius must be provided as MD property to allow granular volume computation.");
+  if (_elem_granular_volumes.find(elem_id) != _elem_granular_volumes.end())
+    gran_vol = _elem_granular_volumes.find(elem_id)->second;
+  else
+    gran_vol = {};
+}
+
+Real
+MDRunBase::particleProperty(unsigned int j, unsigned int prop_id) const
+{
+  // ensure that entry exists
+  mooseAssert(j < _md_particles.properties.size(),
+              "Particle index " << j << " not found in _md_particles. properties vector has length "
+                                << _md_particles.properties.size());
+  mooseAssert(prop_id < N_MD_PROPERTIES,
+              "prop_id must be smaller than " << N_MD_PROPERTIES << ". Provided value " << prop_id);
+  return _md_particles.properties[j][prop_id];
 }
 
 void
@@ -156,8 +197,133 @@ MDRunBase::mapMDParticles()
   }
 }
 
-MultiMooseEnum
-MDRunBase::getMDQuantities() const
+void
+MDRunBase::updateElementGranularVolumes()
 {
-  return MultiMooseEnum("vel_x=0 vel_y=1 vel_z=2 force_x=3 force_y=4 force_z=5 charge=6");
+  // clear the granular volume map
+  _elem_granular_volumes.clear();
+
+  // _max_granular_radius
+  _max_granular_radius = 0;
+  for (auto & p : _md_particles.properties)
+    if (p[7] > _max_granular_radius)
+      _max_granular_radius = p[7];
+
+  /// loop over all local elements
+  ConstElemRange * active_local_elems = _mesh.getActiveLocalElementRange();
+  for (const auto & elem : *active_local_elems)
+  {
+    // find all points within an inflated bounding box
+    std::vector<std::pair<std::size_t, Real>> indices_dist;
+    BoundingBox bbox = elem->loose_bounding_box();
+    Point center = 0.5 * (bbox.min() + bbox.max());
+
+    // inflate the search sphere by the maximum granular radius
+    Real radius = (bbox.max() - center).norm() + _max_granular_radius;
+    _kd_tree->radiusSearch(center, radius, indices_dist);
+
+    // prepare _elem_granular_candidates entry
+    _elem_granular_volumes[elem->unique_id()] = {};
+
+    // construct this element's overlap object
+    ElemType t = elem->type();
+    OVERLAP::Hexahedron hex = overlapUnitHex();
+    OVERLAP::Tetrahedron tet = overlapUnitTet();
+    if (t == HEX8)
+      hex = overlapHex(elem);
+    else if (t == TET4)
+      tet = overlapTet(elem);
+    else
+      mooseError("Element type ", t, "not implemented");
+
+    // loop through all MD particles that the search turned up and test overlap
+    for (unsigned int j = 0; j < indices_dist.size(); ++j)
+    {
+      // construct OVERLAP::sphere object from MD granular particle
+      unsigned int k = indices_dist[j].first;
+      OVERLAP::Sphere sph(OVERLAP::vector_t{_md_particles.pos[k](0),
+                                            _md_particles.pos[k](1),
+                                            _md_particles.pos[k](2)},
+                          _md_particles.properties[k][7]);
+
+      // compute the overlap
+      Real ovlp = 0.0;
+      if (t == HEX8)
+        ovlp = OVERLAP::overlap(sph, hex);
+      else if (t == TET4)
+        ovlp = OVERLAP::overlap(sph, tet);
+
+      // if the overlap is larger than 0, make entry in _elem_granular_volumes
+      if (ovlp > 0.0)
+        _elem_granular_volumes[elem->unique_id()].push_back(std::pair<unsigned int, Real>(k, ovlp));
+    }
+  }
+}
+
+MultiMooseEnum
+MDRunBase::mdParticleProperties()
+{
+  return MultiMooseEnum("vel_x=0 vel_y=1 vel_z=2 force_x=3 force_y=4 force_z=5 charge=6 radius=7");
+}
+
+OVERLAP::Hexahedron
+MDRunBase::overlapHex(const Elem * elem) const
+{
+  Point p;
+  p = elem->point(0);
+  OVERLAP::vector_t v0{p(0), p(1), p(2)};
+  p = elem->point(1);
+  OVERLAP::vector_t v1{p(0), p(1), p(2)};
+  p = elem->point(2);
+  OVERLAP::vector_t v2{p(0), p(1), p(2)};
+  p = elem->point(3);
+  OVERLAP::vector_t v3{p(0), p(1), p(2)};
+  p = elem->point(4);
+  OVERLAP::vector_t v4{p(0), p(1), p(2)};
+  p = elem->point(5);
+  OVERLAP::vector_t v5{p(0), p(1), p(2)};
+  p = elem->point(6);
+  OVERLAP::vector_t v6{p(0), p(1), p(2)};
+  p = elem->point(7);
+  OVERLAP::vector_t v7{p(0), p(1), p(2)};
+  return OVERLAP::Hexahedron{v0, v1, v2, v3, v4, v5, v6, v7};
+}
+
+OVERLAP::Hexahedron
+MDRunBase::overlapUnitHex() const
+{
+  OVERLAP::vector_t v0{-1, -1, -1};
+  OVERLAP::vector_t v1{1, -1, -1};
+  OVERLAP::vector_t v2{1, 1, -1};
+  OVERLAP::vector_t v3{-1, 1, -1};
+  OVERLAP::vector_t v4{-1, -1, 1};
+  OVERLAP::vector_t v5{1, -1, 1};
+  OVERLAP::vector_t v6{1, 1, 1};
+  OVERLAP::vector_t v7{-1, 1, 1};
+  return OVERLAP::Hexahedron{v0, v1, v2, v3, v4, v5, v6, v7};
+}
+
+OVERLAP::Tetrahedron
+MDRunBase::overlapTet(const Elem * elem) const
+{
+  Point p;
+  p = elem->point(0);
+  OVERLAP::vector_t v0{p(0), p(1), p(2)};
+  p = elem->point(1);
+  OVERLAP::vector_t v1{p(0), p(1), p(2)};
+  p = elem->point(2);
+  OVERLAP::vector_t v2{p(0), p(1), p(2)};
+  p = elem->point(3);
+  OVERLAP::vector_t v3{p(0), p(1), p(2)};
+  return OVERLAP::Tetrahedron{v0, v1, v2, v3};
+}
+
+OVERLAP::Tetrahedron
+MDRunBase::overlapUnitTet() const
+{
+  OVERLAP::vector_t v0{0, 0, 0};
+  OVERLAP::vector_t v1{1, 0, 0};
+  OVERLAP::vector_t v2{0, 1, 0};
+  OVERLAP::vector_t v3{0, 0, 1};
+  return OVERLAP::Tetrahedron{v0, v1, v2, v3};
 }

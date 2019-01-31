@@ -54,6 +54,9 @@ protected:
   /// column of x, y, z coordinate in LAMMPS files
   std::vector<unsigned int> _pos_columns;
 
+  /// column of properties in LAMMPS files
+  std::vector<unsigned int> _prop_columns;
+
   /// Conversion from FEM time to MD time_stamp
   const Function * _time_conversion;
 };

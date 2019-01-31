@@ -29,7 +29,9 @@ validParams<LAMMPSFileRunner>()
                                     "a sequence.");
   params.addRequiredParam<std::vector<unsigned int>>(
       "xyz_columns", "Column ids of the x, y, and z coordinates of particles.");
-
+  std::vector<unsigned int> empty = {};
+  params.addParam<std::vector<unsigned int>>(
+      "property_columns", empty, "Column ids of the properties.");
   params.addParam<FunctionName>("time_conversion",
                                 "A conversion from FEM simulation time to MD time stamps.");
   params.addClassDescription("Allows coupling FEM calculations to LAMMPS dump files.");
@@ -41,6 +43,7 @@ LAMMPSFileRunner::LAMMPSFileRunner(const InputParameters & parameters)
     _time_sequence(getParam<bool>("time_sequence")),
     _lammps_file(getParam<FileName>("lammps_file")),
     _pos_columns(getParam<std::vector<unsigned int>>("xyz_columns")),
+    _prop_columns(getParam<std::vector<unsigned int>>("property_columns")),
     _time_conversion(nullptr)
 {
   ;
@@ -50,6 +53,9 @@ LAMMPSFileRunner::LAMMPSFileRunner(const InputParameters & parameters)
 
   if (isParamValid("time_conversion"))
     _time_conversion = &getFunction("time_conversion");
+
+  if (_properties.size() != _prop_columns.size())
+    mooseError("properties array must have same length as property_columns");
 }
 
 void
@@ -86,6 +92,10 @@ LAMMPSFileRunner::updateParticleList()
 
   // update the mapping to mesh if mesh has changed or ...
   mapMDParticles();
+
+  // update the granular candidates as well if necessary
+  if (_granular)
+    updateElementGranularVolumes();
 }
 
 void
@@ -180,10 +190,12 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
   // zero out the position & id vector
   position.clear();
   _md_particles.id.clear();
+  _md_particles.properties.clear();
 
   // size the md particle vector considering not all processors have all particles
   position.reserve(std::ceil(2.0 * _n_particles / _nproc));
   _md_particles.id.reserve(std::ceil(2.0 * _n_particles / _nproc));
+  _md_particles.properties.reserve(std::ceil(2.0 * _n_particles / _nproc));
 
   // read particle entries
   _n_local_particles = 0;
@@ -195,11 +207,37 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
     std::vector<std::string> elements;
     MooseUtils::tokenize<std::string>(line, elements, 1, " ");
 
+#if DEBUG
+    // check that enough columns exist in debug
+    // find largest requested column
+    unsigned int largest_column = 0;
+    for (unsigned int i = 0; i < _dim; ++i)
+      if (_pos_columns[i] > largest_column)
+        largest_column = _pos_columns[i];
+
+    for (unsigned int i = 0; i < _prop_columns.size(); ++i)
+      if (_prop_columns[i] > largest_column)
+        largest_column = _prop_columns[i];
+
+    if (largest_column >= elements.size())
+      mooseError("Error reading ", filename, " on line ", line);
+#endif
+
+    // read location
     Point pos;
     for (unsigned int i = 0; i < _dim; ++i)
     {
       std::stringstream sstr(elements[_pos_columns[i]]);
       sstr >> pos(i);
+    }
+
+    // read properties
+    std::array<Real, N_MD_PROPERTIES> props;
+    for (unsigned int i = 0; i < _prop_columns.size(); ++i)
+    {
+      unsigned int prop_id = _properties.get(i);
+      std::stringstream sstr(elements[_prop_columns[i]]);
+      sstr >> props[prop_id];
     }
 
     // check if this particle is in this processor BBox
@@ -209,6 +247,7 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
     ++_n_local_particles;
     position.push_back(pos);
     _md_particles.id.push_back(j);
+    _md_particles.properties.push_back(props);
   }
   file.close();
 
@@ -264,10 +303,12 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
   // zero out the position & id vector
   position.clear();
   _md_particles.id.clear();
+  _md_particles.properties.clear();
 
   // size the md particle vector considering not all processors have all particles
   position.reserve(std::ceil(2.0 * _n_particles / _nproc));
   _md_particles.id.reserve(std::ceil(2.0 * _n_particles / _nproc));
+  _md_particles.properties.reserve(std::ceil(2.0 * _n_particles / _nproc));
 
   // read particle entries
   _n_local_particles = 0;
@@ -282,11 +323,36 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     std::getline(file_before, line_before);
     MooseUtils::tokenize<std::string>(line_before, elements, 1, " ");
 
+#if DEBUG
+    // check that enough columns exist in debug
+    // find largest requested column
+    unsigned int largest_column = 0;
+    for (unsigned int i = 0; i < _dim; ++i)
+      if (_pos_columns[i] > largest_column)
+        largest_column = _pos_columns[i];
+
+    for (unsigned int i = 0; i < _prop_columns.size(); ++i)
+      if (_prop_columns[i] > largest_column)
+        largest_column = _prop_columns[i];
+
+    if (largest_column >= elements.size())
+      mooseError("Error reading ", filenames.first, " on line ", line_before);
+#endif
+
     Point pos_before;
     for (unsigned int i = 0; i < _dim; ++i)
     {
       std::stringstream sstr(elements[_pos_columns[i]]);
       sstr >> pos_before(i);
+    }
+
+    // read properties from before file
+    std::array<Real, N_MD_PROPERTIES> props_before;
+    for (unsigned int i = 0; i < _prop_columns.size(); ++i)
+    {
+      unsigned int prop_id = _properties.get(i);
+      std::stringstream sstr(elements[_prop_columns[i]]);
+      sstr >> props_before[prop_id];
     }
 
     // get the MD particle from the after file
@@ -296,11 +362,24 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
 
     MooseUtils::tokenize<std::string>(line_after, elements, 1, " ");
 
+    // we have determined largest_column in DEBUG so we can use it in mooseAssert
+    mooseAssert(largest_column < elements.size(),
+                "Error reading " << filenames.second << " on line " << line_after);
+
     Point pos_after;
     for (unsigned int i = 0; i < _dim; ++i)
     {
       std::stringstream sstr(elements[_pos_columns[i]]);
       sstr >> pos_after(i);
+    }
+
+    // read properties from before file
+    std::array<Real, N_MD_PROPERTIES> props_after;
+    for (unsigned int i = 0; i < _prop_columns.size(); ++i)
+    {
+      unsigned int prop_id = _properties.get(i);
+      std::stringstream sstr(elements[_prop_columns[i]]);
+      sstr >> props_after[prop_id];
     }
 
     // check if this particle is in this processor BBox
@@ -311,6 +390,9 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     ++_n_local_particles;
     position.push_back((1 - weight) * pos_before + weight * pos_after);
     _md_particles.id.push_back(j);
+    _md_particles.properties.push_back(std::array<Real, N_MD_PROPERTIES>());
+    for (unsigned int i = 0; i < N_MD_PROPERTIES; ++i)
+      _md_particles.properties.back()[i] = (1 - weight) * props_before[i] + weight * props_after[i];
   }
   file_before.close();
   file_after.close();
