@@ -30,7 +30,7 @@ MyTRIMMesh::MyTRIMMesh(const InputParameters & parameters)
     _min_corner(_xmin, _ymin, _zmin),
     _max_corner(_xmax, _ymax, _zmax)
 {
-  _cell_count.resize(dimension());
+  _cell_count.resize(_dim);
 
   if (isParamValid("elem_type"))
   {
@@ -67,10 +67,10 @@ MyTRIMMesh::MyTRIMMesh(const MyTRIMMesh & other_mesh)
 {
 }
 
-MooseMesh &
-MyTRIMMesh::clone() const
+std::unique_ptr<MooseMesh>
+MyTRIMMesh::safeClone() const
 {
-  return *(new MyTRIMMesh(*this));
+  return libmesh_make_unique<MyTRIMMesh>(*this);
 }
 
 std::unique_ptr<PointLocatorBase>

@@ -33,7 +33,7 @@ public:
 
   // No copy assignment
   MooseMesh & operator=(const MooseMesh & other_mesh) = delete;
-  MooseMesh & clone() const override;
+  virtual std::unique_ptr<MooseMesh> safeClone() const override;
 
   /// obtain a specialized PointLocator for the current mesh
   std::unique_ptr<PointLocatorBase> getPointLocator() const override;
