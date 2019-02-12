@@ -38,9 +38,6 @@ public:
   /// obtain a specialized PointLocator for the current mesh
   std::unique_ptr<PointLocatorBase> getPointLocator() const override;
 
-  Real getMinInDimension(unsigned int component) const override;
-  Real getMaxInDimension(unsigned int component) const override;
-
   /// since this is a regular mesh we can report the grid size in each dimension
   unsigned int getCellCountInDimension(unsigned int component);
 
