@@ -85,18 +85,6 @@ MyTRIMMesh::getPointLocator() const
       new PointLocatorRegularOrthogonal(getMesh(), _point_locator.get()));
 }
 
-Real
-MyTRIMMesh::getMinInDimension(unsigned int component) const
-{
-  return _min_corner(component);
-}
-
-Real
-MyTRIMMesh::getMaxInDimension(unsigned int component) const
-{
-  return _max_corner(component);
-}
-
 unsigned int
 MyTRIMMesh::getCellCountInDimension(unsigned int component)
 {
