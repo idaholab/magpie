@@ -1,0 +1,10 @@
+ITEM: TIMESTEP
+9
+ITEM: NUMBER OF ATOMS
+1
+ITEM: BOX BOUNDS pp pp pp
+ 0.0 2.0
+ 0.0 2.0
+ 0.0 2.0
+ITEM: ATOMS x y z
+ 1.5 1.5 0.5

@@ -1,0 +1,21 @@
+[Tests]
+  [./lammps_file_runner]
+    type = 'Exodiff'
+    input = 'lammps_file_runner.i'
+    exodiff = 'lammps_file_runner_out.e'
+  [../]
+
+  [./lammps_file_runner_sequence]
+    type = 'Exodiff'
+    input = 'lammps_file_runner_sequence.i'
+    exodiff = 'lammps_file_runner_sequence_out.e'
+  [../]
+
+  [./lammps_file_runner_sequence_reverse]
+    type = 'Exodiff'
+    input = 'lammps_file_runner_sequence.i'
+    exodiff = 'lammps_file_runner_sequence_reverse.e'
+    cli_args = 'UserObjects/lammps_runner/lammps_file="sequence_reverse/simple"
+                Outputs/file_base=lammps_file_runner_sequence_reverse'
+  [../]
+[]
