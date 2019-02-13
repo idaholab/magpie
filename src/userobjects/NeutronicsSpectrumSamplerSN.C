@@ -10,7 +10,7 @@
 #ifdef RATTLESNAKE_ENABLED
 
 #include "NeutronicsSpectrumSamplerSN.h"
-#include "YakxsUtilities.h"
+#include "IsotopeUtilities.h"
 #include "ElasticRecoil.h"
 
 // gsl includes

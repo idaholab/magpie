@@ -10,7 +10,7 @@
 #include "MooseMesh.h"
 
 #ifdef RATTLESNAKE_ENABLED
-#include "YakxsUtilities.h"
+#include "IsotopeUtilities.h"
 #endif
 
 // C++ includes
@@ -67,7 +67,7 @@ NeutronicsSpectrumSamplerBase::NeutronicsSpectrumSamplerBase(const InputParamete
     // check if isotope names are valid, NOTE: error handling is delegated to Yakxs::Utilities
     YAKXS::Utility::getAZ(_target_isotope_names[i], A, Z);
     // convert from name to ZAID
-    _zaids[i] = YAKXS::Utility::stringToZaid(_target_isotope_names[i]);
+    _zaids[i] = YAKXS::Utility::getZaid(_target_isotope_names[i]);
 #else
     _zaids[i] = localStringToZaid(_target_isotope_names[i]);
 #endif
