@@ -8,37 +8,52 @@
 
 #pragma once
 
-#include "DerivativeParsedMaterialHelper.h"
+#include "ADMaterial.h"
+#include "DerivativeMaterialPropertyNameInterface.h"
 
 // Forward Declarations
+template <ComputeStage>
 class DeepNeuralNetFreeEnergy;
 
-template <>
-InputParameters validParams<DeepNeuralNetFreeEnergy>();
+declareADValidParams(DeepNeuralNetFreeEnergy);
 
 /**
- *
+ * Evaluate a deep neural net and its derivatives
  */
-class DeepNeuralNetFreeEnergy : public DerivativeFunctionMaterialBase
+template <ComputeStage compute_stage>
+class DeepNeuralNetFreeEnergy : public ADMaterial<compute_stage>,
+                                public DerivativeMaterialPropertyNameInterface
 {
 public:
   DeepNeuralNetFreeEnergy(const InputParameters & parameters);
 
 protected:
+  /// compute material properties for the current quadrature point
+  virtual void computeQpProperties();
+
   /// evaluate the network using the inputs in _activation[0]
   void evaluate();
 
-  /// matrix multiplication helper
-  void multiply(DenseMatrix<Real> & M1, const DenseMatrix<Real> & M2, const DenseMatrix<Real> & M3);
-
   /// network data file with weights and biases
   const FileName _filename;
+
+  /// output material property names
+  const std::vector<MaterialPropertyName> _output_name;
+
+  /// number of outputs
+  const std::size_t _n_output;
+
+  /// output properties
+  std::vector<ADMaterialProperty(Real) *> _output;
 
   /// number of inputs
   const std::size_t _n_input;
 
   /// input variables
-  std::vector<const VariableValue *> _input;
+  std::vector<const ADVariableValue *> _input;
+
+  /// output property derivatives
+  std::vector<ADMaterialProperty(Real) *> _d_output;
 
   /// network weights
   std::vector<DenseMatrix<Real>> _weight;
@@ -50,18 +65,25 @@ protected:
   std::size_t _n_layer;
 
 private:
+  /// matrix multiplication helper
+  void multiply(DenseMatrix<ADReal> & M1,
+                const DenseMatrix<ADReal> & M2,
+                const DenseMatrix<ADReal> & M3);
+
   /// incoming weighted and biased signal (before applying activation function)
-  std::vector<DenseVector<Real>> _z;
+  std::vector<DenseVector<ADReal>> _z;
 
   /// activation vectors
-  std::vector<DenseVector<Real>> _activation;
+  std::vector<DenseVector<ADReal>> _activation;
 
   /// derivatives of activation vectors
-  std::vector<DenseVector<Real>> _d_activation;
+  std::vector<DenseVector<ADReal>> _d_activation;
 
-  /// progressive jacobian matrices
-  std::vector<DenseMatrix<Real>> _diff;
+  /// progressive Jacobian matrices
+  std::vector<DenseMatrix<ADReal>> _diff;
 
   /// product of the weight matrix and the derivative of the activation function
-  std::vector<DenseMatrix<Real>> _prod;
+  std::vector<DenseMatrix<ADReal>> _prod;
+
+  usingMaterialMembers;
 };

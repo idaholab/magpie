@@ -9,27 +9,30 @@
 #include "DeepNeuralNetFreeEnergy.h"
 #include <fstream>
 
-registerMooseObject("MagpieApp", DeepNeuralNetFreeEnergy);
+registerADMooseObject("MagpieApp", DeepNeuralNetFreeEnergy);
 
-template <>
-InputParameters
-validParams<DeepNeuralNetFreeEnergy>()
-{
-  InputParameters params = validParams<DerivativeFunctionMaterialBase>();
-  params.addClassDescription(
-      "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
-  params.addParam<FileName>(
-      "filename",
-      "Data file containing the weights and biasses for a fully connected deep neural network");
-  params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
-  return params;
-}
+defineADValidParams(
+    DeepNeuralNetFreeEnergy,
+    ADMaterial,
+    params.addClassDescription(
+        "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
+    params.addParam<FileName>(
+        "filename",
+        "Data file containing the weights and biasses for a fully connected deep neural network");
+    params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
+    params.addParam<std::vector<MaterialPropertyName>>(
+        "prop_names", "list of material properties fed from the outputs of the neural network"););
 
-DeepNeuralNetFreeEnergy::DeepNeuralNetFreeEnergy(const InputParameters & parameters)
-  : DerivativeFunctionMaterialBase(parameters),
-    _filename(getParam<FileName>("filename")),
+template <ComputeStage compute_stage>
+DeepNeuralNetFreeEnergy<compute_stage>::DeepNeuralNetFreeEnergy(const InputParameters & parameters)
+  : ADMaterial<compute_stage>(parameters),
+    _filename(adGetParam<FileName>("filename")),
+    _output_name(adGetParam<std::vector<MaterialPropertyName>>("prop_names")),
+    _n_output(_output_name.size()),
+    _output(_n_output),
     _n_input(coupledComponents("inputs")),
-    _input(_n_input)
+    _input(_n_input),
+    _d_output(_n_input * _n_output)
 {
   int x, y;
 
@@ -54,9 +57,9 @@ DeepNeuralNetFreeEnergy::DeepNeuralNetFreeEnergy(const InputParameters & paramet
     _weight[i] = DenseMatrix<Real>(x, y);
 
     // initialize computation buffers (including input and output)
-    _activation[i] = DenseVector<Real>(y);
-    _d_activation[i] = DenseVector<Real>(y);
-    _z[i] = DenseVector<Real>(x);
+    _activation[i] = DenseVector<ADReal>(y);
+    _d_activation[i] = DenseVector<ADReal>(y);
+    _z[i] = DenseVector<ADReal>(x);
 
     for (std::size_t k = 0; k < y; ++k)
       for (std::size_t j = 0; j < x; ++j)
@@ -72,7 +75,7 @@ DeepNeuralNetFreeEnergy::DeepNeuralNetFreeEnergy(const InputParameters & paramet
     if (!(ifile >> x))
       mooseError("Error reading file ", _filename);
 
-    _z[i] = DenseVector<Real>(x);
+    _z[i] = DenseVector<ADReal>(x);
     _bias[i] = DenseVector<Real>(x);
 
     for (std::size_t j = 0; j < x; ++j)
@@ -86,8 +89,11 @@ DeepNeuralNetFreeEnergy::DeepNeuralNetFreeEnergy(const InputParameters & paramet
   // validate network properties
   if (_weight.size() != _bias.size())
     paramError("filename", "Inconsistent layer numbers in datafile");
-  if (_z[_n_layer - 1].size() != 1)
-    paramError("filename", "Neural network needs to have exactly one output node");
+  if (_z[_n_layer - 1].size() != _n_output)
+    paramError("prop_names",
+               "Number of supplied property names must match the number of output nodes ",
+               _z[_n_layer - 1].size(),
+               " of the neural net");
   if (_n_input != _activation[0].size())
     paramError("inputs",
                "Number of supplied variables must match the number of input nodes ",
@@ -101,43 +107,50 @@ DeepNeuralNetFreeEnergy::DeepNeuralNetFreeEnergy(const InputParameters & paramet
   for (std::size_t i = 1; i < _n_layer; ++i)
   {
     _prod[i] = _weight[i];
-    _diff[i] = DenseMatrix<Real>(_z[i].size(), _n_input);
+    _diff[i] = DenseMatrix<ADReal>(_z[i].size(), _n_input);
   }
 
-  // test output
-  for (Real T = 0.0; T <= 1.0; T += 0.05)
-    for (Real c = 0.0; c <= 1.0; c += 0.05)
-    {
-      _activation[0](0) = T + 0.001;
-      _activation[0](1) = c;
-      evaluate();
-      Real out10 = _z[_n_layer - 1](0);
+  // get coupled variables for the inputs
+  for (std::size_t j = 0; j < _n_input; ++j)
+    _input[j] = &adCoupledValue("inputs", j);
 
-      _activation[0](0) = T;
-      _activation[0](1) = c + 0.001;
-      evaluate();
-      Real out01 = _z[_n_layer - 1](0);
-
-      _activation[0](0) = T;
-      _activation[0](1) = c;
-      evaluate();
-      Real out00 = _z[_n_layer - 1](0);
-
-      Real fd_T = (out10 - out00) / 0.001;
-      Real fd_c = (out01 - out00) / 0.001;
-
-      Real hc_T = _diff[_n_layer - 1](0, 0);
-      Real hc_c = _diff[_n_layer - 1](0, 1);
-
-      std::cout << "DNN" << T << ' ' << c << ' ' << out00 << ' ' << hc_T << ' ' << fd_T << ' '
-                << hc_c << ' ' << fd_c << '\n';
-    }
+  // create material properties
+  std::size_t k = 0;
+  for (std::size_t i = 0; i < _n_output; ++i)
+  {
+    _output[i] = &adDeclareADProperty<Real>(_output_name[i]);
+    for (std::size_t j = 0; j < _n_input; ++j)
+      _d_output[k++] = &adDeclareADProperty<Real>(
+          propertyNameFirst(_output_name[i], this->getVar("inputs", j)->name()));
+  }
 }
 
+template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy::multiply(DenseMatrix<Real> & M1,
-                                  const DenseMatrix<Real> & M2,
-                                  const DenseMatrix<Real> & M3)
+DeepNeuralNetFreeEnergy<compute_stage>::computeQpProperties()
+{
+  // set input nodes
+  for (std::size_t j = 0; j < _n_input; ++j)
+    _activation[0](j) = (*_input[j])[_qp];
+
+  // evaluate network
+  evaluate();
+
+  // copy back output values
+  std::size_t k = 0;
+  for (std::size_t i = 0; i < _n_output; ++i)
+  {
+    (*_output[i])[_qp] = _z[_n_layer - 1](i);
+    for (std::size_t j = 0; j < _n_input; ++j)
+      (*_d_output[k++])[_qp] = _diff[_n_layer - 1](i, j);
+  }
+}
+
+template <ComputeStage compute_stage>
+void
+DeepNeuralNetFreeEnergy<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
+                                                 const DenseMatrix<ADReal> & M2,
+                                                 const DenseMatrix<ADReal> & M3)
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
@@ -158,8 +171,9 @@ DeepNeuralNetFreeEnergy::multiply(DenseMatrix<Real> & M1,
     }
 }
 
+template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy::evaluate()
+DeepNeuralNetFreeEnergy<compute_stage>::evaluate()
 {
   std::size_t i = 0;
   while (true)
@@ -172,10 +186,8 @@ DeepNeuralNetFreeEnergy::evaluate()
     if (i > 0)
     {
       // prepare product of weights and activation function derivative (previous layer)
-      const std::size_t m = _weight[i].m();
-      const std::size_t n = _weight[i].n();
-      for (std::size_t j = 0; j < m; ++j)
-        for (std::size_t k = 0; k < n; ++k)
+      for (std::size_t j = 0; j < _weight[i].m(); ++j)
+        for (std::size_t k = 0; k < _weight[i].n(); ++k)
           _prod[i](j, k) = _weight[i](j, k) * _d_activation[i](k);
 
       // multiply progressive Jacobian

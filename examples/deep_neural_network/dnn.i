@@ -1,12 +1,22 @@
 [Mesh]
   type = GeneratedMesh
-  dim = 1
+  dim = 2
+  nx = 10
+  ny = 10
 []
 
 [Variables]
   [./T]
+    [./InitialCondition]
+      type = FunctionIC
+      function = x
+    [../]
   [../]
   [./c]
+    [./InitialCondition]
+      type = FunctionIC
+      function = y
+    [../]
   [../]
 []
 
@@ -19,7 +29,9 @@
   [./F]
     type = DeepNeuralNetFreeEnergy
     filename = weights_biases.txt
-    inputs = 'T c'
+    inputs     = 'T c'
+    prop_names = 'F'
+    outputs = exodus
   [../]
 []
 
@@ -27,6 +39,9 @@
   type = Steady
 []
 
+[Outputs]
+  exodus = true
+[]
 
 # ./maagpie-opt -i dnn.i | grep '^DNN' | cut -c4- > out
 # gnuplot:
