@@ -47,7 +47,9 @@ validParams<RadialGreensConvolution>()
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
 
   // make sure we always have geometric point neighbors ghosted
-  params.registerRelationshipManagers("ElementPointNeighbors");
+  params.addRelationshipManager("ElementPointNeighborLayers",
+                                Moose::RelationshipManagerType::GEOMETRIC |
+                                    Moose::RelationshipManagerType::ALGEBRAIC);
 
   return params;
 }
@@ -593,8 +595,8 @@ StandardType<RadialGreensConvolution::QPData>::StandardType(
 
 #endif // LIBMESH_HAVE_MPI
 }
-}
-}
+} // namespace Parallel
+} // namespace libMesh
 
 StandardType<RadialGreensConvolution::QPData>::StandardType(
     const StandardType<RadialGreensConvolution::QPData> & t)
