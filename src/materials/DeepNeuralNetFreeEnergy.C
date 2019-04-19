@@ -7,6 +7,7 @@
 /**********************************************************************/
 
 #include "DeepNeuralNetFreeEnergy.h"
+#include "MooseEnum.h"
 #include <fstream>
 
 registerADMooseObject("MagpieApp", DeepNeuralNetFreeEnergy);
@@ -16,8 +17,12 @@ defineADValidParams(
     ADMaterial,
     params.addClassDescription(
         "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
+
+    MooseEnum fileFormatEnum("MAGPIE GENANN");
+    params.addParam<MooseEnum>("file_format", fileFormatEnum, "Weights and biases file format");
+
     params.addParam<FileName>(
-        "filename",
+        "file_name",
         "Data file containing the weights and biasses for a fully connected deep neural network");
     params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
     params.addParam<std::vector<MaterialPropertyName>>(
@@ -26,61 +31,34 @@ defineADValidParams(
 template <ComputeStage compute_stage>
 DeepNeuralNetFreeEnergy<compute_stage>::DeepNeuralNetFreeEnergy(const InputParameters & parameters)
   : ADMaterial<compute_stage>(parameters),
-    _filename(adGetParam<FileName>("filename")),
-    _output_name(adGetParam<std::vector<MaterialPropertyName>>("prop_names")),
+    _file_format(getParam<MooseEnum>("file_format").template getEnum<FileFormat>()),
+    _file_name(getParam<FileName>("file_name")),
+    _output_name(getParam<std::vector<MaterialPropertyName>>("prop_names")),
     _n_output(_output_name.size()),
     _output(_n_output),
     _n_input(coupledComponents("inputs")),
     _input(_n_input),
     _d_output(_n_input * _n_output)
 {
-  int x, y;
-
   // open the NN data file
   std::ifstream ifile;
-  ifile.open(_filename);
+  ifile.open(_file_name);
   if (!ifile)
     paramError("filename", "Unable to open file");
 
-  // read weights (first the number of layers)
-  ifile >> _n_layer;
-  _weight.resize(_n_layer);
-  _z.resize(_n_layer);
-  _activation.resize(_n_layer);
-  _d_activation.resize(_n_layer);
-  for (std::size_t i = 0; i < _n_layer; ++i)
+  // call the reader for the requested format
+  switch (_file_format)
   {
-    if (!(ifile >> y >> x))
-      mooseError("Error reading file ", _filename);
+    case FileFormat::MAGPIE:
+      loadMagpieNet(ifile);
+      break;
 
-    // initialize weight matrix
-    _weight[i] = DenseMatrix<Real>(x, y);
+    case FileFormat::GENANN:
+      loadGenANN(ifile);
+      break;
 
-    // initialize computation buffers (including input and output)
-    _activation[i] = DenseVector<ADReal>(y);
-    _d_activation[i] = DenseVector<ADReal>(y);
-    _z[i] = DenseVector<ADReal>(x);
-
-    for (std::size_t k = 0; k < y; ++k)
-      for (std::size_t j = 0; j < x; ++j)
-        if (!(ifile >> _weight[i](j, k)))
-          mooseError("Error reading weights from file ", _filename);
-  }
-
-  // read biases (first the number of layers)
-  ifile >> _n_layer;
-  _bias.resize(_n_layer);
-  for (std::size_t i = 0; i < _n_layer; ++i)
-  {
-    if (!(ifile >> x))
-      mooseError("Error reading file ", _filename);
-
-    _z[i] = DenseVector<ADReal>(x);
-    _bias[i] = DenseVector<Real>(x);
-
-    for (std::size_t j = 0; j < x; ++j)
-      if (!(ifile >> _bias[i](j)))
-        mooseError("Error reading biases from file ", _filename);
+    default:
+      paramError("file_format", "Unknown file format");
   }
 
   // close parameter file
@@ -118,10 +96,144 @@ DeepNeuralNetFreeEnergy<compute_stage>::DeepNeuralNetFreeEnergy(const InputParam
   std::size_t k = 0;
   for (std::size_t i = 0; i < _n_output; ++i)
   {
-    _output[i] = &adDeclareADProperty<Real>(_output_name[i]);
+    _output[i] = &declareADProperty<Real>(_output_name[i]);
     for (std::size_t j = 0; j < _n_input; ++j)
-      _d_output[k++] = &adDeclareADProperty<Real>(
-          propertyNameFirst(_output_name[i], this->getVar("inputs", j)->name()));
+      _d_output[k++] = &declareADProperty<Real>(
+          derivativePropertyNameFirst(_output_name[i], this->getVar("inputs", j)->name()));
+  }
+
+  debugDump();
+}
+
+template <ComputeStage compute_stage>
+void
+DeepNeuralNetFreeEnergy<compute_stage>::debugDump()
+{
+  std::ofstream ofile;
+  ofile.open("debug.dat");
+  for (Real T = 0.0; T <= 1.0; T += 0.01)
+    for (Real c = 0.0; c <= 1.0; c += 0.01)
+    {
+      ofile << T << ' ' << c;
+
+      // set inputs
+      _activation[0](0) = T;
+      _activation[0](1) = c;
+
+      // evaluate network
+      evaluate();
+
+      // output values
+      for (std::size_t i = 0; i < _n_output; ++i)
+        ofile << ' ' << _z[_n_layer - 1](i);
+
+      ofile << '\n';
+    }
+}
+
+template <>
+void
+DeepNeuralNetFreeEnergy<JACOBIAN>::debugDump()
+{
+}
+
+template <ComputeStage compute_stage>
+void
+DeepNeuralNetFreeEnergy<compute_stage>::loadGenANN(std::ifstream & ifile)
+{
+  std::size_t x, y;
+
+  // read layer layout
+  unsigned int n_inputs, n_hidden_layers, n_hidden, n_outputs;
+  if (!(ifile >> n_inputs >> n_hidden_layers >> n_hidden >> n_outputs))
+    mooseError("Error reading genann file header from file ", _file_name);
+  _n_layer = n_hidden_layers + 1;
+  _bias.resize(_n_layer);
+  _weight.resize(_n_layer);
+  _z.resize(_n_layer);
+  _activation.resize(_n_layer);
+  _d_activation.resize(_n_layer);
+
+  std::cout << "loadGenANN " << _n_layer << '\n';
+
+  // read weights and biases
+  for (std::size_t i = 0; i < _n_layer; ++i)
+  {
+    // negative biases come first
+    x = i < _n_layer - 1 ? n_hidden : n_outputs;
+
+    _z[i] = DenseVector<ADReal>(x);
+    _bias[i] = DenseVector<Real>(x);
+    for (std::size_t j = 0; j < x; ++j)
+      if (!(ifile >> _bias[i](j)))
+        mooseError("Error reading biases from file ", _file_name);
+      else
+        _bias[i](j) *= -1.0;
+
+    // next come the weights
+    y = i > 0 ? n_hidden : n_inputs;
+    // initialize weight matrix
+    _weight[i] = DenseMatrix<Real>(x, y);
+
+    std::cout << "X,y = " << x << ',' << y << '\n';
+
+    // initialize computation buffers (including input and output)
+    _activation[i] = DenseVector<ADReal>(y);
+    _d_activation[i] = DenseVector<ADReal>(y);
+    _z[i] = DenseVector<ADReal>(x);
+
+    for (std::size_t k = 0; k < y; ++k)
+      for (std::size_t j = 0; j < x; ++j)
+        if (!(ifile >> _weight[i](j, k)))
+          mooseError("Error reading weights from file ", _file_name);
+  }
+}
+
+template <ComputeStage compute_stage>
+void
+DeepNeuralNetFreeEnergy<compute_stage>::loadMagpieNet(std::ifstream & ifile)
+{
+  std::size_t x, y;
+
+  // read weights (first the number of layers)
+  ifile >> _n_layer;
+  _weight.resize(_n_layer);
+  _z.resize(_n_layer);
+  _activation.resize(_n_layer);
+  _d_activation.resize(_n_layer);
+  for (std::size_t i = 0; i < _n_layer; ++i)
+  {
+    if (!(ifile >> y >> x))
+      mooseError("Error reading file ", _file_name);
+
+    // initialize weight matrix
+    _weight[i] = DenseMatrix<Real>(x, y);
+
+    // initialize computation buffers (including input and output)
+    _activation[i] = DenseVector<ADReal>(y);
+    _d_activation[i] = DenseVector<ADReal>(y);
+    _z[i] = DenseVector<ADReal>(x);
+
+    for (std::size_t k = 0; k < y; ++k)
+      for (std::size_t j = 0; j < x; ++j)
+        if (!(ifile >> _weight[i](j, k)))
+          mooseError("Error reading weights from file ", _file_name);
+  }
+
+  // read biases (first the number of layers)
+  ifile >> _n_layer;
+  _bias.resize(_n_layer);
+  for (std::size_t i = 0; i < _n_layer; ++i)
+  {
+    if (!(ifile >> x))
+      mooseError("Error reading file ", _file_name);
+
+    _z[i] = DenseVector<ADReal>(x);
+    _bias[i] = DenseVector<Real>(x);
+
+    for (std::size_t j = 0; j < x; ++j)
+      if (!(ifile >> _bias[i](j)))
+        mooseError("Error reading biases from file ", _file_name);
   }
 }
 
@@ -175,40 +287,47 @@ template <ComputeStage compute_stage>
 void
 DeepNeuralNetFreeEnergy<compute_stage>::evaluate()
 {
-  std::size_t i = 0;
+  _layer = 0;
   while (true)
   {
     // apply weights and biases
-    _weight[i].vector_mult(_z[i], _activation[i]);
-    _z[i] += _bias[i];
+    _weight[_layer].vector_mult(_z[_layer], _activation[_layer]);
+    _z[_layer] += _bias[_layer];
 
     // derivatives
-    if (i > 0)
+    if (_layer > 0)
     {
       // prepare product of weights and activation function derivative (previous layer)
-      for (std::size_t j = 0; j < _weight[i].m(); ++j)
-        for (std::size_t k = 0; k < _weight[i].n(); ++k)
-          _prod[i](j, k) = _weight[i](j, k) * _d_activation[i](k);
+      for (std::size_t j = 0; j < _weight[_layer].m(); ++j)
+        for (std::size_t k = 0; k < _weight[_layer].n(); ++k)
+          _prod[_layer](j, k) = _weight[_layer](j, k) * _d_activation[_layer](k);
 
       // multiply progressive Jacobian
-      multiply(_diff[i], _prod[i], _diff[i - 1]);
+      multiply(_diff[_layer], _prod[_layer], _diff[_layer - 1]);
     }
 
-    // bail to avoid applying sigmoid to the output
-    if (i + 1 == _n_layer)
+    // bail to avoid applying activation function to the output
+    if (_layer + 1 == _n_layer)
       break;
 
-    // apply sigmoid activation function
-    for (std::size_t j = 0; j < _z[i].size(); ++j)
-    {
-      _activation[i + 1](j) = 1.0 / (1.0 + std::exp(-_z[i](j)));
-
-      // Note ds(x)/dx = s(x)*(1-s(x))
-      // the expensive sigmoid only has to be computed once!
-      _d_activation[i + 1](j) = _activation[i + 1](j) * (1 - _activation[i + 1](j));
-    }
+    // apply activation function
+    applyLayerActivation();
 
     // next layer
-    ++i;
+    ++_layer;
+  }
+}
+
+template <ComputeStage compute_stage>
+void
+DeepNeuralNetFreeEnergy<compute_stage>::applyLayerActivation()
+{
+  for (std::size_t j = 0; j < _z[_layer].size(); ++j)
+  {
+    _activation[_layer + 1](j) = 1.0 / (1.0 + std::exp(-_z[_layer](j)));
+
+    // Note ds(x)/dx = s(x)*(1-s(x))
+    // the expensive sigmoid only has to be computed once!
+    _d_activation[_layer + 1](j) = _activation[_layer + 1](j) * (1 - _activation[_layer + 1](j));
   }
 }

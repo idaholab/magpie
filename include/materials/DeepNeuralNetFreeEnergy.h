@@ -28,14 +28,32 @@ public:
   DeepNeuralNetFreeEnergy(const InputParameters & parameters);
 
 protected:
+  /// load a neural net description form a genann file
+  void loadGenANN(std::ifstream & ifile);
+
+  /// load a neural net description form a custom weights and biases file
+  void loadMagpieNet(std::ifstream & ifile);
+
+  void debugDump();
+
   /// compute material properties for the current quadrature point
   virtual void computeQpProperties();
 
   /// evaluate the network using the inputs in _activation[0]
   void evaluate();
 
+  /// apply activation functions (and record their derivatives) for the current layer
+  virtual void applyLayerActivation();
+
+  /// format of the file containing the weights and biases data
+  enum class FileFormat
+  {
+    MAGPIE,
+    GENANN
+  } _file_format;
+
   /// network data file with weights and biases
-  const FileName _filename;
+  const FileName _file_name;
 
   /// output material property names
   const std::vector<MaterialPropertyName> _output_name;
@@ -63,6 +81,9 @@ protected:
 
   /// number of layers excluding the input layer
   std::size_t _n_layer;
+
+  /// layer currently processed
+  std::size_t _layer;
 
 private:
   /// matrix multiplication helper
