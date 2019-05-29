@@ -35,7 +35,7 @@ ThreadedRadialGreensConvolutionLoop::operator()(const QPDataRange & qpdata_range
 
   // fetch thread copy of the function for safe evaluation
   ParallelUniqueId puid;
-  Function & function = _green._fe_problem.getFunction(_function_name, puid.id);
+  const Function & function = _green._fe_problem.getFunction(_function_name, puid.id);
 
   // radial bin size
   const Real dr = r_cut / correction_integral.size();
