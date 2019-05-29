@@ -71,7 +71,7 @@ protected:
   unsigned int _quad_order;
 
   /// Function representing the neutron spectrum
-  Function & _neutron_spectrum;
+  const Function & _neutron_spectrum;
 
   /// Order of Legendre polynomials
   unsigned int _L;
@@ -98,7 +98,7 @@ protected:
   const std::vector<Real> _recoil_energy_limits;
 
   /// Function representing the elastic cross section
-  std::vector<Function *> _scattering_cross_section;
+  std::vector<const Function *> _scattering_cross_section;
 
   /// Varible for the neutron spectrum
   std::vector<Real> _xi_g;

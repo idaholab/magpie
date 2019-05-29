@@ -85,7 +85,7 @@ protected:
   unsigned int _v_var;
 
   /// Green's function
-  Function & _function;
+  const Function & _function;
 
   /// Green's function cut-off radius
   const Real _r_cut;

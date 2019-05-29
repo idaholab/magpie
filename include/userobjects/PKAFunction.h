@@ -36,16 +36,16 @@ protected:
   ///@}
 
   /// Fission rate (per unit volume)
-  Function & _pka_rate;
+  const Function & _pka_rate;
 
   /// PKA nuclear charge
-  Function & _Z;
+  const Function & _Z;
 
   /// PKA mass
-  Function & _m;
+  const Function & _m;
 
   /// PKA Energy (in eV)
-  Function & _E;
+  const Function & _E;
 
   /// time
   const Real & _time;

@@ -55,8 +55,8 @@ PolyatomicDisplacementDerivativeFunction::odeRHS(Real energy,
                                                  void * params)
 {
   (void)disp;
-  PolyatomicDisplacementDerivativeFunction * padf =
-      (PolyatomicDisplacementDerivativeFunction *)params;
+  const PolyatomicDisplacementDerivativeFunction * padf =
+      (const PolyatomicDisplacementDerivativeFunction *)params;
   for (unsigned int i = 0; i < padf->nSpecies(); ++i)
   {
     Real stopping_power = padf->stoppingPower(i, energy);
