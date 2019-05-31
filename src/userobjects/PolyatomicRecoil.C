@@ -157,9 +157,9 @@ PolyatomicRecoil::finalize()
     std::ofstream displacement_file;
     displacement_file.open(getParam<std::string>("displacement_file_base") + ".csv");
 
-    const PolyatomicDisplacementFunction * displacement_function =
+    PolyatomicDisplacementFunction * displacement_function =
         dynamic_cast<PolyatomicDisplacementFunction *>(_padf.get());
-    const PolyatomicDamageEnergyFunction * energy_function =
+    PolyatomicDamageEnergyFunction * energy_function =
         dynamic_cast<PolyatomicDamageEnergyFunction *>(_padf.get());
 
     displacement_file << "energy (eV)";
