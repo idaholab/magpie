@@ -32,7 +32,7 @@ protected:
   virtual Real getLabCosine(Real E, Real T, Real Q = 0.0) const override;
 
   /// Function representing the scattering law
-  Function & _scattering_law;
+  const Function & _scattering_law;
 };
 
 #endif // ELASTICRECOIL_H

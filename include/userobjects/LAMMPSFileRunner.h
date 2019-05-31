@@ -56,7 +56,7 @@ protected:
   std::vector<unsigned int> _pos_columns;
 
   /// Conversion from FEM time to MD time_stamp
-  Function * _time_conversion;
+  const Function * _time_conversion;
 };
 
 #endif // LAMMPSFILERUNNER_H
