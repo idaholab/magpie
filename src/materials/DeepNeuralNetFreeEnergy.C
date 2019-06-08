@@ -154,8 +154,6 @@ DeepNeuralNetFreeEnergy<compute_stage>::loadGenANN(std::ifstream & ifile)
   _activation.resize(_n_layer);
   _d_activation.resize(_n_layer);
 
-  std::cout << "loadGenANN " << _n_layer << '\n';
-
   // read weights and biases
   for (std::size_t i = 0; i < _n_layer; ++i)
   {
@@ -174,8 +172,6 @@ DeepNeuralNetFreeEnergy<compute_stage>::loadGenANN(std::ifstream & ifile)
     y = i > 0 ? n_hidden : n_inputs;
     // initialize weight matrix
     _weight[i] = DenseMatrix<Real>(x, y);
-
-    std::cout << "X,y = " << x << ',' << y << '\n';
 
     // initialize computation buffers (including input and output)
     _activation[i] = DenseVector<ADReal>(y);
