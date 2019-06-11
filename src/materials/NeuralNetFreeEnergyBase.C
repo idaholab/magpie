@@ -6,14 +6,12 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#include "DeepNeuralNetFreeEnergy.h"
+#include "NeuralNetFreeEnergyBase.h"
 #include "MooseEnum.h"
 #include <fstream>
 
-registerADMooseObject("MagpieApp", DeepNeuralNetFreeEnergy);
-
 defineADValidParams(
-    DeepNeuralNetFreeEnergy,
+    NeuralNetFreeEnergyBase,
     ADMaterial,
     params.addClassDescription(
         "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
@@ -29,7 +27,7 @@ defineADValidParams(
         "prop_names", "list of material properties fed from the outputs of the neural network"););
 
 template <ComputeStage compute_stage>
-DeepNeuralNetFreeEnergy<compute_stage>::DeepNeuralNetFreeEnergy(const InputParameters & parameters)
+NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParameters & parameters)
   : ADMaterial<compute_stage>(parameters),
     _file_format(getParam<MooseEnum>("file_format").template getEnum<FileFormat>()),
     _file_name(getParam<FileName>("file_name")),
@@ -102,12 +100,12 @@ DeepNeuralNetFreeEnergy<compute_stage>::DeepNeuralNetFreeEnergy(const InputParam
           derivativePropertyNameFirst(_output_name[i], this->getVar("inputs", j)->name()));
   }
 
-  debugDump();
+  // debugDump();
 }
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::debugDump()
+NeuralNetFreeEnergyBase<compute_stage>::debugDump()
 {
   std::ofstream ofile;
   ofile.open("debug.dat");
@@ -133,13 +131,13 @@ DeepNeuralNetFreeEnergy<compute_stage>::debugDump()
 
 template <>
 void
-DeepNeuralNetFreeEnergy<JACOBIAN>::debugDump()
+NeuralNetFreeEnergyBase<JACOBIAN>::debugDump()
 {
 }
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::loadGenANN(std::ifstream & ifile)
+NeuralNetFreeEnergyBase<compute_stage>::loadGenANN(std::ifstream & ifile)
 {
   std::size_t x, y;
 
@@ -187,7 +185,7 @@ DeepNeuralNetFreeEnergy<compute_stage>::loadGenANN(std::ifstream & ifile)
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::loadMagpieNet(std::ifstream & ifile)
+NeuralNetFreeEnergyBase<compute_stage>::loadMagpieNet(std::ifstream & ifile)
 {
   std::size_t x, y;
 
@@ -235,7 +233,7 @@ DeepNeuralNetFreeEnergy<compute_stage>::loadMagpieNet(std::ifstream & ifile)
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::computeQpProperties()
+NeuralNetFreeEnergyBase<compute_stage>::computeQpProperties()
 {
   // set input nodes
   for (std::size_t j = 0; j < _n_input; ++j)
@@ -256,7 +254,7 @@ DeepNeuralNetFreeEnergy<compute_stage>::computeQpProperties()
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
+NeuralNetFreeEnergyBase<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
                                                  const DenseMatrix<ADReal> & M2,
                                                  const DenseMatrix<ADReal> & M3)
 {
@@ -281,7 +279,7 @@ DeepNeuralNetFreeEnergy<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
 
 template <ComputeStage compute_stage>
 void
-DeepNeuralNetFreeEnergy<compute_stage>::evaluate()
+NeuralNetFreeEnergyBase<compute_stage>::evaluate()
 {
   _layer = 0;
   while (true)
@@ -314,16 +312,4 @@ DeepNeuralNetFreeEnergy<compute_stage>::evaluate()
   }
 }
 
-template <ComputeStage compute_stage>
-void
-DeepNeuralNetFreeEnergy<compute_stage>::applyLayerActivation()
-{
-  for (std::size_t j = 0; j < _z[_layer].size(); ++j)
-  {
-    _activation[_layer + 1](j) = 1.0 / (1.0 + std::exp(-_z[_layer](j)));
-
-    // Note ds(x)/dx = s(x)*(1-s(x))
-    // the expensive sigmoid only has to be computed once!
-    _d_activation[_layer + 1](j) = _activation[_layer + 1](j) * (1 - _activation[_layer + 1](j));
-  }
-}
+adBaseClass(NeuralNetFreeEnergy);

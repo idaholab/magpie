@@ -11,39 +11,66 @@
 #include "ADMaterial.h"
 #include "DerivativeMaterialPropertyNameInterface.h"
 
+#define usingNeuralNetFreeEnergyBaseMembers                                                        \
+  usingMaterialMembers;                                                                            \
+  using NeuralNetFreeEnergyBase<compute_stage>::_layer;                                            \
+  using NeuralNetFreeEnergyBase<compute_stage>::_z;                                                \
+  using NeuralNetFreeEnergyBase<compute_stage>::_activation;                                       \
+  using NeuralNetFreeEnergyBase<compute_stage>::_d_activation;                                     \
+  using NeuralNetFreeEnergyBase<compute_stage>::applyLayerActivation
+
 // Forward Declarations
 template <ComputeStage>
-class DeepNeuralNetFreeEnergy;
+class NeuralNetFreeEnergyBase;
 
-declareADValidParams(DeepNeuralNetFreeEnergy);
+declareADValidParams(NeuralNetFreeEnergyBase);
 
 /**
  * Evaluate a deep neural net and its derivatives
  */
 template <ComputeStage compute_stage>
-class DeepNeuralNetFreeEnergy : public ADMaterial<compute_stage>,
+class NeuralNetFreeEnergyBase : public ADMaterial<compute_stage>,
                                 public DerivativeMaterialPropertyNameInterface
 {
 public:
-  DeepNeuralNetFreeEnergy(const InputParameters & parameters);
+  NeuralNetFreeEnergyBase(const InputParameters & parameters);
 
 protected:
+  /// compute material properties for the current quadrature point
+  virtual void computeQpProperties();
+
+  /// apply activation functions (and record their derivatives) for the current layer
+  virtual void applyLayerActivation() = 0;
+
+  /// layer currently processed
+  std::size_t _layer;
+
+  /// incoming weighted and biased signal (before applying activation function)
+  std::vector<DenseVector<ADReal>> _z;
+
+  /// activation vectors
+  std::vector<DenseVector<ADReal>> _activation;
+
+  /// derivatives of activation vectors
+  std::vector<DenseVector<ADReal>> _d_activation;
+
+private:
   /// load a neural net description form a genann file
   void loadGenANN(std::ifstream & ifile);
 
   /// load a neural net description form a custom weights and biases file
   void loadMagpieNet(std::ifstream & ifile);
 
-  void debugDump();
+  /// matrix multiplication helper
+  void multiply(DenseMatrix<ADReal> & M1,
+                const DenseMatrix<ADReal> & M2,
+                const DenseMatrix<ADReal> & M3);
 
-  /// compute material properties for the current quadrature point
-  virtual void computeQpProperties();
+  /// debug output of the NN results
+  void debugDump();
 
   /// evaluate the network using the inputs in _activation[0]
   void evaluate();
-
-  /// apply activation functions (and record their derivatives) for the current layer
-  virtual void applyLayerActivation();
 
   /// format of the file containing the weights and biases data
   enum class FileFormat
@@ -67,12 +94,6 @@ protected:
   /// number of inputs
   const std::size_t _n_input;
 
-  /// input variables
-  std::vector<const ADVariableValue *> _input;
-
-  /// output property derivatives
-  std::vector<ADMaterialProperty(Real) *> _d_output;
-
   /// network weights
   std::vector<DenseMatrix<Real>> _weight;
 
@@ -82,23 +103,11 @@ protected:
   /// number of layers excluding the input layer
   std::size_t _n_layer;
 
-  /// layer currently processed
-  std::size_t _layer;
+  /// input variables
+  std::vector<const ADVariableValue *> _input;
 
-private:
-  /// matrix multiplication helper
-  void multiply(DenseMatrix<ADReal> & M1,
-                const DenseMatrix<ADReal> & M2,
-                const DenseMatrix<ADReal> & M3);
-
-  /// incoming weighted and biased signal (before applying activation function)
-  std::vector<DenseVector<ADReal>> _z;
-
-  /// activation vectors
-  std::vector<DenseVector<ADReal>> _activation;
-
-  /// derivatives of activation vectors
-  std::vector<DenseVector<ADReal>> _d_activation;
+  /// output property derivatives
+  std::vector<ADMaterialProperty(Real) *> _d_output;
 
   /// progressive Jacobian matrices
   std::vector<DenseMatrix<ADReal>> _diff;
