@@ -1,13 +1,11 @@
 !config navigation breadcrumbs=False scrollspy=False
 
-<div style="text-align: center">
-<img src="media/magpie_logo.svg"/>
-</div>
+!media media/magpie_logo.svg style=display:block;margin-left:auto;margin-right:auto;width:60%;
 
-<h2 class="center" style="font-size:150%;font-weight:300;">Mesoscale-Atomistics Glue Program for Integrated Execution</h2>
+# MAGPIE class=center style=font-weight:500;font-size:350%
+
+# Mesoscale-Atomistics Glue Program for Integrated Execution class=center style=font-weight:300;font-size:150%
 
 Welcome to the Magpie project. Magpie is an Idaho National Laboratory tool for coupling
 atomistic and Monte Carlo methods to the finite element MOOSE framework. It currently couples
 the MyTRIM binary collision Monte-Carlo code and the Sandia SPPARKS Monte Carlo toolkit.
-
-<!--!media media/marmot_single.mp4 style=width:1000px;margin:auto loop=true autoplay=true caption=Void lattice formation under irradiation-->
