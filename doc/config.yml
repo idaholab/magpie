@@ -12,7 +12,7 @@ Extensions:
     MooseDocs.extensions.navigation:
         name: 'Magpie'
         repo: https://github.com/idaholab/magpie
-        home: https://www.mooseframework.org.magpie
+        home: https://www.mooseframework.org/magpie
         menu:
             Getting Started:
                 Installation: 'getting_started/Installation.md'
