@@ -68,7 +68,7 @@ C_i = \Delta t \int_{V_j} F_i (\vec{r}_m, \vec{\rho})  d\vec{\rho}.
 Non-integer results are rounded up with a probability of the $C_i -
 \text{int}(C_i)$; otherwise rounded down. Two PKAs are created from each fission
 event. The algorithm for sampling their type, energy, and direction of motion is
-described in [cite:SchunertTREATHeatSource].
+described in [!cite](SchunertTREATHeatSource).
 
 !syntax parameters /UserObjects/PKAFissionFragmentNeutronics
 
