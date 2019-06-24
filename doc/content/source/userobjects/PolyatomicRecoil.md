@@ -4,9 +4,9 @@
 
 # Description
 
-PolyatomicRecoil allows computation of total and net displacement functions described in [cite:PC1981] and damage energy functions defined in [cite:PC1980]. PolyatomicRecoil will
+PolyatomicRecoil allows computation of total and net displacement functions described in [!cite](PC1981) and damage energy functions defined in [!cite](PC1980). PolyatomicRecoil will
 print output in csv format. In the future the preparation of displacement cross sections, described in
-[cite:HG1993], will be implemented. PolyatomicRecoil also implements the computation of first derivatives of the net displacement function with respect to number densities.
+[!cite](HG1993), will be implemented. PolyatomicRecoil also implements the computation of first derivatives of the net displacement function with respect to number densities.
 
 PolyatomicRecoil allows the displacement and capture energies
 of different species at a particular lattice to be different, e.g. the capture energy of species i at an
