@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMDIRACSOURCE_H
-#define MYTRIMDIRACSOURCE_H
+#pragma once
 
 #include "DiracKernel.h"
 #include "ThreadedRecoilLoopBase.h"
@@ -42,4 +41,3 @@ protected:
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
 
-#endif // MYTRIMDIRACSOURCE_H

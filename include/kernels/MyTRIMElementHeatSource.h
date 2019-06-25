@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTHEATSOURCE_H
-#define MYTRIMELEMENTHEATSOURCE_H
+#pragma once
 
 #include "MyTRIMElementEnergyAccess.h"
 #include "Kernel.h"
@@ -31,4 +30,3 @@ protected:
   const Real & _dt;
 };
 
-#endif // MYTRIMELEMENTHEATSOURCE_H

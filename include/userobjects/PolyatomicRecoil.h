@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICRECOIL_H
-#define POLYATOMICRECOIL_H
+#pragma once
 
 #include "GeneralUserObject.h"
 

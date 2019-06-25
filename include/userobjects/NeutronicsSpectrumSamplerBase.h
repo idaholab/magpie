@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef NEUTRONICSSPECTRUMSAMPLERBASE_H
-#define NEUTRONICSSPECTRUMSAMPLERBASE_H
+#pragma once
 
 // MOOSE includes
 #include "ElementUserObject.h"
@@ -113,4 +112,3 @@ protected:
   std::vector<unsigned int> _zaids;
 };
 
-#endif // NEUTRONICSSPECTRUMSAMPLERBASE_H

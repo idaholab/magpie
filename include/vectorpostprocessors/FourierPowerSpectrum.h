@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef FFTW3_ENABLED
 
-#ifndef FOURIERPOWERSPECTRUM_H
-#define FOURIERPOWERSPECTRUM_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 
@@ -59,5 +58,4 @@ protected:
   ///@}
 };
 
-#endif // FOURIERPOWERSPECTRUM_H
 #endif // FFTW3_ENABLED

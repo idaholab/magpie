@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTENERGYAUX_H
-#define MYTRIMELEMENTENERGYAUX_H
+#pragma once
 
 #include "MyTRIMElementEnergyAccess.h"
 #include "AuxKernel.h"
@@ -28,4 +27,3 @@ public:
   virtual Real computeValue();
 };
 
-#endif // MYTRIMELEMENTENERGYAUX_H

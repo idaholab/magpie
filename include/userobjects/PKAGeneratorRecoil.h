@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAGENERATORRECOIL_H
-#define PKAGENERATORRECOIL_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 #include "PKAGeneratorNeutronicsBase.h"

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAFIXEDPOINTGENERATOR_H
-#define PKAFIXEDPOINTGENERATOR_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 
@@ -59,4 +58,3 @@ protected:
   dof_id_type _elem_id;
 };
 
-#endif // PKAFIXEDPOINTGENERATOR_H

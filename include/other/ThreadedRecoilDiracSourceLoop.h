@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef THREADEDRECOILDIRACSOURCELOOP_H
-#define THREADEDRECOILDIRACSOURCELOOP_H
+#pragma once
 
 #include "ThreadedRecoilLoopBase.h"
 #include "DataIO.h"
@@ -73,4 +72,3 @@ void dataStore(std::ostream &, ThreadedRecoilDiracSourceLoop::MyTRIMResult &, vo
 template <>
 void dataLoad(std::istream &, ThreadedRecoilDiracSourceLoop::MyTRIMResult &, void *);
 
-#endif // THREADEDRECOILDIRACSOURCELOOP_H

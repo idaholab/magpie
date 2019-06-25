@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICDISPLACEMENTDERIVATIVEFUNCTION_H
-#define POLYATOMICDISPLACEMENTDERIVATIVEFUNCTION_H
+#pragma once
 
 #include "PolyatomicDisplacementFunctionBase.h"
 #include "PolyatomicDisplacementFunction.h"

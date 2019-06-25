@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef POINTLOCATORREGULARORTHOGONALDATA_H
-#define POINTLOCATORREGULARORTHOGONALDATA_H
+#pragma once
 
 #include "Moose.h"
 #include "libmesh/point.h"
@@ -60,4 +59,3 @@ protected:
   std::vector<Elem *> _root_elems;
 };
 
-#endif // POINTLOCATORREGULARORTHOGONALDATA_H

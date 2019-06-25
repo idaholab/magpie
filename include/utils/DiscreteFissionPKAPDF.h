@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef DISCRETEFISSIONPKAPDF_H
-#define DISCRETEFISSIONPKAPDF_H
+#pragma once
 
 #include "DiscretePKAPDFBase.h"
 #include "MultiIndex.h"
@@ -62,4 +61,3 @@ protected:
   std::vector<std::map<unsigned int, std::vector<Real>>> _fission_cdf;
 };
 
-#endif // DISCRETEFISSIONPKAPDF_H

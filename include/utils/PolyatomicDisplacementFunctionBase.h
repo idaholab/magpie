@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICDISPLACEMENTFUNCTIONBASE_H
-#define POLYATOMICDISPLACEMENTFUNCTIONBASE_H
+#pragma once
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>

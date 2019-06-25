@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMDIRACRUN_H
-#define MYTRIMDIRACRUN_H
+#pragma once
 
 #include "MyTRIMRunBase.h"
 #include "ThreadedRecoilDiracSourceLoop.h"
@@ -53,4 +52,3 @@ protected:
   ///@}
 };
 
-#endif // MYTRIMDIRACRUN_H

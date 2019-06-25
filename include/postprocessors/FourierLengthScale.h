@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef FFTW3_ENABLED
 
-#ifndef FOURIERLENGTHSCALE_H
-#define FOURIERLENGTHSCALE_H
+#pragma once
 
 #include "GeneralPostprocessor.h"
 
@@ -59,5 +58,4 @@ protected:
   Real _weight_sum;
 };
 
-#endif // FOURIERLENGTHSCALE_H
 #endif // FFTW3_ENABLED

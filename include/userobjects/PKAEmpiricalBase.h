@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAEMPIRICALBASE_H
-#define PKAEMPIRICALBASE_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 
@@ -39,4 +38,3 @@ protected:
   ///@}
 };
 
-#endif // PKAEMPIRICALBASE_H

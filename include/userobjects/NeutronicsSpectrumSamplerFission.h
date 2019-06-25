@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef NEUTRONICSSPECTRUMSAMPLERFISSION_H
-#define NEUTRONICSSPECTRUMSAMPLERFISSION_H
+#pragma once
 
 #include "NeutronicsSpectrumSamplerBase.h"
 

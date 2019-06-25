@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMPKASTATISTICS_H
-#define MYTRIMPKASTATISTICS_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 
@@ -48,4 +47,3 @@ protected:
   VectorPostprocessorValue & _count;
 };
 
-#endif // MYTRIMPKASTATISTICS_H

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef THREADEDRADIALGREENSCONVOLUTIONLOOP_H
-#define THREADEDRADIALGREENSCONVOLUTIONLOOP_H
+#pragma once
 
 #include "PointListAdaptor.h"
 #include "RadialGreensConvolution.h"
@@ -60,4 +59,3 @@ protected:
 private:
 };
 
-#endif // THREADEDRADIALGREENSCONVOLUTIONLOOP_H

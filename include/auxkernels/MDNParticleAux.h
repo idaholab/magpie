@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MDNPARTICLEAUX_H
-#define MDNPARTICLEAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -30,4 +29,3 @@ protected:
   const MDRunBase & _md_uo;
 };
 
-#endif // MDNPARTICLEAUX_H

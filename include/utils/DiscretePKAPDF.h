@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef DISCRETEPKAPDF_H
-#define DISCRETEPKAPDF_H
+#pragma once
 
 #include "DiscretePKAPDFBase.h"
 #include "MultiIndex.h"

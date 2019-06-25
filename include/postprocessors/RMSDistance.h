@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef RMSDISTANCE_H
-#define RMSDISTANCE_H
+#pragma once
 
 #include "ElementIntegralVariablePostprocessor.h"
 

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MDRUNBASE_H
-#define MDRUNBASE_H
+#pragma once
 
 #include "GeneralUserObject.h"
 #include "KDTree.h"
@@ -93,4 +92,3 @@ protected:
   std::unique_ptr<KDTree> _kd_tree;
 };
 
-#endif // MDRUNBASE_H

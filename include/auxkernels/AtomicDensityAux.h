@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef ATOMICDENSITYAUX_H
-#define ATOMICDENSITYAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -35,4 +34,3 @@ protected:
   const Real _volume_scale;
 };
 
-#endif // ATOMICDENSITYAUX_H

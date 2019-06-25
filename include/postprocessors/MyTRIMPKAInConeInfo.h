@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMPKAINCONEINFO_H
-#define MYTRIMPKAINCONEINFO_H
+#pragma once
 
 #include "MyTRIMPKAInfo.h"
 

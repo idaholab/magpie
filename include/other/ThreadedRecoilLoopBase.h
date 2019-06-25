@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef THREADEDRECOILLOOPBASE_H
-#define THREADEDRECOILLOOPBASE_H
+#pragma once
 
 #include "MooseMyTRIMMaterial.h"
 #include "MyTRIMRasterizer.h"
@@ -131,4 +130,3 @@ private:
       LIBMESH_DIM>;
 };
 
-#endif // THREADEDRECOILLOOPBASE_H

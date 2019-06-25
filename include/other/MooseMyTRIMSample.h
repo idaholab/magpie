@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MOOSEMYTRIMSAMPLE_H
-#define MOOSEMYTRIMSAMPLE_H
+#pragma once
 
 #include "MyTRIMRasterizer.h"
 #include "MooseMyTRIMMaterial.h"
@@ -71,4 +70,3 @@ protected:
   MyTRIM_NS::SimconfType * _simconf;
 };
 
-#endif // MOOSEMYTRIMSAMPLE_H

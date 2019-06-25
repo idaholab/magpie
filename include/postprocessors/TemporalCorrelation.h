@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef TEMPORALCORRELATION_H
-#define TEMPORALCORRELATION_H
+#pragma once
 
 #include "ElementAverageValue.h"
 
@@ -32,4 +31,3 @@ protected:
   const VariableValue & _u_dot;
 };
 
-#endif // TEMPORALCORRELATION_H

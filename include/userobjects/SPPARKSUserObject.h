@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef SPPARKSUSEROBJECT_H
-#define SPPARKSUSEROBJECT_H
+#pragma once
 
 #include "GeneralUserObject.h"
 #include "MooseVariable.h"

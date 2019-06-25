@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTRESULTACCESS_H
-#define MYTRIMELEMENTRESULTACCESS_H
+#pragma once
 
 #include "MyTRIMElementRun.h"
 #include "MyTRIMRasterizer.h"
@@ -82,4 +81,3 @@ MyTRIMElementResultAccess<T>::getDefectRate()
   return _value_cache;
 }
 
-#endif // MYTRIMELEMENTRESULTACCESS_H

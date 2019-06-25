@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAGENERATORALPHADECAY_H
-#define PKAGENERATORALPHADECAY_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 
@@ -49,4 +48,3 @@ protected:
   Real _time_conversion;
 };
 
-#endif // PKAGENERATORALPHADECAY_H

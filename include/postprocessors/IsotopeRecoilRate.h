@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef ISOTOPERECOILRATE_H
-#define ISOTOPERECOILRATE_H
+#pragma once
 
 #include "GeneralPostprocessor.h"
 

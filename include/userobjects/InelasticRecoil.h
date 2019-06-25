@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef INELASTICRECOIL_H
-#define INELASTICRECOIL_H
+#pragma once
 
 #include "ScatteringRecoilCrossSection.h"
 
@@ -44,5 +43,4 @@ protected:
   const unsigned int _n_levels;
 };
 
-#endif // INELASTICRECOIL_H
 #endif // GSL_ENABLED

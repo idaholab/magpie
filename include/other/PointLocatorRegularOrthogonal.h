@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef POINTLOCATORREGULARORTHOGONAL_H
-#define POINTLOCATORREGULARORTHOGONAL_H
+#pragma once
 
 #include "Moose.h"
 #include "libmesh/point.h"
@@ -90,4 +89,3 @@ protected:
   PointLocatorRegularOrthogonalData * _data;
 };
 
-#endif // POINTLOCATORREGULARORTHOGONAL_H

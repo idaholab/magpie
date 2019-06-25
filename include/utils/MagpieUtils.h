@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MAGPIEUTILS_H
-#define MAGPIEUTILS_H
+#pragma once
 
 #include "Moose.h"
 #include "MooseEnum.h"
@@ -106,4 +105,3 @@ private:
 
 } // namespace MagpieUtils
 
-#endif // MAGPIEUTILS_H

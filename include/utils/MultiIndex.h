@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MULTIINDEX_H
-#define MULTIINDEX_H
+#pragma once
 
 #include "Moose.h"
 #include "MooseError.h"
@@ -477,4 +476,3 @@ dataLoad(std::istream & stream, MultiIndex<T> & mi, void * context)
   mi.dataLoad(stream, context);
 }
 
-#endif // MULTIINDEX_H

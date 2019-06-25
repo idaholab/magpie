@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAGENERATORBASE_H
-#define PKAGENERATORBASE_H
+#pragma once
 
 #include "DiscreteElementUserObject.h"
 #include "MyTRIMRasterizer.h"
@@ -55,4 +54,3 @@ protected:
   }
 };
 
-#endif // PKAGENERATORBASE_H

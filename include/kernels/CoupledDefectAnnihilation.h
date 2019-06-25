@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef COUPLEDDEFECTANIHILATION_H
-#define COUPLEDDEFECTANIHILATION_H
+#pragma once
 
 #include "Kernel.h"
 
@@ -41,5 +40,3 @@ protected:
 
   const Real _prefactor;
 };
-
-#endif // COUPLEDDEFECTANIHILATION_H

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMRASTERIZER_H
-#define MYTRIMRASTERIZER_H
+#pragma once
 
 #include "ElementUserObject.h"
 #include "PolyatomicDisplacementFunction.h"
@@ -217,4 +216,3 @@ private:
   PerfID _perf_finalize;
 };
 
-#endif // MYTRIMRASTERIZER_H

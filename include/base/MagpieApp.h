@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MAGPIEAPP_H
-#define MAGPIEAPP_H
+#pragma once
 
 #include "MooseApp.h"
 
