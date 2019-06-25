@@ -34,7 +34,7 @@ private:
 
 template <class T>
 MyTRIMElementEnergyAccess<T>::MyTRIMElementEnergyAccess(const InputParameters & parameters)
-  : T(parameters), _mytrim(this->template getUserObject<MyTRIMElementRun>("runner"))
+  : T(parameters), _mytrim(getUserObject<MyTRIMElementRun>("runner"))
 {
   if (this->isNodal())
     mooseError("MyTRIMElementEnergyAccess needs to be applied to an elemental AuxVariable.");
