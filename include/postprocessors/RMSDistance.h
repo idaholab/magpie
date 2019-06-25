@@ -34,5 +34,3 @@ protected:
   const Point _point;
   Real _normalization;
 };
-
-#endif

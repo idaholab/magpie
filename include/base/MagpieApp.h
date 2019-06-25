@@ -27,5 +27,3 @@ public:
 
   static void printLogo();
 };
-
-#endif /* MAGPIEAPP_H */

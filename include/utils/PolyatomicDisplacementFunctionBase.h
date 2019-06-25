@@ -139,5 +139,4 @@ protected:
   ///@}
 };
 
-#endif // DiscretePKAPDF
-#endif
+#endif // GSL_ENABLED

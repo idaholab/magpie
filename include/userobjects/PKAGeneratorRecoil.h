@@ -37,5 +37,3 @@ protected:
    */
   DiscretePKAPDF _pdf;
 };
-
-#endif // PKAGeneratorRecoil_H

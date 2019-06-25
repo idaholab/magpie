@@ -27,5 +27,3 @@ protected:
   const RealVectorValue _direction;
   const Real _min_cosine;
 };
-
-#endif // MyTRIMPKAInConeInfo_H

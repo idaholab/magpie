@@ -55,5 +55,4 @@ protected:
   const PolyatomicDisplacementFunction * _net_displacement_function;
 };
 
-#endif // PolyatomicDisplacementDerivativeFunction
-#endif
+#endif // GSL_ENABLED

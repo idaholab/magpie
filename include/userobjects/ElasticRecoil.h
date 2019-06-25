@@ -34,4 +34,4 @@ protected:
   const Function & _scattering_law;
 };
 
-#endif
+#endif // GSL_ENABLED

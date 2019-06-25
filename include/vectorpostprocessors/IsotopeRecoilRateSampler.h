@@ -36,5 +36,3 @@ protected:
 
   std::vector<Real> & _recoil_rates;
 };
-
-#endif

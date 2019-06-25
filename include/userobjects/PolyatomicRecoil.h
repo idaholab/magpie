@@ -36,5 +36,4 @@ protected:
   std::unique_ptr<PolyatomicDisplacementDerivativeFunction> _padf_derivative;
 };
 
-#endif // PolyatomicRecoil_H
-#endif
+#endif // GSL_ENABLED

@@ -31,5 +31,3 @@ protected:
   const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
   const PostprocessorValue & _scaling_factor;
 };
-
-#endif // IsotopeRecoilRate_H

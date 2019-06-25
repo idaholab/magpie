@@ -42,5 +42,4 @@ public:
   Real _taylor_series_threshold = 1e2;
 };
 
-#endif // PolyatomicDisplacementFunction
-#endif
+#endif // GSL_ENABLED

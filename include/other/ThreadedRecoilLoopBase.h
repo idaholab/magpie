@@ -59,7 +59,7 @@ public:
   void findBestNRTMatch(const std::vector<Real> & number_fractions,
                         unsigned int & index,
                         Real & distance) const;
-#endif
+#endif // GSL_ENABLED
 
   /// defect type enum (vacancies, interstitials, and incoming and outgoing replacements)
   enum DefectType
@@ -110,7 +110,7 @@ protected:
 
   /// derivative information for NRT data
   std::vector<std::unique_ptr<PolyatomicDisplacementDerivativeFunction>> _pa_derivative_nrt;
-#endif
+#endif // GSL_ENABLED
 
 private:
   ///@{ Buffer vacancies and interstitials from the same cascade for instantaneous recombination
@@ -129,4 +129,3 @@ private:
       PointListAdaptor<MyTRIMDefectBufferItem>,
       LIBMESH_DIM>;
 };
-

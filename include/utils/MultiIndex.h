@@ -293,7 +293,7 @@ MultiIndex<T>::slice(size_type dimension, size_type index) const
                  " is larger than ",
                  _shape[dimension[d]]);
   }
-#endif
+#endif // DEBUG
 
   // create a MultiIndex object with new dim = dim - dimension.size()
   size_type new_shape;
@@ -451,7 +451,7 @@ MultiIndex<T>::flatIndex(const size_type & indices) const
   for (unsigned int j = 0; j < indices.size(); ++j)
     if (indices[j] >= _shape[j])
       mooseError("Indices vector at entry ", j, " is ", indices[j], " vs. shape ", _shape[j]);
-#endif
+#endif // DEBUG
 
   // implement the index
   // index = i_M + i_{M-1} * I_M + i_{M-1} * I_M * I_{M-1} ...
@@ -475,4 +475,3 @@ dataLoad(std::istream & stream, MultiIndex<T> & mi, void * context)
 {
   mi.dataLoad(stream, context);
 }
-

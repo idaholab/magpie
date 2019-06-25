@@ -386,5 +386,3 @@ SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & sto
       data[id[j]] = v[j];
   }
 }
-
-#endif

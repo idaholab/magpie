@@ -60,5 +60,3 @@ protected:
   MultiIndex<Real> _marginal_cdf_energy;
   MultiIndex<Real> _marginal_cdf_zaid;
 };
-
-#endif // DiscretePKAPDF

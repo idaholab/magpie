@@ -44,5 +44,4 @@ protected:
   bool _total_displacement_function;
 };
 
-#endif // PolyatomicDisplacementFunction
-#endif
+#endif // GSL_ENABLED
