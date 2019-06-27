@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef NEUTRONICSSPECTRUMSAMPLERFISSION_H
-#define NEUTRONICSSPECTRUMSAMPLERFISSION_H
+#pragma once
 
 #include "NeutronicsSpectrumSamplerBase.h"
 
@@ -47,5 +46,3 @@ protected:
   /// stores the fission cross sections
   std::vector<std::vector<std::vector<Real>>> _fission_cross_section;
 };
-
-#endif // NEUTRONCSSPECTRUMSAMPLERFISSION_H

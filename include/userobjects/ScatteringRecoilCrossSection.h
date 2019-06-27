@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef SCATTERINGRECOILCROSSSECTION_H
-#define SCATTERINGRECOILCROSSSECTION_H
+#pragma once
 
 #include "GeneralUserObject.h"
 
@@ -121,5 +120,4 @@ protected:
   ///@}
 };
 
-#endif // SCATTERINGRECOILCROSSSECTION_H
 #endif // GSL_ENABLED

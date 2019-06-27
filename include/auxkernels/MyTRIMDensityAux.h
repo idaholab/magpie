@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMDENSITYAUX_H
-#define MYTRIMDENSITYAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 #include "MyTRIMRasterizer.h"
@@ -42,4 +41,3 @@ private:
   Real _value_cache;
 };
 
-#endif // MYTRIMDENSITYAUX_H

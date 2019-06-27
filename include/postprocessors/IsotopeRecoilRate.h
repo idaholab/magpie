@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef ISOTOPERECOILRATE_H
-#define ISOTOPERECOILRATE_H
+#pragma once
 
 #include "GeneralPostprocessor.h"
 
@@ -32,5 +31,3 @@ protected:
   const NeutronicsSpectrumSamplerBase & _neutronics_sampler;
   const PostprocessorValue & _scaling_factor;
 };
-
-#endif // IsotopeRecoilRate_H

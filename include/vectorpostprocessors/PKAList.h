@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKALIST_H
-#define PKALIST_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 #include "MyTRIMRasterizer.h"
@@ -45,4 +44,3 @@ protected:
   ///@}
 };
 
-#endif // PKALIST_H

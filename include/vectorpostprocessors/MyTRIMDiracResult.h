@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMDIRACRESULT_H
-#define MYTRIMDIRACRESULT_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 
@@ -42,4 +41,3 @@ protected:
   ///@}
 };
 
-#endif // MYTRIMDIRACRESULT_H

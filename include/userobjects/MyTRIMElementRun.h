@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTRUN_H
-#define MYTRIMELEMENTRUN_H
+#pragma once
 
 #include "MyTRIMRunBase.h"
 #include "ThreadedRecoilElementAveragedLoop.h"
@@ -56,4 +55,3 @@ private:
   MyTRIMResult _zero;
 };
 
-#endif // MYTRIMELEMENTRUN_H

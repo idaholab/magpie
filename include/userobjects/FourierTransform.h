@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef FFTW3_ENABLED
 
-#ifndef FOURIERTRANSFORM_H
-#define FOURIERTRANSFORM_H
+#pragma once
 
 #include "ElementUserObject.h"
 #include "fftw3.h"
@@ -73,5 +72,4 @@ protected:
   ///@}
 };
 
-#endif // FOURIERTRANSFORM_H
 #endif // FFTW3_ENABLED

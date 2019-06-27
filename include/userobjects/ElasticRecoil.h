@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef ELASTICRECOIL_H
-#define ELASTICRECOIL_H
+#pragma once
 
 #include "ScatteringRecoilCrossSection.h"
 
@@ -35,5 +34,4 @@ protected:
   const Function & _scattering_law;
 };
 
-#endif // ELASTICRECOIL_H
-#endif
+#endif // GSL_ENABLED

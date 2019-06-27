@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef SPPARKSUSEROBJECT_H
-#define SPPARKSUSEROBJECT_H
+#pragma once
 
 #include "GeneralUserObject.h"
 #include "MooseVariable.h"
@@ -387,5 +386,3 @@ SPPARKSUserObject::sendRecvFEMData(const std::map<libMesh::dof_id_type, T> & sto
       data[id[j]] = v[j];
   }
 }
-
-#endif

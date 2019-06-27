@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef ISOTOPERECOILRATESAMPLER_H
-#define ISOTOPERECOILRATESAMPLER_H
+#pragma once
 
 // MOOSE includes
 #include "GeneralVectorPostprocessor.h"
@@ -37,5 +36,3 @@ protected:
 
   std::vector<Real> & _recoil_rates;
 };
-
-#endif

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef RADIALGREENSAUX_H
-#define RADIALGREENSAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 #include "RadialGreensConvolution.h"
@@ -31,4 +30,3 @@ protected:
   const RadialGreensConvolution::Result & _convolution;
 };
 
-#endif // RADIALGREENSAUX_H

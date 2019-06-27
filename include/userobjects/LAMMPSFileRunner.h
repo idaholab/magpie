@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef LAMMPSFILERUNNER_H
-#define LAMMPSFILERUNNER_H
+#pragma once
 
 #include "MDRunBase.h"
 
@@ -59,4 +58,3 @@ protected:
   const Function * _time_conversion;
 };
 
-#endif // LAMMPSFILERUNNER_H

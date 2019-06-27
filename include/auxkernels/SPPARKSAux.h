@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef SPPARKSAUX_H
-#define SPPARKSAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -32,4 +31,3 @@ protected:
   const unsigned int _array;
 };
 
-#endif // SPPARKSAUX_H

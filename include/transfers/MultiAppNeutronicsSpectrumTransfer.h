@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MULTIAPPNEUTRONICSSPECTRUMTRANSFER_H
-#define MULTIAPPNEUTRONICSSPECTRUMTRANSFER_H
+#pragma once
 
 #include "MultiAppTransfer.h"
 
@@ -31,4 +30,3 @@ protected:
   UserObjectName _neutronics_pdf_name;
 };
 
-#endif // MULTIAPPNEUTRONICSSPECTRUMTRANSFER_H

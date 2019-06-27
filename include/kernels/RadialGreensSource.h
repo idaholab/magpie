@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef RADIALGREENSSOURCE_H
-#define RADIALGREENSSOURCE_H
+#pragma once
 
 #include "Kernel.h"
 #include "RadialGreensConvolution.h"
@@ -39,4 +38,3 @@ protected:
   RadialGreensConvolution::Result::const_iterator _result;
 };
 
-#endif // RADIALGREENSSOURCE_H

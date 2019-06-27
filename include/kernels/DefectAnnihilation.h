@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef DEFECTANIHILATION_H
-#define DEFECTANIHILATION_H
+#pragma once
 
 #include "Kernel.h"
 
@@ -33,5 +32,3 @@ protected:
   unsigned int _v_var;
   const Real _prefactor;
 };
-
-#endif // DEFECTANIHILATION_H

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAGENERATORNEUTRONICSBASE_H
-#define PKAGENERATORNEUTRONICSBASE_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 #include "MultiIndex.h"
@@ -50,4 +49,3 @@ protected:
   std::vector<Real> _stored_densities;
 };
 
-#endif // PKAGENERATORNEUTRONICSBASE_H

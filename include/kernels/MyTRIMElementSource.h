@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTSOURCE_H
-#define MYTRIMELEMENTSOURCE_H
+#pragma once
 
 #include "MyTRIMElementResultAccess.h"
 #include "MyTRIMRasterizer.h"
@@ -35,4 +34,3 @@ protected:
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
 
-#endif // MYTRIMELEMENTSOURCE_H

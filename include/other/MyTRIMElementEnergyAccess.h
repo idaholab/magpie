@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTENERGYACCESS_H
-#define MYTRIMELEMENTENERGYACCESS_H
+#pragma once
 
 #include "MyTRIMElementRun.h"
 
@@ -67,4 +66,3 @@ MyTRIMElementEnergyAccess<T>::getEnergyDensity()
   return _value_cache;
 }
 
-#endif // MYTRIMELEMENTENERGYACCESS_H

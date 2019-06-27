@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef RADIALGREENSCONVOLUTION_H
-#define RADIALGREENSCONVOLUTION_H
+#pragma once
 
 #include "ElementUserObject.h"
 #include "DataIO.h"
@@ -184,4 +183,3 @@ public:
 }
 }
 
-#endif // RADIALGREENSCONVOLUTION_H

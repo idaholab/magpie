@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MOOSEMYTRIMENERGYDEPOSITION_H
-#define MOOSEMYTRIMENERGYDEPOSITION_H
+#pragma once
 
 #include "MooseMyTRIMCore.h"
 #include "mytrim/ion.h"
@@ -35,4 +34,3 @@ protected:
   std::list<std::pair<Point, Real>> & _edep_list;
 };
 
-#endif // MOOSEMYTRIMENERGYDEPOSITION_H
