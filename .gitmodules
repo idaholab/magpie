@@ -4,3 +4,6 @@
 [submodule "contrib/mytrim"]
 	path = contrib/mytrim
 	url = https://github.com/idaholab/mytrim.git
+[submodule "moose"]
+	path = moose
+	url = https://github.com/idaholab/moose.git
