@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef THREADEDRECOILELEMENTAVERAGEDLOOP_H
-#define THREADEDRECOILELEMENTAVERAGEDLOOP_H
+#pragma once
 
 #include "ThreadedRecoilLoopBase.h"
 #include "DataIO.h"
@@ -70,4 +69,3 @@ void dataStore(std::ostream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &
 template <>
 void dataLoad(std::istream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &, void *);
 
-#endif // THREADEDRECOILELEMENTAVERAGEDLOOP_H

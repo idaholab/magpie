@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MOOSEMYTRIMMATERIAL_H
-#define MOOSEMYTRIMMATERIAL_H
+#pragma once
 
 #include "mytrim/material.h"
 #include "mytrim/element.h"
@@ -32,4 +31,3 @@ public:
   virtual void calculateDensity(Real site_volume);
 };
 
-#endif // MOOSEMYTRIMMATERIAL_H

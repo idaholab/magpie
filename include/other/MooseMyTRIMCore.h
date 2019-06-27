@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MOOSEMYTRIMCORE_H
-#define MOOSEMYTRIMCORE_H
+#pragma once
 
 #include "mytrim/trim.h"
 #include "MooseTypes.h"
@@ -32,4 +31,3 @@ protected:
   const unsigned int _dim;
 };
 
-#endif // MOOSEMYTRIMCORE_H

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAFISSIONFRAGMENTEMPIRICAL_H
-#define PKAFISSIONFRAGMENTEMPIRICAL_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 #include "mytrim/invert.h"
@@ -40,4 +39,3 @@ protected:
   const VariableValue & _relative_density;
 };
 
-#endif // PKAFISSIONFRAGMENTEMPIRICAL_H

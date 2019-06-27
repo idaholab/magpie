@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef DiscretePKAPDFBaseBASE_H
-#define DiscretePKAPDFBaseBASE_H
+#pragma once
 
 #include "MultiIndex.h"
 #include "mytrim/ion.h"
@@ -60,5 +59,3 @@ protected:
   /// number of energy groups
   unsigned int _ng;
 };
-
-#endif // DiscretePKAPDFBase

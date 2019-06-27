@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICDAMAGEENERGYFUNCTION_H
-#define POLYATOMICDAMAGEENERGYFUNCTION_H
+#pragma once
 
 #include "PolyatomicDisplacementFunctionBase.h"
 
@@ -43,5 +42,4 @@ public:
   Real _taylor_series_threshold = 1e2;
 };
 
-#endif // PolyatomicDisplacementFunction
-#endif
+#endif // GSL_ENABLED

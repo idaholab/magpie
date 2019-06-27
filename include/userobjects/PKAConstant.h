@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKACONSTANT_H
-#define PKACONSTANT_H
+#pragma once
 
 #include "PKAEmpiricalBase.h"
 
@@ -47,4 +46,3 @@ protected:
   const Real _E;
 };
 
-#endif // PKACONSTANT_H

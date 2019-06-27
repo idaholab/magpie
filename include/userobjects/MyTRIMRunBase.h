@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMRUNBASE_H
-#define MYTRIMRUNBASE_H
+#pragma once
 
 #include "GeneralUserObject.h"
 #include "MyTRIMRasterizer.h"
@@ -58,4 +57,3 @@ protected:
   const unsigned int _dim;
 };
 
-#endif // MYTRIMRUNBASE_H

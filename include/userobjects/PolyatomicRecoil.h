@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICRECOIL_H
-#define POLYATOMICRECOIL_H
+#pragma once
 
 #include "GeneralUserObject.h"
 
@@ -37,5 +36,4 @@ protected:
   std::unique_ptr<PolyatomicDisplacementDerivativeFunction> _padf_derivative;
 };
 
-#endif // PolyatomicRecoil_H
-#endif
+#endif // GSL_ENABLED

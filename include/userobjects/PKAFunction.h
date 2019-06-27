@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAFUNCTION_H
-#define PKAFUNCTION_H
+#pragma once
 
 #include "PKAEmpiricalBase.h"
 #include "Function.h"
@@ -51,4 +50,3 @@ protected:
   const Real & _time;
 };
 
-#endif // PKAFUNCTION_H

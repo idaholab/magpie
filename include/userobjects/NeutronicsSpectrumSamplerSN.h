@@ -8,8 +8,7 @@
 #ifdef GSL_ENABLED
 #ifdef RATTLESNAKE_ENABLED
 
-#ifndef NEUTRONICSSPECTRUMSAMPLERSN_H
-#define NEUTRONICSSPECTRUMSAMPLERSN_H
+#pragma once
 
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "AQData.h"
@@ -56,7 +55,6 @@ protected:
   std::vector<std::vector<const ElasticRecoil *>> _recoil_cross_sections;
 };
 
-#endif // NEUTRONICSSPECTRUMSAMPLERSN_H
 
 #endif // RATTLESNAKE_ENABLED
 #endif // GSL_ENABLED

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMPKAINFO_H
-#define MYTRIMPKAINFO_H
+#pragma once
 
 #include "GeneralPostprocessor.h"
 #include "mytrim/ion.h"
@@ -50,4 +49,3 @@ protected:
   Real _value;
 };
 
-#endif // MYTRIMPKAINFO_H

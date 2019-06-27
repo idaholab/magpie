@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMELEMENTRESULTAUX_H
-#define MYTRIMELEMENTRESULTAUX_H
+#pragma once
 
 #include "MyTRIMElementResultAccess.h"
 #include "AuxKernel.h"
@@ -28,4 +27,3 @@ public:
   virtual Real computeValue();
 };
 
-#endif // MYTRIMELEMENTRESULTAUX_H

@@ -7,8 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#ifndef POLYATOMICDISPLACEMENTFUNCTION_H
-#define POLYATOMICDISPLACEMENTFUNCTION_H
+#pragma once
 
 #include "PolyatomicDisplacementFunctionBase.h"
 
@@ -45,5 +44,4 @@ protected:
   bool _total_displacement_function;
 };
 
-#endif // PolyatomicDisplacementFunction
-#endif
+#endif // GSL_ENABLED

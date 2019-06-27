@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMMESH_H
-#define MYTRIMMESH_H
+#pragma once
 
 #include "GeneratedMesh.h"
 #include "PointLocatorRegularOrthogonal.h"
@@ -49,4 +48,3 @@ protected:
   mutable std::unique_ptr<PointLocatorRegularOrthogonal> _point_locator;
 };
 
-#endif // MYTRIMMESH_H

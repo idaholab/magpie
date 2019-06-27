@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MYTRIMPKAENERGYHISTOGRAM_H
-#define MYTRIMPKAENERGYHISTOGRAM_H
+#pragma once
 
 #include "GeneralVectorPostprocessor.h"
 
@@ -44,4 +43,3 @@ protected:
   VectorPostprocessorValue & _count;
 };
 
-#endif // MYTRIMPKAENERGYHISTOGRAM_H

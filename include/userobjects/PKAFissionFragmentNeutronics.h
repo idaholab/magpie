@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAFISSIONFRAGMENTNEUTRONICS_H
-#define PKAFISSIONFRAGMENTNEUTRONICS_H
+#pragma once
 
 #include "PKAGeneratorBase.h"
 #include "PKAGeneratorNeutronicsBase.h"
@@ -40,4 +39,3 @@ protected:
   DiscreteFissionPKAPDF _pdf;
 };
 
-#endif // PKAFISSIONFRAGMENTNEUTRONICS_H

@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef PKAGUN_H
-#define PKAGUN_H
+#pragma once
 
 #include "PKAFixedPointGenerator.h"
 
@@ -32,4 +31,3 @@ protected:
   const Point _direction;
 };
 
-#endif // PKAGUN_H
