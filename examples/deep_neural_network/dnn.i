@@ -32,6 +32,8 @@
       min = 0.45
       max = 0.55
       seed = 1234
+      #type = FunctionIC
+      #function = cos(x/70*2*pi)/2+0.5
     [../]
   [../]
   [./wn]
@@ -43,6 +45,8 @@
       min = 0.45
       max = 0.55
       seed = 1234
+      #type = FunctionIC
+      #function = cos(x/70*2*pi)/2+0.5
     [../]
   [../]
   [./wp]
@@ -99,16 +103,22 @@
 [Materials]
   # active = 'Fp pfmobility'
   [./Fn]
-    type = DeepNeuralNetFreeEnergy
-    filename = weights_biases.txt
+    type = NeuralNetFreeEnergy
+    file_name = weights_biases.txt
+    file_format = MAGPIE
+    activation_function = SOFTSIGN
     inputs     = 'T cn'
     prop_names = 'Fn'
+    outputs = exodus
+    debug = true
   [../]
   [./Fp]
     type = DerivativeParsedMaterial
     f_name = 'Fp'
     function = 'cp*(1-cp)+0.001*(T*300+400)*(cp*log(cp)+(1-cp)*log(1-cp))'
     args = 'cp T'
+    derivative_order = 2
+    outputs = exodus
   [../]
   [./pfmobility]
     type = GenericConstantMaterial

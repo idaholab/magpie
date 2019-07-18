@@ -24,7 +24,8 @@ defineADValidParams(
         "Data file containing the weights and biasses for a fully connected deep neural network");
     params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
     params.addParam<std::vector<MaterialPropertyName>>(
-        "prop_names", "list of material properties fed from the outputs of the neural network"););
+        "prop_names", "list of material properties fed from the outputs of the neural network");
+    params.addParam<bool>("debug", "Tabulate the NN to a file for debugging purposes"););
 
 template <ComputeStage compute_stage>
 NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParameters & parameters)
@@ -99,8 +100,14 @@ NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParam
       _d_output[k++] = &declareADProperty<Real>(
           derivativePropertyNameFirst(_output_name[i], this->getVar("inputs", j)->name()));
   }
+}
 
-  // debugDump();
+template <ComputeStage compute_stage>
+void
+NeuralNetFreeEnergyBase<compute_stage>::initialSetup()
+{
+  if (getParam<bool>("debug"))
+    debugDump();
 }
 
 template <ComputeStage compute_stage>
@@ -214,8 +221,7 @@ NeuralNetFreeEnergyBase<compute_stage>::loadMagpieNet(std::ifstream & ifile)
           mooseError("Error reading weights from file ", _file_name);
   }
 
-  // read biases (first the number of layers)
-  ifile >> _n_layer;
+  // read biases
   _bias.resize(_n_layer);
   for (std::size_t i = 0; i < _n_layer; ++i)
   {
@@ -312,4 +318,4 @@ NeuralNetFreeEnergyBase<compute_stage>::evaluate()
   }
 }
 
-adBaseClass(NeuralNetFreeEnergy);
+adBaseClass(NeuralNetFreeEnergyBase);

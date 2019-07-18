@@ -35,6 +35,8 @@ class NeuralNetFreeEnergyBase : public ADMaterial<compute_stage>,
 public:
   NeuralNetFreeEnergyBase(const InputParameters & parameters);
 
+  virtual void initialSetup();
+
 protected:
   /// compute material properties for the current quadrature point
   virtual void computeQpProperties();

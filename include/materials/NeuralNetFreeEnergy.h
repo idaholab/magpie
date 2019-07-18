@@ -28,7 +28,9 @@ public:
 protected:
   enum class ActivationFunction
   {
-    SIGMOID
+    SIGMOID,
+    SOFTSIGN,
+    TANH
   } _activation_function;
 
   /// apply activation functions (and record their derivatives) for the current layer
