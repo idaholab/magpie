@@ -38,7 +38,7 @@ MyTRIMDiracSource::MyTRIMDiracSource(const InputParameters & parameters)
     _defect(getParam<MooseEnum>("defect").getEnum<ThreadedRecoilLoopBase::DefectType>()),
     _trim_parameters(_rasterizer.getTrimParameters())
 {
-  if (getParam<bool>("drop_duplicate_points") == true)
+  if (getParam<bool>("drop_duplicate_points"))
     mooseWarning("Explicitly setting drop_duplicate_points to true will cause overlapping defects "
                  "to be miscounted.");
 }

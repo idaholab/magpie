@@ -51,7 +51,7 @@ struct ThreadedRecoilDiracSourceLoop::MyTRIMResult
                unsigned int var,
                ThreadedRecoilDiracSourceLoop::DefectType type,
                dof_id_type elem_id,
-               Real weight = 1)
+               Real weight)
     : _location(location), _var(var), _type(type), _elem_id(elem_id), _weight(weight)
   {
   }
