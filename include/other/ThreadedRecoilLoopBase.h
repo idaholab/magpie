@@ -61,7 +61,7 @@ public:
                         Real & distance) const;
 #endif // GSL_ENABLED
 
-  /// defect type enum (vacancies, interstitials, and incoming and outgoing replacements)
+  /// defect type enum (vacancies, interstitials, incoming and outgoing replacements, and energy deposition)
   enum DefectType
   {
     NONE = -1,
@@ -69,7 +69,8 @@ public:
     INTERSTITIAL,
     REPLACEMENT_IN,
     REPLACEMENT_OUT,
-    N_DEFECTS
+    N_DEFECTS,
+    ENERGY_DEPOSITION = 5
   };
 
 protected:
