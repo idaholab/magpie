@@ -9,6 +9,7 @@
 #include "MagpieApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
+#include "ModulesApp.h"
 #include "MooseSyntax.h"
 
 template <>
@@ -51,6 +52,8 @@ MagpieApp__registerAll(Factory & factory, ActionFactory & action_factory, Syntax
 void
 MagpieApp::registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax)
 {
+  ModulesApp::registerAll(factory, action_factory, syntax);
+
   Registry::registerObjectsTo(factory, {"MagpieApp"});
   Registry::registerActionsTo(action_factory, {"MagpieApp"});
   MagpieApp::associateSyntax(syntax, action_factory);
