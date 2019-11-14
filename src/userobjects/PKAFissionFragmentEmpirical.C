@@ -15,8 +15,9 @@ InputParameters
 validParams<PKAFissionFragmentEmpirical>()
 {
   InputParameters params = validParams<PKAGeneratorBase>();
-  params.addClassDescription("Fission fragment PKA generator usimg an empirical mass and energy "
-                             "distribution for LWR UO2 fuel");
+  params.addClassDescription(
+      "Fission fragment PKA generator using an empirical mass and energy "
+      "distribution for LWR UO2 fuel from H.R. Faust, Eur. Phys. J. A 14 (2002) 459.");
   params.addParam<PostprocessorName>("fission_rate",
                                      1e-8,
                                      "Fission rate per unit volume (uses mesh units defined in the "
