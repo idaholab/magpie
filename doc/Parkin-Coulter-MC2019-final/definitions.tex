@@ -1,0 +1,332 @@
+% Common style and macro defintions for Yak and Mammoth documentation
+%=================================================================================================
+
+%%% General Commands
+% shortcut for Rattlesnake
+\newcommand{\rattlesnake}{Rattlesnake\xspace}
+\newcommand{\rsn}{Rattlesnake\xspace}
+\newcommand{\MOOSE}{MOOSE\xspace}
+
+%% structural elements
+% An explanation for a function
+\newcommand{\explain}[1]{\mbox{\hspace{2em} #1}}
+% attemtion box
+\newcommand{\attention}[1]{\mbox{\hspace{2em} #1}}
+% comments at the sde of the paragraph
+\newcommand{\sidenotes}[1]{\marginpar{ {\footnotesize #1} }}
+% inline comments
+\newcommand{\inlinenotes}[1]{{\color{red} {\footnotesize #1} }}
+% create empty double page, TODO do we need that?
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+%TODO description here
+\newcommand{\apost}{\textit{a posteriori\xspace}}
+%TODO description here
+\newcommand{\Apost}{\textit{A posteriori}\xspace}
+% create a label on text so that it can be later referred with pageref
+\newcommand{\hlabel}{\phantomsection\label}
+
+%%% Math
+%% Paratnhis etc.
+% ()
+\newcommand{\parenthesis}[1]{{\left( #1 \right)}}
+% []
+\newcommand{\bracket}[1]{{\left[ #1 \right]}}
+% {}
+\newcommand{\bracet}[1]{{\left\{ #1 \right\}}}
+% <>
+\newcommand{\angled}[1]{{\left\langle #1 \right\rangle}}
+
+%% common math symbols
+% imaginary number
+\newcommand{\img}{\ensuremath{\hat{\imath}}\xspace}
+% gradient symbol
+\newcommand{\grad}{\vec{\nabla}}
+\newcommand{\del}{\vec{\nabla}}
+% adjoint
+\newcommand{\adj}[2][{}]{{{#2}^{\dagger #1}}}
+% order number
+\newcommand{\order}[1]{^\parenthesis{#1}}
+
+%% common math function
+% divergence
+\renewcommand{\div}{\del\! \cdot \!}
+% rotation
+\newcommand{\rot}{\del\! \times \!}
+% absolute value
+\newcommand{\abs}[1]{\left|#1\right|}
+% norm
+\newcommand{\norm}[2][{}]{\lVert#2\rVert_{#1}}
+% e function
+\newcommand{\e}[1]{\mathrm{e}^{#1}}
+% power of ten
+\newcommand{\tento}[1]{\ensuremath{10^{#1}}\xspace}
+% E notation
+\newcommand{\E}[1]{\ensuremath{\times \tento{#1}}\xspace}
+% sign
+\DeclareMathOperator{\sign}{sign}
+
+%% fraction
+% 1 / 2
+\newcommand{\half}[1][1]{\frac{#1}{2}}
+% 1 / 3
+\newcommand{\third}[1][1]{\frac{#1}{3}}
+% 1 / 4
+\newcommand{\fourth}[1][1]{\frac{#1}{4}}
+
+% vectors etc
+% vector
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\dvect}[1]{\vec{\mathbf{#1}}}
+\newcommand{\tvect}[1]{\vec{\vec{\mathbf{#1}}}}
+\newcommand{\vectsymbol}[1]{\boldsymbol{#1}}
+% matrix
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\vmat}[1]{\vec{\mathbf{#1}}}
+\newcommand{\tmat}[1]{\vec{\vec{\mathbf{#1}}}}
+% tensor
+\newcommand{\tensor}[1]{\vec{\vec{#1}}}
+% PDE operator symbol
+\newcommand{\op}[1]{\mathbbl{#1}}
+% bilinear and linear operator symbol
+\newcommand{\kernel}[1]{\mathbbm{#1}}
+
+% derivatives
+% first derivatives
+% general first derivative, with optional argument for f
+\newcommand{\dd}[2][]{\frac{\partial #1}{\partial #2}}
+% partial derivative for x, optional argument for f
+\newcommand{\ddx}[1][]{\dd[#1]{x}}
+% partial derivative for y, optional argument for f
+\newcommand{\ddy}[1][]{\dd[#1]{y}}
+% partial derivative for z, optional argument for f
+\newcommand{\ddz}[1][]{\dd[#1]{z}}
+% partial derivative for t, optional argument for f
+\newcommand{\ddt}[1][]{\dd[#1]{t}}
+
+% second derivatives, only for a single variable, cross derivatives are too many
+% second general derivative, optional argument for f
+\newcommand{\ddd}[2][{}]{\frac{\partial^2 #1}{\partial {#2}^2}}
+% second partial derivative for x, optional argument for f
+\newcommand{\ddxx}[1][]{\ddd[#1]{x}}
+% second partial derivative for y, optional argument for f
+\newcommand{\ddyy}[1][]{\ddd[#1]{y}}
+% second partial derivative for z, optional argument for f
+\newcommand{\ddzz}[1][]{\ddd[#1]{z}}
+% second partial derivative for t, optional argument for f
+\newcommand{\ddtt}[1][]{\ddd[#1]{t}}
+
+% integrals
+% integral dx, optional parameter for different variable
+\newcommand{\dx}[1][x]{\,d#1}
+% integral dy
+\newcommand{\dy}{\dx[y]}
+% integral dz
+\newcommand{\dz}{\dx[z]}
+% integral dt
+\newcommand{\dt}{\dx[t]}
+%integral dmu
+\newcommand{\dmu}{\dx[\mu]}
+%integral dOmega
+\newcommand{\domg}{\dx[\Omega]}
+
+% spherical integrals
+% shortcut for sphere notation
+\newcommand{\sphere}{\ensuremath{\mathcal{S}}\xspace}
+% angular quadrature weight
+\newcommand{\aqweight}{\omega}
+
+% integral over full sphere
+\newcommand{\intsp}{\int_{4\pi}}
+% integral over half sphere
+\newcommand{\inthalfsp}{\int_{2\pi}}
+% polar integral
+\newcommand{\intpolar}{\int_{-1}^{1}}
+% negative partial polar integral
+\newcommand{\intnpolar}{\int_{-1}^{0}}
+% positive partial polar integral
+\newcommand{\intppolar}{\int_{0}^{1}}
+% positive half sphere with respect to a norm
+\newcommand{\intplus}[1]{\int_{\direction\cdot #1 > 0}}
+% negative half sphere with respect to a norm
+\newcommand{\intminus}[1]{\int_{\direction\cdot #1 < 0}}
+
+
+% FEM symbols
+% spatial domain
+\newcommand*{\domain}{\ensuremath{\mathcal{D}}\xspace}
+% boundary of a spatical domain
+\newcommand*{\boundary}{\ensuremath{{\partial\domain}}\xspace}
+% vacuum boundary of a spatical domain
+\newcommand*{\vboundary}{\ensuremath{{\boundary}_v}\xspace}
+% reflective boundary of a spatical domain
+\newcommand*{\rboundary}{\ensuremath{{\boundary}_r}\xspace}
+% interface surface
+\newcommand*{\interface}{\ensuremath{{\Gamma}}\xspace}
+% general and isotropic test function
+\newcommand{\testfct}{\ensuremath{\phi^{*}}\xspace}
+% angular test function
+\newcommand{\atestfct}{\ensuremath{\psi^{*}}\xspace}
+% surface normal
+\newcommand{\normal}{\ensuremath{\vec{n}}\xspace}
+% boundary normal
+\newcommand{\bnormal}{\ensuremath{\normal_\mathrm{b}}\xspace}
+% surface normal dot direction
+\newcommand{\omgdn}{\direction\cdot\normal}
+% boundary normal dot direction
+\newcommand{\omgdnb}{\direction\cdot\bnormal}
+
+% DFEM commands
+% interface jump
+\newcommand{\jump}[1]{[\![#1]\!]}
+% what is the different?
+\newcommand{\jmpa}[1]{[\![\![#1]\!]\!]}
+% another jump notation
+\newcommand{\jmpb}[1]{\llbracket #1 \rrbracket}
+% mean value
+\newcommand{\meanval}[1]{\{\!\!\{#1\}\!\!\}}
+
+% common physical symbols
+% mass stream
+\newcommand{\mdot}{\ensuremath{\dot{m}}\xspace}
+
+% nuclear symbols
+% Sn
+\newcommand{\sn}[1][N]{\ensuremath{S_#1}\xspace}
+% Pn
+\newcommand{\pn}[1][N]{\ensuremath{P_#1}\xspace}
+% keff
+\newcommand{\keff}{\ensuremath{k_{\text{eff}}}\xspace}
+% kinf
+\newcommand{\kinf}{\ensuremath{k_{\text{inf}}}\xspace}
+
+% transport symbols
+% direction omega
+\newcommand{\direction}{\ensuremath{\vec{\Omega}}\xspace}
+% direction omega
+\newcommand{\position}{\ensuremath{\vec{x}}\xspace}
+% current
+\newcommand{\current}[1][]{\ensuremath{\vec{J}_{#1}}\xspace}
+% positive half range current
+\newcommand{\ppcurrent}[1][]{\ensuremath{\hat{\jmath}\,^+_{#1}}\xspace}
+% negative half range current
+\newcommand{\npcurrent}[1][]{\ensuremath{\hat{\jmath}\,^-_{#1}}\xspace}
+% drift vector
+\newcommand{\drift}[1][]{\ensuremath{\hat{D}_{#1}}\xspace}
+% local diffusion coefficient
+\newcommand{\DC}[1][]{\ensuremath{\mathrm{D}_{#1}}\xspace}
+% nonlocal diffusion tensor
+\newcommand{\DCNL}[1][]{\ensuremath{\tensor{\mathrm{D}}_{#1}}\xspace}
+% cross section label
+\newcommand{\xslabel}[2][]{\ifthenelse{\isempty{#1}}{\mathrm{#2}}{\mathrm{#2},#1}}
+% total cross section
+\newcommand{\sigt}[1][]{\ensuremath{\sigma_{\xslabel[#1]{t}}}\xspace}
+% scattering cross section
+\newcommand{\sigs}[1][]{\ensuremath{\sigma_{\xslabel[#1]{s}}}\xspace}
+% fission cross section
+\newcommand{\sigf}[1][]{\ensuremath{\sigma_{\xslabel[#1]{f}}}\xspace}
+% removal cross section
+\newcommand{\sigr}[1][]{\ensuremath{\sigma_{\xslabel[#1]{r}}}\xspace}
+% absorption cross section
+\newcommand{\siga}[1][]{\ensuremath{\sigma_{\xslabel[#1]{a}}}\xspace}
+% transport cross section
+\newcommand{\sigtr}[1][]{\ensuremath{\sigma_{\xslabel[#1]{tr}}}\xspace}
+% scattering moment
+\newcommand{\sigl}[2][{}]{\ensuremath{\sigma_{#2#1}}\xspace}
+% prompt fission spectrum
+\newcommand{\chip}[1][]{\ensuremath{\chi_{\xslabel[#1]{p}}}\xspace}
+% delayed fission spectrum
+\newcommand{\chid}[1][]{\ensuremath{\chi_{\xslabel[#1]{d}}}\xspace}
+
+% total cross section
+\newcommand{\Sigt}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{t}}}\xspace}
+% scattering cross section
+\newcommand{\Sigs}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{s}}}\xspace}
+% fission cross section
+\newcommand{\Sigf}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{f}}}\xspace}
+% removal cross section
+\newcommand{\Sigr}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{r}}}\xspace}
+% absorption cross section
+\newcommand{\Siga}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{a}}}\xspace}
+% transport cross section
+\newcommand{\Sigtr}[1][]{\ensuremath{\Sigma_{\xslabel[#1]{tr}}}\xspace}
+% scattering moment
+\newcommand{\Sigl}[2][{}]{\ensuremath{\Sigma_{#2#1}}\xspace}
+
+% spatial weight function
+\newcommand{\weight}[1][]{\ensuremath{w_{#1}}\xspace}
+
+% physical units
+% general style for a unit symbol
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+% distance
+% meter maybe \meter better and more clear?
+\newcommand{\m}{\unit{m}\xspace}
+% centimeter
+\newcommand{\cm}{\unit{cm}\xspace}
+% milimeter
+\newcommand{\mm}{\unit{mm}\xspace}
+
+% time
+% second
+\newcommand{\s}{\unit{s}\xspace}
+
+% transport units
+% scalar flux
+\newcommand{\sfluxunit}{\,\ensuremath{\unit{cm}^{-2}\unit{s}^{-1}}\xspace}
+% angular flux
+\newcommand{\afluxunit}{\,\ensuremath{\unit{cm}^{-2}\unit{s}^{-1}\unit{st}^{-1}}\xspace}
+% transport source
+\newcommand{\tsrcunit}{\,\ensuremath{\unit{cm}^{-3}\unit{s}^{-1}\unit{st}^{-1}}\xspace}
+% diffussion source
+\newcommand{\dsrcunit}{\,\ensuremath{\unit{cm}^{-3}\unit{s}^{-1}}\xspace}
+% diffusion coefficient
+\newcommand{\dcunit}{\,\ensuremath{\unit{cm}}\xspace}
+
+
+% \newenvironment{myverbatim}%            To change the pseudocode font
+% {\par\noindent%
+%  \rule[0pt]{\linewidth}{0.2pt}
+%  \vspace*{-9pt}
+%  \linespread{0.0}\small\verbatim}%
+% {\rule[-5pt]{\linewidth}{0.2pt}\endverbatim}
+%
+% \newenvironment{myverbatim1}%            To change the pseudocode font
+% {\par\noindent%
+%  \rule[0pt]{\linewidth}{0.2pt}
+%  \vspace*{-9pt}
+%  \linespread{1.0}\scriptsize\verbatim}%
+% {\rule[-5pt]{\linewidth}{0.2pt}\endverbatim}
+
+\newcommand{\source}{Q\xspace}
+\newcommand{\n}{d\xspace}
+\newcommand{\M}{{N_d}\xspace}
+
+\titleclass{\subsubsubsection}{straight}[\subsection]
+\newcounter{subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection.\arabic{subsubsubsection}}
+\renewcommand\theparagraph{\thesubsubsubsection.\arabic{paragraph}} % optional; useful if paragraphs are to be numbered
+\titleformat{\subsubsubsection}
+{\normalfont\normalsize\bfseries}{\thesubsubsubsection}{1em}{}
+\titlespacing*{\subsubsubsection}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{5}{\z@}%
+	{3.25ex \@plus1ex \@minus.2ex}%
+	{-1em}%
+	{\normalfont\normalsize\bfseries}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{6}{\parindent}%
+	{3.25ex \@plus1ex \@minus .2ex}%
+	{-1em}%
+	{\normalfont\normalsize\bfseries}}
+\def\toclevel@subsubsubsection{4}
+\def\toclevel@paragraph{5}
+\def\toclevel@paragraph{6}
+\def\l@subsubsubsection{\@dottedtocline{4}{7em}{4em}}
+\def\l@paragraph{\@dottedtocline{5}{10em}{5em}}
+\def\l@subparagraph{\@dottedtocline{6}{14em}{6em}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\newcommand{\colorsubsubsubsection}[2]{\subsubsubsection{\texorpdfstring{\color{#1}{#2}}{\emph{#2}}}}
+
+\newcommand{\para}[2]{\hyperref[#1]{#2}}
