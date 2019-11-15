@@ -1,6 +1,9 @@
 Content:
     - ${ROOT_DIR}/doc/content
     - ${MOOSE_DIR}/framework/doc/content
+    - ${MOOSE_DIR}/modules/phase_field/doc/content
+    - ${MOOSE_DIR}/modules/tensor_mechanics/doc/content
+    - ${MOOSE_DIR}/modules/heat_conduction/doc/content
 
 Renderer:
     type: MooseDocs.base.MaterializeRenderer
@@ -28,6 +31,9 @@ Extensions:
         hide:
             magpie: !include ${ROOT_DIR}/doc/hidden.yml
             framework: !include ${MOOSE_DIR}/framework/doc/hidden.yml
+            phase_field: !include ${MOOSE_DIR}/modules/phase_field/doc/hidden.yml
+            tensor_mechanics: !include ${MOOSE_DIR}/modules/tensor_mechanics/doc/hidden.yml
+            heat_conduction: !include ${MOOSE_DIR}/modules/heat_conduction/doc/hidden.yml
         remove:
             framework: !include ${MOOSE_DIR}/framework/doc/remove.yml
 
