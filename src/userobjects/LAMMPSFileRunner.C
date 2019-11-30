@@ -10,6 +10,8 @@
 #include "MooseUtils.h"
 #include "Function.h"
 #include <sstream>
+#include <cstring>
+#include <cctype>
 
 registerMooseObject("MagpieApp", LAMMPSFileRunner);
 
@@ -136,9 +138,13 @@ LAMMPSFileRunner::findBracketingLAMMPSFiles(Real md_time,
                  " failed. LAMMPS filename must be base.<t>.xyz where <t> is the timestamp.");
     std::stringstream sstr(elements[1]);
 
-    if (sstr >> timestamp || sstr.eof())
-      if (sstr.fail())
-        continue;
+    if (!isTimestamp(elements[1]))
+      continue;
+    sstr >> timestamp;
+
+    // if (sstr >> timestamp || sstr.eof())
+    //  if (sstr.fail())
+    //    continue;
 
     // increase the counter & check if this file is a candidate for before/after
     ++lammps_files_found;
@@ -257,6 +263,15 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
   // size back
   position.shrink_to_fit();
   _md_particles.id.shrink_to_fit();
+}
+
+bool
+LAMMPSFileRunner::isTimestamp(std::string ts_candidate) const
+{
+  for (auto & s : ts_candidate)
+    if (!isdigit(s))
+      return false;
+  return true;
 }
 
 void

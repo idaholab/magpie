@@ -45,6 +45,8 @@ protected:
                                  std::pair<std::string, std::string> & filenames,
                                  std::pair<Real, Real> & timestamps);
 
+  bool isTimestamp(std::string ts_candidate) const;
+
   /// whether a sequence of input files or a single input file is read
   bool _time_sequence;
 
@@ -60,4 +62,3 @@ protected:
   /// Conversion from FEM time to MD time_stamp
   const Function * _time_conversion;
 };
-
