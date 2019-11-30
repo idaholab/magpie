@@ -43,6 +43,7 @@
     type = LAMMPSFileRunner
     lammps_file = 'single.0.xyz'
     xyz_columns = '0 1 2'
+    max_granular_radius = 1
     md_particle_properties = 'radius'
     property_columns = '3'
   [../]

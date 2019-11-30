@@ -135,7 +135,10 @@ LAMMPSFileRunner::findBracketingLAMMPSFiles(Real md_time,
                  f.second,
                  " failed. LAMMPS filename must be base.<t>.xyz where <t> is the timestamp.");
     std::stringstream sstr(elements[1]);
-    sstr >> timestamp;
+
+    if (sstr >> timestamp || sstr.eof())
+      if (sstr.fail())
+        continue;
 
     // increase the counter & check if this file is a candidate for before/after
     ++lammps_files_found;
@@ -286,8 +289,12 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
   if (np != _n_particles)
     mooseError("Files ",
                filenames.first,
+               " : ",
+               _n_particles,
                " and ",
                filenames.second,
+               " : ",
+               np,
                " have different number of particles.");
 
   // skip another five lines

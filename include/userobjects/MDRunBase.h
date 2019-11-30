@@ -113,6 +113,9 @@ protected:
   /// stores bounding boxes of all other processors
   std::vector<BoundingBox> _bbox;
 
+  /// maximum granular radius for parallel bounding boxes
+  Real _max_granular_radius;
+
   /// total number of particles
   unsigned int _n_particles = 0;
 
@@ -130,8 +133,4 @@ protected:
 
   /// A KDTree object to handle md_particles
   std::unique_ptr<KDTree> _kd_tree;
-
-  /// maximum granular radius
-  Real _max_granular_radius;
 };
-

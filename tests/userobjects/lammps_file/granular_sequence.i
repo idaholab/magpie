@@ -44,6 +44,7 @@
     lammps_file = 'granular'
     time_sequence = true
     xyz_columns = '0 1 2'
+    max_granular_radius = 0.1
     md_particle_properties = 'radius charge'
     property_columns = '3 4'
   [../]

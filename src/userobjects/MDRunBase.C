@@ -42,6 +42,11 @@ validParams<MDRunBase>()
   params.addParam<MultiMooseEnum>("md_particle_properties",
                                   MDRunBase::mdParticleProperties(),
                                   "Properties of MD particles to be obtained and stored.");
+  params.addRangeCheckedParam<Real>(
+      "max_granular_radius",
+      0,
+      "max_granular_radius>=0",
+      "Maximum radius of granular particles. This can be important for partitioning.");
   params.addClassDescription(
       "Base class for execution of coupled molecular dynamics MOOSE calculations.");
   return params;
@@ -56,6 +61,15 @@ MDRunBase::MDRunBase(const InputParameters & parameters)
     _nproc(_app.n_processors()),
     _bbox(_nproc)
 {
+  // if the calculation is granular, max_particle_radius
+  if (_granular)
+  {
+    if (!parameters.isParamSetByUser("max_granular_radius"))
+      paramError("max_granular_radius",
+                 "max_granular_radius must be set for granular calculations");
+    _max_granular_radius = getParam<Real>("max_granular_radius");
+  }
+
   // check _properties array and MooseEnum for consistency
   if (N_MD_PROPERTIES != mdParticleProperties().getNames().size())
     mooseError("Mismatch of MD particle property enum and property array. Report on github.");
@@ -68,13 +82,17 @@ MDRunBase::MDRunBase(const InputParameters & parameters)
 void
 MDRunBase::initialSetup()
 {
-  // TODO: need to inflate the bounding box for granular particles
-  if (_granular)
-    mooseDoOnce(mooseWarning("Granular particles can lead to wrong answers in parallel runs "
-                             "because processor bounding boxes do not account for particle size."));
-
   for (unsigned int j = 0; j < _nproc; ++j)
+  {
     _bbox[j] = MeshTools::create_processor_bounding_box(_mesh, j);
+
+    // inflate bounding box
+    for (unsigned int d = 0; d < _dim; ++d)
+    {
+      _bbox[j].first(d) -= _max_granular_radius;
+      _bbox[j].second(d) += _max_granular_radius;
+    }
+  }
 }
 
 void
@@ -82,7 +100,16 @@ MDRunBase::timestepSetup()
 {
   // update/init subdomain bounding boxes
   for (unsigned int j = 0; j < _nproc; ++j)
+  {
     _bbox[j] = MeshTools::create_processor_bounding_box(_mesh, j);
+
+    // inflate bounding box
+    for (unsigned int d = 0; d < _dim; ++d)
+    {
+      _bbox[j].first(d) -= _max_granular_radius;
+      _bbox[j].second(d) += _max_granular_radius;
+    }
+  }
 
   // callback for updating md particle list
   updateParticleList();
@@ -203,11 +230,27 @@ MDRunBase::updateElementGranularVolumes()
   // clear the granular volume map
   _elem_granular_volumes.clear();
 
-  // _max_granular_radius
+  /*
+     // Ideally we want to compute _max_granular_radius automatically
+     // but the value is needed for setting bounding boxes to partition
+     // the particles on the processors. For now, it's an input parameter
+     // until a path forward is determined.
+     // The commented lines compute the largest granular radius
   _max_granular_radius = 0;
   for (auto & p : _md_particles.properties)
     if (p[7] > _max_granular_radius)
       _max_granular_radius = p[7];
+  */
+  /// do a sanity check _max_granular_radius
+  Real mgr = 0;
+  for (auto & p : _md_particles.properties)
+    if (p[7] > mgr)
+      mgr = p[7];
+  if (mgr > _max_granular_radius)
+    mooseError("Granular particle with radius: ",
+               mgr,
+               " exceeds max_granular_radius: ",
+               _max_granular_radius);
 
   /// loop over all local elements
   ConstElemRange * active_local_elems = _mesh.getActiveLocalElementRange();
