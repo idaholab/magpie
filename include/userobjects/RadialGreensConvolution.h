@@ -20,7 +20,7 @@
 #include <memory>
 #include <tuple>
 
-using namespace libMesh::Parallel;
+using namespace TIMPI;
 
 class RadialGreensConvolution;
 class ThreadedRadialGreensConvolutionLoop;
@@ -167,9 +167,7 @@ template <>
 const Point & PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
     const RadialGreensConvolution::QPData & item) const;
 
-namespace libMesh
-{
-namespace Parallel
+namespace TIMPI
 {
 
 template <>
@@ -180,6 +178,4 @@ public:
   StandardType(const StandardType<RadialGreensConvolution::QPData> & t);
   ~StandardType() { this->free(); }
 };
-}
-}
-
+} // namespace TIMPI
