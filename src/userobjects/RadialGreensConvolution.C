@@ -270,7 +270,7 @@ RadialGreensConvolution::finalize()
     {
       // inspect incoming message
       Parallel::Status status(_communicator.probe(Parallel::any_source, send_tag));
-      const auto source_pid = cast_int<processor_id_type>(status.source());
+      const auto source_pid = TIMPI::cast_int<processor_id_type>(status.source());
       const auto message_size = status.size(item_type);
 
       // resize receive buffer accordingly and receive data
@@ -543,9 +543,7 @@ RadialGreensConvolution::updateCommunicationLists()
   _update_communication_lists = false;
 }
 
-namespace libMesh
-{
-namespace Parallel
+namespace TIMPI
 {
 
 StandardType<RadialGreensConvolution::QPData>::StandardType(
@@ -595,8 +593,7 @@ StandardType<RadialGreensConvolution::QPData>::StandardType(
 
 #endif // LIBMESH_HAVE_MPI
 }
-} // namespace Parallel
-} // namespace libMesh
+} // namespace TIMPI
 
 StandardType<RadialGreensConvolution::QPData>::StandardType(
     const StandardType<RadialGreensConvolution::QPData> & t)
