@@ -70,13 +70,14 @@ MDRunBase::MDRunBase(const InputParameters & parameters)
     _max_granular_radius = getParam<Real>("max_granular_radius");
   }
 
-  // check _properties array and MooseEnum for consistency
-  if (N_MD_PROPERTIES != mdParticleProperties().getNames().size())
-    mooseError("Mismatch of MD particle property enum and property array. Report on github.");
+  // set up the map from property ID to index
+  _md_particles._prop_size = _properties.size();
+  for (unsigned int j = 0; j < _properties.size(); ++j)
+    _md_particles._map_props[_properties.get(j)] = j;
 
-  for (auto & id : mdParticleProperties().getIDs())
-    if (id < 0 || id >= N_MD_PROPERTIES)
-      mooseError("Property id ", id, " is either < 0 or larger than array size.");
+  // _md_particles._r_index is a short-cut for the "radius" index
+  if (_granular)
+    _md_particles._r_index = propIndex("radius");
 }
 
 void
@@ -149,9 +150,7 @@ MDRunBase::particleProperty(unsigned int j, unsigned int prop_id) const
   mooseAssert(j < _md_particles.properties.size(),
               "Particle index " << j << " not found in _md_particles. properties vector has length "
                                 << _md_particles.properties.size());
-  mooseAssert(prop_id < N_MD_PROPERTIES,
-              "prop_id must be smaller than " << N_MD_PROPERTIES << ". Provided value " << prop_id);
-  return _md_particles.properties[j][prop_id];
+  return _md_particles.properties[j][propIndex(prop_id)];
 }
 
 void
@@ -244,8 +243,8 @@ MDRunBase::updateElementGranularVolumes()
   /// do a sanity check _max_granular_radius
   Real mgr = 0;
   for (auto & p : _md_particles.properties)
-    if (p[7] > mgr)
-      mgr = p[7];
+    if (p[_md_particles._r_index] > mgr)
+      mgr = p[_md_particles._r_index];
   if (mgr > _max_granular_radius)
     mooseError("Granular particle with radius: ",
                mgr,
@@ -287,7 +286,7 @@ MDRunBase::updateElementGranularVolumes()
       OVERLAP::Sphere sph(OVERLAP::vector_t{_md_particles.pos[k](0),
                                             _md_particles.pos[k](1),
                                             _md_particles.pos[k](2)},
-                          _md_particles.properties[k][7]);
+                          _md_particles.properties[k][_md_particles._r_index]);
 
       // compute the overlap
       Real ovlp = 0.0;
@@ -307,6 +306,22 @@ MultiMooseEnum
 MDRunBase::mdParticleProperties()
 {
   return MultiMooseEnum("vel_x=0 vel_y=1 vel_z=2 force_x=3 force_y=4 force_z=5 charge=6 radius=7");
+}
+
+unsigned int
+MDRunBase::propIndex(unsigned int prop_id) const
+{
+  auto it = _md_particles._map_props.find(prop_id);
+  if (it == _md_particles._map_props.end())
+    mooseError("Property id ", prop_id, " is not present in _map_props map.");
+  return it->second;
+}
+
+unsigned int
+MDRunBase::propIndex(const std::string & prop_name) const
+{
+  unsigned int prop_id = mdParticleProperties().find(prop_name)->id();
+  return propIndex(prop_id);
 }
 
 OVERLAP::Hexahedron

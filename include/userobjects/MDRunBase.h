@@ -8,8 +8,6 @@
 
 #pragma once
 
-#define N_MD_PROPERTIES 8
-
 #include "overlap.hpp"
 #include "GeneralUserObject.h"
 #include "KDTree.h"
@@ -45,7 +43,16 @@ public:
     std::vector<unique_id_type> elem_id;
 
     /// data attached to each particle
-    std::vector<std::array<Real, N_MD_PROPERTIES>> properties;
+    std::vector<std::vector<Real>> properties;
+
+    /// the size of the properties vector
+    unsigned int _prop_size;
+
+    /// maps property IDs to position in properties vector
+    std::map<unsigned int, unsigned int> _map_props;
+
+    // the index of the radius property in properties vector
+    unsigned int _r_index;
   };
 
   /// access to the MDParticles
@@ -69,6 +76,12 @@ public:
 
   /// List of quantities to get from MD simulation
   static MultiMooseEnum mdParticleProperties();
+
+  /// helper function to get property index in properties vector
+  unsigned int propIndex(unsigned int prop_id) const;
+
+  /// helper function to get property index in properties vector
+  unsigned int propIndex(const std::string & prop_name) const;
 
 protected:
   /// call back function to update the particle list

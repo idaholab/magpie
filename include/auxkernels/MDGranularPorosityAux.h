@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MDGRANULARPOROSITYAUX_H
-#define MDGRANULARPOROSITYAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -22,7 +21,6 @@ class MDGranularPorosityAux : public AuxKernel
 {
 public:
   MDGranularPorosityAux(const InputParameters & params);
-  virtual ~MDGranularPorosityAux() {}
 
   virtual Real computeValue();
 
@@ -35,5 +33,3 @@ protected:
   /// property value that is computed only on qp = 0
   Real _packing_fraction;
 };
-
-#endif // MDGRANULARPOROSITYAUXx_H

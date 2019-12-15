@@ -241,12 +241,12 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
     }
 
     // read properties
-    std::array<Real, N_MD_PROPERTIES> props;
+    std::vector<Real> props(_md_particles._prop_size);
     for (unsigned int i = 0; i < _prop_columns.size(); ++i)
     {
       unsigned int prop_id = _properties.get(i);
       std::stringstream sstr(elements[_prop_columns[i]]);
-      sstr >> props[prop_id];
+      sstr >> props[propIndex(prop_id)];
     }
 
     // check if this particle is in this processor BBox
@@ -369,12 +369,12 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     }
 
     // read properties from before file
-    std::array<Real, N_MD_PROPERTIES> props_before;
+    std::vector<Real> props_before(_md_particles._prop_size);
     for (unsigned int i = 0; i < _prop_columns.size(); ++i)
     {
       unsigned int prop_id = _properties.get(i);
       std::stringstream sstr(elements[_prop_columns[i]]);
-      sstr >> props_before[prop_id];
+      sstr >> props_before[propIndex(prop_id)];
     }
 
     // get the MD particle from the after file
@@ -396,12 +396,12 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     }
 
     // read properties from before file
-    std::array<Real, N_MD_PROPERTIES> props_after;
+    std::vector<Real> props_after(_md_particles._prop_size);
     for (unsigned int i = 0; i < _prop_columns.size(); ++i)
     {
       unsigned int prop_id = _properties.get(i);
       std::stringstream sstr(elements[_prop_columns[i]]);
-      sstr >> props_after[prop_id];
+      sstr >> props_after[propIndex(prop_id)];
     }
 
     // check if this particle is in this processor BBox
@@ -412,8 +412,8 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     ++_n_local_particles;
     position.push_back((1 - weight) * pos_before + weight * pos_after);
     _md_particles.id.push_back(j);
-    _md_particles.properties.push_back(std::array<Real, N_MD_PROPERTIES>());
-    for (unsigned int i = 0; i < N_MD_PROPERTIES; ++i)
+    _md_particles.properties.push_back(std::vector<Real>(_md_particles._prop_size));
+    for (unsigned int i = 0; i < _md_particles._prop_size; ++i)
       _md_particles.properties.back()[i] = (1 - weight) * props_before[i] + weight * props_after[i];
   }
   file_before.close();

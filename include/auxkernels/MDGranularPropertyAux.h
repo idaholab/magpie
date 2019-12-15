@@ -6,8 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#ifndef MDGRANULARPROPERTYAUX_H
-#define MDGRANULARPROPERTYAUX_H
+#pragma once
 
 #include "AuxKernel.h"
 
@@ -22,7 +21,6 @@ class MDGranularPropertyAux : public AuxKernel
 {
 public:
   MDGranularPropertyAux(const InputParameters & params);
-  virtual ~MDGranularPropertyAux() {}
 
   virtual Real computeValue();
 
@@ -41,5 +39,3 @@ protected:
   /// property value that is computed only on qp = 0
   Real _property_value;
 };
-
-#endif // MDGRANULARPROPERTYAUX_H
