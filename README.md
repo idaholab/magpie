@@ -28,6 +28,12 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 
 [Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
 
+### Contrib
+
+Part of this code uses the exact calculation of the [overlap](contrib/overlap/README.md) volume of spheres
+and mesh elements routines copyright (C) 2015-2018 by Severin Strobl
+<git@severin-strobl.de> (http://dx.doi.org/10.1016/j.jcp.2016.02.003).
+
 ### License
 
 Copyright 2017 Battelle Energy Alliance, LLC

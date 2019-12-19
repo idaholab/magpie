@@ -18,3 +18,5 @@ endif
 
 include $(MAGPIE_DIR)/contrib/gsl.mk
 include $(MAGPIE_DIR)/contrib/fftw3.mk
+
+app_INCLUDES   += -I $(MAGPIE_DIR)/contrib/overlap
