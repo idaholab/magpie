@@ -12,22 +12,30 @@
 
 // forward declarations
 class MDRunBase;
-class MDNParticleAux;
+class MDGranularPropertyAux;
 
 template <>
-InputParameters validParams<MDNParticleAux>();
+InputParameters validParams<MDGranularPropertyAux>();
 
-class MDNParticleAux : public AuxKernel
+class MDGranularPropertyAux : public AuxKernel
 {
 public:
-  MDNParticleAux(const InputParameters & params);
-  virtual ~MDNParticleAux() {}
+  MDGranularPropertyAux(const InputParameters & params);
 
   virtual Real computeValue();
 
+  static MooseEnum mdAveragingType();
+
 protected:
+  /// referene to the MDRunBase user object
   const MDRunBase & _md_uo;
 
-  std::vector<unsigned int> _particles;
-};
+  /// the type of average to be computed
+  MooseEnum _average_type;
 
+  /// ID of the desired MD property
+  unsigned int _property_id;
+
+  /// property value that is computed only on qp = 0
+  Real _property_value;
+};

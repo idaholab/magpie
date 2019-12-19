@@ -18,4 +18,22 @@
     cli_args = 'UserObjects/lammps_runner/lammps_file="sequence_reverse/simple"
                 Outputs/file_base=lammps_file_runner_sequence_reverse'
   [../]
+
+  [./granular]
+    type = 'Exodiff'
+    input = 'granular.i'
+    exodiff = 'granular_out.e'
+  [../]
+
+  [./granular_sequence]
+    type = 'Exodiff'
+    input = 'granular_sequence.i'
+    exodiff = 'granular_sequence_out.e'
+  [../]
+
+  [./granular_tet]
+    type = 'Exodiff'
+    input = 'granular_tet.i'
+    exodiff = 'granular_tet_out.e'
+  [../]
 []

@@ -12,22 +12,24 @@
 
 // forward declarations
 class MDRunBase;
-class MDNParticleAux;
+class MDGranularPorosityAux;
 
 template <>
-InputParameters validParams<MDNParticleAux>();
+InputParameters validParams<MDGranularPorosityAux>();
 
-class MDNParticleAux : public AuxKernel
+class MDGranularPorosityAux : public AuxKernel
 {
 public:
-  MDNParticleAux(const InputParameters & params);
-  virtual ~MDNParticleAux() {}
+  MDGranularPorosityAux(const InputParameters & params);
 
   virtual Real computeValue();
 
 protected:
+  /// referene to the MDRunBase user object
   const MDRunBase & _md_uo;
 
-  std::vector<unsigned int> _particles;
-};
+  const bool _compute_packing;
 
+  /// property value that is computed only on qp = 0
+  Real _packing_fraction;
+};
