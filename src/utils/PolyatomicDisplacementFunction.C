@@ -161,4 +161,15 @@ PolyatomicDisplacementFunction::integralTypeII(Real energy,
   return integral;
 }
 
+void
+PolyatomicDisplacementFunction::inverseMapIndex(unsigned int n,
+                                                unsigned int & i,
+                                                unsigned int & j,
+                                                unsigned int & l) const
+{
+  i = n % _n_species;
+  j = (n - i) / _n_species;
+  l = 0;
+}
+
 #endif

@@ -39,11 +39,17 @@ public:
   Real source(Real energy, unsigned int i, unsigned int j, unsigned int l);
 
 protected:
-  /// maps triple index theta_ijl to single theta_n; l runs faster than j runs faster than i
+  /// override the mapIndex function: flattens ijl to single index n
   unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int l) const override
   {
     return i + j * _n_species + l * _n_species * _n_species;
   };
+
+  /// override the inverseMapIndex function: retrieves n given ijk
+  void inverseMapIndex(unsigned int n,
+                       unsigned int & i,
+                       unsigned int & j,
+                       unsigned int & l) const override;
 
   /// the source term in the NRT equatons for the derivative requires the solution of the equations themselves
   const PolyatomicDisplacementFunction * _net_displacement_function;

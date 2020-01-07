@@ -57,7 +57,8 @@ public:
   ///@}
 
   /// linear interpolation of the damage function
-  Real linearInterpolation(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
+  Real
+  linearInterpolation(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
 
   /// gets stopping power for a given species and energy; non-const because it uses _ions so no need to construct ion
   Real stoppingPower(unsigned int species, Real energy);
@@ -71,6 +72,10 @@ public:
 protected:
   /// this function flattens the arrays i, j, l to a single index
   virtual unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int l) const = 0;
+
+  /// this function unflattens n to indices i, j, l
+  virtual void
+  inverseMapIndex(unsigned int n, unsigned int & i, unsigned int & j, unsigned int & l) const = 0;
 
   /// computes the integral int_0^t dT T * d(sigma_ij) / dT for species combination i, j and small t
   Real
@@ -93,7 +98,6 @@ protected:
   /// a helper function called from linearInterpolation
   Real linearInterpolationHelper(
       Real energy, unsigned int index, unsigned int i, unsigned int j, unsigned int l) const;
-
 
   /// damage function type [nij and gij, respectively in PK JNM 101, 1981; or nu_i JNM 88, (1980)]
   nrt_type _damage_function_type;

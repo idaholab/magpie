@@ -156,10 +156,21 @@ PolyatomicDamageEnergyFunction::integralTypeII(Real energy, unsigned int i, unsi
     {
       Real recoil_energy = scale * (_quad_points[qp] + 1) + lower;
       integral += scale * _quad_weights[qp] * scatteringCrossSection(i, j, energy, recoil_energy) *
-                  (linearInterpolation( energy - recoil_energy, i) - current_value);
+                  (linearInterpolation(energy - recoil_energy, i) - current_value);
     }
   }
   return integral;
+}
+
+void
+PolyatomicDamageEnergyFunction::inverseMapIndex(unsigned int n,
+                                                unsigned int & i,
+                                                unsigned int & j,
+                                                unsigned int & l) const
+{
+  i = n;
+  j = 0;
+  l = 0;
 }
 
 #endif

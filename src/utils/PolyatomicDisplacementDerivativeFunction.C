@@ -183,4 +183,16 @@ PolyatomicDisplacementDerivativeFunction::source(Real energy,
          d_net_dE * stoppingPowerDerivative(i, l, energy);
 }
 
+void
+PolyatomicDisplacementDerivativeFunction::inverseMapIndex(unsigned int n,
+                                                          unsigned int & i,
+                                                          unsigned int & j,
+                                                          unsigned int & l) const
+{
+  unsigned int t = n % (_n_species * _n_species);
+  i = t % _n_species;
+  j = (t - i) / _n_species;
+  l = (n - t) / (_n_species * _n_species);
+}
+
 #endif
