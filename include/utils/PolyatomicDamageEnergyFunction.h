@@ -25,11 +25,8 @@ public:
 
   static int odeRHS(Real energy, const Real disp[], Real f[], void * params);
 
-  ///@{ some getters needed for accessing this pointer in odeRHS
-  Real linearInterpolation(unsigned int i, Real energy) const;
-  Real linearInterpolation(unsigned int i, Real energy, unsigned int index) const;
+  /// a getter needed for accessing this pointer in odeRHS
   Real taylorSeriesThreshold() const { return _taylor_series_threshold; }
-  ///@}
 
   Real integralTypeI(Real energy, unsigned int i, unsigned int j);
 
@@ -40,6 +37,12 @@ public:
    * by nu_i(E-T) - nu_i(E) \approx -T d(nu_i) / dE.
    */
   Real _taylor_series_threshold = 1e2;
+
+protected:
+  unsigned int mapIndex(unsigned int i, unsigned int /*j*/, unsigned int /*l*/) const override
+  {
+    return i;
+  };
 };
 
 #endif // GSL_ENABLED

@@ -41,6 +41,7 @@ public:
 
   virtual ~PolyatomicDisplacementFunctionBase();
 
+  /// computes the displacement function from current last energy to Emax
   void advanceDisplacements(Real Emax);
 
   ///@{ some getters needed for accessing this pointer in odeRHS
@@ -55,6 +56,9 @@ public:
   Real numberDensity(unsigned int i) const { return _material->_element[i]._t * _material->_arho; }
   ///@}
 
+  /// linear interpolation of the damage function
+  Real linearInterpolation(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
+
   /// gets stopping power for a given species and energy; non-const because it uses _ions so no need to construct ion
   Real stoppingPower(unsigned int species, Real energy);
 
@@ -65,6 +69,9 @@ public:
   unsigned int energyIndex(Real energy) const;
 
 protected:
+  /// this function flattens the arrays i, j, l to a single index
+  virtual unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int l) const = 0;
+
   /// computes the integral int_0^t dT T * d(sigma_ij) / dT for species combination i, j and small t
   Real
   weightedScatteringIntegral(Real energy, Real energy_limit, unsigned int i, unsigned int j) const;
@@ -83,6 +90,11 @@ protected:
   virtual Real
   nonCaptureProbability(unsigned int i, unsigned int k, Real energy, Real recoil_energy) const;
 
+  /// a helper function called from linearInterpolation
+  Real linearInterpolationHelper(
+      Real energy, unsigned int index, unsigned int i, unsigned int j, unsigned int l) const;
+
+
   /// damage function type [nij and gij, respectively in PK JNM 101, 1981; or nu_i JNM 88, (1980)]
   nrt_type _damage_function_type;
 
@@ -98,10 +110,11 @@ protected:
   /// the current maximum energy to which PC equations are solved
   std::vector<Real> _energy_history;
 
-  /**
-   * The displacement values nu_ij flattened into 1D array
-   */
+  /// The displacement values nu_ij flattened into 1D array
   std::vector<std::vector<Real>> _displacement_function;
+
+  /// The integral of the displacement function over energy
+  std::vector<std::vector<Real>> _displacement_function_integral;
 
   /// Ecap_ik average residual energy of type i atom to not be trapped at k-site
   std::vector<std::vector<Real>> _Ecap;

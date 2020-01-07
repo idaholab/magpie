@@ -267,4 +267,32 @@ PolyatomicDisplacementFunctionBase::weightedScatteringIntegral(Real energy,
   return integral;
 }
 
+Real
+PolyatomicDisplacementFunctionBase::linearInterpolation(Real energy,
+                                                        unsigned int i,
+                                                        unsigned int j,
+                                                        unsigned int l) const
+{
+  unsigned int index = energyIndex(energy);
+  if (index == 0)
+    return _displacement_function[0][mapIndex(i, j, l)];
+
+  return linearInterpolationHelper(energy, index, i, j, l);
+}
+
+Real
+PolyatomicDisplacementFunctionBase::linearInterpolationHelper(Real energy, unsigned int index,
+    unsigned int i, unsigned int j, unsigned int l) const
+{
+  unsigned int k = mapIndex(i, j, l);
+
+  // linear interpolation
+  Real e1 = _energy_history[index - 1];
+  Real e2 = _energy_history[index];
+  Real v1 = _displacement_function[index - 1][k];
+  Real v2 = _displacement_function[index][k];
+
+  return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
+}
+
 #endif
