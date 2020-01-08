@@ -210,7 +210,7 @@ PolyatomicRecoil::finalize()
                  ++derivative)
               displacement_file << ","
                                 << _padf_derivative->linearInterpolation(
-                                  _padf_derivative->energyPoint(n),
+                                       _padf_derivative->energyPoint(n),
                                        projectile,
                                        target,
                                        derivative);
@@ -242,7 +242,8 @@ PolyatomicRecoil::finalize()
           displacement_file << _padf->energyPoint(n);
           for (unsigned int projectile = 0; projectile < _padf->nSpecies(); ++projectile)
             displacement_file << ","
-                              << energy_function->linearInterpolation(_padf->energyPoint(n), projectile);
+                              << energy_function->linearInterpolation(_padf->energyPoint(n),
+                                                                      projectile);
           displacement_file << std::endl;
         }
       }

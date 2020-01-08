@@ -64,8 +64,10 @@ public:
   linearInterpolation(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
 
   /// linear interpolation of the integral of the damage function
-  Real
-  linearInterpolationIntegralDamageFunction(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
+  Real linearInterpolationIntegralDamageFunction(Real energy,
+                                                 unsigned int i,
+                                                 unsigned int j = 0,
+                                                 unsigned int l = 0) const;
 
   /// gets stopping power for a given species and energy; non-const because it uses _ions so no need to construct ion
   Real stoppingPower(unsigned int species, Real energy);
