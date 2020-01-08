@@ -126,7 +126,8 @@ PolyatomicDisplacementFunctionBase::computeDisplacementFunctionIntegral()
 
   for (unsigned int e = 1; e < nEnergySteps(); ++e)
   {
-    _displacement_function_integral.push_back(std::vector<Real>(_problem_size));
+    // initialize the integral to the integral of the previous step
+    _displacement_function_integral[e] = _displacement_function_integral[e - 1];
 
     // set energy points for integration
     Real lower = energyPoint(e - 1);
@@ -141,6 +142,7 @@ PolyatomicDisplacementFunctionBase::computeDisplacementFunctionIntegral()
       {
         unsigned int i, j, l;
         inverseMapIndex(n, i, j, l);
+
         _displacement_function_integral[e][n] += w * linearInterpolation(energy, i, j, l);
       }
     }
