@@ -111,6 +111,42 @@ PolyatomicDisplacementFunctionBase::advanceDisplacements(Real new_energy)
     std ::cout << "gsl_odeiv2_driver_apply returned error code  " << status << std::endl;
 }
 
+void
+PolyatomicDisplacementFunctionBase::computeDisplacementFunctionIntegral()
+{
+  // clear the _displacement_function_integral array because this might
+  // have been called before; not the most efficient if the user keeps on calling
+  // this function but they are at their own peril and should know to call it
+  // after finishing the computation of disp function
+  _displacement_function_integral.clear();
+
+  // resize the array; note that initial value is zero (entry for
+  // _displacement_function_integral[0])
+  _displacement_function_integral.resize(nEnergySteps(), std::vector<Real>(_problem_size));
+
+  for (unsigned int e = 1; e < nEnergySteps(); ++e)
+  {
+    _displacement_function_integral.push_back(std::vector<Real>(_problem_size));
+
+    // set energy points for integration
+    Real lower = energyPoint(e - 1);
+    Real upper = energyPoint(e);
+    Real f = 0.5 * (upper - lower);
+    for (unsigned int qp = 0; qp < _quad_order; ++qp)
+    {
+      Real energy = f * (_quad_points[qp] + 1) + lower;
+      Real w = f * _quad_weights[qp];
+
+      for (unsigned int n = 0; n < _problem_size; ++n)
+      {
+        unsigned int i, j, l;
+        inverseMapIndex(n, i, j, l);
+        _displacement_function_integral[e][n] += w * linearInterpolation(energy, i, j, l);
+      }
+    }
+  }
+}
+
 Real
 PolyatomicDisplacementFunctionBase::stoppingPower(unsigned int species, Real energy)
 {
@@ -281,8 +317,8 @@ PolyatomicDisplacementFunctionBase::linearInterpolation(Real energy,
 }
 
 Real
-PolyatomicDisplacementFunctionBase::linearInterpolationHelper(Real energy, unsigned int index,
-    unsigned int i, unsigned int j, unsigned int l) const
+PolyatomicDisplacementFunctionBase::linearInterpolationHelper(
+    Real energy, unsigned int index, unsigned int i, unsigned int j, unsigned int l) const
 {
   unsigned int k = mapIndex(i, j, l);
 
@@ -291,6 +327,27 @@ PolyatomicDisplacementFunctionBase::linearInterpolationHelper(Real energy, unsig
   Real e2 = _energy_history[index];
   Real v1 = _displacement_function[index - 1][k];
   Real v2 = _displacement_function[index][k];
+
+  return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
+}
+
+Real
+PolyatomicDisplacementFunctionBase::linearInterpolationIntegralDamageFunction(Real energy,
+                                                                              unsigned int i,
+                                                                              unsigned int j,
+                                                                              unsigned int l) const
+{
+  unsigned int index = energyIndex(energy);
+  unsigned int k = mapIndex(i, j, l);
+
+  if (index == 0)
+    return _displacement_function_integral[0][mapIndex(i, j, l)];
+
+  // linear interpolation
+  Real e1 = _energy_history[index - 1];
+  Real e2 = _energy_history[index];
+  Real v1 = _displacement_function_integral[index - 1][k];
+  Real v2 = _displacement_function_integral[index][k];
 
   return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
