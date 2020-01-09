@@ -32,6 +32,9 @@ PolyatomicDamageEnergyFunction::PolyatomicDamageEnergyFunction(
   if (damage_function_type != ENERGY)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 1;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDamageEnergyFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -110,7 +113,7 @@ PolyatomicDamageEnergyFunction::integralTypeI(Real energy, unsigned int i, unsig
     {
       Real recoil_energy = scale * (_quad_points[qp] + 1) + lower;
       integral += scale * _quad_weights[qp] * scatteringCrossSection(i, j, energy, recoil_energy) *
-                  linearInterpolationHelper(recoil_energy, l, j, 0, 0);
+                  linearInterpolation(recoil_energy, j);
     }
   }
   return integral;
@@ -160,17 +163,6 @@ PolyatomicDamageEnergyFunction::integralTypeII(Real energy, unsigned int i, unsi
     }
   }
   return integral;
-}
-
-void
-PolyatomicDamageEnergyFunction::inverseMapIndex(unsigned int n,
-                                                unsigned int & i,
-                                                unsigned int & j,
-                                                unsigned int & l) const
-{
-  i = n;
-  j = 0;
-  l = 0;
 }
 
 #endif

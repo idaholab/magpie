@@ -139,12 +139,7 @@ PolyatomicDisplacementFunctionBase::computeDisplacementFunctionIntegral()
       Real w = f * _quad_weights[qp];
 
       for (unsigned int n = 0; n < _problem_size; ++n)
-      {
-        unsigned int i, j, l;
-        inverseMapIndex(n, i, j, l);
-
-        _displacement_function_integral[e][n] += w * linearInterpolation(energy, i, j, l);
-      }
+        _displacement_function_integral[e][n] += w * linearInterpolationFromFlatIndex(energy, n);
     }
   }
 }
@@ -311,24 +306,35 @@ PolyatomicDisplacementFunctionBase::linearInterpolation(Real energy,
                                                         unsigned int j,
                                                         unsigned int l) const
 {
-  unsigned int index = energyIndex(energy);
-  if (index == 0)
-    return _displacement_function[0][mapIndex(i, j, l)];
+  unsigned int energy_index = energyIndex(energy);
+  unsigned int index = mapIndex(i, j, l);
+  if (energy_index == 0)
+    return _displacement_function[0][index];
 
-  return linearInterpolationHelper(energy, index, i, j, l);
+  return linearInterpolationHelper(energy, energy_index, index);
 }
 
 Real
-PolyatomicDisplacementFunctionBase::linearInterpolationHelper(
-    Real energy, unsigned int index, unsigned int i, unsigned int j, unsigned int l) const
+PolyatomicDisplacementFunctionBase::linearInterpolationFromFlatIndex(Real energy,
+                                                                     unsigned int index) const
 {
-  unsigned int k = mapIndex(i, j, l);
+  unsigned int energy_index = energyIndex(energy);
+  if (energy_index == 0)
+    return _displacement_function[0][index];
 
+  return linearInterpolationHelper(energy, energy_index, index);
+}
+
+Real
+PolyatomicDisplacementFunctionBase::linearInterpolationHelper(Real energy,
+                                                              unsigned int energy_index,
+                                                              unsigned int index) const
+{
   // linear interpolation
-  Real e1 = _energy_history[index - 1];
-  Real e2 = _energy_history[index];
-  Real v1 = _displacement_function[index - 1][k];
-  Real v2 = _displacement_function[index][k];
+  Real e1 = _energy_history[energy_index - 1];
+  Real e2 = _energy_history[energy_index];
+  Real v1 = _displacement_function[energy_index - 1][index];
+  Real v2 = _displacement_function[energy_index][index];
 
   return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
@@ -339,19 +345,28 @@ PolyatomicDisplacementFunctionBase::linearInterpolationIntegralDamageFunction(Re
                                                                               unsigned int j,
                                                                               unsigned int l) const
 {
-  unsigned int index = energyIndex(energy);
-  unsigned int k = mapIndex(i, j, l);
+  unsigned int energy_index = energyIndex(energy);
+  unsigned int index = mapIndex(i, j, l);
 
-  if (index == 0)
-    return _displacement_function_integral[0][mapIndex(i, j, l)];
+  if (energy_index == 0)
+    return _displacement_function_integral[0][index];
 
   // linear interpolation
-  Real e1 = _energy_history[index - 1];
-  Real e2 = _energy_history[index];
-  Real v1 = _displacement_function_integral[index - 1][k];
-  Real v2 = _displacement_function_integral[index][k];
+  Real e1 = _energy_history[energy_index - 1];
+  Real e2 = _energy_history[energy_index];
+  Real v1 = _displacement_function_integral[energy_index - 1][index];
+  Real v2 = _displacement_function_integral[energy_index][index];
 
   return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
+
+unsigned int
+PolyatomicDisplacementFunctionBase::mapIndex(unsigned int i, unsigned int j, unsigned int l) const
+{
+  assert(_n_indices > 0);
+  assert(j == 0 || _n_indices > 1);
+  assert(l == 0 || _n_indices > 2);
+  return i + j * _n_species + l * _n_species * _n_species;
+};
 
 #endif

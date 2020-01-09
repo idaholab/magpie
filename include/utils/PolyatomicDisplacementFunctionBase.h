@@ -59,9 +59,11 @@ public:
   Real numberDensity(unsigned int i) const { return _material->_element[i]._t * _material->_arho; }
   ///@}
 
-  /// linear interpolation of the damage function
+  ///@{ linear interpolation of the damage function
   Real
   linearInterpolation(Real energy, unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
+  Real linearInterpolationFromFlatIndex(Real energy, unsigned int index) const;
+  ///@}
 
   /// linear interpolation of the integral of the damage function
   Real linearInterpolationIntegralDamageFunction(Real energy,
@@ -79,12 +81,8 @@ public:
   unsigned int energyIndex(Real energy) const;
 
 protected:
-  /// this function flattens the arrays i, j, l to a single index
-  virtual unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int l) const = 0;
-
-  /// this function unflattens n to indices i, j, l
-  virtual void
-  inverseMapIndex(unsigned int n, unsigned int & i, unsigned int & j, unsigned int & l) const = 0;
+  /// override the mapIndex function: flattens ijl to single index n
+  unsigned int mapIndex(unsigned int i, unsigned int j = 0, unsigned int l = 0) const;
 
   /// computes the integral int_0^t dT T * d(sigma_ij) / dT for species combination i, j and small t
   Real
@@ -105,8 +103,7 @@ protected:
   nonCaptureProbability(unsigned int i, unsigned int k, Real energy, Real recoil_energy) const;
 
   /// a helper function called from linearInterpolation
-  Real linearInterpolationHelper(
-      Real energy, unsigned int index, unsigned int i, unsigned int j, unsigned int l) const;
+  Real linearInterpolationHelper(Real energy, unsigned int energy_index, unsigned int index) const;
 
   /// damage function type [nij and gij, respectively in PK JNM 101, 1981; or nu_i JNM 88, (1980)]
   nrt_type _damage_function_type;
@@ -116,6 +113,9 @@ protected:
 
   /// the number of different species in the material
   unsigned int _n_species;
+
+  /// the number of species indices of this object
+  unsigned int _n_indices = 0;
 
   /// the size of the problem = _n_species**2 for TOTAL & NET, _n_species for ENERGY
   unsigned int _problem_size;

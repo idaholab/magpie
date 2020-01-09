@@ -32,18 +32,6 @@ public:
   Real integralTypeII(Real energy, unsigned int i, unsigned int j, unsigned int k) const;
 
 protected:
-  /// override the mapIndex function: flattens ijl to single index n
-  unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int /*l*/) const override
-  {
-    return i + j * _n_species;
-  };
-
-  /// override the inverseMapIndex function: retrieves n given ijk
-  void inverseMapIndex(unsigned int n,
-                       unsigned int & i,
-                       unsigned int & j,
-                       unsigned int & l) const override;
-
   /// is the total damage function computed
   bool _total_displacement_function;
 };

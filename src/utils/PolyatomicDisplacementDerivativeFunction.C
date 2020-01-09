@@ -34,6 +34,9 @@ PolyatomicDisplacementDerivativeFunction::PolyatomicDisplacementDerivativeFuncti
   if (damage_function_type != NET_DERIVATIVE)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 3;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDisplacementDerivativeFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -181,18 +184,6 @@ PolyatomicDisplacementDerivativeFunction::source(Real energy,
   return _net_displacement_function->integralTypeI(energy, i, j, l) +
          _net_displacement_function->integralTypeII(energy, i, j, l) -
          d_net_dE * stoppingPowerDerivative(i, l, energy);
-}
-
-void
-PolyatomicDisplacementDerivativeFunction::inverseMapIndex(unsigned int n,
-                                                          unsigned int & i,
-                                                          unsigned int & j,
-                                                          unsigned int & l) const
-{
-  unsigned int t = n % (_n_species * _n_species);
-  i = t % _n_species;
-  j = (t - i) / _n_species;
-  l = (n - t) / (_n_species * _n_species);
 }
 
 #endif

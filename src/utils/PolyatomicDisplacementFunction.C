@@ -33,6 +33,9 @@ PolyatomicDisplacementFunction::PolyatomicDisplacementFunction(
   if (damage_function_type != TOTAL && damage_function_type != NET)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 2;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDisplacementFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -159,17 +162,6 @@ PolyatomicDisplacementFunction::integralTypeII(Real energy,
     }
   }
   return integral;
-}
-
-void
-PolyatomicDisplacementFunction::inverseMapIndex(unsigned int n,
-                                                unsigned int & i,
-                                                unsigned int & j,
-                                                unsigned int & l) const
-{
-  i = n % _n_species;
-  j = (n - i) / _n_species;
-  l = 0;
 }
 
 #endif

@@ -37,19 +37,6 @@ public:
    * by nu_i(E-T) - nu_i(E) \approx -T d(nu_i) / dE.
    */
   Real _taylor_series_threshold = 1e2;
-
-protected:
-  /// override the mapIndex function: flattens ijl to single index n
-  unsigned int mapIndex(unsigned int i, unsigned int /*j*/, unsigned int /*l*/) const override
-  {
-    return i;
-  };
-
-  /// override the inverseMapIndex function: retrieves n given ijk
-  void inverseMapIndex(unsigned int n,
-                       unsigned int & i,
-                       unsigned int & j,
-                       unsigned int & l) const override;
 };
 
 #endif // GSL_ENABLED
