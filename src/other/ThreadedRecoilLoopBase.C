@@ -167,10 +167,10 @@ ThreadedRecoilLoopBase::operator()(const PKARange & pka_list)
                   _trim_parameters.element_prototypes[target_var]._m);
               // using linear perturbation theory estimate of g_ij(number_fractions)
               Real w = _pa_nrt[index]->linearInterpolation(
-                  species_index, target_species_index, recoil->_E);
+                  recoil->_E, species_index, target_species_index);
               for (unsigned int l = 0; l < _pa_derivative_nrt[index]->nSpecies(); ++l)
                 w += _pa_derivative_nrt[index]->linearInterpolation(
-                         species_index, target_species_index, l, recoil->_E) *
+                         recoil->_E, species_index, target_species_index, l) *
                      (number_fractions[l] - _pa_nrt[index]->numberFraction(l));
 
               // increment energy, vacancy and interstitial buffers

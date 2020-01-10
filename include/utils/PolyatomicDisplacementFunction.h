@@ -25,11 +25,6 @@ public:
 
   static int odeRHS(Real energy, const Real disp[], Real f[], void * params);
 
-  ///@{ some getters needed for accessing this pointer in odeRHS
-  Real linearInterpolation(unsigned int i, unsigned int j, Real energy) const;
-  Real linearInterpolation(unsigned int i, unsigned int j, Real energy, unsigned int index) const;
-  ///@}
-
   /// computes term 1 in Parkin-Coulter expression nu_k(T - Eb)
   Real integralTypeI(Real energy, unsigned int i, unsigned int j, unsigned int k) const;
 
@@ -37,9 +32,6 @@ public:
   Real integralTypeII(Real energy, unsigned int i, unsigned int j, unsigned int k) const;
 
 protected:
-  /// maps double index nu_ij to single index nu_n; j runs faster than i
-  unsigned int mapIndex(unsigned int i, unsigned int j) const { return i + j * _n_species; };
-
   /// is the total damage function computed
   bool _total_displacement_function;
 };
