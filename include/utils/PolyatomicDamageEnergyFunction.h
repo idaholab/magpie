@@ -23,7 +23,7 @@ public:
                                  nrt_type damage_function_type,
                                  std::vector<std::vector<Real>> Ecap = {{}});
 
-  static int odeRHS(Real energy, const Real disp[], Real f[], void * params);
+  virtual std::vector<Real> getRHS(Real energy) override;
 
   /// a getter needed for accessing this pointer in odeRHS
   Real taylorSeriesThreshold() const { return _taylor_series_threshold; }

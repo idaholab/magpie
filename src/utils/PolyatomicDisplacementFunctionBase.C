@@ -84,11 +84,30 @@ PolyatomicDisplacementFunctionBase::PolyatomicDisplacementFunctionBase(
     _quad_weights[j] = weight;
   }
   gsl_integration_glfixed_table_free(qp_table);
+
+  // set up the gsl ODE machinery
+  auto func = &PolyatomicDisplacementFunction::gslInterface;
+  _sys = {func, NULL, _problem_size, this};
+  _ode_driver = gsl_odeiv2_driver_alloc_y_new(&_sys, gsl_odeiv2_step_rk4, 10.0, 1e-2, 1.0e-3);
 }
 
 PolyatomicDisplacementFunctionBase::~PolyatomicDisplacementFunctionBase()
 {
   gsl_odeiv2_driver_free(_ode_driver);
+}
+
+int
+PolyatomicDisplacementFunctionBase::gslInterface(Real energy,
+                                                 const Real disp[],
+                                                 Real f[],
+                                                 void * params)
+{
+  (void)disp;
+  PolyatomicDisplacementFunctionBase * padf = (PolyatomicDisplacementFunctionBase *)params;
+  std::vector<Real> rhs = padf->getRHS(energy);
+  for (unsigned int j = 0; j < rhs.size(); ++j)
+    f[j] = rhs[j];
+  return GSL_SUCCESS;
 }
 
 void

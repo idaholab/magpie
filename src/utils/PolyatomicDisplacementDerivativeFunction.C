@@ -37,11 +37,6 @@ PolyatomicDisplacementDerivativeFunction::PolyatomicDisplacementDerivativeFuncti
   // set the number of indices
   _n_indices = 3;
 
-  // set up the gsl ODE machinery
-  auto func = &PolyatomicDisplacementDerivativeFunction::odeRHS;
-  _sys = {func, NULL, _problem_size, this};
-  _ode_driver = gsl_odeiv2_driver_alloc_y_new(&_sys, gsl_odeiv2_step_rk4, 10.0, 1e-2, 1.0e-3);
-
   Real Edisp_min = std::numeric_limits<Real>::max();
   for (unsigned int j = 0; j < _n_species; ++j)
     if (_material->_element[j]._Edisp < Edisp_min)
@@ -51,34 +46,28 @@ PolyatomicDisplacementDerivativeFunction::PolyatomicDisplacementDerivativeFuncti
   // note that initial conditions are 0s for theta_ijl
 }
 
-int
-PolyatomicDisplacementDerivativeFunction::odeRHS(Real energy,
-                                                 const Real disp[],
-                                                 Real f[],
-                                                 void * params)
+std::vector<Real>
+PolyatomicDisplacementDerivativeFunction::getRHS(Real energy)
 {
-  (void)disp;
-  PolyatomicDisplacementDerivativeFunction * padf =
-      (PolyatomicDisplacementDerivativeFunction *)params;
-  for (unsigned int i = 0; i < padf->nSpecies(); ++i)
+  std::vector<Real> f(_problem_size);
+  for (unsigned int i = 0; i < nSpecies(); ++i)
   {
-    Real stopping_power = padf->stoppingPower(i, energy);
-    for (unsigned int j = 0; j < padf->nSpecies(); ++j)
-      for (unsigned int l = 0; l < padf->nSpecies(); ++l)
+    Real stopping_power = stoppingPower(i, energy);
+    for (unsigned int j = 0; j < nSpecies(); ++j)
+      for (unsigned int l = 0; l < nSpecies(); ++l)
       {
         // working on the right hand side for theta_ijl
-        unsigned int n = padf->mapIndex(i, j, l);
+        unsigned int n = mapIndex(i, j, l);
         f[n] = 0;
 
-        for (unsigned int k = 0; k < padf->nSpecies(); ++k)
-          f[n] +=
-              padf->numberFraction(k) *
-              (padf->integralTypeI(energy, i, j, l, k) + padf->integralTypeII(energy, i, j, l, k)) /
-              stopping_power;
-        f[n] += padf->source(energy, i, j, l) / stopping_power;
+        for (unsigned int k = 0; k < nSpecies(); ++k)
+          f[n] += numberFraction(k) *
+                  (integralTypeI(energy, i, j, l, k) + integralTypeII(energy, i, j, l, k)) /
+                  stopping_power;
+        f[n] += source(energy, i, j, l) / stopping_power;
       }
   }
-  return GSL_SUCCESS;
+  return f;
 }
 
 Real

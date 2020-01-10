@@ -36,11 +36,6 @@ PolyatomicDisplacementFunction::PolyatomicDisplacementFunction(
   // set the number of indices
   _n_indices = 2;
 
-  // set up the gsl ODE machinery
-  auto func = &PolyatomicDisplacementFunction::odeRHS;
-  _sys = {func, NULL, _problem_size, this};
-  _ode_driver = gsl_odeiv2_driver_alloc_y_new(&_sys, gsl_odeiv2_step_rk4, 10.0, 1e-2, 1.0e-3);
-
   Real Edisp_min = std::numeric_limits<Real>::max();
   for (unsigned int j = 0; j < _n_species; ++j)
     if (_material->_element[j]._Edisp < Edisp_min)
@@ -54,27 +49,25 @@ PolyatomicDisplacementFunction::PolyatomicDisplacementFunction(
       _displacement_function[0][mapIndex(i, i, 0)] = 1;
 }
 
-int
-PolyatomicDisplacementFunction::odeRHS(Real energy, const Real disp[], Real f[], void * params)
+std::vector<Real>
+PolyatomicDisplacementFunction::getRHS(Real energy)
 {
-  (void)disp;
-  PolyatomicDisplacementFunction * padf = (PolyatomicDisplacementFunction *)params;
-  for (unsigned int i = 0; i < padf->nSpecies(); ++i)
+  std::vector<Real> f(_problem_size);
+  for (unsigned int i = 0; i < nSpecies(); ++i)
   {
-    Real stopping_power = padf->stoppingPower(i, energy);
-    for (unsigned int j = 0; j < padf->nSpecies(); ++j)
+    Real stopping_power = stoppingPower(i, energy);
+    for (unsigned int j = 0; j < nSpecies(); ++j)
     {
       // working on the right hand side for nu_ij
-      unsigned int n = padf->mapIndex(i, j, 0);
+      unsigned int n = mapIndex(i, j, 0);
       f[n] = 0;
 
-      for (unsigned int k = 0; k < padf->nSpecies(); ++k)
-        f[n] += padf->numberFraction(k) *
-                (padf->integralTypeI(energy, i, j, k) + padf->integralTypeII(energy, i, j, k)) /
-                stopping_power;
+      for (unsigned int k = 0; k < nSpecies(); ++k)
+        f[n] += numberFraction(k) *
+                (integralTypeI(energy, i, j, k) + integralTypeII(energy, i, j, k)) / stopping_power;
     }
   }
-  return GSL_SUCCESS;
+  return f;
 }
 
 Real
