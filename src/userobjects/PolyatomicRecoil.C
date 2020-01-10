@@ -210,10 +210,10 @@ PolyatomicRecoil::finalize()
                  ++derivative)
               displacement_file << ","
                                 << _padf_derivative->linearInterpolation(
+                                       _padf_derivative->energyPoint(n),
                                        projectile,
                                        target,
-                                       derivative,
-                                       _padf_derivative->energyPoint(n));
+                                       derivative);
         displacement_file << std::endl;
       }
     else
@@ -230,7 +230,7 @@ PolyatomicRecoil::finalize()
                   getParam<MooseEnum>("damage_type") == "TOTAL" && target == projectile ? 1 : 0;
               displacement_file << ","
                                 << delta_ij + displacement_function->linearInterpolation(
-                                                  projectile, target, _padf->energyPoint(n));
+                                                  _padf->energyPoint(n), projectile, target);
             }
           displacement_file << std::endl;
         }
@@ -242,8 +242,8 @@ PolyatomicRecoil::finalize()
           displacement_file << _padf->energyPoint(n);
           for (unsigned int projectile = 0; projectile < _padf->nSpecies(); ++projectile)
             displacement_file << ","
-                              << energy_function->linearInterpolation(projectile,
-                                                                      _padf->energyPoint(n));
+                              << energy_function->linearInterpolation(_padf->energyPoint(n),
+                                                                      projectile);
           displacement_file << std::endl;
         }
       }

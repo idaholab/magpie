@@ -33,6 +33,9 @@ PolyatomicDisplacementFunction::PolyatomicDisplacementFunction(
   if (damage_function_type != TOTAL && damage_function_type != NET)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 2;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDisplacementFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -48,7 +51,7 @@ PolyatomicDisplacementFunction::PolyatomicDisplacementFunction(
   // note: for net displacement function, the gii = 1, for total displacement function nij = 0
   if (_damage_function_type == NET)
     for (unsigned int i = 0; i < _n_species; ++i)
-      _displacement_function[0][mapIndex(i, i)] = 1;
+      _displacement_function[0][mapIndex(i, i, 0)] = 1;
 }
 
 int
@@ -62,7 +65,7 @@ PolyatomicDisplacementFunction::odeRHS(Real energy, const Real disp[], Real f[],
     for (unsigned int j = 0; j < padf->nSpecies(); ++j)
     {
       // working on the right hand side for nu_ij
-      unsigned int n = padf->mapIndex(i, j);
+      unsigned int n = padf->mapIndex(i, j, 0);
       f[n] = 0;
 
       for (unsigned int k = 0; k < padf->nSpecies(); ++k)
@@ -103,7 +106,7 @@ PolyatomicDisplacementFunction::integralTypeI(Real energy,
       Real recoil_energy = f * (_quad_points[qp] + 1) + lower;
       integral += f * _quad_weights[qp] * scatteringCrossSection(i, k, energy, recoil_energy) *
                   displacementProbability(k, recoil_energy) *
-                  (delta_kj + linearInterpolation(k, j, recoil_energy - Ebind));
+                  (delta_kj + linearInterpolation(recoil_energy - Ebind, k, j));
     }
   }
   return integral;
@@ -119,11 +122,11 @@ PolyatomicDisplacementFunction::integralTypeII(Real energy,
   Real threshold = std::min(_asymptotic_threshold, energy * _lambda[i][k]);
 
   // store the current displacement function value
-  Real current_value = linearInterpolation(i, j, energy);
+  Real current_value = linearInterpolation(energy, i, j);
 
   // estimate the derivative d(nu_i) / dE:
   Real dE = _energy_history.back() - _energy_history[_energy_history.size() - 2];
-  Real derivative = (current_value - linearInterpolation(i, j, energy - dE)) / dE;
+  Real derivative = (current_value - linearInterpolation(energy - dE, i, j)) / dE;
 
   // integrate up to threshold and multiply by estimate of the derivative
   Real integral = -weightedScatteringIntegral(energy, threshold, i, k) * derivative;
@@ -154,40 +157,11 @@ PolyatomicDisplacementFunction::integralTypeII(Real energy,
       Real recoil_energy = f * (_quad_points[qp] + 1) + lower;
       integral += f * _quad_weights[qp] * scatteringCrossSection(i, k, energy, recoil_energy) *
                   (nonCaptureProbability(i, k, energy, recoil_energy) *
-                       linearInterpolation(i, j, energy - recoil_energy) -
+                       linearInterpolation(energy - recoil_energy, i, j) -
                    current_value);
     }
   }
   return integral;
-}
-
-Real
-PolyatomicDisplacementFunction::linearInterpolation(unsigned int i,
-                                                    unsigned int j,
-                                                    Real energy) const
-{
-  unsigned int index = energyIndex(energy);
-  if (index == 0)
-    return _displacement_function[0][mapIndex(i, j)];
-
-  return linearInterpolation(i, j, energy, index);
-}
-
-Real
-PolyatomicDisplacementFunction::linearInterpolation(unsigned int i,
-                                                    unsigned int j,
-                                                    Real energy,
-                                                    unsigned int index) const
-{
-  unsigned int k = mapIndex(i, j);
-
-  // linear interpolation
-  Real e1 = _energy_history[index - 1];
-  Real e2 = _energy_history[index];
-  Real v1 = _displacement_function[index - 1][k];
-  Real v2 = _displacement_function[index][k];
-
-  return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
 
 #endif

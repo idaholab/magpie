@@ -34,6 +34,9 @@ PolyatomicDisplacementDerivativeFunction::PolyatomicDisplacementDerivativeFuncti
   if (damage_function_type != NET_DERIVATIVE)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 3;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDisplacementDerivativeFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -104,7 +107,7 @@ PolyatomicDisplacementDerivativeFunction::integralTypeI(
       Real recoil_energy = f * (_quad_points[qp] + 1) + lower;
       integral += f * _quad_weights[qp] * scatteringCrossSection(i, k, energy, recoil_energy) *
                   displacementProbability(k, recoil_energy) *
-                  linearInterpolation(k, j, l, recoil_energy - Ebind);
+                  linearInterpolation(recoil_energy - Ebind, k, j, l);
     }
   }
   return integral;
@@ -118,11 +121,11 @@ PolyatomicDisplacementDerivativeFunction::integralTypeII(
   Real threshold = std::min(_asymptotic_threshold, energy * _lambda[i][k]);
 
   // store the current displacement function value
-  Real current_value = linearInterpolation(i, j, l, energy);
+  Real current_value = linearInterpolation(energy, i, j, l);
 
   // estimate the derivative d(nu_i) / dE:
   Real dE = _energy_history.back() - _energy_history[_energy_history.size() - 2];
-  Real derivative = (current_value - linearInterpolation(i, j, l, energy - dE)) / dE;
+  Real derivative = (current_value - linearInterpolation(energy - dE, i, j, l)) / dE;
 
   // integrate up to threshold and multiply by estimate of the derivative
   Real integral = -weightedScatteringIntegral(energy, threshold, i, k) * derivative;
@@ -153,7 +156,7 @@ PolyatomicDisplacementDerivativeFunction::integralTypeII(
       Real recoil_energy = f * (_quad_points[qp] + 1) + lower;
       integral += f * _quad_weights[qp] * scatteringCrossSection(i, k, energy, recoil_energy) *
                   (nonCaptureProbability(i, k, energy, recoil_energy) *
-                       linearInterpolation(i, j, l, energy - recoil_energy) -
+                       linearInterpolation(energy - recoil_energy, i, j, l) -
                    current_value);
     }
   }
@@ -174,41 +177,13 @@ PolyatomicDisplacementDerivativeFunction::source(Real energy,
   {
     Real e1 = _net_displacement_function->energyPoint(index - 1);
     Real e2 = _net_displacement_function->energyPoint(index);
-    Real v1 = _net_displacement_function->linearInterpolation(i, j, e1);
-    Real v2 = _net_displacement_function->linearInterpolation(i, j, e2);
+    Real v1 = _net_displacement_function->linearInterpolation(e1, i, j);
+    Real v2 = _net_displacement_function->linearInterpolation(e2, i, j);
     d_net_dE = (v2 - v1) / (e2 - e1);
   }
   return _net_displacement_function->integralTypeI(energy, i, j, l) +
          _net_displacement_function->integralTypeII(energy, i, j, l) -
          d_net_dE * stoppingPowerDerivative(i, l, energy);
-}
-
-Real
-PolyatomicDisplacementDerivativeFunction::linearInterpolation(unsigned int i,
-                                                              unsigned int j,
-                                                              unsigned int l,
-                                                              Real energy) const
-{
-  unsigned int index = energyIndex(energy);
-  if (index == 0)
-    return _displacement_function[0][mapIndex(i, j, l)];
-
-  return linearInterpolation(i, j, l, energy, index);
-}
-
-Real
-PolyatomicDisplacementDerivativeFunction::linearInterpolation(
-    unsigned int i, unsigned int j, unsigned int l, Real energy, unsigned int index) const
-{
-  unsigned int k = mapIndex(i, j, l);
-
-  // linear interpolation
-  Real e1 = _energy_history[index - 1];
-  Real e2 = _energy_history[index];
-  Real v1 = _displacement_function[index - 1][k];
-  Real v2 = _displacement_function[index][k];
-
-  return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
 
 #endif

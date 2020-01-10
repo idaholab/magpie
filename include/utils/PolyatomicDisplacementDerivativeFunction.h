@@ -27,12 +27,6 @@ public:
 
   static int odeRHS(Real energy, const Real disp[], Real f[], void * params);
 
-  ///@{ some getters needed for accessing this pointer in odeRHS
-  Real linearInterpolation(unsigned int i, unsigned int j, unsigned int l, Real energy) const;
-  Real linearInterpolation(
-      unsigned int i, unsigned int j, unsigned int l, Real energy, unsigned int index) const;
-  ///@}
-
   /// computes term 1 in Parkin-Coulter expression nu_k(T - Eb)
   Real
   integralTypeI(Real energy, unsigned int i, unsigned int j, unsigned int l, unsigned int k) const;
@@ -45,12 +39,6 @@ public:
   Real source(Real energy, unsigned int i, unsigned int j, unsigned int l);
 
 protected:
-  /// maps triple index theta_ijl to single theta_n; l runs faster than j runs faster than i
-  unsigned int mapIndex(unsigned int i, unsigned int j, unsigned int l) const
-  {
-    return i + j * _n_species + l * _n_species * _n_species;
-  };
-
   /// the source term in the NRT equatons for the derivative requires the solution of the equations themselves
   const PolyatomicDisplacementFunction * _net_displacement_function;
 };

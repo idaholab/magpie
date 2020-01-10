@@ -32,6 +32,9 @@ PolyatomicDamageEnergyFunction::PolyatomicDamageEnergyFunction(
   if (damage_function_type != ENERGY)
     throw std::exception();
 
+  // set the number of indices
+  _n_indices = 1;
+
   // set up the gsl ODE machinery
   auto func = &PolyatomicDamageEnergyFunction::odeRHS;
   _sys = {func, NULL, _problem_size, this};
@@ -110,7 +113,7 @@ PolyatomicDamageEnergyFunction::integralTypeI(Real energy, unsigned int i, unsig
     {
       Real recoil_energy = scale * (_quad_points[qp] + 1) + lower;
       integral += scale * _quad_weights[qp] * scatteringCrossSection(i, j, energy, recoil_energy) *
-                  linearInterpolation(j, recoil_energy, l);
+                  linearInterpolation(recoil_energy, j);
     }
   }
   return integral;
@@ -123,11 +126,11 @@ PolyatomicDamageEnergyFunction::integralTypeII(Real energy, unsigned int i, unsi
   Real threshold = std::min(_asymptotic_threshold, energy * _lambda[i][j]);
 
   // store the current displacement function value
-  Real current_value = linearInterpolation(i, energy);
+  Real current_value = linearInterpolation(energy, i);
 
   // estimate the derivative d(nu_i) / dE:
   Real dE = _energy_history.back() - _energy_history[_energy_history.size() - 2];
-  Real derivative = (current_value - linearInterpolation(i, energy - dE)) / dE;
+  Real derivative = (current_value - linearInterpolation(energy - dE, i)) / dE;
 
   // integrate up to threshold and multiply by estimate of the derivative
   Real integral = -weightedScatteringIntegral(energy, threshold, i, j) * derivative;
@@ -156,36 +159,10 @@ PolyatomicDamageEnergyFunction::integralTypeII(Real energy, unsigned int i, unsi
     {
       Real recoil_energy = scale * (_quad_points[qp] + 1) + lower;
       integral += scale * _quad_weights[qp] * scatteringCrossSection(i, j, energy, recoil_energy) *
-                  (linearInterpolation(i, energy - recoil_energy) - current_value);
+                  (linearInterpolation(energy - recoil_energy, i) - current_value);
     }
   }
   return integral;
-}
-
-Real
-PolyatomicDamageEnergyFunction::linearInterpolation(unsigned int i, Real energy) const
-{
-  unsigned int index = energyIndex(energy);
-  if (index == 0)
-    return _displacement_function[0][i];
-
-  return linearInterpolation(i, energy, index);
-}
-
-Real
-PolyatomicDamageEnergyFunction::linearInterpolation(unsigned int i,
-                                                    Real energy,
-                                                    unsigned int index) const
-{
-  // interpolation: power law interpolation df = a * E^b unless one value is zero => linear
-  // interpolation
-  Real e1 = _energy_history[index - 1];
-  Real e2 = _energy_history[index];
-  Real v1 = _displacement_function[index - 1][i];
-  Real v2 = _displacement_function[index][i];
-
-  // do linear interpolation instead of power law
-  return v1 + (energy - e1) / (e2 - e1) * (v2 - v1);
 }
 
 #endif
