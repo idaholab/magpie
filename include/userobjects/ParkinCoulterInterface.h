@@ -16,19 +16,19 @@
 // mytrim includes
 #include <mytrim/element.h>
 
-class ParkinCoulterBase;
+class ParkinCoulterInterface;
 class PolyatomicDisplacementFunction;
 class PolyatomicDamageEnergyFunction;
 class PolyatomicDisplacementDerivativeFunction;
 
 template <>
-InputParameters validParams<ParkinCoulterBase>();
+InputParameters validParams<ParkinCoulterInterface>();
 
-class ParkinCoulterBase : public GeneralUserObject
+class ParkinCoulterInterface
 {
 public:
-  ParkinCoulterBase(const InputParameters & parameters);
-  void initialize() override {}
+  ParkinCoulterInterface(const MooseObject * moose_object);
+  static InputParameters validParams();
 
 protected:
   /// recomputes the Polyatomic damage functions
@@ -49,6 +49,12 @@ protected:
 
   /// computes the polymat object that is used to create PolyatomicDisplacementFunctions
   std::vector<MyTRIM_NS::Element> polyMat() const;
+
+  /// the MooseObject that inherits from this interface
+  const MooseObject * _moose_obj;
+
+  /// convenience reference to InputParameters from MooseObject
+  const InputParameters & _pars;
 
   std::vector<std::vector<Real>> _Ecap;
 

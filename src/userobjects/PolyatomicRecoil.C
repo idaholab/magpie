@@ -21,7 +21,8 @@ registerMooseObject("MagpieApp", PolyatomicRecoil);
 InputParameters
 PolyatomicRecoil::validParams()
 {
-  InputParameters params = ParkinCoulterBase::validParams();
+  InputParameters params = GeneralUserObject::validParams();
+  params += ParkinCoulterInterface::validParams();
   params.addRequiredParam<std::vector<unsigned int>>("Z", "Atomic numbers");
   params.addRequiredParam<std::vector<Real>>("A", "Mass numbers");
   params.addRequiredParam<std::vector<Real>>("number_fraction", "Number fractions");
@@ -48,7 +49,7 @@ PolyatomicRecoil::validParams()
 }
 
 PolyatomicRecoil::PolyatomicRecoil(const InputParameters & parameters)
-  : ParkinCoulterBase(parameters)
+  : GeneralUserObject(parameters), ParkinCoulterInterface(this)
 {
 }
 

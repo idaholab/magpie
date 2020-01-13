@@ -7,7 +7,7 @@
 /**********************************************************************/
 #ifdef GSL_ENABLED
 
-#include "ParkinCoulterBase.h"
+#include "ParkinCoulterInterface.h"
 #include "PolyatomicDisplacementFunction.h"
 #include "PolyatomicDamageEnergyFunction.h"
 #include "PolyatomicDisplacementDerivativeFunction.h"
@@ -16,11 +16,10 @@
 // mytrim includes
 #include <mytrim/element.h>
 
-template <>
 InputParameters
-validParams<ParkinCoulterBase>()
+ParkinCoulterInterface::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = emptyInputParameters();
   params.addRequiredParam<std::vector<Real>>("displacement_thresholds", "Dispacement thresholds");
   params.addParam<std::vector<Real>>("lattice_binding_energies", "Lattice binding energies");
   params.addParam<std::vector<std::vector<Real>>>(
@@ -37,32 +36,28 @@ validParams<ParkinCoulterBase>()
       "logarithmic_energy_spacing",
       "logarithmic_energy_spacing > 1",
       "Spacing of the energy points En in log space energy_spacing = E_{n+1} / En");
-
-  // this should only be run once
-  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
-  params.suppressParameter<ExecFlagEnum>("execute_on");
   return params;
 }
 
-ParkinCoulterBase::ParkinCoulterBase(const InputParameters & parameters)
-  : GeneralUserObject(parameters)
+ParkinCoulterInterface::ParkinCoulterInterface(const MooseObject * moose_object)
+  : _moose_obj(moose_object), _pars(moose_object->parameters())
 {
   _Ecap = {{}};
-  if (isParamValid("Ecap"))
-    _Ecap = getParam<std::vector<std::vector<Real>>>("Ecap");
+  if (_pars.isParamValid("Ecap"))
+    _Ecap = _pars.get<std::vector<std::vector<Real>>>("Ecap");
 }
 
 std::vector<MyTRIM_NS::Element>
-ParkinCoulterBase::polyMat() const
+ParkinCoulterInterface::polyMat() const
 {
   std::vector<MyTRIM_NS::Element> poly_mat;
   std::vector<unsigned int> atomic_numbers = atomicNumbers();
   std::vector<Real> mass_numbers = massNumbers();
   std::vector<Real> N = numberFractions();
-  std::vector<Real> threshold = getParam<std::vector<Real>>("displacement_thresholds");
+  std::vector<Real> threshold = _pars.get<std::vector<Real>>("displacement_thresholds");
   std::vector<Real> bind;
-  if (isParamValid("lattice_binding_energies"))
-    bind = getParam<std::vector<Real>>("lattice_binding_energies");
+  if (_pars.isParamValid("lattice_binding_energies"))
+    bind = _pars.get<std::vector<Real>>("lattice_binding_energies");
   else
     bind.assign(atomic_numbers.size(), 0.0);
 
@@ -87,16 +82,16 @@ ParkinCoulterBase::polyMat() const
 }
 
 void
-ParkinCoulterBase::computeDamageFunctions()
+ParkinCoulterInterface::computeDamageFunctions()
 {
   // callback for allocating damage functions
   initDamageFunctions();
 
   Real energy = _padf->minEnergy();
   Real Emax = maxEnergy();
-  Real threshold = getParam<Real>("uniform_energy_spacing_threshold");
-  Real dE = getParam<Real>("uniform_energy_spacing");
-  Real logdE = getParam<Real>("logarithmic_energy_spacing");
+  Real threshold = _pars.get<Real>("uniform_energy_spacing_threshold");
+  Real dE = _pars.get<Real>("uniform_energy_spacing");
+  Real logdE = _pars.get<Real>("logarithmic_energy_spacing");
 
   for (;;) // while (energy <= Emax)
   {
