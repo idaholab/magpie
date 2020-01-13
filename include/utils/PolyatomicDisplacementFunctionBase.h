@@ -41,6 +41,10 @@ public:
 
   virtual ~PolyatomicDisplacementFunctionBase();
 
+  static int gslInterface(Real energy, const Real disp[], Real f[], void * params);
+
+  virtual std::vector<Real> getRHS(Real energy) = 0;
+
   /// computes the displacement function from current last energy to Emax
   void advanceDisplacements(Real Emax);
 

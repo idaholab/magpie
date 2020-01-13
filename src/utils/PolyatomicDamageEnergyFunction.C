@@ -35,11 +35,6 @@ PolyatomicDamageEnergyFunction::PolyatomicDamageEnergyFunction(
   // set the number of indices
   _n_indices = 1;
 
-  // set up the gsl ODE machinery
-  auto func = &PolyatomicDamageEnergyFunction::odeRHS;
-  _sys = {func, NULL, _problem_size, this};
-  _ode_driver = gsl_odeiv2_driver_alloc_y_new(&_sys, gsl_odeiv2_step_rk4, 10.0, 1e-2, 1.0e-3);
-
   /*
    * The ENERGY mode has no lower cutoff, because is nu_i(0) = 0. However, this will
    * lead to issues with evaluating the scattering XS. We use Lindhard's initial condition
@@ -53,30 +48,29 @@ PolyatomicDamageEnergyFunction::PolyatomicDamageEnergyFunction(
     _displacement_function[0][i] = _energy_history[0];
 }
 
-int
-PolyatomicDamageEnergyFunction::odeRHS(Real energy, const Real disp[], Real f[], void * params)
+std::vector<Real>
+PolyatomicDamageEnergyFunction::getRHS(Real energy)
 {
-  (void)disp;
-  PolyatomicDamageEnergyFunction * padf = (PolyatomicDamageEnergyFunction *)params;
-  for (unsigned int i = 0; i < padf->nSpecies(); ++i)
+  std::vector<Real> f(_problem_size);
+  for (unsigned int i = 0; i < nSpecies(); ++i)
   {
     f[i] = 0;
-    Real denominator = padf->stoppingPower(i, energy);
+    Real denominator = stoppingPower(i, energy);
 
     // range of energies from the threshold to E
-    for (unsigned int j = 0; j < padf->nSpecies(); ++j)
+    for (unsigned int j = 0; j < nSpecies(); ++j)
     {
-      f[i] += padf->numberFraction(j) * padf->integralTypeI(energy, i, j);
+      f[i] += numberFraction(j) * integralTypeI(energy, i, j);
 
-      if (energy <= padf->taylorSeriesThreshold())
-        denominator += padf->numberFraction(j) *
-                       padf->weightedScatteringIntegral(energy, energy * padf->lambda(i, j), i, j);
+      if (energy <= taylorSeriesThreshold())
+        denominator +=
+            numberFraction(j) * weightedScatteringIntegral(energy, energy * lambda(i, j), i, j);
       else
-        f[i] += padf->numberFraction(j) * padf->integralTypeII(energy, i, j);
+        f[i] += numberFraction(j) * integralTypeII(energy, i, j);
     }
     f[i] /= denominator;
   }
-  return GSL_SUCCESS;
+  return f;
 }
 
 Real
