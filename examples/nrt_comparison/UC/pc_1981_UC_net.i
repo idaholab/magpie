@@ -43,7 +43,6 @@
     Emax = 1e7
     uniform_energy_spacing = 0.1
     uniform_energy_spacing_threshold = 10
-    execute_on = timestep_end
     displacement_file_base = pc_UC_net_case4
     damage_type = NET
   [../]

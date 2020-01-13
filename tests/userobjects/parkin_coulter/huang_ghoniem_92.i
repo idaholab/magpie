@@ -33,7 +33,6 @@
      logarithmic_energy_spacing = 1.1
 
      Emax = 1.0e3
-     execute_on = timestep_end
 
      displacement_file_base = 'huang_ghoniem_n_ij'
   [../]
