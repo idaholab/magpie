@@ -72,23 +72,13 @@ PolyatomicDisplacementFunctionBase::PolyatomicDisplacementFunctionBase(
   else
     _Ecap = Ecap;
 
-  // set up integration rule
-  auto * qp_table = gsl_integration_glfixed_table_alloc(_quad_order);
-  _quad_points.resize(_quad_order);
-  _quad_weights.resize(_quad_order);
-  for (std::size_t j = 0; j < _quad_order; ++j)
-  {
-    double point, weight;
-    gsl_integration_glfixed_point(-1.0, 1.0, j, &point, &weight, qp_table);
-    _quad_points[j] = point;
-    _quad_weights[j] = weight;
-  }
-  gsl_integration_glfixed_table_free(qp_table);
-
   // set up the gsl ODE machinery
   auto func = &PolyatomicDisplacementFunction::gslInterface;
   _sys = {func, NULL, _problem_size, this};
   _ode_driver = gsl_odeiv2_driver_alloc_y_new(&_sys, gsl_odeiv2_step_rk4, 10.0, 1e-2, 1.0e-3);
+
+  // set up integration rule
+  gslQuadRule(_quad_order, _quad_points, _quad_weights);
 }
 
 PolyatomicDisplacementFunctionBase::~PolyatomicDisplacementFunctionBase()
@@ -161,6 +151,25 @@ PolyatomicDisplacementFunctionBase::computeDisplacementFunctionIntegral()
         _displacement_function_integral[e][n] += w * linearInterpolationFromFlatIndex(energy, n);
     }
   }
+}
+
+void
+PolyatomicDisplacementFunctionBase::gslQuadRule(unsigned int quad_order,
+                                                std::vector<Real> & quad_points,
+                                                std::vector<Real> & quad_weights)
+{
+  // set up integration rule
+  auto * qp_table = gsl_integration_glfixed_table_alloc(quad_order);
+  quad_points.resize(quad_order);
+  quad_weights.resize(quad_order);
+  for (std::size_t j = 0; j < quad_order; ++j)
+  {
+    Real point, weight;
+    gsl_integration_glfixed_point(-1.0, 1.0, j, &point, &weight, qp_table);
+    quad_points[j] = point;
+    quad_weights[j] = weight;
+  }
+  gsl_integration_glfixed_table_free(qp_table);
 }
 
 Real

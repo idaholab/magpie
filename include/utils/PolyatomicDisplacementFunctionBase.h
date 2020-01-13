@@ -50,6 +50,11 @@ public:
   /// computes the integral of the displacement function
   void computeDisplacementFunctionIntegral();
 
+  /// obtain quadrature rule from GSL
+  static void gslQuadRule(unsigned int quad_order,
+                          std::vector<Real> & quad_points,
+                          std::vector<Real> & quad_weights);
+
   ///@{ some getters needed for accessing this pointer in odeRHS
   unsigned int nSpecies() const { return _n_species; }
   unsigned int problemSize() const { return _problem_size; }
