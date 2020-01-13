@@ -9,28 +9,25 @@
 
 #pragma once
 
-#include "GeneralUserObject.h"
+#include "ParkinCoulterBase.h"
 
-class PolyatomicDisplacementFunctionBase;
-class PolyatomicDisplacementDerivativeFunction;
+class PolyatomicRecoil;
 
-class PolyatomicRecoil : public GeneralUserObject
+class PolyatomicRecoil : public ParkinCoulterBase
 {
 public:
   static InputParameters validParams();
 
   PolyatomicRecoil(const InputParameters & parameters);
-
-  void execute() override;
-  void initialize() override {}
   void finalize() override;
+  void execute() override;
 
 protected:
-  std::vector<unsigned int> _atomic_numbers;
-  std::vector<Real> _mass_numbers;
-
-  std::unique_ptr<PolyatomicDisplacementFunctionBase> _padf;
-  std::unique_ptr<PolyatomicDisplacementDerivativeFunction> _padf_derivative;
+  virtual void initDamageFunctions() override;
+  virtual std::vector<unsigned int> atomicNumbers() const override;
+  virtual std::vector<Real> massNumbers() const override;
+  virtual std::vector<Real> numberFractions() const override;
+  virtual Real maxEnergy() const override { return getParam<Real>("Emax"); }
 };
 
 #endif // GSL_ENABLED
