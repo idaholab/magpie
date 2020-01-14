@@ -25,7 +25,7 @@ public:
                                            const PolyatomicDisplacementFunction * net_disp,
                                            std::vector<std::vector<Real>> Ecap = {{}});
 
-  static int odeRHS(Real energy, const Real disp[], Real f[], void * params);
+  virtual std::vector<Real> getRHS(Real energy) override;
 
   /// computes term 1 in Parkin-Coulter expression nu_k(T - Eb)
   Real
