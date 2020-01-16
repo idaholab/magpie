@@ -11,41 +11,31 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
-#ifdef GSL_ENABLED
 
 #include <cmath>
 #include <gtest/gtest.h>
 
-// GSL includes
-#include <gsl/gsl_integration.h>
+#include "libmesh/vector_value.h"
 
-// function to integrate
-double
-function(double x, void * params)
+#include "MooseTypes.h"
+#include "RankTwoTensor.h"
+#include "RankThreeTensor.h"
+#include "RankFourTensor.h"
+
+TEST(TensorSizeCheck, vector) { EXPECT_EQ(sizeof(RealVectorValue), LIBMESH_DIM * sizeof(Real)); }
+
+TEST(TensorSizeCheck, rankTwo)
 {
-  double alpha = *(double *)params;
-  double f = std::log(alpha * x) / std::sqrt(x);
-  return f;
+  EXPECT_EQ(sizeof(RankTwoTensor), LIBMESH_DIM * LIBMESH_DIM * sizeof(Real));
 }
 
-TEST(GSLTest, integrationTest)
+TEST(TensorSizeCheck, rankThree)
 {
-  gsl_integration_workspace * w = gsl_integration_workspace_alloc(1000);
-
-  double result, error;
-  double alpha = 1.0;
-
-  gsl_function F;
-  F.function = &function;
-  F.params = &alpha;
-
-  gsl_integration_qags(&F, 0, 1, 0, 1e-7, 1000, w, &result, &error);
-
-  EXPECT_NEAR(result, -4.000000000000085265, 1e-18) << "Integration result is wrong";
-  EXPECT_NEAR(error, 0.000000000000135447, 1e-18) << "Integration error is wrong";
-  EXPECT_EQ(w->size, 8);
-
-  gsl_integration_workspace_free(w);
+  EXPECT_EQ(sizeof(RankThreeTensor), LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM * sizeof(Real));
 }
 
-#endif
+TEST(TensorSizeCheck, rankFour)
+{
+  EXPECT_EQ(sizeof(RankFourTensor),
+            LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM * sizeof(Real));
+}
