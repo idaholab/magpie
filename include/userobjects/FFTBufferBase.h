@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "GeneralUserObject.h"
+#include "ElementUserObject.h"
 
 template <typename T>
 class FFTBufferBase;
@@ -17,7 +17,7 @@ class FFTBufferBase;
  * Generic FFT interleaved data buffer base class
  */
 template <typename T>
-class FFTBufferBase : public GeneralUserObject
+class FFTBufferBase : public ElementUserObject
 {
 public:
   static InputParameters validParams();
@@ -27,14 +27,22 @@ public:
   virtual void initialize() {}
   virtual void execute() {}
   virtual void finalize() {}
+  virtual void threadJoin(const UserObject &) {}
 
-  // transforms
+  ///@{ transforms
   virtual void forward() = 0;
   virtual void backward() = 0;
+  ///@}
 
-  // data access
+  ///@{ data access by index
   const T & operator[](std::size_t i) const { return _buffer[i]; }
   T & operator[](std::size_t i) { return _buffer[i]; }
+  ///@}
+
+  ///@{ data access by location
+  const T & operator()(const Point & p) const;
+  T & operator()(const Point & p);
+  ///@}
 
 protected:
   /// get the addres of the first data element of the ith object in the bufefr
@@ -70,4 +78,10 @@ protected:
 
   /// stride in units of double size
   std::ptrdiff_t _stride;
+
+  /// optional moose sister variabe (to obtain IC from)
+  std::vector<const VariableValue *> _moose_variable;
+
+  /// cache the howMany value
+  const std::size_t _how_many;
 };
