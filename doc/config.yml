@@ -7,9 +7,6 @@ Content:
 
 Renderer:
     type: MooseDocs.base.MaterializeRenderer
-    name: Magpie
-    repo: https://github.com/idaholab/magpie
-    home: http://mooseframework.org/magpie
 
 Extensions:
     MooseDocs.extensions.navigation:
