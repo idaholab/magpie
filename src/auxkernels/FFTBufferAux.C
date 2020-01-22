@@ -29,5 +29,6 @@ FFTBufferAux::FFTBufferAux(const InputParameters & parameters)
 Real
 FFTBufferAux::computeValue()
 {
+  std::cout << 'B';
   return _buffer(_current_elem->centroid());
 }

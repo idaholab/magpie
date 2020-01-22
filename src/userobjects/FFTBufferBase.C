@@ -111,8 +111,8 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
   _buffer.resize(_buffer_size);
 
   // compute stride and start pointer
-  auto istart = start(0);
-  std::ptrdiff_t istride = reinterpret_cast<char *>(start(1)) - reinterpret_cast<char *>(istart);
+  _start = reinterpret_cast<Real *>(start(0));
+  std::ptrdiff_t istride = reinterpret_cast<char *>(start(1)) - reinterpret_cast<char *>(_start);
   if (istride % sizeof(Real) != 0)
     mooseError("Invalid data alignment");
   istride /= sizeof(Real);
@@ -122,6 +122,7 @@ template <>
 void
 FFTBufferBase<Real>::execute()
 {
+  std::cout << 'A';
   // get  grid / buffer location
   Point centroid = _current_elem->centroid();
   std::size_t a = 0;

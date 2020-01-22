@@ -101,7 +101,7 @@ public:
    * @param subdomain The subdomain id in question
    * @return true if active on subdomain, false otherwise
    */
-  virtual bool activeOnSubdomain(SubdomainID subdomain) const { return true; }
+  virtual bool activeOnSubdomain(SubdomainID /*subdomain*/) const { return true; }
 
   /**
    * Prepare the initial condition
@@ -140,12 +140,15 @@ public:
    */
   virtual void computeNodalValues() {}
 
-  virtual void getDofIndices(const Elem * elem, std::vector<dof_id_type> & dof_indices) const {}
+  virtual void getDofIndices(const Elem * /*elem*/,
+                             std::vector<dof_id_type> & /*dof_indices*/) const
+  {
+  }
 
   virtual unsigned int numberOfDofsNeighbor() { return 0; }
 
-  virtual void insert(NumericVector<Number> & residual) {}
-  virtual void add(NumericVector<Number> & residual) {}
+  virtual void insert(NumericVector<Number> & /*residual*/) {}
+  virtual void add(NumericVector<Number> & /*residual*/) {}
 
 protected:
   std::vector<dof_id_type> _no_dofs;
