@@ -10,6 +10,7 @@
 #pragma once
 
 #include "ElementUserObject.h"
+#include "PerfGraphInterface.h"
 #include "fftw3.h"
 
 #include <memory>

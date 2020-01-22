@@ -13,6 +13,15 @@
 template <typename T>
 class FFTBufferBase;
 
+#define usingFFTBufferBaseMembers                                                                  \
+  using ElementUserObject::_perf_graph;                                                            \
+  using FFTBufferBase<T>::_dim;                                                                    \
+  using FFTBufferBase<T>::_grid;                                                                   \
+  using FFTBufferBase<T>::_buffer;                                                                 \
+  using FFTBufferBase<T>::_start;                                                                  \
+  using FFTBufferBase<T>::_stride;                                                                 \
+  using FFTBufferBase<T>::_how_many
+
 /**
  * Generic FFT interleaved data buffer base class
  */

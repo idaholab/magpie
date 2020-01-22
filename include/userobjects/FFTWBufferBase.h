@@ -10,6 +10,7 @@
 #pragma once
 
 #include "FFTBufferBase.h"
+#include "PerfGraphInterface.h"
 
 #include "fftw3.h"
 
@@ -31,9 +32,17 @@ public:
   void backward() override;
 
 protected:
-  /// FFTW plans
+  ///@{ FFTW plans
   fftw_plan _forward_plan;
   fftw_plan _backward_plan;
+  ///@}
+
+  ///@{ timers
+  PerfID _perf_plan;
+  PerfID _perf_fft;
+  ///@}
+
+  usingFFTBufferBaseMembers;
 };
 
 #endif

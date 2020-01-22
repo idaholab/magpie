@@ -16,9 +16,17 @@
 
 template <typename T>
 FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
-  : FFTBufferBase<T>(parameters), _forward_plan(nullptr), _backward_plan(nullptr)
+  : FFTBufferBase<T>(parameters),
+    _perf_plan(this->registerTimedSection("fftw_plan_r2r", 2)),
+    _perf_fft(this->registerTimedSection("fftw_execute", 2))
 {
   // create plans
+  std::vector<fftw_r2r_kind> kind(_dim, FFTW_R2HC);
+  {
+    TIME_SECTION(_perf_plan);
+    _forward_plan = fftw_plan_r2r(_dim, _grid.data(), _start, _start, kind.data(), FFTW_ESTIMATE);
+    _backward_plan = fftw_plan_r2r(_dim, _grid.data(), _start, _start, kind.data(), FFTW_ESTIMATE);
+  }
 }
 
 template <typename T>
@@ -33,8 +41,13 @@ template <typename T>
 void
 FFTWBufferBase<T>::forward()
 {
+  mooseInfo("FFTWBufferBase<T>::forward()");
+
   // execute plan
-  fftw_execute(_forward_plan);
+  {
+    TIME_SECTION(_perf_fft);
+    fftw_execute(_forward_plan);
+  }
 }
 
 template <typename T>
@@ -42,7 +55,10 @@ void
 FFTWBufferBase<T>::backward()
 {
   // execute plan
-  fftw_execute(_backward_plan);
+  {
+    TIME_SECTION(_perf_fft);
+    fftw_execute(_backward_plan);
+  }
 }
 
 // explicit instantiation and registration
