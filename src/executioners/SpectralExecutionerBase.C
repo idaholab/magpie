@@ -56,12 +56,22 @@ SpectralExecutionerBase::execute()
   _fe_problem.outputStep(EXEC_INITIAL);
   _fe_problem.advanceState();
 
-  mooseInfo("SpectralExecutionerBase::execute()");
-
   auto & c = getFFTBuffer<Real>("c");
   c.forward();
 
+  auto & R = getFFTBuffer<RealVectorValue>("R");
+  R.forward();
+
   _time_step = 1;
+  _fe_problem.execute(EXEC_FINAL);
+  _time = _time_step;
+  _fe_problem.outputStep(EXEC_FINAL);
+  _fe_problem.advanceState();
+
+  c.backward();
+  R.backward();
+
+  _time_step = 2;
   _fe_problem.execute(EXEC_FINAL);
   _time = _time_step;
   _fe_problem.outputStep(EXEC_FINAL);

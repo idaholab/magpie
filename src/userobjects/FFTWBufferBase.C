@@ -21,11 +21,38 @@ FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
     _perf_fft(this->registerTimedSection("fftw_execute", 2))
 {
   // create plans
-  std::vector<fftw_r2r_kind> kind(_dim, FFTW_R2HC);
   {
     TIME_SECTION(_perf_plan);
-    _forward_plan = fftw_plan_r2r(_dim, _grid.data(), _start, _start, kind.data(), FFTW_ESTIMATE);
-    _backward_plan = fftw_plan_r2r(_dim, _grid.data(), _start, _start, kind.data(), FFTW_ESTIMATE);
+
+    std::vector<fftw_r2r_kind> forward_kind(_dim, FFTW_R2HC);
+    _forward_plan = fftw_plan_many_r2r(_dim,
+                                       _grid.data(),
+                                       _how_many,
+                                       _start,
+                                       _grid.data(),
+                                       _stride,
+                                       1,
+                                       _start,
+                                       _grid.data(),
+                                       _stride,
+                                       1,
+                                       forward_kind.data(),
+                                       FFTW_ESTIMATE);
+
+    std::vector<fftw_r2r_kind> backward_kind(_dim, FFTW_HC2R);
+    _backward_plan = fftw_plan_many_r2r(_dim,
+                                        _grid.data(),
+                                        _how_many,
+                                        _start,
+                                        _grid.data(),
+                                        _stride,
+                                        1,
+                                        _start,
+                                        _grid.data(),
+                                        _stride,
+                                        1,
+                                        backward_kind.data(),
+                                        FFTW_ESTIMATE);
   }
 }
 
@@ -41,8 +68,6 @@ template <typename T>
 void
 FFTWBufferBase<T>::forward()
 {
-  mooseInfo("FFTWBufferBase<T>::forward()");
-
   // execute plan
   {
     TIME_SECTION(_perf_fft);
