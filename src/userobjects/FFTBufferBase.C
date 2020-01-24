@@ -93,7 +93,7 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
       if (var->isNodal())
         paramError("moose_variable", "Variable must be elemental.");
 
-      _moose_variable[i] = &coupledValue("moose_variable");
+      _moose_variable[i] = &coupledValue("moose_variable", i);
     }
   }
 
@@ -112,17 +112,16 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
 
   // compute stride and start pointer
   _start = reinterpret_cast<Real *>(start(0));
-  std::ptrdiff_t istride = reinterpret_cast<char *>(start(1)) - reinterpret_cast<char *>(_start);
-  if (istride % sizeof(Real) != 0)
+  _stride = reinterpret_cast<char *>(start(1)) - reinterpret_cast<char *>(_start);
+  if (_stride % sizeof(Real) != 0)
     mooseError("Invalid data alignment");
-  istride /= sizeof(Real);
+  _stride /= sizeof(Real);
 }
 
-template <>
+template <typename T>
 void
-FFTBufferBase<Real>::execute()
+FFTBufferBase<T>::execute()
 {
-  std::cout << 'A';
   // get  grid / buffer location
   Point centroid = _current_elem->centroid();
   std::size_t a = 0;

@@ -34,7 +34,7 @@ public:
   FFTBufferBase(const InputParameters & parameters);
 
   virtual void initialize() {}
-  virtual void execute() {}
+  virtual void execute();
   virtual void finalize() {}
   virtual void threadJoin(const UserObject &) {}
 
