@@ -33,8 +33,12 @@ public:
   virtual bool lastSolveConverged() const override { return true; }
 
 protected:
+  /// obtain a non-const reference to an FFT buffer
   template <typename T>
   FFTBufferBase<T> & getFFTBuffer(const std::string & name);
+
+  /// multiply a scalar buffer by its corresponding k-vector field int a vector buffer
+  void kVectorMultiply(const FFTBufferBase<Real> & in, FFTBufferBase<RealVectorValue> & out) const;
 
   Real _system_time;
   int & _time_step;

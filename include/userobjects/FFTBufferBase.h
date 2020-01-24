@@ -53,6 +53,31 @@ public:
   T & operator()(const Point & p);
   ///@}
 
+  ///@{ convenience math operators
+  FFTBufferBase<T> & operator+=(FFTBufferBase<T> const & rhs);
+  FFTBufferBase<T> & operator-=(FFTBufferBase<T> const & rhs);
+  FFTBufferBase<T> & operator*=(FFTBufferBase<Real> const & rhs);
+  FFTBufferBase<T> & operator/=(FFTBufferBase<Real> const & rhs);
+  FFTBufferBase<T> & operator*=(Real rhs);
+  FFTBufferBase<T> & operator/=(Real rhs);
+  ///@}
+
+  /// return the number of grid cells along each dimension without padding
+  const std::vector<int> & grid() const { return _grid; }
+
+  /// return the number of proper grid cells without padding
+  const std::size_t & size() const { return _grid_size; }
+
+  /// return the buffer dimension
+  const unsigned int & dim() const { return _dim; }
+
+  /// return the buffer dimension
+  const std::vector<Real> & kTable(unsigned int d) const
+  {
+    mooseAssert(d < _dim, "invalid kTable component");
+    return _k_table[d];
+  }
+
 protected:
   /// get the addres of the first data element of the ith object in the bufefr
   Real * start(std::size_t i);
@@ -77,9 +102,9 @@ protected:
   /// FFT grid cell volume
   Real _cell_volume;
 
-  ///@{ FFT data buffer
+  ///@{ FFT data buffer and unpadded number of grid cells
   std::vector<T> _buffer;
-  std::size_t _buffer_size;
+  std::size_t _grid_size;
   ///@}
 
   /// pointer to the start of the data
@@ -90,6 +115,9 @@ protected:
 
   /// optional moose sister variabe (to obtain IC from)
   std::vector<const VariableValue *> _moose_variable;
+
+  /// pretabulated k-vector components
+  std::vector<std::vector<Real>> _k_table;
 
   /// cache the howMany value
   const std::size_t _how_many;
