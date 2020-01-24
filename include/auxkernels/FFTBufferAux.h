@@ -28,5 +28,17 @@ public:
 protected:
   virtual Real computeValue() override;
 
-  const FFTBufferBase<Real> & _buffer;
+  /// buffer reference as generic parent class
+  const UserObject & _buffer;
+
+  ///@{ specific buffer type, only one of those will be non-null
+  const FFTBufferBase<Real> * _real_buffer;
+  const FFTBufferBase<RealVectorValue> * _realvectorvalue_buffer;
+  const FFTBufferBase<RankTwoTensor> * _ranktwotensor_buffer;
+  const FFTBufferBase<RankThreeTensor> * _rankthreetensor_buffer;
+  const FFTBufferBase<RankFourTensor> * _rankfourtensor_buffer;
+  ///@}
+
+  /// component to access
+  const std::vector<unsigned int> _component;
 };
