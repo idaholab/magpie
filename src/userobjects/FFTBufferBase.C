@@ -44,8 +44,9 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
     _cell_volume(1.0),
-    _buffer_size(1),
+    _grid_size(1),
     _moose_variable(coupledComponents("moose_variable")),
+    _k_table(_dim),
     _how_many(howMany())
 {
   // make sure Real is double
@@ -98,6 +99,7 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
   }
 
   // get mesh extents and calculate space required and estimate spectrum bins
+  std::size_t buffer_size = 1;
   for (unsigned int i = 0; i < _dim; ++i)
   {
     _min_corner(i) = _mesh.getMinInDimension(i);
@@ -105,10 +107,18 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     _box_size(i) = _max_corner(i) - _min_corner(i);
     _cell_volume *= _box_size(i) / _grid[i];
 
+    // unpadded size (number of physical grid cells)
+    _grid_size *= _grid[i];
+
     // last direction needs to be padded for in-place transforms
-    _buffer_size *= (i == _dim - 1) ? ((_grid[i] >> 1) + 1) << 1 : _grid[i];
+    buffer_size *= (i == _dim - 1) ? ((_grid[i] >> 1) + 1) << 1 : _grid[i];
+
+    // precompute kvector components for current direction
+    _k_table[i].resize(_grid[i]);
+    for (int j = 0; j < _grid[i]; ++j)
+      _k_table[i][j] = (j * 2 > _grid[i] ? Real(_grid[i] - j) : Real(j)) / _box_size(i);
   }
-  _buffer.resize(_buffer_size);
+  _buffer.resize(buffer_size);
 
   // compute stride and start pointer
   _start = reinterpret_cast<Real *>(start(0));
@@ -151,6 +161,61 @@ FFTBufferBase<T>::operator()(const Point & p)
   for (unsigned int i = 0; i < _dim; ++i)
     a = a * _grid[i] + std::floor(((p(i) - _min_corner(i)) * _grid[i]) / _box_size(i));
   return _buffer[a];
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator+=(FFTBufferBase<T> const & rhs)
+{
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] += rhs[i];
+  return *this;
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator-=(FFTBufferBase<T> const & rhs)
+{
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] -= rhs[i];
+  return *this;
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator*=(FFTBufferBase<Real> const & rhs)
+{
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] *= rhs[i];
+  return *this;
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator/=(FFTBufferBase<Real> const & rhs)
+{
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] /= rhs[i];
+  return *this;
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator*=(Real rhs)
+{
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] *= rhs;
+  return *this;
+}
+
+template <typename T>
+FFTBufferBase<T> &
+FFTBufferBase<T>::operator/=(Real rhs)
+{
+  const Real reciprocal = 1 / rhs;
+  for (std::size_t i = 0; i < _grid_size; ++i)
+    _buffer[i] *= reciprocal;
+  return *this;
 }
 
 template <>
