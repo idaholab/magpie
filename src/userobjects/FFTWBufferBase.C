@@ -24,35 +24,33 @@ FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
   {
     TIME_SECTION(_perf_plan);
 
-    std::vector<fftw_r2r_kind> forward_kind(_dim, FFTW_R2HC);
-    _forward_plan = fftw_plan_many_r2r(_dim,
-                                       _grid.data(),
-                                       _how_many,
-                                       _start,
-                                       _grid.data(),
-                                       _stride,
-                                       1,
-                                       _start,
-                                       _grid.data(),
-                                       _stride,
-                                       1,
-                                       forward_kind.data(),
-                                       FFTW_ESTIMATE);
+    _forward_plan =
+        fftw_plan_many_dft_r2c(_dim,
+                               _grid.data(),
+                               _how_many,
+                               _real_space_data_start,
+                               nullptr,
+                               _real_space_data_stride,
+                               1,
+                               reinterpret_cast<double(*)[2]>(_reciprocal_space_data_start),
+                               nullptr,
+                               _reciprocal_space_data_stride,
+                               1,
+                               FFTW_ESTIMATE);
 
-    std::vector<fftw_r2r_kind> backward_kind(_dim, FFTW_HC2R);
-    _backward_plan = fftw_plan_many_r2r(_dim,
-                                        _grid.data(),
-                                        _how_many,
-                                        _start,
-                                        _grid.data(),
-                                        _stride,
-                                        1,
-                                        _start,
-                                        _grid.data(),
-                                        _stride,
-                                        1,
-                                        backward_kind.data(),
-                                        FFTW_ESTIMATE);
+    _backward_plan =
+        fftw_plan_many_dft_c2r(_dim,
+                               _grid.data(),
+                               _how_many,
+                               reinterpret_cast<double(*)[2]>(_reciprocal_space_data_start),
+                               nullptr,
+                               _reciprocal_space_data_stride,
+                               1,
+                               _real_space_data_start,
+                               nullptr,
+                               _real_space_data_stride,
+                               1,
+                               FFTW_ESTIMATE);
   }
 }
 

@@ -57,16 +57,22 @@ SpectralExecutionerBase::execute()
   _fe_problem.advanceState();
 
   // back and forth test
-  auto & c = getFFTBuffer<Real>("c");
-  c.forward();
-  auto & R = getFFTBuffer<RealVectorValue>("R");
-  R.forward();
+  auto & c_buffer = getFFTBuffer<Real>("c");
+  auto c = c_buffer.realSpace();
+  c_buffer.forward();
+
+  auto & R_buffer = getFFTBuffer<RealVectorValue>("R");
+  auto R = R_buffer.realSpace();
+  R_buffer.forward();
 
   // gradient test
-  auto & u = getFFTBuffer<Real>("u");
-  u.forward();
-  auto & grad_u = getFFTBuffer<RealVectorValue>("grad_u");
-  kVectorMultiply(u, grad_u);
+  auto & u_buffer = getFFTBuffer<Real>("u");
+  auto u = u_buffer.realSpace();
+  u_buffer.forward();
+
+  auto & grad_u_buffer = getFFTBuffer<RealVectorValue>("grad_u");
+  auto grad_u = grad_u_buffer.realSpace();
+  kVectorMultiply(u_buffer, grad_u_buffer);
 
   _time_step = 1;
   _fe_problem.execute(EXEC_FINAL);
@@ -75,14 +81,15 @@ SpectralExecutionerBase::execute()
   _fe_problem.advanceState();
 
   // back and forth test
-  c.backward();
-  R.backward();
+  c_buffer.backward();
+  R_buffer.backward();
   R /= 10000.0;
   c /= 10000.0;
 
   // gradient test
-  u.backward();
-  grad_u.backward();
+  u_buffer.backward();
+  grad_u_buffer.backward();
+
   u /= 10000.0;
   grad_u /= 100.0;
 
@@ -93,14 +100,17 @@ SpectralExecutionerBase::execute()
 }
 
 void
-SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in,
-                                         FFTBufferBase<RealVectorValue> & out) const
+SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
+                                         FFTBufferBase<RealVectorValue> & out_buffer) const
 {
-  mooseAssert(in.size() == out.size(), "Buffer sizes must be equal");
-  mooseAssert(in.dim() == out.dim(), "Buffer dimensions must be equal");
+  mooseAssert(in_buffer.dim() == out_buffer.dim(), "Buffer dimensions must be equal");
 
-  const auto & grid = in.grid();
-  switch (in.dim())
+  const FFTData<Complex> & in = in_buffer.reciprocalSpace();
+  FFTData<ComplexVectorValue> & out = out_buffer.reciprocalSpace();
+  mooseAssert(in.size() == out.size(), "Buffer sizes must be equal");
+
+  const auto & grid = in_buffer.grid();
+  switch (in_buffer.dim())
   {
     case 1:
     {
@@ -108,8 +118,6 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in,
       for (int i = 0; i < ni; ++i)
       {
         out[i](0) = in[i] * i;
-        out[i](1) = 0.0;
-        out[i](2) = 0.0;
       }
       return;
     }
@@ -124,7 +132,6 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in,
         {
           out[index](0) = in[index] * i;
           out[index](1) = in[index] * j;
-          out[index](2) = 0.0;
           index++;
         }
       return;

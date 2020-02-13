@@ -44,15 +44,16 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
     _cell_volume(1.0),
-    _grid_size(1),
     _moose_variable(coupledComponents("moose_variable")),
-    _k_table(_dim),
-    _how_many(howMany())
+    _how_many(_real_space_data.howMany())
 {
   // make sure Real is double
   static_assert(
       std::is_same<Real, double>::value,
       "Libmesh must be build with double precision floating point numbers as the 'Real' type.");
+
+  static_assert(sizeof(std::complex<Real>) == 2 * sizeof(Real),
+                "Complex numbers based on 'Real' should have the size of two 'Real' types.");
 
   // FFT needs a regular grid of values to operate on
   if (isParamValid("grid"))
@@ -99,7 +100,8 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
   }
 
   // get mesh extents and calculate space required and estimate spectrum bins
-  std::size_t buffer_size = 1;
+  std::size_t real_space_buffer_size = 1;
+  std::size_t reciprocal_space_buffer_size = 1;
   for (unsigned int i = 0; i < _dim; ++i)
   {
     _min_corner(i) = _mesh.getMinInDimension(i);
@@ -107,25 +109,35 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     _box_size(i) = _max_corner(i) - _min_corner(i);
     _cell_volume *= _box_size(i) / _grid[i];
 
-    // unpadded size (number of physical grid cells)
-    _grid_size *= _grid[i];
-
-    // last direction needs to be padded for in-place transforms
-    buffer_size *= (i == _dim - 1) ? ((_grid[i] >> 1) + 1) << 1 : _grid[i];
+    // unumber of physical grid cells
+    real_space_buffer_size *= _grid[i];
+    // last direction needs to be roughly cut in half
+    reciprocal_space_buffer_size *= (i == _dim - 1) ? ((_grid[i] >> 1) + 1) : _grid[i];
 
     // precompute kvector components for current direction
     _k_table[i].resize(_grid[i]);
     for (int j = 0; j < _grid[i]; ++j)
       _k_table[i][j] = (j * 2 > _grid[i] ? Real(_grid[i] - j) : Real(j)) / _box_size(i);
   }
-  _buffer.resize(buffer_size);
+  _real_space_data.resize(real_space_buffer_size);
+  _reciprocal_space_data.resize(reciprocal_space_buffer_size);
 
   // compute stride and start pointer
-  _start = reinterpret_cast<Real *>(start(0));
-  _stride = reinterpret_cast<char *>(start(1)) - reinterpret_cast<char *>(_start);
-  if (_stride % sizeof(Real) != 0)
+  _real_space_data_start = reinterpret_cast<Real *>(_real_space_data.start(0));
+  _reciprocal_space_data_start = reinterpret_cast<Complex *>(_reciprocal_space_data.start(0));
+
+  _real_space_data_stride = reinterpret_cast<char *>(_real_space_data.start(1)) -
+                            reinterpret_cast<char *>(_real_space_data_start);
+  _reciprocal_space_data_stride = reinterpret_cast<char *>(_reciprocal_space_data.start(1)) -
+                                  reinterpret_cast<char *>(_reciprocal_space_data_start);
+
+  if (_real_space_data_stride % sizeof(Real) != 0)
     mooseError("Invalid data alignment");
-  _stride /= sizeof(Real);
+  _real_space_data_stride /= sizeof(Real);
+
+  if (_reciprocal_space_data_stride % sizeof(Complex) != 0)
+    mooseError("Invalid data alignment");
+  _reciprocal_space_data_stride /= sizeof(Complex);
 }
 
 template <typename T>
@@ -140,7 +152,7 @@ FFTBufferBase<T>::execute()
 
   // copy solution value from the variables into the buffer
   for (unsigned i = 0; i < _moose_variable.size(); ++i)
-    _start[a * _how_many + i] = (*_moose_variable[i])[0];
+    _real_space_data_start[a * _how_many + i] = (*_moose_variable[i])[0];
 }
 
 template <typename T>
@@ -150,7 +162,7 @@ FFTBufferBase<T>::operator()(const Point & p) const
   std::size_t a = 0;
   for (unsigned int i = 0; i < _dim; ++i)
     a = a * _grid[i] + std::floor(((p(i) - _min_corner(i)) * _grid[i]) / _box_size(i));
-  return _buffer[a];
+  return _real_space_data[a];
 }
 
 template <typename T>
@@ -160,135 +172,10 @@ FFTBufferBase<T>::operator()(const Point & p)
   std::size_t a = 0;
   for (unsigned int i = 0; i < _dim; ++i)
     a = a * _grid[i] + std::floor(((p(i) - _min_corner(i)) * _grid[i]) / _box_size(i));
-  return _buffer[a];
+  return _real_space_data[a];
 }
 
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator+=(FFTBufferBase<T> const & rhs)
-{
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] += rhs[i];
-  return *this;
-}
-
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator-=(FFTBufferBase<T> const & rhs)
-{
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] -= rhs[i];
-  return *this;
-}
-
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator*=(FFTBufferBase<Real> const & rhs)
-{
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] *= rhs[i];
-  return *this;
-}
-
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator/=(FFTBufferBase<Real> const & rhs)
-{
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] /= rhs[i];
-  return *this;
-}
-
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator*=(Real rhs)
-{
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] *= rhs;
-  return *this;
-}
-
-template <typename T>
-FFTBufferBase<T> &
-FFTBufferBase<T>::operator/=(Real rhs)
-{
-  const Real reciprocal = 1 / rhs;
-  for (std::size_t i = 0; i < _grid_size; ++i)
-    _buffer[i] *= reciprocal;
-  return *this;
-}
-
-template <>
-Real *
-FFTBufferBase<Real>::start(std::size_t i)
-{
-  return &_buffer[i];
-}
-
-template <>
-Real *
-FFTBufferBase<RealVectorValue>::start(std::size_t i)
-{
-  return &_buffer[i](0);
-}
-
-template <>
-Real *
-FFTBufferBase<RankTwoTensor>::start(std::size_t i)
-{
-  return &_buffer[i](0, 0);
-}
-
-template <>
-Real *
-FFTBufferBase<RankThreeTensor>::start(std::size_t i)
-{
-  return &_buffer[i](0, 0, 0);
-}
-
-template <>
-Real *
-FFTBufferBase<RankFourTensor>::start(std::size_t i)
-{
-  return &_buffer[i](0, 0, 0, 0);
-}
-
-template <>
-std::size_t
-FFTBufferBase<Real>::howMany() const
-{
-  return 1;
-}
-
-template <>
-std::size_t
-FFTBufferBase<RealVectorValue>::howMany() const
-{
-  return LIBMESH_DIM;
-}
-
-template <>
-std::size_t
-FFTBufferBase<RankTwoTensor>::howMany() const
-{
-  return LIBMESH_DIM * LIBMESH_DIM;
-}
-
-template <>
-std::size_t
-FFTBufferBase<RankThreeTensor>::howMany() const
-{
-  return LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM;
-}
-
-template <>
-std::size_t
-FFTBufferBase<RankFourTensor>::howMany() const
-{
-  return LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM * LIBMESH_DIM;
-}
-
-// explicit instantiation
+// explicit instantiations
 template class FFTBufferBase<Real>;
 template class FFTBufferBase<RealVectorValue>;
 template class FFTBufferBase<RankTwoTensor>;
