@@ -8,7 +8,9 @@
 
 #pragma once
 
+#include "ComplexTypes.h"
 #include "ElementUserObject.h"
+#include "FFTData.h"
 
 template <typename T>
 class FFTBufferBase;
@@ -16,10 +18,14 @@ class FFTBufferBase;
 #define usingFFTBufferBaseMembers                                                                  \
   using ElementUserObject::_perf_graph;                                                            \
   using FFTBufferBase<T>::_dim;                                                                    \
-  using FFTBufferBase<T>::_grid;                                                                   \
-  using FFTBufferBase<T>::_buffer;                                                                 \
-  using FFTBufferBase<T>::_start;                                                                  \
-  using FFTBufferBase<T>::_stride;                                                                 \
+  using FFTBufferBase<T>::_real_space_grid;                                                        \
+  using FFTBufferBase<T>::_reciprocal_space_grid;                                                  \
+  using FFTBufferBase<T>::_real_space_data;                                                        \
+  using FFTBufferBase<T>::_reciprocal_space_data;                                                  \
+  using FFTBufferBase<T>::_real_space_data_start;                                                  \
+  using FFTBufferBase<T>::_reciprocal_space_data_start;                                            \
+  using FFTBufferBase<T>::_real_space_data_stride;                                                 \
+  using FFTBufferBase<T>::_reciprocal_space_data_stride;                                           \
   using FFTBufferBase<T>::_how_many
 
 /**
@@ -28,6 +34,8 @@ class FFTBufferBase;
 template <typename T>
 class FFTBufferBase : public ElementUserObject
 {
+  using ComplexT = typename ComplexType<T>::type;
+
 public:
   static InputParameters validParams();
 
@@ -43,30 +51,19 @@ public:
   virtual void backward() = 0;
   ///@}
 
-  ///@{ data access by index
-  const T & operator[](std::size_t i) const { return _buffer[i]; }
-  T & operator[](std::size_t i) { return _buffer[i]; }
-  ///@}
+  ///@{ buffer access
+  FFTData<T> & realSpace() { return _real_space_data; }
+  FFTData<ComplexT> & reciprocalSpace() { return _reciprocal_space_data; }
+  const FFTData<T> & realSpace() const { return _real_space_data; }
+  const FFTData<ComplexT> & reciprocalSpace() const { return _reciprocal_space_data; }
 
-  ///@{ data access by location
+  ///@{ real space data access by location
   const T & operator()(const Point & p) const;
   T & operator()(const Point & p);
   ///@}
 
-  ///@{ convenience math operators
-  FFTBufferBase<T> & operator+=(FFTBufferBase<T> const & rhs);
-  FFTBufferBase<T> & operator-=(FFTBufferBase<T> const & rhs);
-  FFTBufferBase<T> & operator*=(FFTBufferBase<Real> const & rhs);
-  FFTBufferBase<T> & operator/=(FFTBufferBase<Real> const & rhs);
-  FFTBufferBase<T> & operator*=(Real rhs);
-  FFTBufferBase<T> & operator/=(Real rhs);
-  ///@}
-
   /// return the number of grid cells along each dimension without padding
   const std::vector<int> & grid() const { return _grid; }
-
-  /// return the number of proper grid cells without padding
-  const std::size_t & size() const { return _grid_size; }
 
   /// return the buffer dimension
   const unsigned int & dim() const { return _dim; }
@@ -79,12 +76,6 @@ public:
   }
 
 protected:
-  /// get the addres of the first data element of the ith object in the bufefr
-  Real * start(std::size_t i);
-
-  /// get the number of transforms required for type T
-  std::size_t howMany() const;
-
   ///@{ mesh data
   MooseMesh & _mesh;
   unsigned int _dim;
@@ -103,15 +94,17 @@ protected:
   Real _cell_volume;
 
   ///@{ FFT data buffer and unpadded number of grid cells
-  std::vector<T> _buffer;
-  std::size_t _grid_size;
+  FFTData<T> _real_space_data;
+  FFTData<ComplexT> _reciprocal_space_data;
   ///@}
 
   /// pointer to the start of the data
-  Real * _start;
+  Real * _real_space_data_start;
+  Complex * _reciprocal_space_data_start;
 
   /// stride in units of double size
-  std::ptrdiff_t _stride;
+  std::ptrdiff_t _real_space_data_stride;
+  std::ptrdiff_t _reciprocal_space_data_stride;
 
   /// optional moose sister variabe (to obtain IC from)
   std::vector<const VariableValue *> _moose_variable;
