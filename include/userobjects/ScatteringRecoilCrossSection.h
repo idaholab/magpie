@@ -11,14 +11,11 @@
 
 #include "GeneralUserObject.h"
 
-class ScatteringRecoilCrossSection;
-
-template <>
-InputParameters validParams<ScatteringRecoilCrossSection>();
-
 class ScatteringRecoilCrossSection : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   ScatteringRecoilCrossSection(const InputParameters & parameters);
 
   virtual void initialize() override;

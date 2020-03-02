@@ -12,11 +12,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAEnergyHistogram);
 
-template <>
 InputParameters
-validParams<MyTRIMPKAEnergyHistogram>()
+MyTRIMPKAEnergyHistogram::validParams()
 {
-  InputParameters params = validParams<GeneralVectorPostprocessor>();
+  InputParameters params = GeneralVectorPostprocessor::validParams();
   params.addClassDescription(
       "Generate an energy histogram for the primary knock-on atom (PKA) list");
   params.addRequiredParam<UserObjectName>(

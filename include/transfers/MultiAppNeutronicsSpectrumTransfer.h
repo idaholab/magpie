@@ -10,17 +10,14 @@
 
 #include "MultiAppTransfer.h"
 
-class MultiAppNeutronicsSpectrumTransfer;
-
-template <>
-InputParameters validParams<MultiAppNeutronicsSpectrumTransfer>();
-
 /**
  * Transfer a neutronics probability density to a neutronics based pka generator.
  */
 class MultiAppNeutronicsSpectrumTransfer : public MultiAppTransfer
 {
 public:
+  static InputParameters validParams();
+
   MultiAppNeutronicsSpectrumTransfer(const InputParameters & parameters);
 
   virtual void execute();
@@ -29,4 +26,3 @@ protected:
   UserObjectName _pka_generator_name;
   UserObjectName _neutronics_pdf_name;
 };
-

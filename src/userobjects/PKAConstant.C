@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", PKAConstant);
 
-template <>
 InputParameters
-validParams<PKAConstant>()
+PKAConstant::validParams()
 {
-  InputParameters params = validParams<PKAEmpiricalBase>();
+  InputParameters params = PKAEmpiricalBase::validParams();
   params.addClassDescription("PKAs with constant mass, charge, energy, and rate");
   params.addParam<Real>(
       "pka_rate",

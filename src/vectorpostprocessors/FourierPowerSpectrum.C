@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", FourierPowerSpectrum);
 
-template <>
 InputParameters
-validParams<FourierPowerSpectrum>()
+FourierPowerSpectrum::validParams()
 {
-  InputParameters params = validParams<GeneralVectorPostprocessor>();
+  InputParameters params = GeneralVectorPostprocessor::validParams();
   params.addClassDescription("Compute the power spectrum of a given fourier transform. The "
                              "resulting frequency is in reciprocal length units.");
   params.addRequiredParam<UserObjectName>(

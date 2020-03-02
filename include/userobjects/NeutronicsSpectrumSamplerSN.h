@@ -13,12 +13,7 @@
 #include "NeutronicsSpectrumSamplerBase.h"
 #include "AQData.h"
 
-// Forward Declarations
-class NeutronicsSpectrumSamplerSN;
 class ElasticRecoil;
-
-template <>
-InputParameters validParams<NeutronicsSpectrumSamplerSN>();
 
 /**
  * Computes PDFs from neutronics data that is used to sample PKAs due to
@@ -29,6 +24,8 @@ InputParameters validParams<NeutronicsSpectrumSamplerSN>();
 class NeutronicsSpectrumSamplerSN : public NeutronicsSpectrumSamplerBase
 {
 public:
+  static InputParameters validParams();
+
   NeutronicsSpectrumSamplerSN(const InputParameters & parameters);
 
   virtual Real totalRecoilRate(unsigned int point_id,

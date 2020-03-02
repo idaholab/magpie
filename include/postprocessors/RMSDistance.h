@@ -10,19 +10,16 @@
 
 #include "ElementIntegralVariablePostprocessor.h"
 
-// Forward Declarations
-class RMSDistance;
-
-template <>
-InputParameters validParams<RMSDistance>();
-
 /**
  * This postprocessor computes The RMS distance of a variable to a given point
  */
 class RMSDistance : public ElementIntegralVariablePostprocessor
 {
 public:
+  static InputParameters validParams();
+
   RMSDistance(const InputParameters & parameters);
+
   virtual void initialize() override;
   virtual Real getValue() override;
   virtual void threadJoin(const UserObject & y) override;

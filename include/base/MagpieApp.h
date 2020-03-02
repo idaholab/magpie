@@ -10,16 +10,12 @@
 
 #include "MooseApp.h"
 
-class MagpieApp;
-
-template <>
-InputParameters validParams<MagpieApp>();
-
 class MagpieApp : public MooseApp
 {
 public:
+  static InputParameters validParams();
+
   MagpieApp(const InputParameters & parameters);
-  virtual ~MagpieApp();
 
   static void registerApps();
   static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);

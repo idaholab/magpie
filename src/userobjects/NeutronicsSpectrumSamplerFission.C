@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", NeutronicsSpectrumSamplerFission);
 
-template <>
 InputParameters
-validParams<NeutronicsSpectrumSamplerFission>()
+NeutronicsSpectrumSamplerFission::validParams()
 {
-  InputParameters params = validParams<NeutronicsSpectrumSamplerBase>();
+  InputParameters params = NeutronicsSpectrumSamplerBase::validParams();
   params.suppressParameter<unsigned int>("L");
   params.set<unsigned int>("L") = 0;
   params.addRequiredCoupledVar("scalar_fluxes", "Scalar fluxes, dimension G.");

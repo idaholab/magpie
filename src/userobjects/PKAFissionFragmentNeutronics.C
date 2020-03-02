@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", PKAFissionFragmentNeutronics);
 
-template <>
 InputParameters
-validParams<PKAFissionFragmentNeutronics>()
+PKAFissionFragmentNeutronics::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorNeutronicsBase>();
+  InputParameters params = PKAGeneratorNeutronicsBase::validParams();
   params.addClassDescription(
       "PKA generator (fission) user object.\n Takes pdf and samples PKAs due to fission.");
   return params;

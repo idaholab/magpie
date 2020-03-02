@@ -32,11 +32,10 @@ dataLoad(std::istream & stream, MDRunBase::MDParticles & pl, void * context)
   dataLoad(stream, pl.properties, context);
 }
 
-template <>
 InputParameters
-validParams<MDRunBase>()
+MDRunBase::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
   params.suppressParameter<ExecFlagEnum>("execute_on");
   params.addParam<MultiMooseEnum>("md_particle_properties",

@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", SPPARKSAux);
 
-template <>
 InputParameters
-validParams<SPPARKSAux>()
+SPPARKSAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addRequiredParam<UserObjectName>("user_object", "Name of SPPARKSUserObject");
   params.addParam<unsigned int>("var", "Index into SPPARKS array");
   MooseEnum arrayType("IARRAY DARRAY");

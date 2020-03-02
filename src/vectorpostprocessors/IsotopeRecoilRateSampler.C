@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", IsotopeRecoilRateSampler);
 
-template <>
 InputParameters
-validParams<IsotopeRecoilRateSampler>()
+IsotopeRecoilRateSampler::validParams()
 {
-  InputParameters params = validParams<GeneralVectorPostprocessor>();
+  InputParameters params = GeneralVectorPostprocessor::validParams();
   params.addRequiredParam<std::string>(
       "target_isotope", "The isotope name that you want to get the total recoil rate for");
   params.addRequiredParam<std::vector<unsigned int>>(

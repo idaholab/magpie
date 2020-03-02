@@ -11,16 +11,13 @@
 #include "GeneralPostprocessor.h"
 #include "mytrim/ion.h"
 
-// forward declarations
-class MyTRIMPKAInfo;
 class MyTRIMRasterizer;
-
-template <>
-InputParameters validParams<MyTRIMPKAInfo>();
 
 class MyTRIMPKAInfo : public GeneralPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMPKAInfo(const InputParameters & parameters);
 
   virtual void initialize() override;
@@ -48,4 +45,3 @@ protected:
   /// the value this PP computes (determined by the value_type parameter)
   Real _value;
 };
-

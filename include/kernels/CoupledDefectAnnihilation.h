@@ -10,17 +10,14 @@
 
 #include "Kernel.h"
 
-class CoupledDefectAnnihilation;
-
-template <>
-InputParameters validParams<CoupledDefectAnnihilation>();
-
 /**
  * Coupled anihilation reaction kernel for vacancies and interstitials.
  */
 class CoupledDefectAnnihilation : public Kernel
 {
 public:
+  static InputParameters validParams();
+
   CoupledDefectAnnihilation(const InputParameters & parameters);
 
 protected:

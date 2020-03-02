@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", RadialGreensAux);
 
-template <>
 InputParameters
-validParams<RadialGreensAux>()
+RadialGreensAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addClassDescription("Visualize data generated in a RadialGreensConvolution user object");
   params.addRequiredParam<UserObjectName>("convolution", "RadialGreensConvolution user object");
   return params;

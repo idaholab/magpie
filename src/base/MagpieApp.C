@@ -12,11 +12,10 @@
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
 
-template <>
 InputParameters
-validParams<MagpieApp>()
+MagpieApp::validParams()
 {
-  InputParameters params = validParams<MooseApp>();
+  InputParameters params = MooseApp::validParams();
   return params;
 }
 
@@ -29,8 +28,6 @@ MagpieApp::MagpieApp(const InputParameters & parameters) : MooseApp(parameters)
   srand(processor_id());
   MagpieApp::registerAll(_factory, _action_factory, _syntax);
 }
-
-MagpieApp::~MagpieApp() {}
 
 extern "C" void
 MagpieApp__registerApps()

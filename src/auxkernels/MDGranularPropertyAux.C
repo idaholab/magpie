@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MDGranularPropertyAux);
 
-template <>
 InputParameters
-validParams<MDGranularPropertyAux>()
+MDGranularPropertyAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addRequiredParam<UserObjectName>("user_object", "Name of MD runner UserObject");
   params.addParam<MultiMooseEnum>("md_particle_property",
                                   MDRunBase::mdParticleProperties(),

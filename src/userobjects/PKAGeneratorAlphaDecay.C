@@ -12,11 +12,10 @@
 
 registerMooseObject("MagpieApp", PKAGeneratorAlphaDecay);
 
-template <>
 InputParameters
-validParams<PKAGeneratorAlphaDecay>()
+PKAGeneratorAlphaDecay::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorBase>();
+  InputParameters params = PKAGeneratorBase::validParams();
   params.addClassDescription("A PKAGenerator for starting alpha particles from decay\nDecay data "
                              "is retrieved from file data/alpha_decay/alpha_decay.txt");
   params.addRequiredParam<std::vector<unsigned int>>("ZAID",

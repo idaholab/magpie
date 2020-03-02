@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMDiracSource);
 
-template <>
 InputParameters
-validParams<MyTRIMDiracSource>()
+MyTRIMDiracSource::validParams()
 {
-  InputParameters params = validParams<DiracKernel>();
+  InputParameters params = DiracKernel::validParams();
   params.addRequiredParam<UserObjectName>(
       "runner", "Name of the MyTRIMDiracRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");

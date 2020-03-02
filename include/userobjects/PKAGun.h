@@ -10,17 +10,14 @@
 
 #include "PKAFixedPointGenerator.h"
 
-class PKAGun;
-
-template <>
-InputParameters validParams<PKAGun>();
-
 /**
  * Starts PKAs at a fixed point in a fixed direction
  */
 class PKAGun : public PKAFixedPointGenerator
 {
 public:
+  static InputParameters validParams();
+
   PKAGun(const InputParameters & parameters);
 
 protected:
@@ -30,4 +27,3 @@ protected:
   /// the direction along which the PKAs move
   const Point _direction;
 };
-

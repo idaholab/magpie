@@ -11,17 +11,14 @@
 #include "PKAGeneratorBase.h"
 #include "mytrim/invert.h"
 
-class PKAFissionFragmentEmpirical;
-
-template <>
-InputParameters validParams<PKAFissionFragmentEmpirical>();
-
 /**
  * Fission fragment PKA generator usimg an empirical mass and energy distribution.
  */
 class PKAFissionFragmentEmpirical : public PKAGeneratorBase
 {
 public:
+  static InputParameters validParams();
+
   PKAFissionFragmentEmpirical(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
@@ -38,4 +35,3 @@ protected:
    */
   const VariableValue & _relative_density;
 };
-

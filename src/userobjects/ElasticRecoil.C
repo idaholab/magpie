@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", ElasticRecoil);
 
-template <>
 InputParameters
-validParams<ElasticRecoil>()
+ElasticRecoil::validParams()
 {
-  InputParameters params = validParams<ScatteringRecoilCrossSection>();
+  InputParameters params = ScatteringRecoilCrossSection::validParams();
   params.addClassDescription(
       "Computes recoil cross sections for elastic scattering events. Allows output to csv.");
   params.addRequiredParam<FunctionName>("scattering_law",

@@ -10,16 +10,13 @@
 
 #include "GeneralVectorPostprocessor.h"
 
-// forward declarations
-class MyTRIMPKAStatistics;
 class MyTRIMRasterizer;
-
-template <>
-InputParameters validParams<MyTRIMPKAStatistics>();
 
 class MyTRIMPKAStatistics : public GeneralVectorPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMPKAStatistics(const InputParameters & parameters);
 
   virtual void initialize();
@@ -46,4 +43,3 @@ protected:
   /// number of PKA in the bin
   VectorPostprocessorValue & _count;
 };
-

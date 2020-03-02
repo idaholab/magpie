@@ -15,11 +15,10 @@
 
 registerMooseObject("MagpieApp", LAMMPSFileRunner);
 
-template <>
 InputParameters
-validParams<LAMMPSFileRunner>()
+LAMMPSFileRunner::validParams()
 {
-  InputParameters params = validParams<MDRunBase>();
+  InputParameters params = MDRunBase::validParams();
   params.addClassDescription("Reads a LAMMPS dump file or sequence of dump files and "
                              "maps LAMMPS particles to MOOSE FEM mesh.");
   params.addParam<bool>("time_sequence",

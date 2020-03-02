@@ -11,14 +11,11 @@
 
 #include "ScatteringRecoilCrossSection.h"
 
-class InelasticRecoil;
-
-template <>
-InputParameters validParams<InelasticRecoil>();
-
 class InelasticRecoil : public ScatteringRecoilCrossSection
 {
 public:
+  static InputParameters validParams();
+
   InelasticRecoil(const InputParameters & parameters);
 
   virtual void execute() override;
