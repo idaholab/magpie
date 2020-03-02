@@ -18,8 +18,7 @@ class FFTBufferBase;
 #define usingFFTBufferBaseMembers                                                                  \
   using ElementUserObject::_perf_graph;                                                            \
   using FFTBufferBase<T>::_dim;                                                                    \
-  using FFTBufferBase<T>::_real_space_grid;                                                        \
-  using FFTBufferBase<T>::_reciprocal_space_grid;                                                  \
+  using FFTBufferBase<T>::_grid;                                                                   \
   using FFTBufferBase<T>::_real_space_data;                                                        \
   using FFTBufferBase<T>::_reciprocal_space_data;                                                  \
   using FFTBufferBase<T>::_real_space_data_start;                                                  \

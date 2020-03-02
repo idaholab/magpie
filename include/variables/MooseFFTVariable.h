@@ -53,7 +53,7 @@ public:
   {
     mooseError("Nodal FFT variables are not supported.");
   }
-  virtual void reinitNodesNeighbor(const std::vector<dof_id_type> & nodes)
+  virtual void reinitNodesNeighbor(const std::vector<dof_id_type> &)
   {
     mooseError("Nodal FFT variables are not supported.");
   }

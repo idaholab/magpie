@@ -11,7 +11,7 @@
 InputParameters
 MooseFFTVariable::validParams()
 {
-  InputParameters params = MooseVariableFEBase::validParams();
+  auto params = MooseVariableFEBase::validParams();
   return params;
 }
 

@@ -39,8 +39,6 @@ protected:
 
   /// dummy system for the FFT variables
   AuxiliarySystem _fft_dummy_system;
-
-  unsigned int _fft_var_number;
 };
 
 template <typename T>
