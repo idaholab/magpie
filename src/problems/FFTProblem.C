@@ -85,7 +85,7 @@ FFTProblem::getVariable(THREAD_ID tid,
     auto params = MooseVariableBase::validParams();
     params.set<MooseEnum>("order") = "CONSTANT";
     params.set<MooseEnum>("family") = "MONOMIAL";
-    params.set<unsigned int>("_var_num") = _fft_var_number;
+    params.set<unsigned int>("_var_num") = fft_var_number;
     params.set<THREAD_ID>("tid") = tid;
     params.set<THREAD_ID>("_tid") = tid;
     params.set<Moose::VarKindType>("_var_kind") = Moose::VarKindType::VAR_AUXILIARY;

@@ -45,6 +45,7 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     _dim(_mesh.dimension()),
     _cell_volume(1.0),
     _moose_variable(coupledComponents("moose_variable")),
+    _k_table(_dim),
     _how_many(_real_space_data.howMany())
 {
   // make sure Real is double

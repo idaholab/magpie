@@ -17,10 +17,10 @@
 #include "libmesh/vector_value.h"
 
 typedef std::complex<Real> Complex;
-typedef VectorValue<std::complex<Real>> ComplexVectorValue;
-typedef RankTwoTensorTempl<std::complex<Real>> ComplexRankTwoTensor;
-typedef RankThreeTensorTempl<std::complex<Real>> ComplexRankThreeTensor;
-typedef RankFourTensorTempl<std::complex<Real>> ComplexRankFourTensor;
+typedef VectorValue<Complex> ComplexVectorValue;
+typedef RankTwoTensorTempl<Complex> ComplexRankTwoTensor;
+typedef RankThreeTensorTempl<Complex> ComplexRankThreeTensor;
+typedef RankFourTensorTempl<Complex> ComplexRankFourTensor;
 
 // helper template to select the corresponding complex tensor type
 template <typename T>

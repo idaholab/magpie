@@ -37,8 +37,11 @@ absoluteFuzzyEqual(const std::complex<Real> & var1,
 #include "RankThreeTensorImplementation.h"
 #include "RankFourTensorImplementation.h"
 
-template class VectorValue<std::complex<Real>>;
+namespace libMesh
+{
+template class VectorValue<Complex>;
+}
 
-template class RankTwoTensorTempl<std::complex<Real>>;
-template class RankThreeTensorTempl<std::complex<Real>>;
-template class RankFourTensorTempl<std::complex<Real>>;
+template class RankTwoTensorTempl<Complex>;
+template class RankThreeTensorTempl<Complex>;
+template class RankFourTensorTempl<Complex>;
