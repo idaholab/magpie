@@ -6,21 +6,23 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#pragma once
+#include "PolarPhaseFieldAction.h"
 
-#include "MooseApp.h"
+registerMooseAction("MagpieApp", PolarPhaseFieldAction, "add_kernel");
 
-class MagpieApp : public MooseApp
+InputParameters
+PolarPhaseFieldAction::validParams()
 {
-public:
-  static InputParameters validParams();
+  InputParameters params = Action::validParams();
+  return params;
+}
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+PolarPhaseFieldAction::PolarPhaseFieldAction(const InputParameters & parameters)
+  : Action(parameters)
+{
+}
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & syntax, ActionFactory & action_factory);
-
-  static void printLogo();
-};
+void
+PolarPhaseFieldAction::act()
+{
+}
