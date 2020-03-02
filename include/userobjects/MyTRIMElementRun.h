@@ -11,17 +11,14 @@
 #include "MyTRIMRunBase.h"
 #include "ThreadedRecoilElementAveragedLoop.h"
 
-class MyTRIMElementRun;
-
-template <>
-InputParameters validParams<MyTRIMElementRun>();
-
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
  */
 class MyTRIMElementRun : public MyTRIMRunBase
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMElementRun(const InputParameters & parameters);
 
   virtual void initialize() {}
@@ -54,4 +51,3 @@ private:
   /// zero result to return for elements that have not been touched by the cascades
   MyTRIMResult _zero;
 };
-

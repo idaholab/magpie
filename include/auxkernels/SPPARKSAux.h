@@ -10,18 +10,14 @@
 
 #include "AuxKernel.h"
 
-// forward declarations
 class SPPARKSUserObject;
-class SPPARKSAux;
-
-template <>
-InputParameters validParams<SPPARKSAux>();
 
 class SPPARKSAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   SPPARKSAux(const InputParameters & params);
-  virtual ~SPPARKSAux() {}
 
   virtual Real computeValue();
 
@@ -30,4 +26,3 @@ protected:
   const unsigned int _var;
   const unsigned int _array;
 };
-

@@ -14,11 +14,7 @@
 #include <map>
 #include <vector>
 
-class MyTRIMRunBase;
 class MooseMesh;
-
-template <>
-InputParameters validParams<MyTRIMRunBase>();
 
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
@@ -26,6 +22,8 @@ InputParameters validParams<MyTRIMRunBase>();
 class MyTRIMRunBase : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMRunBase(const InputParameters & parameters);
 
   // get the number of elements in the TRIM simulation
@@ -56,4 +54,3 @@ protected:
   /// dimension of the mesh
   const unsigned int _dim;
 };
-

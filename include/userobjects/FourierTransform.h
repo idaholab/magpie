@@ -14,19 +14,16 @@
 
 #include <memory>
 
-class FourierTransform;
-
-template <>
-InputParameters validParams<FourierTransform>();
-
 /**
  * Compute the fourier transform of a selected variable field.
  */
 class FourierTransform : public ElementUserObject
 {
 public:
+  static InputParameters validParams();
+
   FourierTransform(const InputParameters & parameters);
-  ~FourierTransform();
+  ~FourierTransform() override;
 
   virtual void initialize() override;
   virtual void execute() override;

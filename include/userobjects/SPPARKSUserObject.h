@@ -15,15 +15,11 @@
 
 #include "spparks/src/library.h"
 
-// forward declarations
-class SPPARKSUserObject;
-
-template <>
-InputParameters validParams<SPPARKSUserObject>();
-
 class SPPARKSUserObject : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   SPPARKSUserObject(const InputParameters & parameters);
   virtual ~SPPARKSUserObject();
 

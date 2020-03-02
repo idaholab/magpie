@@ -10,11 +10,10 @@
 
 registerMooseObject("MooseApp", RMSDistance);
 
-template <>
 InputParameters
-validParams<RMSDistance>()
+RMSDistance::validParams()
 {
-  InputParameters params = validParams<ElementIntegralVariablePostprocessor>();
+  InputParameters params = ElementIntegralVariablePostprocessor::validParams();
   params.addRequiredParam<Point>("point", "Point to which the RMS distance is computed");
   params.addClassDescription(
       "Computes the RMS distance of a distribution with respect to a fixed point.");

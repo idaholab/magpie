@@ -12,11 +12,10 @@
 
 registerMooseObject("MagpieApp", PKAGeneratorRecoil);
 
-template <>
 InputParameters
-validParams<PKAGeneratorRecoil>()
+PKAGeneratorRecoil::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorNeutronicsBase>();
+  InputParameters params = PKAGeneratorNeutronicsBase::validParams();
   params.addClassDescription(
       "PKA recoil generator user object.\n Takes pdf and samples PKAs due to recoil reaction.");
   return params;

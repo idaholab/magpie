@@ -12,14 +12,11 @@
 #include "PKAGeneratorNeutronicsBase.h"
 #include "DiscretePKAPDF.h"
 
-class PKAGeneratorRecoil;
-
-template <>
-InputParameters validParams<PKAGeneratorRecoil>();
-
 class PKAGeneratorRecoil : public PKAGeneratorNeutronicsBase
 {
 public:
+  static InputParameters validParams();
+
   PKAGeneratorRecoil(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,

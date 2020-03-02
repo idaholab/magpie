@@ -10,15 +10,11 @@
 
 #include "MyTRIMPKAInfo.h"
 
-// forward declarations
-class MyTRIMPKAInConeInfo;
-
-template <>
-InputParameters validParams<MyTRIMPKAInConeInfo>();
-
 class MyTRIMPKAInConeInfo : public MyTRIMPKAInfo
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMPKAInConeInfo(const InputParameters & parameters);
 
 protected:

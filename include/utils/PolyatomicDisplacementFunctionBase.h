@@ -15,7 +15,6 @@
 
 #include <mytrim/material.h>
 
-// forward declarations
 class SimconfType;
 class IonBase;
 

@@ -11,17 +11,14 @@
 #include "Kernel.h"
 #include "RadialGreensConvolution.h"
 
-class RadialGreensSource;
-
-template <>
-InputParameters validParams<RadialGreensSource>();
-
 /**
  * Apply the convolution from a RadialGreensConvolution object to a non-linear variable
  */
 class RadialGreensSource : public Kernel
 {
 public:
+  static InputParameters validParams();
+
   RadialGreensSource(const InputParameters & parameters);
 
 protected:
@@ -37,4 +34,3 @@ protected:
   // iterator pointing to the map entry for the current element
   RadialGreensConvolution::Result::const_iterator _result;
 };
-

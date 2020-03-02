@@ -10,16 +10,13 @@
 
 #include "GeneralVectorPostprocessor.h"
 
-// forward declarations
-class MyTRIMPKAEnergyHistogram;
 class MyTRIMRasterizer;
-
-template <>
-InputParameters validParams<MyTRIMPKAEnergyHistogram>();
 
 class MyTRIMPKAEnergyHistogram : public GeneralVectorPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMPKAEnergyHistogram(const InputParameters & parameters);
 
   virtual void initialize();
@@ -42,4 +39,3 @@ protected:
   /// number of PKA in the channel
   VectorPostprocessorValue & _count;
 };
-

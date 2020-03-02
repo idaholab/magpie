@@ -10,17 +10,14 @@
 
 #include "Kernel.h"
 
-class DefectAnnihilation;
-
-template <>
-InputParameters validParams<DefectAnnihilation>();
-
 /**
  * Anihilation reaction kernel for vacancies and interstitials.
  */
 class DefectAnnihilation : public Kernel
 {
 public:
+  static InputParameters validParams();
+
   DefectAnnihilation(const InputParameters & parameters);
 
 protected:

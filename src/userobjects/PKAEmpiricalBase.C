@@ -8,11 +8,10 @@
 
 #include "PKAEmpiricalBase.h"
 
-template <>
 InputParameters
-validParams<PKAEmpiricalBase>()
+PKAEmpiricalBase::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorBase>();
+  InputParameters params = PKAGeneratorBase::validParams();
   return params;
 }
 

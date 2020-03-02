@@ -19,11 +19,7 @@
 #include "mytrim/ion.h"
 #include "mytrim/element.h"
 
-class MyTRIMRasterizer;
 class PKAGeneratorBase;
-
-template <>
-InputParameters validParams<MyTRIMRasterizer>();
 
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library
@@ -31,6 +27,8 @@ InputParameters validParams<MyTRIMRasterizer>();
 class MyTRIMRasterizer : public ElementUserObject
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMRasterizer(const InputParameters & parameters);
 
   /// determines if a TRIM run is executed during this timestep
@@ -215,4 +213,3 @@ private:
   /// timers
   PerfID _perf_finalize;
 };
-

@@ -13,11 +13,7 @@
 #include "KDTree.h"
 #include "libmesh/bounding_box.h"
 
-class MDRunBase;
 class MooseMesh;
-
-template <>
-InputParameters validParams<MDRunBase>();
 
 /**
  * Base class for molecular dynamics runs in Magpie
@@ -25,6 +21,8 @@ InputParameters validParams<MDRunBase>();
 class MDRunBase : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   MDRunBase(const InputParameters & parameters);
 
   void initialSetup() override;

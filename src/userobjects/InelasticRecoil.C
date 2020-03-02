@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", InelasticRecoil);
 
-template <>
 InputParameters
-validParams<InelasticRecoil>()
+InelasticRecoil::validParams()
 {
-  InputParameters params = validParams<ScatteringRecoilCrossSection>();
+  InputParameters params = ScatteringRecoilCrossSection::validParams();
   params.addClassDescription(
       "Computes recoil cross sections for inelastic scattering events. Allows output to csv.");
   params.addRequiredParam<std::vector<Real>>("Q",

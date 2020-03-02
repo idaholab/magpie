@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", PKAFunction);
 
-template <>
 InputParameters
-validParams<PKAFunction>()
+PKAFunction::validParams()
 {
-  InputParameters params = validParams<PKAEmpiricalBase>();
+  InputParameters params = PKAEmpiricalBase::validParams();
   params.addClassDescription("PKAs with time dependent mass, charge, energy, and rate");
   params.addParam<FunctionName>(
       "pka_rate",

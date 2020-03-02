@@ -20,11 +20,10 @@
 
 registerMooseObject("MagpieApp", NeutronicsSpectrumSamplerSN);
 
-template <>
 InputParameters
-validParams<NeutronicsSpectrumSamplerSN>()
+NeutronicsSpectrumSamplerSN::validParams()
 {
-  InputParameters params = validParams<NeutronicsSpectrumSamplerBase>();
+  InputParameters params = NeutronicsSpectrumSamplerBase::validParams();
   params.addRequiredCoupledVar("angular_variables",
                                "Angular fluxes, dimension G x M (# angular directions).");
   params.addRequiredParam<std::vector<std::string>>("recoil_isotope_names",

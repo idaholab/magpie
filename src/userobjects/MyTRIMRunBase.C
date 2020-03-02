@@ -9,11 +9,10 @@
 #include "MyTRIMRunBase.h"
 #include "MooseMesh.h"
 
-template <>
 InputParameters
-validParams<MyTRIMRunBase>()
+MyTRIMRunBase::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.addRequiredParam<UserObjectName>("rasterizer",
                                           "MyTRIMRasterizer object to provide material data");
 

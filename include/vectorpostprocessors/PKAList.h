@@ -11,17 +11,14 @@
 #include "GeneralVectorPostprocessor.h"
 #include "MyTRIMRasterizer.h"
 
-class PKAList;
-
-template <>
-InputParameters validParams<PKAList>();
-
 /**
  * Outputs the list of MyTRIM defects comopiled with the the MyTRIMDiracRunner
  */
 class PKAList : public GeneralVectorPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   PKAList(const InputParameters & parameters);
 
   virtual void initialize();
@@ -43,4 +40,3 @@ protected:
   VectorPostprocessorValue & _Z;
   ///@}
 };
-

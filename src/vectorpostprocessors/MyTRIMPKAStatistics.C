@@ -12,11 +12,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAStatistics);
 
-template <>
 InputParameters
-validParams<MyTRIMPKAStatistics>()
+MyTRIMPKAStatistics::validParams()
 {
-  InputParameters params = validParams<GeneralVectorPostprocessor>();
+  InputParameters params = GeneralVectorPostprocessor::validParams();
   params.addClassDescription("Compile a table of the number of PKA with the same value of a chosen "
                              "property (e.g. a mass histogram)");
   params.addRequiredParam<UserObjectName>(

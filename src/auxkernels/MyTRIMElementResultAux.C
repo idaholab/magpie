@@ -11,9 +11,8 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementResultAux);
 
-template <>
 InputParameters
-validParams<MyTRIMElementResultAux>()
+MyTRIMElementResultAux::validParams()
 {
   InputParameters params = MyTRIMElementResultAccess<AuxKernel>::validParams();
   return params;

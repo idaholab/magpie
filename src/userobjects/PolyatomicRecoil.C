@@ -18,11 +18,10 @@
 
 registerMooseObject("MagpieApp", PolyatomicRecoil);
 
-template <>
 InputParameters
-validParams<PolyatomicRecoil>()
+PolyatomicRecoil::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.addRequiredParam<std::vector<unsigned int>>("Z", "Atomic numbers");
   params.addRequiredParam<std::vector<Real>>("A", "Mass numbers");
   params.addRequiredParam<std::vector<Real>>("number_fraction", "Number fractions");

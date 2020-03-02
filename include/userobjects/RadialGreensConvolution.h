@@ -22,11 +22,7 @@
 
 using namespace TIMPI;
 
-class RadialGreensConvolution;
 class ThreadedRadialGreensConvolutionLoop;
-
-template <>
-InputParameters validParams<RadialGreensConvolution>();
 
 /**
  * Gather and communicate a full list of all quadrature points and the values of
@@ -36,6 +32,8 @@ InputParameters validParams<RadialGreensConvolution>();
 class RadialGreensConvolution : public ElementUserObject
 {
 public:
+  static InputParameters validParams();
+
   RadialGreensConvolution(const InputParameters & parameters);
 
   virtual void initialSetup() override;

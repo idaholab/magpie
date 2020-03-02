@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", PKAFissionFragmentEmpirical);
 
-template <>
 InputParameters
-validParams<PKAFissionFragmentEmpirical>()
+PKAFissionFragmentEmpirical::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorBase>();
+  InputParameters params = PKAGeneratorBase::validParams();
   params.addClassDescription(
       "Fission fragment PKA generator using an empirical mass and energy "
       "distribution for LWR UO2 fuel from H.R. Faust, Eur. Phys. J. A 14 (2002) 459.");

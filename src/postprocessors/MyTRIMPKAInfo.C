@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAInfo);
 
-template <>
 InputParameters
-validParams<MyTRIMPKAInfo>()
+MyTRIMPKAInfo::validParams()
 {
-  InputParameters params = validParams<GeneralPostprocessor>();
+  InputParameters params = GeneralPostprocessor::validParams();
   params.addClassDescription("Aggregate a global property of the primary knock-on atom (PKA) list "
                              "(e.g. total energy or number of PKA)");
   params.addRequiredParam<UserObjectName>(

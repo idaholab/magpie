@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", PKAGun);
 
-template <>
 InputParameters
-validParams<PKAGun>()
+PKAGun::validParams()
 {
-  InputParameters params = validParams<PKAFixedPointGenerator>();
+  InputParameters params = PKAFixedPointGenerator::validParams();
   params.addClassDescription(
       "This PKAGenerator starts particle from a fixed point in a fixed direction.");
   params.addRequiredParam<Point>("direction", "The fixed direction the PKAs move along");

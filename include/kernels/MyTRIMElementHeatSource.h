@@ -11,16 +11,11 @@
 #include "MyTRIMElementEnergyAccess.h"
 #include "Kernel.h"
 
-// forward declarations
-class MyTRIMElementRun;
-class MyTRIMElementHeatSource;
-
-template <>
-InputParameters validParams<MyTRIMElementHeatSource>();
-
 class MyTRIMElementHeatSource : public MyTRIMElementEnergyAccess<Kernel>
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMElementHeatSource(const InputParameters & params);
 
 protected:
@@ -29,4 +24,3 @@ protected:
   // current timestep size
   const Real & _dt;
 };
-

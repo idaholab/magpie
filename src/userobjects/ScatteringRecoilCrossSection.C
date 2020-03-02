@@ -15,11 +15,10 @@
 #include "gsl/gsl_sf_legendre.h"
 #include "gsl/gsl_integration.h"
 
-template <>
 InputParameters
-validParams<ScatteringRecoilCrossSection>()
+ScatteringRecoilCrossSection::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.addClassDescription(
       "Base class for computing recoil scattering cross sections for a single isotope."
       "It outputs the coefficients for the Legendre expansion of the cross section up to the "

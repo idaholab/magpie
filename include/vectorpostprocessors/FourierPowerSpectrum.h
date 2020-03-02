@@ -10,14 +10,9 @@
 #pragma once
 
 #include "GeneralVectorPostprocessor.h"
-
 #include <memory>
 
-class FourierPowerSpectrum;
 class FourierTransform;
-
-template <>
-InputParameters validParams<FourierPowerSpectrum>();
 
 /**
  * Compute the power spectrum from the data of a FourierTransform object.
@@ -25,6 +20,8 @@ InputParameters validParams<FourierPowerSpectrum>();
 class FourierPowerSpectrum : public GeneralVectorPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   FourierPowerSpectrum(const InputParameters & parameters);
 
   virtual void initialize() override{};

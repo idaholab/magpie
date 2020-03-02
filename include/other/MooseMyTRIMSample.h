@@ -15,7 +15,6 @@
 #include "mytrim/ion.h"
 #include "mytrim/element.h"
 
-// Forward declarations
 class MooseMesh;
 
 /**
@@ -69,4 +68,3 @@ protected:
   /// internal state object for the TRIM simulation
   MyTRIM_NS::SimconfType * _simconf;
 };
-

@@ -10,11 +10,7 @@
 
 #include "AuxKernel.h"
 
-class AtomicDensityAux;
 class MyTRIMRasterizer;
-
-template <>
-InputParameters validParams<AtomicDensityAux>();
 
 /**
  * Compute the atomic density at an element.
@@ -22,6 +18,8 @@ InputParameters validParams<AtomicDensityAux>();
 class AtomicDensityAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   AtomicDensityAux(const InputParameters & parameters);
 
 protected:
@@ -33,4 +31,3 @@ protected:
   /// volume scale factor to go from nm^3 to the mesh units selected in the rasterizer
   const Real _volume_scale;
 };
-

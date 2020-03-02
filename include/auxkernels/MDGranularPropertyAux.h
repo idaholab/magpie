@@ -10,16 +10,13 @@
 
 #include "AuxKernel.h"
 
-// forward declarations
 class MDRunBase;
-class MDGranularPropertyAux;
-
-template <>
-InputParameters validParams<MDGranularPropertyAux>();
 
 class MDGranularPropertyAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   MDGranularPropertyAux(const InputParameters & params);
 
   virtual Real computeValue();

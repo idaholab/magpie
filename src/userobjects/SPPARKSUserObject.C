@@ -14,11 +14,10 @@
 
 registerMooseObject("MagpieApp", SPPARKSUserObject);
 
-template <>
 InputParameters
-validParams<SPPARKSUserObject>()
+SPPARKSUserObject::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.addParam<std::string>("file", "", "SPPARKS input file");
   params.addParam<bool>("spparks_only", false, "Whether to run SPPARKS independently of MOOSE");
 

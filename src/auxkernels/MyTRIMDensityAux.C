@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMDensityAux);
 
-template <>
 InputParameters
-validParams<MyTRIMDensityAux>()
+MyTRIMDensityAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addClassDescription("Returns the material density in g/cm^3");
   params.addRequiredParam<UserObjectName>("rasterizer",
                                           "MyTRIMRasterizer object to provide material data");

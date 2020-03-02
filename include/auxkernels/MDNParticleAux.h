@@ -10,18 +10,14 @@
 
 #include "AuxKernel.h"
 
-// forward declarations
 class MDRunBase;
-class MDNParticleAux;
-
-template <>
-InputParameters validParams<MDNParticleAux>();
 
 class MDNParticleAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   MDNParticleAux(const InputParameters & params);
-  virtual ~MDNParticleAux() {}
 
   virtual Real computeValue();
 
@@ -30,4 +26,3 @@ protected:
 
   std::vector<unsigned int> _particles;
 };
-

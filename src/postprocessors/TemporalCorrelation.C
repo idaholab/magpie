@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", TemporalCorrelation);
 
-template <>
 InputParameters
-validParams<TemporalCorrelation>()
+TemporalCorrelation::validParams()
 {
-  InputParameters params = validParams<ElementAverageValue>();
+  InputParameters params = ElementAverageValue::validParams();
   params.addClassDescription("Integrate over the L2 norm of a variable time derivative.");
   return params;
 }

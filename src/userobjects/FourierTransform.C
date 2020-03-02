@@ -16,11 +16,10 @@
 
 registerMooseObject("MagpieApp", FourierTransform);
 
-template <>
 InputParameters
-validParams<FourierTransform>()
+FourierTransform::validParams()
 {
-  InputParameters params = validParams<ElementUserObject>();
+  InputParameters params = ElementUserObject::validParams();
   params.addClassDescription("Compute the Fourier transform of a given variable field.");
   params.addCoupledVar("variable", "Variable field to compute the transform of");
   params.addRangeCheckedParam<std::vector<int>>(

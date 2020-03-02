@@ -30,11 +30,10 @@ PointListAdaptor<RadialGreensConvolution::QPData>::getPoint(
   return item._q_point;
 }
 
-template <>
 InputParameters
-validParams<RadialGreensConvolution>()
+RadialGreensConvolution::validParams()
 {
-  InputParameters params = validParams<ElementUserObject>();
+  InputParameters params = ElementUserObject::validParams();
   params.addClassDescription("Perform a radial Green's function convolution");
   params.addCoupledVar("v", "Variable to gather");
   params.addRequiredParam<FunctionName>(

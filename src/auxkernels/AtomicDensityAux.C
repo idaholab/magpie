@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", AtomicDensityAux);
 
-template <>
 InputParameters
-validParams<AtomicDensityAux>()
+AtomicDensityAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addClassDescription("Compute the atomic density as Atoms/volume at an element using data "
                              "from a MyTRIMRasterizer. Volume is in the Mesh units set in the "
                              "rasterizer.");
