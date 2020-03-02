@@ -12,16 +12,13 @@
 #include "ThreadedRecoilLoopBase.h"
 #include "MyTRIMRasterizer.h"
 
-// forward declarations
 class MyTRIMDiracRun;
-class MyTRIMDiracSource;
-
-template <>
-InputParameters validParams<MyTRIMDiracSource>();
 
 class MyTRIMDiracSource : public DiracKernel
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMDiracSource(const InputParameters & params);
 
   virtual void addPoints();
@@ -40,4 +37,3 @@ protected:
   /// Simulation parameters
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
-

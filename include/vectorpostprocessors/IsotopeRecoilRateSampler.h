@@ -11,19 +11,14 @@
 // MOOSE includes
 #include "GeneralVectorPostprocessor.h"
 
-// Forward Declarations
-class IsotopeRecoilRateSampler;
 class NeutronicsSpectrumSamplerBase;
-
-template <>
-InputParameters validParams<IsotopeRecoilRateSampler>();
 
 class IsotopeRecoilRateSampler : public GeneralVectorPostprocessor
 {
 public:
-  IsotopeRecoilRateSampler(const InputParameters & parameters);
+  static InputParameters validParams();
 
-  virtual ~IsotopeRecoilRateSampler() {}
+  IsotopeRecoilRateSampler(const InputParameters & parameters);
 
   virtual void initialize() {}
   virtual void execute();

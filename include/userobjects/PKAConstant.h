@@ -10,17 +10,14 @@
 
 #include "PKAEmpiricalBase.h"
 
-class PKAConstant;
-
-template <>
-InputParameters validParams<PKAConstant>();
-
 /**
  * PKAs with constant mass, charge, energy, and rate
  */
 class PKAConstant : public PKAEmpiricalBase
 {
 public:
+  static InputParameters validParams();
+
   PKAConstant(const InputParameters & parameters);
 
 protected:
@@ -45,4 +42,3 @@ protected:
   /// PKA Energy (in eV)
   const Real _E;
 };
-

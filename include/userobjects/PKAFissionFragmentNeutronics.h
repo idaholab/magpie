@@ -12,14 +12,11 @@
 #include "PKAGeneratorNeutronicsBase.h"
 #include "DiscreteFissionPKAPDF.h"
 
-class PKAFissionFragmentNeutronics;
-
-template <>
-InputParameters validParams<PKAFissionFragmentNeutronics>();
-
 class PKAFissionFragmentNeutronics : public PKAGeneratorNeutronicsBase
 {
 public:
+  static InputParameters validParams();
+
   PKAFissionFragmentNeutronics(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
@@ -38,4 +35,3 @@ protected:
    */
   DiscreteFissionPKAPDF _pdf;
 };
-

@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementRun);
 
-template <>
 InputParameters
-validParams<MyTRIMElementRun>()
+MyTRIMElementRun::validParams()
 {
-  InputParameters params = validParams<MyTRIMRunBase>();
+  InputParameters params = MyTRIMRunBase::validParams();
   params.addClassDescription("Run a TRIM binary collision Monte Carlo simulation across the entire "
                              "sample and gather the results for use with an element averaged "
                              "source Kernel.");

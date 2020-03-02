@@ -10,11 +10,7 @@
 
 #include "GeneralVectorPostprocessor.h"
 
-class MyTRIMDiracResult;
 class MyTRIMDiracRun;
-
-template <>
-InputParameters validParams<MyTRIMDiracResult>();
 
 /**
  * Outputs the list of MyTRIM defects comopiled with the the MyTRIMDiracRunner
@@ -22,6 +18,8 @@ InputParameters validParams<MyTRIMDiracResult>();
 class MyTRIMDiracResult : public GeneralVectorPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMDiracResult(const InputParameters & parameters);
 
   virtual void initialize();
@@ -40,4 +38,3 @@ protected:
   VectorPostprocessorValue & _elem_id;
   ///@}
 };
-

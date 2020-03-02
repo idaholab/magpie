@@ -11,19 +11,12 @@
 #include "MyTRIMElementEnergyAccess.h"
 #include "AuxKernel.h"
 
-// forward declarations
-class MyTRIMElementRun;
-class MyTRIMElementEnergyAux;
-
-template <>
-InputParameters validParams<MyTRIMElementEnergyAux>();
-
 class MyTRIMElementEnergyAux : public MyTRIMElementEnergyAccess<AuxKernel>
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMElementEnergyAux(const InputParameters & params);
-  virtual ~MyTRIMElementEnergyAux() {}
 
   virtual Real computeValue();
 };
-

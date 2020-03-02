@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MDGranularPorosityAux);
 
-template <>
 InputParameters
-validParams<MDGranularPorosityAux>()
+MDGranularPorosityAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addRequiredParam<UserObjectName>("user_object", "Name of MD runner UserObject");
   params.addParam<bool>(
       "compute_packing_fraction", false, "Whether to compute porosity or packing fraction.");

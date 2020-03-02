@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMPKAInConeInfo);
 
-template <>
 InputParameters
-validParams<MyTRIMPKAInConeInfo>()
+MyTRIMPKAInConeInfo::validParams()
 {
-  InputParameters params = validParams<MyTRIMPKAInfo>();
+  InputParameters params = MyTRIMPKAInfo::validParams();
   params.addClassDescription(
       "Aggregate a global property of the primary knock-on atom for PKAs within a cone of "
       "opening angle opening_angle along cone_axis");

@@ -11,9 +11,8 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementSource);
 
-template <>
 InputParameters
-validParams<MyTRIMElementSource>()
+MyTRIMElementSource::validParams()
 {
   InputParameters params = MyTRIMElementResultAccess<Kernel>::validParams();
   params.addParam<Real>("prefactor", 1.0, "Prefactor to scale the applied production rate");

@@ -11,11 +11,6 @@
 #include "GeneratedMesh.h"
 #include "PointLocatorRegularOrthogonal.h"
 
-class MyTRIMMesh;
-
-template <>
-InputParameters validParams<MyTRIMMesh>();
-
 /**
  * Restricted regular orthogonal generated mesh with equal size level 0 elements
  * (no bias) and EDGE2, QUAD4, or HEX8 elements only. These restrictions allow
@@ -27,6 +22,8 @@ InputParameters validParams<MyTRIMMesh>();
 class MyTRIMMesh : public GeneratedMesh
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMMesh(const InputParameters & parameters);
   MyTRIMMesh(const MyTRIMMesh & other_mesh);
 
@@ -47,4 +44,3 @@ protected:
 
   mutable std::unique_ptr<PointLocatorRegularOrthogonal> _point_locator;
 };
-

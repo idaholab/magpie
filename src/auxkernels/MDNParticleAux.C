@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MDNParticleAux);
 
-template <>
 InputParameters
-validParams<MDNParticleAux>()
+MDNParticleAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addRequiredParam<UserObjectName>("user_object", "Name of MD runner UserObject");
   params.addClassDescription("Injects the number of MD particles from MDRunBase object user_object "
                              "into auxiliary variable.");

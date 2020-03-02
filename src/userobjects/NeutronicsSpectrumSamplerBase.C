@@ -18,11 +18,10 @@
 #include <algorithm>
 #include <limits>
 
-template <>
 InputParameters
-validParams<NeutronicsSpectrumSamplerBase>()
+NeutronicsSpectrumSamplerBase::validParams()
 {
-  InputParameters params = validParams<ElementUserObject>();
+  InputParameters params = ElementUserObject::validParams();
   params.addRequiredParam<std::vector<std::string>>("target_isotope_names",
                                                     "The list of target isotope names e.g. U235.");
   params.addRequiredCoupledVar("number_densities", "Number densities for each isotope.");

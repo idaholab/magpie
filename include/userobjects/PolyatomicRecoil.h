@@ -11,17 +11,14 @@
 
 #include "GeneralUserObject.h"
 
-class PolyatomicRecoil;
-class PolyatomicDisplacementFunction;
-class PolyatomicDamageEnergyFunction;
+class PolyatomicDisplacementFunctionBase;
 class PolyatomicDisplacementDerivativeFunction;
-
-template <>
-InputParameters validParams<PolyatomicRecoil>();
 
 class PolyatomicRecoil : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   PolyatomicRecoil(const InputParameters & parameters);
 
   void execute() override;

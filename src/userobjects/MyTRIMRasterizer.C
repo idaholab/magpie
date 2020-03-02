@@ -70,11 +70,10 @@ dataLoad(std::istream & stream, MyTRIM_NS::IonBase & pl, void * context)
 
 registerMooseObject("MagpieApp", MyTRIMRasterizer);
 
-template <>
 InputParameters
-validParams<MyTRIMRasterizer>()
+MyTRIMRasterizer::validParams()
 {
-  InputParameters params = validParams<ElementUserObject>();
+  InputParameters params = ElementUserObject::validParams();
   params.addClassDescription("Gather the element distribution of the simulation domain for a TRIM "
                              "binary collision Monte Carlo simulation");
 

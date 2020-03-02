@@ -10,17 +10,15 @@
 
 #include "GeneralPostprocessor.h"
 
-// forward declarations
-class IsotopeRecoilRate;
 class NeutronicsSpectrumSamplerBase;
-
-template <>
-InputParameters validParams<IsotopeRecoilRate>();
 
 class IsotopeRecoilRate : public GeneralPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   IsotopeRecoilRate(const InputParameters & parameters);
+
   virtual void execute() override {}
   virtual void initialize() override {}
   virtual Real getValue() override;

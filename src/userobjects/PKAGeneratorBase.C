@@ -10,11 +10,10 @@
 #include "MagpieUtils.h"
 #include <algorithm>
 
-template <>
 InputParameters
-validParams<PKAGeneratorBase>()
+PKAGeneratorBase::validParams()
 {
-  InputParameters params = validParams<DiscreteElementUserObject>();
+  InputParameters params = DiscreteElementUserObject::validParams();
   params.addClassDescription("PKA generator user object base class.\n Takes pdf and samples PKAs "
                              "due to various interactions.");
   return params;

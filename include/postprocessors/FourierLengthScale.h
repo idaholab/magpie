@@ -13,11 +13,7 @@
 
 #include <memory>
 
-class FourierLengthScale;
 class FourierTransform;
-
-template <>
-InputParameters validParams<FourierLengthScale>();
 
 /**
  * Compute the average length scale form a fast fourier transform
@@ -25,6 +21,8 @@ InputParameters validParams<FourierLengthScale>();
 class FourierLengthScale : public GeneralPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   FourierLengthScale(const InputParameters & parameters);
 
   virtual void initialize() override{};

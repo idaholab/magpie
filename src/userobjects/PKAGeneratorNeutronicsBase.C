@@ -11,11 +11,10 @@
 #include "MultiIndex.h"
 #include "DiscreteFissionPKAPDF.h"
 
-template <>
 InputParameters
-validParams<PKAGeneratorNeutronicsBase>()
+PKAGeneratorNeutronicsBase::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorBase>();
+  InputParameters params = PKAGeneratorBase::validParams();
   params.addParam<std::vector<PostprocessorName>>(
       "partial_reaction_rates",
       "Partial neutronic reaction rates per unit volume [sum_g xs_{r,g,i} * phi_g], "

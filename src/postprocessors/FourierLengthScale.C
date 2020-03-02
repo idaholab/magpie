@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", FourierLengthScale);
 
-template <>
 InputParameters
-validParams<FourierLengthScale>()
+FourierLengthScale::validParams()
 {
-  InputParameters params = validParams<GeneralPostprocessor>();
+  InputParameters params = GeneralPostprocessor::validParams();
   params.addClassDescription(
       "Compute the average length scale form a given Fourier transform in length units.");
   params.addRequiredParam<UserObjectName>(

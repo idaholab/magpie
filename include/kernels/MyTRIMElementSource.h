@@ -12,16 +12,11 @@
 #include "MyTRIMRasterizer.h"
 #include "Kernel.h"
 
-// forward declarations
-class MyTRIMElementRun;
-class MyTRIMElementSource;
-
-template <>
-InputParameters validParams<MyTRIMElementSource>();
-
 class MyTRIMElementSource : public MyTRIMElementResultAccess<Kernel>
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMElementSource(const InputParameters & params);
 
 protected:
@@ -33,4 +28,3 @@ protected:
   /// Simulation parameters
   const MyTRIMRasterizer::TrimParameters & _trim_parameters;
 };
-

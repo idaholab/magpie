@@ -11,17 +11,14 @@
 #include "AuxKernel.h"
 #include "RadialGreensConvolution.h"
 
-class RadialGreensAux;
-
-template <>
-InputParameters validParams<RadialGreensAux>();
-
 /**
  * Visualize data generated in a RadialGreensConvolution user object
  */
 class RadialGreensAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   RadialGreensAux(const InputParameters & parameters);
 
 protected:
@@ -29,4 +26,3 @@ protected:
 
   const RadialGreensConvolution::Result & _convolution;
 };
-

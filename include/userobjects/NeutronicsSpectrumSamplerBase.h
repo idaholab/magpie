@@ -12,12 +12,6 @@
 #include "ElementUserObject.h"
 #include "MultiIndex.h"
 
-// Forward Declarations
-class NeutronicsSpectrumSamplerBase;
-
-template <>
-InputParameters validParams<NeutronicsSpectrumSamplerBase>();
-
 /**
  * Computes PDFs from neutronics calculations that are
  * used to sample PKAs that will be passed to BCMC simulations.
@@ -25,6 +19,8 @@ InputParameters validParams<NeutronicsSpectrumSamplerBase>();
 class NeutronicsSpectrumSamplerBase : public ElementUserObject
 {
 public:
+  static InputParameters validParams();
+
   NeutronicsSpectrumSamplerBase(const InputParameters & parameters);
 
   virtual void execute();
@@ -111,4 +107,3 @@ protected:
   /// vector of ZAIDs
   std::vector<unsigned int> _zaids;
 };
-

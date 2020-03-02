@@ -10,11 +10,6 @@
 
 #include "ElementAverageValue.h"
 
-class TemporalCorrelation;
-
-template <>
-InputParameters validParams<TemporalCorrelation>();
-
 /**
  * Compute average of the L2 norm of a variable time derivative as a measure of the
  * correlation between timesteps. Small values indicate slow, gradual change, large
@@ -23,6 +18,8 @@ InputParameters validParams<TemporalCorrelation>();
 class TemporalCorrelation : public ElementAverageValue
 {
 public:
+  static InputParameters validParams();
+
   TemporalCorrelation(const InputParameters & parameters);
 
 protected:
@@ -30,4 +27,3 @@ protected:
   virtual Real getValue() override;
   const VariableValue & _u_dot;
 };
-

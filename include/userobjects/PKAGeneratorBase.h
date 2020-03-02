@@ -12,11 +12,6 @@
 #include "MyTRIMRasterizer.h"
 #include "mytrim/ion.h"
 
-class PKAGeneratorBase;
-
-template <>
-InputParameters validParams<PKAGeneratorBase>();
-
 /**
  * Abstract base class for PKA calculation UOs that plug into MyTRIMRasterizer
  * to generate a set of PKAs for the current element
@@ -24,6 +19,8 @@ InputParameters validParams<PKAGeneratorBase>();
 class PKAGeneratorBase : public DiscreteElementUserObject
 {
 public:
+  static InputParameters validParams();
+
   PKAGeneratorBase(const InputParameters & parameters);
 
   /**
@@ -53,4 +50,3 @@ protected:
     return Point(X, Y, Z);
   }
 };
-

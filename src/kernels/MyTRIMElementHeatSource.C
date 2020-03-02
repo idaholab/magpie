@@ -11,9 +11,8 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementHeatSource);
 
-template <>
 InputParameters
-validParams<MyTRIMElementHeatSource>()
+MyTRIMElementHeatSource::validParams()
 {
   InputParameters params = MyTRIMElementEnergyAccess<Kernel>::validParams();
   return params;

@@ -10,17 +10,14 @@
 
 #include "PKAGeneratorBase.h"
 
-class PKAEmpiricalBase;
-
-template <>
-InputParameters validParams<PKAEmpiricalBase>();
-
 /**
  * Base class for empirical PKA generators
  */
 class PKAEmpiricalBase : public PKAGeneratorBase
 {
 public:
+  static InputParameters validParams();
+
   PKAEmpiricalBase(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
@@ -37,4 +34,3 @@ protected:
   virtual Real getE() const = 0;
   ///@}
 };
-

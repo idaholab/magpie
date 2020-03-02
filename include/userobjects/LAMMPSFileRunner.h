@@ -10,11 +10,7 @@
 
 #include "MDRunBase.h"
 
-class LAMMPSFileRunner;
 class Function;
-
-template <>
-InputParameters validParams<LAMMPSFileRunner>();
 
 /**
  * Reads lammps dump files to emulate MD simulation
@@ -22,6 +18,8 @@ InputParameters validParams<LAMMPSFileRunner>();
 class LAMMPSFileRunner : public MDRunBase
 {
 public:
+  static InputParameters validParams();
+
   LAMMPSFileRunner(const InputParameters & parameters);
 
   virtual void initialize() override {}

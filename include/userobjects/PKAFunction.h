@@ -11,17 +11,14 @@
 #include "PKAEmpiricalBase.h"
 #include "Function.h"
 
-class PKAFunction;
-
-template <>
-InputParameters validParams<PKAFunction>();
-
 /**
  * PKAs with time dependent mass, charge, energy, and rate
  */
 class PKAFunction : public PKAEmpiricalBase
 {
 public:
+  static InputParameters validParams();
+
   PKAFunction(const InputParameters & parameters);
 
 protected:
@@ -49,4 +46,3 @@ protected:
   /// time
   const Real & _time;
 };
-

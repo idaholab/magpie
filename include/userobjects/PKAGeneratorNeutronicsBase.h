@@ -14,11 +14,6 @@
 #include "mytrim/ion.h"
 #include "DiscreteFissionPKAPDF.h"
 
-class PKAGeneratorNeutronicsBase;
-
-template <>
-InputParameters validParams<PKAGeneratorNeutronicsBase>();
-
 /**
  * A PKAGenerator class that uses neutronics computed reaction rates for
  * sampling the inital state of PKAs.
@@ -26,6 +21,8 @@ InputParameters validParams<PKAGeneratorNeutronicsBase>();
 class PKAGeneratorNeutronicsBase : public PKAGeneratorBase
 {
 public:
+  static InputParameters validParams();
+
   PKAGeneratorNeutronicsBase(const InputParameters & parameters);
 
   /// helper function to set pdf based on neutronics information from Mammoth
@@ -48,4 +45,3 @@ protected:
   std::vector<const Real *> _averaged_number_densities;
   std::vector<Real> _stored_densities;
 };
-

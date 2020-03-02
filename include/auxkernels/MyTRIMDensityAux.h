@@ -12,17 +12,12 @@
 #include "MyTRIMRasterizer.h"
 #include "mytrim/simconf.h"
 
-// forward declarations
-class MyTRIMDensityAux;
-
-template <>
-InputParameters validParams<MyTRIMDensityAux>();
-
 class MyTRIMDensityAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMDensityAux(const InputParameters & params);
-  virtual ~MyTRIMDensityAux() {}
 
   virtual Real computeValue();
 
@@ -40,4 +35,3 @@ private:
   /// calculate values only for qp 0 and cache them here
   Real _value_cache;
 };
-

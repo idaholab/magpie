@@ -10,17 +10,14 @@
 
 #include "PKAGeneratorBase.h"
 
-class PKAGeneratorAlphaDecay;
-
-template <>
-InputParameters validParams<PKAGeneratorAlphaDecay>();
-
 /**
  * PKAGenerator for alpha decays and corresponding recoil atoms
  */
 class PKAGeneratorAlphaDecay : public PKAGeneratorBase
 {
 public:
+  static InputParameters validParams();
+
   PKAGeneratorAlphaDecay(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
@@ -47,4 +44,3 @@ protected:
   /// half-life conversion from seconds to model unit
   Real _time_conversion;
 };
-

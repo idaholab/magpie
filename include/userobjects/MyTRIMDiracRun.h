@@ -11,11 +11,6 @@
 #include "MyTRIMRunBase.h"
 #include "ThreadedRecoilDiracSourceLoop.h"
 
-class MyTRIMDiracRun;
-
-template <>
-InputParameters validParams<MyTRIMDiracRun>();
-
 /**
  * This UserObject rasterizes a simulation domain for the MyTRIM library and
  * stores the resulting defect distributions as
@@ -23,6 +18,8 @@ InputParameters validParams<MyTRIMDiracRun>();
 class MyTRIMDiracRun : public MyTRIMRunBase
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMDiracRun(const InputParameters & parameters);
 
   virtual void initialize() {}
@@ -51,4 +48,3 @@ protected:
   PerfID _perf_finalize;
   ///@}
 };
-

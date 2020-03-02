@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMMesh);
 
-template <>
 InputParameters
-validParams<MyTRIMMesh>()
+MyTRIMMesh::validParams()
 {
-  InputParameters params = validParams<GeneratedMesh>();
+  InputParameters params = GeneratedMesh::validParams();
   params.addClassDescription(
       "Regular orthogonal generated mesh with restrictions to simple elements.");
   params.suppressParameter<Real>("bias_x");

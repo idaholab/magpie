@@ -10,11 +10,6 @@
 
 #include "PKAGeneratorBase.h"
 
-class PKAFixedPointGenerator;
-
-template <>
-InputParameters validParams<PKAFixedPointGenerator>();
-
 /**
  * This PKAGenerator allows starting particles from a single
  * point within the domain.
@@ -22,6 +17,8 @@ InputParameters validParams<PKAFixedPointGenerator>();
 class PKAFixedPointGenerator : public PKAGeneratorBase
 {
 public:
+  static InputParameters validParams();
+
   PKAFixedPointGenerator(const InputParameters & parameters);
 
   virtual void appendPKAs(std::vector<MyTRIM_NS::IonBase> &,
@@ -57,4 +54,3 @@ protected:
   /// the element id of the element containing _point
   dof_id_type _elem_id;
 };
-

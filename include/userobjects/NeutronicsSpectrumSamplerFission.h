@@ -10,12 +10,6 @@
 
 #include "NeutronicsSpectrumSamplerBase.h"
 
-// Forward Declarations
-class NeutronicsSpectrumSamplerFission;
-
-template <>
-InputParameters validParams<NeutronicsSpectrumSamplerFission>();
-
 /**
  * Computes PDFs from neutronics data that is used to sample PKAs due to fission
  * for coupled BCMC simulations.
@@ -25,6 +19,8 @@ InputParameters validParams<NeutronicsSpectrumSamplerFission>();
 class NeutronicsSpectrumSamplerFission : public NeutronicsSpectrumSamplerBase
 {
 public:
+  static InputParameters validParams();
+
   NeutronicsSpectrumSamplerFission(const InputParameters & parameters);
 
   /// returns a MultiIndex<Real> PDF at a given point ID

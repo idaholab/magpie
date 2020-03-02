@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", CoupledDefectAnnihilation);
 
-template <>
 InputParameters
-validParams<CoupledDefectAnnihilation>()
+CoupledDefectAnnihilation::validParams()
 {
-  InputParameters params = validParams<Kernel>();
+  InputParameters params = Kernel::validParams();
   params.addClassDescription("Coupled annihilation rate kernel that is proportional to the product "
                              "of two coupled variables c and v.");
   params.addRequiredCoupledVar("c", "First defect concentration");

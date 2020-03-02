@@ -10,11 +10,10 @@
 
 registerMooseObject("MagpieApp", RadialGreensSource);
 
-template <>
 InputParameters
-validParams<RadialGreensSource>()
+RadialGreensSource::validParams()
 {
-  InputParameters params = validParams<Kernel>();
+  InputParameters params = Kernel::validParams();
   params.addClassDescription(
       "Apply the convolution from a RadialGreensConvolution object to a non-linear variable");
   params.addRequiredParam<UserObjectName>("convolution", "RadialGreensConvolution user object");

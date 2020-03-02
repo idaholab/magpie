@@ -11,19 +11,12 @@
 #include "MyTRIMElementResultAccess.h"
 #include "AuxKernel.h"
 
-// forward declarations
-class MyTRIMElementRun;
-class MyTRIMElementResultAux;
-
-template <>
-InputParameters validParams<MyTRIMElementResultAux>();
-
 class MyTRIMElementResultAux : public MyTRIMElementResultAccess<AuxKernel>
 {
 public:
+  static InputParameters validParams();
+
   MyTRIMElementResultAux(const InputParameters & params);
-  virtual ~MyTRIMElementResultAux() {}
 
   virtual Real computeValue();
 };
-

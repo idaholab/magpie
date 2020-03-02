@@ -17,11 +17,10 @@
 
 registerMooseObject("MagpieApp", MultiAppNeutronicsSpectrumTransfer);
 
-template <>
 InputParameters
-validParams<MultiAppNeutronicsSpectrumTransfer>()
+MultiAppNeutronicsSpectrumTransfer::validParams()
 {
-  InputParameters params = validParams<MultiAppTransfer>();
+  InputParameters params = MultiAppTransfer::validParams();
   params.addRequiredParam<UserObjectName>("pka_neutronics", "PKA generator object name.");
   params.addRequiredParam<UserObjectName>("radiation_damage_sampler",
                                           "Neutronics user object providing the PDF data.");

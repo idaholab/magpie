@@ -10,16 +10,13 @@
 
 #include "AuxKernel.h"
 
-// forward declarations
 class MDRunBase;
-class MDGranularPorosityAux;
-
-template <>
-InputParameters validParams<MDGranularPorosityAux>();
 
 class MDGranularPorosityAux : public AuxKernel
 {
 public:
+  static InputParameters validParams();
+
   MDGranularPorosityAux(const InputParameters & params);
 
   virtual Real computeValue();

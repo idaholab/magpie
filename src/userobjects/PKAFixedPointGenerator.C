@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", PKAFixedPointGenerator);
 
-template <>
 InputParameters
-validParams<PKAFixedPointGenerator>()
+PKAFixedPointGenerator::validParams()
 {
-  InputParameters params = validParams<PKAGeneratorBase>();
+  InputParameters params = PKAGeneratorBase::validParams();
   params.addClassDescription("This PKAGenerator starts particle from a fixed point in a random "
                              "direction (isotropically).");
   params.addParam<unsigned int>(

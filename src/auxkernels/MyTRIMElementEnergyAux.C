@@ -11,9 +11,8 @@
 
 registerMooseObject("MagpieApp", MyTRIMElementEnergyAux);
 
-template <>
 InputParameters
-validParams<MyTRIMElementEnergyAux>()
+MyTRIMElementEnergyAux::validParams()
 {
   InputParameters params = MyTRIMElementEnergyAccess<AuxKernel>::validParams();
   return params;
