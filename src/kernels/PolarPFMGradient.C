@@ -16,7 +16,7 @@ PolarPFMGradient::validParams()
   InputParameters params = KernelValue::validParams();
   params.addClassDescription("Gradient energy term in the polar phase field model");
   params.addRequiredParam<MaterialPropertyName>(
-      "prop", "Material property of which the kernel variable derivative will be taken of");
+      "F", "Material property of which the kernel variable derivative will be taken of");
   params.addCoupledVar("v", "Coupled order parameter");
   return params;
 }
@@ -26,9 +26,9 @@ PolarPFMGradient::PolarPFMGradient(const InputParameters & parameters)
     _grad_v(coupledGradient("v")),
     _v_name(getVar("v", 0)->name()),
     _v_var(coupled("v")),
-    _dpropdu(getMaterialPropertyDerivative<Real>("prop", _var.name())),
-    _d2propdu2(getMaterialPropertyDerivative<Real>("prop", _var.name(), _var.name())),
-    _d2propdudv(getMaterialPropertyDerivative<Real>("prop", _var.name(), _v_name))
+    _dpropdu(getMaterialPropertyDerivative<Real>("F", _var.name())),
+    _d2propdu2(getMaterialPropertyDerivative<Real>("F", _var.name(), _var.name())),
+    _d2propdudv(getMaterialPropertyDerivative<Real>("F", _var.name(), _v_name))
 {
 }
 

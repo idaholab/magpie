@@ -14,7 +14,7 @@ InputParameters
 PolarPFMPsiL::validParams()
 {
   InputParameters params = DerivativeParsedMaterialHelper::validParams();
-  params.addClassDescription("");
+  params.addClassDescription("Bulk Helmholtz energy");
   params.addRequiredCoupledVar("upsilon", "Upsilon order parameter");
   params.addRequiredCoupledVar("theta", "Theta order parameter");
   params.addRequiredParam<Real>("G0", "Thermal energy of the melt");

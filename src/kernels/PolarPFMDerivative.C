@@ -15,13 +15,15 @@ PolarPFMDerivative::validParams()
 {
   InputParameters params = KernelValue::validParams();
   params.addClassDescription("Bulk energy derivative term in the polar phase field model");
+  params.addRequiredParam<MaterialPropertyName>(
+      "F", "Material property of which the kernel variable derivative will be taken of");
   return params;
 }
 
 PolarPFMDerivative::PolarPFMDerivative(const InputParameters & parameters)
   : DerivativeMaterialInterface<KernelValue>(parameters),
-    _dpropdu(getMaterialPropertyDerivative<Real>("prop", _var.name())),
-    _d2propdu2(getMaterialPropertyDerivative<Real>("prop", _var.name(), _var.name()))
+    _dpropdu(getMaterialPropertyDerivative<Real>("F", _var.name())),
+    _d2propdu2(getMaterialPropertyDerivative<Real>("F", _var.name(), _var.name()))
 
 {
 }
