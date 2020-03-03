@@ -121,8 +121,8 @@ protected:
   /// dimension of the mesh
   const unsigned int _nproc;
 
-  /// stores bounding boxes of all other processors
-  std::vector<BoundingBox> _bbox;
+  /// the processor bounding box of this processor
+  BoundingBox _bbox;
 
   /// maximum granular radius for parallel bounding boxes
   Real _max_granular_radius;

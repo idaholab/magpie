@@ -57,17 +57,12 @@ MDRunBase::MDRunBase(const InputParameters & parameters)
     _granular(_properties.contains("radius")),
     _mesh(_subproblem.mesh()),
     _dim(_mesh.dimension()),
-    _nproc(_app.n_processors()),
-    _bbox(_nproc)
+    _nproc(_app.n_processors())
 {
-  // if the calculation is granular, max_particle_radius
-  if (_granular)
-  {
-    if (!parameters.isParamSetByUser("max_granular_radius"))
-      paramError("max_granular_radius",
-                 "max_granular_radius must be set for granular calculations");
-    _max_granular_radius = getParam<Real>("max_granular_radius");
-  }
+  _max_granular_radius = getParam<Real>("max_granular_radius");
+  // if the calculation is granular, max_particle_radius must be set
+  if (_granular && !parameters.isParamSetByUser("max_granular_radius"))
+    paramError("max_granular_radius", "max_granular_radius must be set for granular calculations");
 
   // set up the map from property ID to index
   _md_particles._prop_size = _properties.size();
@@ -82,33 +77,27 @@ MDRunBase::MDRunBase(const InputParameters & parameters)
 void
 MDRunBase::initialSetup()
 {
-  for (unsigned int j = 0; j < _nproc; ++j)
-  {
-    _bbox[j] = MeshTools::create_processor_bounding_box(_mesh, j);
+  _bbox = MeshTools::create_processor_bounding_box(_mesh, processor_id());
 
-    // inflate bounding box
-    for (unsigned int d = 0; d < _dim; ++d)
-    {
-      _bbox[j].first(d) -= _max_granular_radius;
-      _bbox[j].second(d) += _max_granular_radius;
-    }
+  // inflate bounding box
+  for (unsigned int d = 0; d < _dim; ++d)
+  {
+    _bbox.first(d) -= _max_granular_radius;
+    _bbox.second(d) += _max_granular_radius;
   }
 }
 
 void
 MDRunBase::timestepSetup()
 {
-  // update/init subdomain bounding boxes
-  for (unsigned int j = 0; j < _nproc; ++j)
-  {
-    _bbox[j] = MeshTools::create_processor_bounding_box(_mesh, j);
+  // update/init the processor bounding box
+  _bbox = MeshTools::create_processor_bounding_box(_mesh, processor_id());
 
-    // inflate bounding box
-    for (unsigned int d = 0; d < _dim; ++d)
-    {
-      _bbox[j].first(d) -= _max_granular_radius;
-      _bbox[j].second(d) += _max_granular_radius;
-    }
+  // inflate bounding box
+  for (unsigned int d = 0; d < _dim; ++d)
+  {
+    _bbox.first(d) -= _max_granular_radius;
+    _bbox.second(d) += _max_granular_radius;
   }
 
   // callback for updating md particle list
