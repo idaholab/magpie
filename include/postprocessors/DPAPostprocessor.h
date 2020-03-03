@@ -13,15 +13,13 @@
 #include "GeneralPostprocessor.h"
 
 // forward declarations
-class DPAPostprocessor;
 class DPAUserObjectBase;
-
-template <>
-InputParameters validParams<DPAPostprocessor>();
 
 class DPAPostprocessor : public GeneralPostprocessor
 {
 public:
+  static InputParameters validParams();
+
   DPAPostprocessor(const InputParameters & parameters);
   virtual void execute() override {}
   virtual void initialize() override {}

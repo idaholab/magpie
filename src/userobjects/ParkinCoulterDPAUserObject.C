@@ -20,11 +20,10 @@
 
 registerMooseObject("MagpieApp", ParkinCoulterDPAUserObject);
 
-template <>
 InputParameters
-validParams<ParkinCoulterDPAUserObject>()
+ParkinCoulterDPAUserObject::validParams()
 {
-  InputParameters params = validParams<DPAUserObjectBase>();
+  InputParameters params = DPAUserObjectBase::validParams();
   params += ParkinCoulterInterface::validParams();
   params.addClassDescription(
       "Computes the dose in dpa from composition, cross section, damage type, and neutron flux for "

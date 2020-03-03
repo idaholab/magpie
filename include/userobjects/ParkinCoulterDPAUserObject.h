@@ -12,14 +12,11 @@
 #include "DPAUserObjectBase.h"
 #include "ParkinCoulterInterface.h"
 
-class ParkinCoulterDPAUserObject;
-
-template <>
-InputParameters validParams<ParkinCoulterDPAUserObject>();
-
 class ParkinCoulterDPAUserObject : public DPAUserObjectBase, public ParkinCoulterInterface
 {
 public:
+  static InputParameters validParams();
+
   ParkinCoulterDPAUserObject(const InputParameters & parameters);
   void finalize() override;
   void execute() override;

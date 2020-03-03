@@ -11,14 +11,11 @@
 
 #include "GeneralUserObject.h"
 
-class DPAUserObjectBase;
-
-template <>
-InputParameters validParams<DPAUserObjectBase>();
-
 class DPAUserObjectBase : public GeneralUserObject
 {
 public:
+  static InputParameters validParams();
+
   DPAUserObjectBase(const InputParameters & parameters);
 
   ///@{ get the

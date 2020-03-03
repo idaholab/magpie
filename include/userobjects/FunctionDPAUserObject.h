@@ -13,14 +13,11 @@
 #include "DPAUserObjectBase.h"
 #include "LinearInterpolation.h"
 
-class FunctionDPAUserObject;
-
-template <>
-InputParameters validParams<FunctionDPAUserObject>();
-
 class FunctionDPAUserObject : public DPAUserObjectBase
 {
 public:
+  static InputParameters validParams();
+
   FunctionDPAUserObject(const InputParameters & parameters);
   void finalize() override;
   void execute() override;

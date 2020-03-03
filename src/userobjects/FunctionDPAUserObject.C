@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", FunctionDPAUserObject);
 
-template <>
 InputParameters
-validParams<FunctionDPAUserObject>()
+FunctionDPAUserObject::validParams()
 {
-  InputParameters params = validParams<DPAUserObjectBase>();
+  InputParameters params = DPAUserObjectBase::validParams();
   params.addRequiredParam<std::vector<std::vector<FunctionName>>>(
       "damage_functions", "Damage functions for each combinations of projectiles and targets.");
   params.addParam<Real>(

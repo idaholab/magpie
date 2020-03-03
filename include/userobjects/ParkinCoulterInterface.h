@@ -16,13 +16,9 @@
 // mytrim includes
 #include <mytrim/element.h>
 
-class ParkinCoulterInterface;
 class PolyatomicDisplacementFunction;
 class PolyatomicDamageEnergyFunction;
 class PolyatomicDisplacementDerivativeFunction;
-
-template <>
-InputParameters validParams<ParkinCoulterInterface>();
 
 class ParkinCoulterInterface
 {

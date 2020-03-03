@@ -13,11 +13,10 @@
 
 registerMooseObject("MagpieApp", DPAPostprocessor);
 
-template <>
 InputParameters
-validParams<DPAPostprocessor>()
+DPAPostprocessor::validParams()
 {
-  InputParameters params = validParams<GeneralPostprocessor>();
+  InputParameters params = GeneralPostprocessor::validParams();
   params.addRequiredParam<UserObjectName>("dpa_object", "The neutronics damage object.");
   params.addClassDescription("Retrieves the value of the dpa from a DPAUserObjectBase.");
   return params;

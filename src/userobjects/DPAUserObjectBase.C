@@ -11,11 +11,10 @@
 #include "DPAUserObjectBase.h"
 #include "PolyatomicDisplacementFunction.h"
 
-template <>
 InputParameters
-validParams<DPAUserObjectBase>()
+DPAUserObjectBase::validParams()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = GeneralUserObject::validParams();
   params.addParam<Real>("irradiation_time", "Irradiation time used ");
   MultiMooseEnum damage_reaction_types("elastic inelastic");
   params.addParam<MultiMooseEnum>("damage_reaction_types",
