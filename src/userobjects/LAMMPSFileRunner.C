@@ -249,7 +249,7 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
     }
 
     // check if this particle is in this processor BBox
-    if (!_bbox[processor_id()].contains_point(pos))
+    if (!_bbox.contains_point(pos))
       continue;
 
     ++_n_local_particles;
@@ -404,8 +404,7 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     }
 
     // check if this particle is in this processor BBox
-    if (!_bbox[processor_id()].contains_point(pos_after) &&
-        !_bbox[processor_id()].contains_point(pos_before))
+    if (!_bbox.contains_point(pos_after) && !_bbox.contains_point(pos_before))
       continue;
 
     ++_n_local_particles;
