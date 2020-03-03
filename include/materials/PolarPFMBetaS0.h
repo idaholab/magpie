@@ -14,12 +14,12 @@
 /**
  * Solid-melt gradient energy coefficient, eq. (7) from Physical Review B 89, 184102 (2014)
  */
-class PolarPFMBetaSO : public DerivativeParsedMaterialHelper, public ExpressionBuilder
+class PolarPFMBetaS0 : public DerivativeParsedMaterialHelper, public ExpressionBuilder
 {
 public:
   static InputParameters validParams();
 
-  PolarPFMBetaSO(const InputParameters & parameters);
+  PolarPFMBetaS0(const InputParameters & parameters);
 
 protected:
   EBTerm _theta;

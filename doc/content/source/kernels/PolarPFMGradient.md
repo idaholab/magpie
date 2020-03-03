@@ -14,7 +14,7 @@ evolution equations of both order parameters.
 | $u$ (`variable`)| $v$ (`v`)| $F$ (`F`) |
 | - | - | - |
 | $\Upsilon$ | $\vartheta$ | [PolarPFMPhi](/PolarPFMPhi.md) |
-| $\vartheta$ | $\Upsilon$ | [PolarPFMBetaS0](/PolarPFMBetaSO.md) |
+| $\vartheta$ | $\Upsilon$ | [PolarPFMBetaS0](/PolarPFMBetaS0.md) |
 
 !syntax parameters /Kernels/PolarPFMGradient
 

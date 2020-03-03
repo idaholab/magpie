@@ -6,12 +6,12 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#include "PolarPFMBetaSO.h"
+#include "PolarPFMBetaS0.h"
 
-registerMooseObject("MagpieApp", PolarPFMBetaSO);
+registerMooseObject("MagpieApp", PolarPFMBetaS0);
 
 InputParameters
-PolarPFMBetaSO::validParams()
+PolarPFMBetaS0::validParams()
 {
   InputParameters params = DerivativeParsedMaterialHelper::validParams();
   params.addClassDescription("Material property betaSO");
@@ -22,7 +22,7 @@ PolarPFMBetaSO::validParams()
   return params;
 }
 
-PolarPFMBetaSO::PolarPFMBetaSO(const InputParameters & parameters)
+PolarPFMBetaS0::PolarPFMBetaS0(const InputParameters & parameters)
   : DerivativeParsedMaterialHelper(parameters),
     _theta("theta"),
     _a_beta(getParam<Real>("a_beta")),
@@ -36,7 +36,7 @@ PolarPFMBetaSO::PolarPFMBetaSO(const InputParameters & parameters)
              (_a_beta - 3) * _theta * _theta * _theta * _theta;
 
   // solid-melt gradient energy coefficient (7)
-  EBTerm betaSO = _beta10 + (_beta20 - _beta10) * q;
+  EBTerm betaS0 = _beta10 + (_beta20 - _beta10) * q;
 
-  functionParse(betaSO);
+  functionParse(betaS0);
 }
