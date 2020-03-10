@@ -25,8 +25,8 @@ PolarPFMPsiL::validParams()
   params.addRequiredParam<Real>("A21", "Barrier coefficient solid 2 and solid 1");
   params.addRequiredParam<Real>("DeltaG10",
                                 "Difference in thermal energy between solid 1 and melt");
-  params.addRequiredParam<Real>("DeltaG21",
-                                "Difference in thermal energy between solid 2 and solid 1");
+  params.addRequiredParam<Real>("DeltaG20",
+                                "Difference in thermal energy between solid 2 and melt");
   return params;
 }
 
@@ -38,7 +38,8 @@ PolarPFMPsiL::PolarPFMPsiL(const InputParameters & parameters)
     _a_theta(getParam<Real>("a_theta")),
     _a_A(getParam<Real>("a_A")),
     _deltaG10(getParam<Real>("DeltaG10")),
-    _deltaG21(getParam<Real>("DeltaG21")),
+    _deltaG20(getParam<Real>("DeltaG20")),
+    _deltaG21(_deltaG20 - _deltaG10),
     _a10(getParam<Real>("A10")),
     _a20(getParam<Real>("A20")),
     _a21(getParam<Real>("A21"))
@@ -47,7 +48,7 @@ PolarPFMPsiL::PolarPFMPsiL(const InputParameters & parameters)
 
   // interpolating function (8)
   EBFunction q;
-  EBTerm y, a;
+  EBTerm y("y"), a("a");
   q(y, a) = a * y * y - 2 * (a - 2) * y * y * y + (a - 3) * y * y * y * y;
 
   // change in thermal energy of the phases (5)

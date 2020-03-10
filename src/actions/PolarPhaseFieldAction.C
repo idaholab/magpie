@@ -39,8 +39,8 @@ PolarPhaseFieldAction::validParams()
   params.addRequiredParam<Real>("G0", "Thermal energy of the melt");
   params.addRequiredParam<Real>("DeltaG10",
                                 "Difference in thermal energy between solid 1 and melt");
-  params.addRequiredParam<Real>("DeltaG21",
-                                "Difference in thermal energy between solid 2 and solid 1");
+  params.addRequiredParam<Real>("DeltaG20",
+                                "Difference in thermal energy between solid 2 and melt");
 
   return params;
 }

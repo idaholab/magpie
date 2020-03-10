@@ -37,6 +37,7 @@ protected:
 
   ///@{ change in thermal energy between phases
   const Real _deltaG10;
+  const Real _deltaG20;
   const Real _deltaG21;
   ///@}
 

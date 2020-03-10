@@ -35,20 +35,20 @@ PolarPFMGradient::PolarPFMGradient(const InputParameters & parameters)
 Real
 PolarPFMGradient::precomputeQpResidual()
 {
-  return -0.5 * _dpropdu[_qp] * _grad_v[_qp].norm_sq();
+  return 0.5 * _dpropdu[_qp] * _grad_v[_qp].norm_sq();
 }
 
 Real
 PolarPFMGradient::precomputeQpJacobian()
 {
-  return -0.5 * _d2propdu2[_qp] * _phi[_j][_qp] * _grad_v[_qp].norm_sq();
+  return 0.5 * _d2propdu2[_qp] * _phi[_j][_qp] * _grad_v[_qp].norm_sq();
 }
 
 Real
 PolarPFMGradient::computeQpOffDiagJacobian(unsigned int jvar)
 {
   if (jvar == _v_var)
-    return -0.5 *
+    return 0.5 *
            (_d2propdudv[_qp] * _phi[_j][_qp] * _grad_v[_qp].norm_sq() +
             _dpropdu[_qp] * 2.0 * _grad_v[_qp] * _grad_phi[_j][_qp]) *
            _test[_i][_qp];

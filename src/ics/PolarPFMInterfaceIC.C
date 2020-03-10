@@ -43,9 +43,8 @@ PolarPFMInterfaceIC::value(const Point & r)
   // solid-melt gradient energy coefficient (7)
   const Real betaS0 = _beta10 + (_beta20 - _beta10) * q;
 
-  const Real x0 = 0;
-  const Real W = 60;
-  const Real p = 0;
+  const Real W = 40;
+  const Real p = 1;
 
   const Real x = r(0);
 
