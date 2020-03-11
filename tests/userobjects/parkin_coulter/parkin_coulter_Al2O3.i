@@ -28,7 +28,6 @@
     Emax = 1e3
     uniform_energy_spacing = 0.2
     uniform_energy_spacing_threshold = 10
-    execute_on = timestep_end
     displacement_file_base = parkin_coulter_Al2O3
     damage_type = NET
   [../]
