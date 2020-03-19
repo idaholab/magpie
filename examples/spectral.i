@@ -12,7 +12,7 @@
 []
 
 [AuxVariables]
-  [./c_aux]
+  [./c_fft]
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
@@ -21,7 +21,7 @@
     [../]
   [../]
 
-  [./R0_aux]
+  [./R0_fft]
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
@@ -29,7 +29,7 @@
       function = 'cos(x/100*2*pi*2)*cos(y/100*2*pi*4)'
     [../]
   [../]
-  [./R1_aux]
+  [./R1_fft]
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
@@ -37,7 +37,7 @@
       function = 'cos(x/100*2*pi*3)*cos(y/100*2*pi*3)'
     [../]
   [../]
-  [./R2_aux]
+  [./R2_fft]
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
@@ -47,7 +47,7 @@
   [../]
 
 
-  [./u_aux]
+  [./u_fft]
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
@@ -60,11 +60,31 @@
       outvalue = 0
     [../]
   [../]
-  [./grad_u0_aux]
+  [./grad_u0_fft]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./grad_u1_aux]
+  [./grad_u1_fft]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  
+  [./u_fem]
+    [./InitialCondition]
+      type = SmoothCircleIC
+      x1 = 50
+      y1 = 50
+      radius = 30
+      int_width = 20
+      invalue = 1
+      outvalue = 0
+    [../]
+  [../]
+  [./grad_u0_fem]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_u1_fem]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -82,16 +102,16 @@
   # Buffers
   [./c]
     type = RealFFTWBuffer
-    moose_variable = c_aux
+    moose_variable = c_fft
   [../]
   [./R]
     type = RealVectorValueFFTWBuffer
-    moose_variable = 'R0_aux R1_aux R2_aux'
+    moose_variable = 'R0_fft R1_fft R2_fft'
   [../]
 
   [./u]
     type = RealFFTWBuffer
-    moose_variable = u_aux
+    moose_variable = u_fft
   [../]
   [./grad_u]
     type = RealVectorValueFFTWBuffer
@@ -99,53 +119,68 @@
 []
 
 [AuxKernels]
-  [./c_aux]
+  [./c_fft]
     type = FFTBufferAux
-    variable = c_aux
+    variable = c_fft
     fft_buffer = c
     execute_on = FINAL
   [../]
 
-  [./R0_aux]
+  [./R0_fft]
     type = FFTBufferAux
-    variable = R0_aux
+    variable = R0_fft
     fft_buffer = R
     component = 0
     execute_on = FINAL
   [../]
-  [./R1_aux]
+  [./R1_fft]
     type = FFTBufferAux
-    variable = R1_aux
+    variable = R1_fft
     fft_buffer = R
     component = 1
     execute_on = FINAL
   [../]
-  [./R2_aux]
+  [./R2_fft]
     type = FFTBufferAux
-    variable = R2_aux
+    variable = R2_fft
     fft_buffer = R
     component = 2
     execute_on = FINAL
   [../]
 
-  [./u_aux]
+  [./u_fft]
     type = FFTBufferAux
-    variable = u_aux
+    variable = u_fft
     fft_buffer = u
     execute_on = FINAL
   [../]
 
-  [./grad_u0_aux]
+  [./grad_u0_fft]
     type = FFTBufferAux
-    variable = grad_u0_aux
+    variable = grad_u0_fft
     fft_buffer = grad_u
     component = 0
     execute_on = FINAL
   [../]
-  [./grad_u1_aux]
+  [./grad_u1_fft]
     type = FFTBufferAux
-    variable = grad_u1_aux
+    variable = grad_u1_fft
     fft_buffer = grad_u
+    component = 1
+    execute_on = FINAL
+  [../]
+
+  [./grad_u0_fem]
+    type = GradientComponentAux
+    variable = grad_u0_fem
+    v = u_fem
+    component = 0
+    execute_on = FINAL
+  [../]
+  [./grad_u1_fem]
+    type = GradientComponentAux
+    variable = grad_u1_fem
+    v = u_fem
     component = 1
     execute_on = FINAL
   [../]

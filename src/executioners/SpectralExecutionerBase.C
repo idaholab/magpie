@@ -72,7 +72,6 @@ SpectralExecutionerBase::execute()
   u_buffer.forward();
 
   auto & grad_u_buffer = getFFTBuffer<RealVectorValue>("grad_u");
-  auto grad_u = grad_u_buffer.realSpace();
   kVectorMultiply(u_buffer, grad_u_buffer);
 
   _time_step = 1;
@@ -92,6 +91,7 @@ SpectralExecutionerBase::execute()
   grad_u_buffer.backward();
 
   u /= 10000.0;
+  auto grad_u = grad_u_buffer.realSpace();
   grad_u /= 100.0;
 
   _time_step = 2;
@@ -111,6 +111,7 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
   mooseAssert(in.size() == out.size(), "Buffer sizes must be equal");
 
   const auto & grid = in_buffer.grid();
+  const Complex I(0.0, 1.0);
   switch (in_buffer.dim())
   {
     case 1:
@@ -118,7 +119,7 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
       const auto & ivec = in_buffer.kTable(0);
       const int ni = grid[0];
       for (int i = 0; i * 2 <= ni; ++i)
-        out[i](0) = in[i] * ivec[i];
+        out[i](0) = in[i] * ivec[i] * I;
       return;
     }
 
@@ -128,12 +129,12 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
       const auto & ivec = in_buffer.kTable(0);
       const auto & jvec = in_buffer.kTable(1);
       const int ni = grid[0];
-      const int nj = grid[1];
+      const int nj = (grid[1] >> 1) + 1;
       for (int i = 0; i < ni; ++i)
-        for (int j = 0; j * 2 <= nj; ++j)
+        for (int j = 0; j < nj; ++j)
         {
-          out[index](0) = in[index] * ivec[i];
-          out[index](1) = in[index] * jvec[j];
+          out[index](0) = in[index] * ivec[i] * I;
+          out[index](1) = in[index] * jvec[j] * I;
           index++;
         }
       return;
@@ -152,9 +153,9 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
         for (int j = 0; j < nj; ++j)
           for (int k = 0; k * 2 <= nk; ++k)
           {
-            out[index](0) = in[index] * ivec[i];
-            out[index](1) = in[index] * jvec[j];
-            out[index](2) = in[index] * kvec[k];
+            out[index](0) = in[index] * ivec[i] * I;
+            out[index](1) = in[index] * jvec[j] * I;
+            out[index](2) = in[index] * kvec[k] * I;
             index++;
           }
       return;

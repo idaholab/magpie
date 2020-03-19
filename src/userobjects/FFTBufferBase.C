@@ -118,7 +118,7 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     // precompute kvector components for current direction
     _k_table[i].resize(_grid[i]);
     for (int j = 0; j < _grid[i]; ++j)
-      _k_table[i][j] = (j * 2 > _grid[i] ? Real(_grid[i] - j) : Real(j)) / _box_size(i);
+      _k_table[i][j] = ((j < (_grid[i] >> 1) + 1) ? Real(j) : (Real(j) - _grid[i])) / _box_size(i);
   }
   _real_space_data.resize(real_space_buffer_size);
   _reciprocal_space_data.resize(reciprocal_space_buffer_size);
