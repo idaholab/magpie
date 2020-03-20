@@ -52,6 +52,8 @@ FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
                                1,
                                FFTW_ESTIMATE);
   }
+
+  _scaling = 1.0 / std::sqrt(_real_space_data.size());
 }
 
 template <typename T>
@@ -64,7 +66,7 @@ FFTWBufferBase<T>::~FFTWBufferBase()
 
 template <typename T>
 void
-FFTWBufferBase<T>::forward()
+FFTWBufferBase<T>::forwardRaw()
 {
   // execute plan
   {
@@ -75,7 +77,7 @@ FFTWBufferBase<T>::forward()
 
 template <typename T>
 void
-FFTWBufferBase<T>::backward()
+FFTWBufferBase<T>::backwardRaw()
 {
   // execute plan
   {

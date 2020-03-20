@@ -157,6 +157,22 @@ FFTBufferBase<T>::execute()
 }
 
 template <typename T>
+void
+FFTBufferBase<T>::forward()
+{
+  forwardRaw();
+  _reciprocal_space_data *= forwardScale();
+}
+
+template <typename T>
+void
+FFTBufferBase<T>::backward()
+{
+  backwardRaw();
+  _real_space_data *= backwardScale();
+}
+
+template <typename T>
 const T &
 FFTBufferBase<T>::operator()(const Point & p) const
 {

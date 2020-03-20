@@ -2,9 +2,10 @@
   type = MyTRIMMesh
   dim = 2
   xmax = 100
-  ymax = 100
+  ymin = -25
+  ymax = 25
   nx = 100
-  ny = 100
+  ny = 50
 []
 
 [Problem]
@@ -51,13 +52,23 @@
     order = CONSTANT
     family = MONOMIAL
     [./InitialCondition]
-      type = SmoothCircleIC
+      type = SmoothSuperellipsoidIC
       x1 = 50
-      y1 = 50
-      radius = 30
-      int_width = 20
+      y1 = 0
+      a = 30
+      b = 15
+      int_width = 15
       invalue = 1
       outvalue = 0
+      n = 2
+    [../]
+  [../]
+  [./v_fft]
+    order = CONSTANT
+    family = MONOMIAL
+    [./InitialCondition]
+      type = FunctionIC
+      function = if(y<0,y,-y)
     [../]
   [../]
   [./grad_u0_fft]
@@ -68,16 +79,30 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./grad_v1_fft]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
   
   [./u_fem]
     [./InitialCondition]
-      type = SmoothCircleIC
+      type = SmoothSuperellipsoidIC
       x1 = 50
-      y1 = 50
-      radius = 30
-      int_width = 20
+      y1 = 0
+      a = 30
+      b = 15
+      int_width = 15
       invalue = 1
       outvalue = 0
+      n = 2
+    [../]
+  [../]
+  [./v_fem]
+    order = CONSTANT
+    family = MONOMIAL
+    [./InitialCondition]
+      type = FunctionIC
+      function = if(y<0,y,-y)
     [../]
   [../]
   [./grad_u0_fem]
@@ -85,6 +110,10 @@
     family = MONOMIAL
   [../]
   [./grad_u1_fem]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_v1_fem]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -114,6 +143,13 @@
     moose_variable = u_fft
   [../]
   [./grad_u]
+    type = RealVectorValueFFTWBuffer
+  [../]
+  [./v]
+    type = RealFFTWBuffer
+    moose_variable = v_fft
+  [../]
+  [./grad_v]
     type = RealVectorValueFFTWBuffer
   [../]
 []
@@ -154,6 +190,12 @@
     fft_buffer = u
     execute_on = FINAL
   [../]
+  [./v_fft]
+    type = FFTBufferAux
+    variable = v_fft
+    fft_buffer = v
+    execute_on = FINAL
+  [../]
 
   [./grad_u0_fft]
     type = FFTBufferAux
@@ -166,6 +208,13 @@
     type = FFTBufferAux
     variable = grad_u1_fft
     fft_buffer = grad_u
+    component = 1
+    execute_on = FINAL
+  [../]
+  [./grad_v1_fft]
+    type = FFTBufferAux
+    variable = grad_v1_fft
+    fft_buffer = grad_v
     component = 1
     execute_on = FINAL
   [../]

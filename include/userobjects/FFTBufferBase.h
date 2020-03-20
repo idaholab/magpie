@@ -45,9 +45,19 @@ public:
   virtual void finalize() {}
   virtual void threadJoin(const UserObject &) {}
 
-  ///@{ transforms
-  virtual void forward() = 0;
-  virtual void backward() = 0;
+  ///@{ transforms with proper scaling guaranteed
+  virtual void forward();
+  virtual void backward();
+  ///@}
+
+  ///@{ transforms without proper scaling guaranteed
+  virtual void forwardRaw() = 0;
+  virtual void backwardRaw() = 0;
+  ///@}
+
+  ///@{ scaling required after respective transform
+  virtual Real forwardScale() { return 1.0; }
+  virtual Real backwardScale() { return forwardScale(); }
   ///@}
 
   ///@{ buffer access

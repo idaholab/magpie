@@ -59,20 +59,25 @@ SpectralExecutionerBase::execute()
   // back and forth test
   auto & c_buffer = getFFTBuffer<Real>("c");
   auto c = c_buffer.realSpace();
-  auto c_tilde = c_buffer.reciprocalSpace();
+  // auto c_tilde = c_buffer.reciprocalSpace();
   c_buffer.forward();
 
   auto & R_buffer = getFFTBuffer<RealVectorValue>("R");
   auto R = R_buffer.realSpace();
   R_buffer.forward();
 
-  // gradient test
+  // gradient tests
   auto & u_buffer = getFFTBuffer<Real>("u");
   auto u = u_buffer.realSpace();
   u_buffer.forward();
+  auto & v_buffer = getFFTBuffer<Real>("v");
+  auto v = v_buffer.realSpace();
+  v_buffer.forward();
 
   auto & grad_u_buffer = getFFTBuffer<RealVectorValue>("grad_u");
   kVectorMultiply(u_buffer, grad_u_buffer);
+  auto & grad_v_buffer = getFFTBuffer<RealVectorValue>("grad_v");
+  kVectorMultiply(v_buffer, grad_v_buffer);
 
   _time_step = 1;
   _fe_problem.execute(EXEC_FINAL);
@@ -83,16 +88,14 @@ SpectralExecutionerBase::execute()
   // back and forth test
   c_buffer.backward();
   R_buffer.backward();
-  R /= 10000.0;
-  c /= 10000.0;
 
   // gradient test
   u_buffer.backward();
   grad_u_buffer.backward();
+  v_buffer.backward();
+  grad_v_buffer.backward();
 
-  u /= 10000.0;
-  auto grad_u = grad_u_buffer.realSpace();
-  grad_u /= 100.0;
+  // auto grad_u = grad_u_buffer.realSpace();
 
   _time_step = 2;
   _fe_problem.execute(EXEC_FINAL);
