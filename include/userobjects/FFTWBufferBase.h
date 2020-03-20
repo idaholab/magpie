@@ -28,8 +28,11 @@ public:
   ~FFTWBufferBase();
 
   // transforms
-  void forward() override;
-  void backward() override;
+  void forwardRaw() override;
+  void backwardRaw() override;
+
+  // scaling
+  Real forwardScale() override { return _scaling; }
 
 protected:
   ///@{ FFTW plans
@@ -41,6 +44,9 @@ protected:
   PerfID _perf_plan;
   PerfID _perf_fft;
   ///@}
+
+  /// scale factor
+  Real _scaling;
 
   usingFFTBufferBaseMembers;
 };
