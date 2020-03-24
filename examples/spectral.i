@@ -83,7 +83,7 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  
+
   [./u_fem]
     [./InitialCondition]
       type = SmoothSuperellipsoidIC
