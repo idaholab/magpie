@@ -15,7 +15,7 @@
 
   [./parkin_coulter_1981_net_derivative_Al2O3_nrt]
     type = 'CSVDiff'
-    input = 'parkin_coulter_Al2O3.i'
+    input = 'parkin_coulter_Al2O3_net_derivative.i'
     csvdiff = 'parkin_coulter_net_derivative_Al2O3.csv'
     cli_args = 'UserObjects/parkin_coulter/damage_type=NET_DERIVATIVE
                 UserObjects/parkin_coulter/displacement_file_base=parkin_coulter_net_derivative_Al2O3'

@@ -135,7 +135,7 @@
 
     # control NRT
     max_nrt_difference = 0.4
-    analytical_energy_cutoff = 1e3
+    analytical_energy_cutoff = 500
   [../]
 
   [./runner]
