@@ -19,12 +19,6 @@
   using NeuralNetFreeEnergyBase<compute_stage>::_d_activation;                                     \
   using NeuralNetFreeEnergyBase<compute_stage>::applyLayerActivation
 
-// Forward Declarations
-template <ComputeStage>
-class NeuralNetFreeEnergyBase;
-
-declareADValidParams(NeuralNetFreeEnergyBase);
-
 /**
  * Evaluate a deep neural net and its derivatives
  */
@@ -33,6 +27,8 @@ class NeuralNetFreeEnergyBase : public ADMaterial<compute_stage>,
                                 public DerivativeMaterialPropertyNameInterface
 {
 public:
+  static InputParameters validParams();
+
   NeuralNetFreeEnergyBase(const InputParameters & parameters);
 
   virtual void initialSetup();
@@ -117,5 +113,6 @@ private:
   /// product of the weight matrix and the derivative of the activation function
   std::vector<DenseMatrix<ADReal>> _prod;
 
+protected:
   usingMaterialMembers;
 };

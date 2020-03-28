@@ -10,16 +10,19 @@
 
 registerADMooseObject("MagpieApp", NeuralNetFreeEnergy);
 
-defineADValidParams(
-    NeuralNetFreeEnergy,
-    NeuralNetFreeEnergyBase,
-    params.addClassDescription("Evaluates a fitted deep neural network to obtain a free energy and "
-                               "its derivatives with a preset activation function.");
+template <ComputeStage compute_stage>
+InputParameters
+NeuralNetFreeEnergy<compute_stage>::validParams()
+{
+  auto params = NeuralNetFreeEnergyBase<compute_stage>::validParams();
+  params.addClassDescription("Evaluates a fitted deep neural network to obtain a free energy and "
+                             "its derivatives with a preset activation function.");
 
-    MooseEnum activationFunctionEnum("SIGMOID SOFTSIGN TANH", "SIGMOID");
-    params.addParam<MooseEnum>("activation_function",
-                               activationFunctionEnum,
-                               "Weights and biases file format"););
+  MooseEnum activationFunctionEnum("SIGMOID SOFTSIGN TANH", "SIGMOID");
+  params.template addParam<MooseEnum>(
+      "activation_function", activationFunctionEnum, "Weights and biases file format");
+  return params;
+}
 
 template <ComputeStage compute_stage>
 NeuralNetFreeEnergy<compute_stage>::NeuralNetFreeEnergy(const InputParameters & parameters)

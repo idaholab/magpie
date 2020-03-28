@@ -10,22 +10,27 @@
 #include "MooseEnum.h"
 #include <fstream>
 
-defineADValidParams(
-    NeuralNetFreeEnergyBase,
-    ADMaterial,
-    params.addClassDescription(
-        "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
+template <ComputeStage compute_stage>
+InputParameters
+NeuralNetFreeEnergyBase<compute_stage>::validParams()
+{
+  auto params = ADMaterial<compute_stage>::validParams();
+  params.addClassDescription(
+      "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
 
-    MooseEnum fileFormatEnum("MAGPIE GENANN");
-    params.addParam<MooseEnum>("file_format", fileFormatEnum, "Weights and biases file format");
+  MooseEnum fileFormatEnum("MAGPIE GENANN");
+  params.template addParam<MooseEnum>(
+      "file_format", fileFormatEnum, "Weights and biases file format");
 
-    params.addParam<FileName>(
-        "file_name",
-        "Data file containing the weights and biasses for a fully connected deep neural network");
-    params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
-    params.addParam<std::vector<MaterialPropertyName>>(
-        "prop_names", "list of material properties fed from the outputs of the neural network");
-    params.addParam<bool>("debug", "Tabulate the NN to a file for debugging purposes"););
+  params.template addParam<FileName>(
+      "file_name",
+      "Data file containing the weights and biasses for a fully connected deep neural network");
+  params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
+  params.template addParam<std::vector<MaterialPropertyName>>(
+      "prop_names", "list of material properties fed from the outputs of the neural network");
+  params.template addParam<bool>("debug", "Tabulate the NN to a file for debugging purposes");
+  return params;
+}
 
 template <ComputeStage compute_stage>
 NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParameters & parameters)

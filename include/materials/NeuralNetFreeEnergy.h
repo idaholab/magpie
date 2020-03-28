@@ -10,12 +10,6 @@
 
 #include "NeuralNetFreeEnergyBase.h"
 
-// Forward Declarations
-template <ComputeStage>
-class NeuralNetFreeEnergy;
-
-declareADValidParams(NeuralNetFreeEnergy);
-
 /**
  * Evaluate a deep neural net and its derivatives
  */
@@ -23,6 +17,8 @@ template <ComputeStage compute_stage>
 class NeuralNetFreeEnergy : public NeuralNetFreeEnergyBase<compute_stage>
 {
 public:
+  static InputParameters validParams();
+
   NeuralNetFreeEnergy(const InputParameters & parameters);
 
 protected:
