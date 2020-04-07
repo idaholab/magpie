@@ -8,8 +8,9 @@ This kernel implements the term
 -\frac12 \frac{\partial F}{\partial u} |\nabla v|^2
 \end{equation}
 
-in the polar phase field model from [!cite](Momeni2014). This term is used in the
-evolution equations of both order parameters.
+in the [polar phase field model](/PolarPhaseField/index.md) from
+[!cite](Momeni2014). This term is used in the evolution equations of both order
+parameters.
 
 | $u$ (`variable`)| $v$ (`v`)| $F$ (`F`) |
 | - | - | - |

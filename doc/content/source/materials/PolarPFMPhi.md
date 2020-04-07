@@ -1,6 +1,7 @@
 # PolarPFMPhi
 
-This material implements the product of the gradient energy coefficient $\beta^{21}$ and the interpolation function $\phi$ from [!cite](Momeni2014).
+This material implements the product of the gradient energy coefficient $\beta^{21}$ and the interpolation function $\phi$ of the [polar phase field model](/PolarPhaseField/index.md)
+from [!cite](Momeni2014).
 
 \begin{equation}
 \beta^{21}\phi(\Upsilon,a_\phi,a_0)

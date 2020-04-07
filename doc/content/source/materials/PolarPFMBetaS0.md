@@ -1,6 +1,7 @@
 # PolarPFMPhi
 
 This material implements the gradient energy coefficient $\beta^{S0}(\vartheta)$
+of the [polar phase field model](/PolarPhaseField/index.md)
 from [!cite](Momeni2014).
 
 This object can be used with the [MatDiffusion](/MatDiffusion.md) and
