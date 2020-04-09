@@ -39,10 +39,11 @@ private:
 template <class T>
 MyTRIMElementResultAccess<T>::MyTRIMElementResultAccess(const InputParameters & parameters)
   : T(parameters),
-    _mytrim(getUserObject<MyTRIMElementRun>("runner")),
+    _mytrim(this->template getUserObject<MyTRIMElementRun>("runner")),
     _rasterizer(_mytrim.rasterizer()),
-    _ivar(getParam<unsigned int>("ivar")),
-    _defect(getParam<MooseEnum>("defect").template getEnum<ThreadedRecoilLoopBase::DefectType>())
+    _ivar(this->template getParam<unsigned int>("ivar")),
+    _defect(this->template getParam<MooseEnum>("defect")
+                .template getEnum<ThreadedRecoilLoopBase::DefectType>())
 {
   if (this->isNodal())
     mooseError("MyTRIMElementResultAccess needs to be applied to an elemental AuxVariable.");
