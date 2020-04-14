@@ -44,7 +44,7 @@ MultiAppNeutronicsSpectrumTransfer::execute()
   // get the neutronics PDF user object
   FEProblemBase & from_problem = _multi_app->problemBase();
   const NeutronicsSpectrumSamplerBase & neutronics_pdf =
-      from_problem.getUserObjectTempl<NeutronicsSpectrumSamplerBase>(_neutronics_pdf_name);
+      from_problem.getUserObject<NeutronicsSpectrumSamplerBase>(_neutronics_pdf_name);
 
   // loop over all sub apps and copy over the neutronics data
   for (unsigned int i = 0; i < _multi_app->numGlobalApps(); ++i)
@@ -57,8 +57,8 @@ MultiAppNeutronicsSpectrumTransfer::execute()
       for (THREAD_ID tid = 0; tid < libMesh::n_threads(); ++tid)
       {
         PKAGeneratorNeutronicsBase & pka_uo = const_cast<PKAGeneratorNeutronicsBase &>(
-            _multi_app->appProblem(i).getUserObjectTempl<PKAGeneratorNeutronicsBase>(
-                _pka_generator_name, tid));
+            _multi_app->appProblem(i).getUserObject<PKAGeneratorNeutronicsBase>(_pka_generator_name,
+                                                                                tid));
         pka_uo.setPDF(zaids, energies, probabilities);
       }
     }

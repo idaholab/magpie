@@ -11,6 +11,8 @@
 #include "MooseRandom.h"
 #include "MagpieUtils.h"
 
+#include "libmesh/vector_value.h"
+
 DiscretePKAPDF::DiscretePKAPDF()
   : DiscretePKAPDFBase(),
     _probability_density_function(MultiIndex<Real>({1})),
