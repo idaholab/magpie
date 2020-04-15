@@ -13,8 +13,7 @@
 /**
  * Evaluate a deep neural net and its derivatives
  */
-template <ComputeStage compute_stage>
-class NeuralNetFreeEnergy : public NeuralNetFreeEnergyBase<compute_stage>
+class NeuralNetFreeEnergy : public NeuralNetFreeEnergyBase
 {
 public:
   static InputParameters validParams();
@@ -31,6 +30,4 @@ protected:
 
   /// apply activation functions (and record their derivatives) for the current layer
   void applyLayerActivation() override;
-
-  usingNeuralNetFreeEnergyBaseMembers;
 };

@@ -11,20 +11,10 @@
 #include "ADMaterial.h"
 #include "DerivativeMaterialPropertyNameInterface.h"
 
-#define usingNeuralNetFreeEnergyBaseMembers                                                        \
-  usingMaterialMembers;                                                                            \
-  using NeuralNetFreeEnergyBase<compute_stage>::_layer;                                            \
-  using NeuralNetFreeEnergyBase<compute_stage>::_z;                                                \
-  using NeuralNetFreeEnergyBase<compute_stage>::_activation;                                       \
-  using NeuralNetFreeEnergyBase<compute_stage>::_d_activation;                                     \
-  using NeuralNetFreeEnergyBase<compute_stage>::applyLayerActivation
-
 /**
  * Evaluate a deep neural net and its derivatives
  */
-template <ComputeStage compute_stage>
-class NeuralNetFreeEnergyBase : public ADMaterial<compute_stage>,
-                                public DerivativeMaterialPropertyNameInterface
+class NeuralNetFreeEnergyBase : public ADMaterial, public DerivativeMaterialPropertyNameInterface
 {
 public:
   static InputParameters validParams();
@@ -87,7 +77,7 @@ private:
   const std::size_t _n_output;
 
   /// output properties
-  std::vector<ADMaterialProperty(Real) *> _output;
+  std::vector<ADMaterialProperty<Real> *> _output;
 
   /// number of inputs
   const std::size_t _n_input;
@@ -105,14 +95,11 @@ private:
   std::vector<const ADVariableValue *> _input;
 
   /// output property derivatives
-  std::vector<ADMaterialProperty(Real) *> _d_output;
+  std::vector<ADMaterialProperty<Real> *> _d_output;
 
   /// progressive Jacobian matrices
   std::vector<DenseMatrix<ADReal>> _diff;
 
   /// product of the weight matrix and the derivative of the activation function
   std::vector<DenseMatrix<ADReal>> _prod;
-
-protected:
-  usingMaterialMembers;
 };

@@ -10,11 +10,10 @@
 #include "MooseEnum.h"
 #include <fstream>
 
-template <ComputeStage compute_stage>
 InputParameters
-NeuralNetFreeEnergyBase<compute_stage>::validParams()
+NeuralNetFreeEnergyBase::validParams()
 {
-  auto params = ADMaterial<compute_stage>::validParams();
+  auto params = ADMaterial::validParams();
   params.addClassDescription(
       "Evaluates a fitted deep neural network to obtain a free energy and its derivatives.");
 
@@ -32,9 +31,8 @@ NeuralNetFreeEnergyBase<compute_stage>::validParams()
   return params;
 }
 
-template <ComputeStage compute_stage>
-NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParameters & parameters)
-  : ADMaterial<compute_stage>(parameters),
+NeuralNetFreeEnergyBase::NeuralNetFreeEnergyBase(const InputParameters & parameters)
+  : ADMaterial(parameters),
     _file_format(getParam<MooseEnum>("file_format").template getEnum<FileFormat>()),
     _file_name(getParam<FileName>("file_name")),
     _output_name(getParam<std::vector<MaterialPropertyName>>("prop_names")),
@@ -107,17 +105,15 @@ NeuralNetFreeEnergyBase<compute_stage>::NeuralNetFreeEnergyBase(const InputParam
   }
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::initialSetup()
+NeuralNetFreeEnergyBase::initialSetup()
 {
   if (getParam<bool>("debug"))
     debugDump();
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::debugDump()
+NeuralNetFreeEnergyBase::debugDump()
 {
   std::ofstream ofile;
   ofile.open("debug.dat");
@@ -141,15 +137,8 @@ NeuralNetFreeEnergyBase<compute_stage>::debugDump()
     }
 }
 
-template <>
 void
-NeuralNetFreeEnergyBase<JACOBIAN>::debugDump()
-{
-}
-
-template <ComputeStage compute_stage>
-void
-NeuralNetFreeEnergyBase<compute_stage>::loadGenANN(std::ifstream & ifile)
+NeuralNetFreeEnergyBase::loadGenANN(std::ifstream & ifile)
 {
   std::size_t x, y;
 
@@ -195,9 +184,8 @@ NeuralNetFreeEnergyBase<compute_stage>::loadGenANN(std::ifstream & ifile)
   }
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::loadMagpieNet(std::ifstream & ifile)
+NeuralNetFreeEnergyBase::loadMagpieNet(std::ifstream & ifile)
 {
   std::size_t x, y;
 
@@ -242,9 +230,8 @@ NeuralNetFreeEnergyBase<compute_stage>::loadMagpieNet(std::ifstream & ifile)
   }
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::computeQpProperties()
+NeuralNetFreeEnergyBase::computeQpProperties()
 {
   // set input nodes
   for (std::size_t j = 0; j < _n_input; ++j)
@@ -263,11 +250,10 @@ NeuralNetFreeEnergyBase<compute_stage>::computeQpProperties()
   }
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
-                                                 const DenseMatrix<ADReal> & M2,
-                                                 const DenseMatrix<ADReal> & M3)
+NeuralNetFreeEnergyBase::multiply(DenseMatrix<ADReal> & M1,
+                                  const DenseMatrix<ADReal> & M2,
+                                  const DenseMatrix<ADReal> & M3)
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
@@ -288,9 +274,8 @@ NeuralNetFreeEnergyBase<compute_stage>::multiply(DenseMatrix<ADReal> & M1,
     }
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergyBase<compute_stage>::evaluate()
+NeuralNetFreeEnergyBase::evaluate()
 {
   _layer = 0;
   while (true)
@@ -322,5 +307,3 @@ NeuralNetFreeEnergyBase<compute_stage>::evaluate()
     ++_layer;
   }
 }
-
-adBaseClass(NeuralNetFreeEnergyBase);

@@ -10,11 +10,10 @@
 
 registerADMooseObject("MagpieApp", NeuralNetFreeEnergy);
 
-template <ComputeStage compute_stage>
 InputParameters
-NeuralNetFreeEnergy<compute_stage>::validParams()
+NeuralNetFreeEnergy::validParams()
 {
-  auto params = NeuralNetFreeEnergyBase<compute_stage>::validParams();
+  auto params = NeuralNetFreeEnergyBase::validParams();
   params.addClassDescription("Evaluates a fitted deep neural network to obtain a free energy and "
                              "its derivatives with a preset activation function.");
 
@@ -24,17 +23,15 @@ NeuralNetFreeEnergy<compute_stage>::validParams()
   return params;
 }
 
-template <ComputeStage compute_stage>
-NeuralNetFreeEnergy<compute_stage>::NeuralNetFreeEnergy(const InputParameters & parameters)
-  : NeuralNetFreeEnergyBase<compute_stage>(parameters),
+NeuralNetFreeEnergy::NeuralNetFreeEnergy(const InputParameters & parameters)
+  : NeuralNetFreeEnergyBase(parameters),
     _activation_function(
         getParam<MooseEnum>("activation_function").template getEnum<ActivationFunction>())
 {
 }
 
-template <ComputeStage compute_stage>
 void
-NeuralNetFreeEnergy<compute_stage>::applyLayerActivation()
+NeuralNetFreeEnergy::applyLayerActivation()
 {
   switch (_activation_function)
   {
