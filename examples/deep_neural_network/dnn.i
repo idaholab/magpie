@@ -59,13 +59,13 @@
     type = ADSplitCHParsed
     variable = cn
     f_name = Fn
-    kappa_name = kappa_c
+    kappa_name = ad_kappa_c
     w = wn
   [../]
   [./wn_res]
     type = ADSplitCHWRes
     variable = wn
-    mob_name = M
+    mob_name = ad_M
   [../]
   [./timen]
     type = ADCoupledTimeDerivative
@@ -125,6 +125,11 @@
     prop_names  = 'M kappa_c'
     prop_values = '1 0.25'
   [../]
+  [./adpfmobility]
+    type = ADGenericConstantMaterial
+    prop_names  = 'ad_M ad_kappa_c'
+    prop_values = '1 0.25'
+  [../]
 []
 
 [Preconditioning]
@@ -138,6 +143,14 @@
   kernel_coverage_check = false
 []
 
+[Postprocessors]
+  [./diff]
+    type = ElementL2Difference
+    variable = cn
+    other_variable = cp
+  [../]
+[]
+
 [Executioner]
   type = Transient
   solve_type = 'NEWTON'
@@ -149,5 +162,6 @@
 
 [Outputs]
   exodus = true
+  gnuplot = true
   print_linear_residuals = false
 []

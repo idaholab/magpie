@@ -16,6 +16,8 @@ import numpy as np
 # Parameters
 #
 
+cmd = ' '.join(sys.argv)
+
 parser = argparse.ArgumentParser(description='Fit a neural network to a Gibbs free energy.')
 parser.add_argument('datafile', help='Text file with columns for the inputs, free energy, and (optionally) chemical potential data.')
 parser.add_argument('inputs', type=int, help="Number of input nodes")
@@ -28,6 +30,8 @@ parser.add_argument('-m', '--mini_batch', type=int, default=128, help="Mini batc
 parser.add_argument('-H', '--hidden_layer_nodes', type=int, default=20, help="Number of nodes per hidden layer (20)")
 parser.add_argument('-n', '--hidden_layer_count', type=int, default=2, help="Number of hidden layers (2)")
 parser.add_argument('-r', '--learning_rate', type=float, default=1e-5, help="Learning rate meta parameter (1e-5)")
+parser.add_argument('-G', '--disable_gpu', action="store_true", help="Disable GPU detection and learn on the CPU")
+parser.add_argument('-a', '--activation', choices=['softsign','sigmoid','tanh'], default='softsign', help="Activation function")
 args = parser.parse_args()
 print(args)
 
@@ -36,8 +40,21 @@ use_chemical_potentials = args.use_chemical_potentials
 if use_chemical_potentials:
     print("Using chemical potential data in loss function")
 
+# use cuda if available
+gpu = torch.cuda.is_available() and not args.disable_gpu
+
 # data file with D_in + D_out columns
 filename = args.datafile
+
+# Activation function
+if args.activation == 'sigmoid' :
+    activation = torch.nn.Sigmoid
+elif args.activation == 'softsign' :
+    activation = torch.nn.Softsign
+elif args.activation == 'tanh' :
+    activation = torch.nn.Tanh
+else :
+    print("invalid activation function '%s'" % args.activation)
 
 # input dimension (temperature and concentrations)
 D_in = args.inputs
@@ -79,17 +96,28 @@ H = args.hidden_layer_nodes
 
 # open training log
 log = open("model.log", "a")
+log.write("# %s\n" % cmd)
+log.flush()
 
 # Create tensors to hold inputs and outputs (and gradients)
-x = torch.Tensor(data[0:D_in]).transpose(0,1)
-y = torch.Tensor(data[D_in:D_in+D_out]).transpose(0,1)
-grad = torch.Tensor(data[D_in+D_out:]).transpose(0,1)
+if gpu:
+    x = torch.from_numpy(data[0:D_in]).transpose(0,1).float().cuda()
+    y = torch.from_numpy(data[D_in:D_in+D_out]).transpose(0,1).float().cuda()
+    grad = torch.from_numpy(data[D_in+D_out:]).transpose(0,1).float().cuda()
+else:
+    x = torch.Tensor(data[0:D_in]).transpose(0,1)
+    y = torch.Tensor(data[D_in:D_in+D_out]).transpose(0,1)
+    grad = torch.Tensor(data[D_in+D_out:]).transpose(0,1)
 
 # get min and max of input data
 in_bounds = [(np.amin(d), np.amax(d)) for d in data[:D_in]]
 in_norm = [(b[1]-b[0], b[0]/(b[1]-b[0])) for b in in_bounds]
 out_bounds = [(np.amin(d), np.amax(d)) for d in data[D_in:D_in+D_out]]
 out_norm = [(b[1]-b[0], b[0]) for b in out_bounds]
+
+print(D_in, D_in+D_out)
+print(np.amin(data[D_in:D_in+D_out][0]))
+print(data[D_in:D_in+D_out][0])
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -134,22 +162,23 @@ def shift_output():
     n_layers = int(len(params) / 2)
 
     y_pred = model.forward(x)
-    yd = np.transpose(y.detach().numpy())
-    ypd = np.transpose(y_pred.detach().numpy())
+    if gpu:
+        yd = np.transpose(y.cpu().detach().numpy())
+        ypd = np.transpose(y_pred.cpu().detach().numpy())
+    else:
+        yd = np.transpose(y.detach().numpy())
+        ypd = np.transpose(y_pred.detach().numpy())
 
     # output biases
     p = params[n_layers*2-1]
     for i in range(D_out):
       p[i].data += np.mean(yd[i]-ypd[i])
 
-# Activation function
-# activation = torch.nn.Sigmoid
-activation = torch.nn.Softsign
-
 if os.path.exists('model.dat') :
     # Load the model from file
     print("Resuming training of existing model")
     model = torch.load('model.dat')
+    # model = model.load_state_dict(torch.load('model.dat'))
 else:
     # Use the nn package to define our model and loss function.
     print("Seting up new model with %d hidden layers with %d nodes each." %
@@ -163,6 +192,9 @@ else:
 
     model.apply(weights_init)
     adjust_weights()
+
+if gpu:
+    model = model.float().cuda()
 
 # shift outputs by recalculating output layer bias
 shift_output()
@@ -195,8 +227,11 @@ for epoch in range(n_epochs):
       y_pred = model.forward(batch_x)
 
       if use_chemical_potentials:
+          ones = torch.ones(y_pred.shape)
+          if gpu:
+              ones = ones.float().cuda()
           # Forward pass: compute predicted y by passing x to the model.
-          y_pred.backward(torch.ones(y_pred.shape), retain_graph=True)
+          y_pred.backward(ones, retain_graph=True)
           grad_pred = torch.autograd.grad(y_pred, batch_x,
                         grad_outputs=y_pred.data.new(y_pred.shape).fill_(1),
                         create_graph=True)[0]
@@ -204,20 +239,26 @@ for epoch in range(n_epochs):
           optimizer.zero_grad()
 
           batch_grad = torch.autograd.Variable(grad[indices], requires_grad=False)
+
+          # skip temperature derivative
+          batch_grad = batch_grad[:,1:]
+          grad_pred = grad_pred[:,1:]
+
           loss = torch.mean((y_pred - batch_y) ** 2 + (grad_pred - batch_grad) ** 2)
 
       else:
-          loss = torch.sum((y_pred - batch_y) ** 2)
+          loss = torch.mean((y_pred - batch_y) ** 2)
 
       # print learning status
       if epoch % output_status == 0 and i == 0:
           print(epoch, loss.item())
-          log.write("%d %f\n" % (epoch, loss.item()))
+          log.write("%d %E\n" % (epoch, loss.item()))
           log.flush()
 
       # save model once in a while to allow for resuming of the training
       if epoch > 0 and epoch % output_model == 0 and i == 0:
           torch.save(model, 'model.dat')
+          #torch.save(model.state_dict(), 'model.dat')
           print("Model saved.")
 
       # Backward pass: compute gradient of the loss with respect to model
@@ -230,22 +271,35 @@ for epoch in range(n_epochs):
 
 log.close()
 
-if use_chemical_potentials:
+if use_chemical_potentials or True:
     # Forward pass: compute predicted y by passing x to the model.
     xg = torch.autograd.Variable(x, requires_grad=True)
     y_pred = model.forward(xg)
-    y_pred.backward(torch.ones(y_pred.shape), retain_graph=True)
+    ones = torch.ones(y_pred.shape)
+    if gpu:
+        ones = ones.float().cuda()
+    y_pred.backward(ones, retain_graph=True)
     grad_pred = torch.autograd.grad(y_pred, xg,
                   grad_outputs=y_pred.data.new(y_pred.shape).fill_(1),
                   create_graph=True)[0]
-    xd = x.detach().numpy()
-    yd = y_pred.detach().numpy()
-    gd = grad_pred.detach().numpy()
+    if gpu:
+        xd = x.cpu().detach().numpy()
+        yd = y_pred.cpu().detach().numpy()
+        gd = grad_pred.cpu().detach().numpy()
+    else:
+        xd = x.detach().numpy()
+        yd = y_pred.detach().numpy()
+        gd = grad_pred.detach().numpy()
     np.savetxt('out.txt', np.concatenate((xd, yd, gd), axis=1))
 else:
     y_pred = model.forward(x)
-    xd = x.detach().numpy()
-    yd = y_pred.detach().numpy()
+    if gpu:
+        xd = x.cpu().detach().numpy()
+        yd = y_pred.cpu().detach().numpy()
+    else:
+        xd = x.detach().numpy()
+        yd = y_pred.detach().numpy()
     np.savetxt('out.txt', np.concatenate((xd, yd), axis=1))
 
 torch.save(model, 'model.dat')
+#torch.save(model.state_dict(), 'model.dat')

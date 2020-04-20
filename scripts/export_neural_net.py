@@ -26,7 +26,7 @@ with open('weights_biases.txt', "w") as f:
     # loop over weights
     for layer in range(n_layers):
         p = params[layer*2]
-        pp = p.detach().numpy().transpose()
+        pp = p.detach().cpu().numpy().transpose()
         # print size
         x = pp.shape[0]
         y = pp.shape[1]
@@ -37,7 +37,7 @@ with open('weights_biases.txt', "w") as f:
     # loop over biases
     for layer in range(n_layers):
         p = params[layer*2+1]
-        pp = p.detach().numpy()
+        pp = p.detach().cpu().numpy()
         # print size
         x = p.size()[0]
         f.write("%d\n" % x)
