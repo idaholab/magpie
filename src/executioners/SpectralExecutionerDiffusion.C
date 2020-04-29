@@ -77,8 +77,6 @@ SpectralExecutionerDiffusion::getGreensFunction(FFTBufferBase<Real> & greens,
   Real accGreens = 0.0;
 
   const Point & box_size = greens.getBoxSize();
-  const Point & min_corner = greens.getMinCorner();
-  const Point & max_corner = greens.getMaxCorner();
 
   const auto & grid = greens.grid();
   switch (greens.dim())
