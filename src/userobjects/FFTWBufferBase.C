@@ -53,7 +53,7 @@ FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
                                FFTW_ESTIMATE);
   }
 
-  _scaling = 1.0 / std::sqrt(_real_space_data.size());
+  _scaling = 1.0 / (_real_space_data.size());
 }
 
 template <typename T>

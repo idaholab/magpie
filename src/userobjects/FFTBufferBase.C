@@ -162,7 +162,6 @@ void
 FFTBufferBase<T>::forward()
 {
   forwardRaw();
-  _reciprocal_space_data *= forwardScale();
 }
 
 template <typename T>

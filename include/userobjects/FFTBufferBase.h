@@ -74,6 +74,15 @@ public:
   /// return the number of grid cells along each dimension without padding
   const std::vector<int> & grid() const { return _grid; }
 
+  /// return the size of the box
+  const Point & getBoxSize() const { return _box_size; }
+
+  /// return the minimum coordinate corner
+  const Point & getMinCorner() const { return _min_corner; }
+
+  /// return the maximum coordinate corner
+  const Point & getMaxCorner() const { return _max_corner; }
+
   /// return the buffer dimension
   const unsigned int & dim() const { return _dim; }
 
