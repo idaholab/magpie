@@ -1,0 +1,14 @@
+[Tests]
+  [./diffusion2DMat]
+    input = 'diffusion2DMat.i'
+    type = 'Exodiff'
+    exodiff = 'diffusion2DMat_out.e'
+    abs_zero = 1e-6
+  [../]
+  [./spectralDiffusionGreens2D]
+    input = 'spectralDiffusionGreens2D.i'
+    type = 'Exodiff'
+    exodiff = 'spectralDiffusionGreens2D_out.e'
+    abs_zero = 1e-6
+  [../]
+[]
