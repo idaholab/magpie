@@ -26,7 +26,7 @@
 
 [Kernels]
   [./diff]
-    type = ADMatDiffusion
+    type = MatDiffusion
     variable = diffused
     diffusivity = diffusivity
   [../]
