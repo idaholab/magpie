@@ -11,4 +11,10 @@
     exodiff = 'spectralDiffusionGreens2D_out.e'
     abs_zero = 1e-6
   [../]
+  [./spectralDerivative]
+    input = 'spectralDerivative.i'
+    type = 'Exodiff'
+    exodiff = 'spectralDerivative_out.e'
+    abs_zero = 1e-6
+  [../]
 []
