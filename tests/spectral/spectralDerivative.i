@@ -236,7 +236,7 @@
 []
 
 [Executioner]
-  type = SpectralExecutionerBase
+  type = TestSpectralExecutioner
 []
 
 [Outputs]
