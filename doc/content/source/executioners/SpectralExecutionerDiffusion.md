@@ -9,7 +9,7 @@
 As shown below, this diffusion execution does not need to iterate due to its linear nature. Spectral executioners are, however, not restricted to linear solves.
 
 !listing src/executioners/SpectralExecutionerDiffusion.C
-         re=void\SpectralExecutionerDiffusion::execute.*?^}
+         re=void\sSpectralExecutionerDiffusion::execute.*}
 
 !syntax parameters /Executioner/SpectralExecutionerDiffusion
 
