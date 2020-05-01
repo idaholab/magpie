@@ -29,6 +29,8 @@ MagpieApp::MagpieApp(const InputParameters & parameters) : MooseApp(parameters)
   MagpieApp::registerAll(_factory, _action_factory, _syntax);
 }
 
+MagpieApp::~MagpieApp() {}
+
 extern "C" void
 MagpieApp__registerApps()
 {

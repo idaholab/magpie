@@ -1,4 +1,12 @@
-#include "MagpieApp.h"
+/**********************************************************************/
+/*                     DO NOT MODIFY THIS HEADER                      */
+/* MAGPIE - Mesoscale Atomistic Glue Program for Integrated Execution */
+/*                                                                    */
+/*            Copyright 2017 Battelle Energy Alliance, LLC            */
+/*                        ALL RIGHTS RESERVED                         */
+/**********************************************************************/
+
+#include "MagpieTestApp.h"
 #include "MooseInit.h"
 #include "Moose.h"
 #include "MooseApp.h"
@@ -15,13 +23,20 @@ main(int argc, char * argv[])
   MooseInit init(argc, argv);
 
   // print ASCII art application logo
-  MagpieApp::printLogo();
+  MagpieTestApp::printLogo();
 
   // Register this application's MooseApp and any it depends on
-  MagpieApp::registerApps();
+  MagpieTestApp::registerApps();
 
   // This creates dynamic memory that we're responsible for deleting
-  std::shared_ptr<MooseApp> app = AppFactory::createAppShared("MagpieApp", argc, argv);
+  std::shared_ptr<MooseApp> app = AppFactory::createAppShared("MagpieTestApp", argc, argv);
+
+  std::shared_ptr<MagpieTestApp> btapp = std::dynamic_pointer_cast<MagpieTestApp>(app);
+  if (!btapp)
+    mooseError("Did not create Magpie");
+
+  app->setCheckUnusedFlag(true);
+  app->setErrorOverridden();
 
   // Execute the application
   app->run();
