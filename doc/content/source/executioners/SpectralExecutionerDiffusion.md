@@ -8,46 +8,8 @@
 
 As shown below, this diffusion execution does not need to iterate due to its linear nature. Spectral executioners are, however, not restricted to linear solves.
 
-```cpp
-void
-SpectralExecutionerDiffusion::execute()
-{
-  unsigned int thisStep = 0;
-
-  _time_step = thisStep;
-  _time = _time_step;
-  _fe_problem.outputStep(EXEC_INITIAL);
-  _fe_problem.advanceState();
-
-  auto & u_buffer = getFFTBuffer<Real>("u");
-  auto & greens = getFFTBuffer<Real>("greens_buffer");
-
-  // Get Greens function of
-  getGreensFunction(greens, _dt, _diff_coeff);
-  greens.forwardRaw();
-
-  for (unsigned int step_no = 0; step_no < _nsteps; step_no++)
-  {
-    u_buffer.forwardRaw();
-
-    u_buffer.reciprocalSpace() *= greens.reciprocalSpace();
-    u_buffer.backward();
-
-    // End of diffusion computations
-    thisStep++;
-    _t_current += _dt;
-    _time_step = thisStep;
-
-    _fe_problem.execute(EXEC_FINAL);
-    _time = _t_current;
-    Moose::out << "_t_current: " << _t_current << ". \n";
-    _fe_problem.outputStep(EXEC_FINAL);
-
-    if (step_no != _nsteps - 1)
-      _fe_problem.advanceState();
-}
-}
-```
+!listing src/executioners/SpectralExecutionerDiffusion.C
+         re=void\SpectralExecutionerDiffusion::execute.*?^}
 
 !syntax parameters /Executioner/SpectralExecutionerDiffusion
 
