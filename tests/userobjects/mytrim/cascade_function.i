@@ -65,7 +65,6 @@
     m = 238
     Z = 54
     E = '1000*10^t'
-    point = '0 0 0'
     pka_rate = (0.6-t)*0.1
   [../]
   [./rasterizer]

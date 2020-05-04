@@ -8,19 +8,24 @@
 
 #pragma once
 
-#include "MooseApp.h"
+#include "AuxKernel.h"
 
-class MagpieApp : public MooseApp
+/**
+ * Get a selected component of the gradient of a coupled variable
+ */
+class GradientComponentAux : public AuxKernel
 {
 public:
   static InputParameters validParams();
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+  GradientComponentAux(const InputParameters & parameters);
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/) {}
+protected:
+  virtual Real computeValue() override;
 
-  static void printLogo();
+  /// Gradient of the coupled variable
+  const VariableGradient & _grad_v;
+
+  /// Component of the gradient vector to match
+  const unsigned int _component;
 };

@@ -6,21 +6,31 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#pragma once
+#ifndef TESTSPECTRALEXECUTIONER_H
+#define TESTSPECTRALEXECUTIONER_H
 
-#include "MooseApp.h"
+#include "SpectralExecutionerBase.h"
+#include "FFTWBufferBase.h"
+#include "FFTProblem.h"
 
-class MagpieApp : public MooseApp
+// System includes
+#include <string>
+
+// Forward declarations
+class InputParameters;
+
+/**
+ * FFT Executioner base class.
+ */
+class TestSpectralExecutioner : public SpectralExecutionerBase
 {
 public:
   static InputParameters validParams();
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+  TestSpectralExecutioner(const InputParameters & parameters);
+  virtual void execute() override;
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/) {}
-
-  static void printLogo();
 };
+
+
+#endif

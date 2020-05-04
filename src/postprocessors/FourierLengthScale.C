@@ -41,17 +41,19 @@ FourierLengthScale::FourierLengthScale(const InputParameters & parameters)
 void
 FourierLengthScale::computeLengthScale(std::vector<int> & c, std::vector<Real> & F, std::size_t i)
 {
-  if (i == 0)
+  if (i == _dim - 1)
   {
     Real sum_high = 0.0;
     for (unsigned int j = 1; j < _dim; ++j)
       sum_high += F[j];
 
-    for (c[0] = 0; c[0] < _grid[0]; ++c[0])
+    auto & cc = c[_dim - 1];
+    for (cc = 0; cc < _grid[_dim - 1]; ++cc)
     {
-      // do stuff at lowest dimension
-      Real sum =
-          sum_high + Utility::pow<2>((c[0] * 2 > _grid[0] ? _grid[0] - c[0] : c[0]) / _box_size(0));
+      // do stuff at highest dimension
+      F[_dim - 1] =
+          Utility::pow<2>((cc * 2 > _grid[_dim - 1] ? _grid[_dim - 1] - cc : cc) / _box_size(0));
+      Real sum = sum_high + F[_dim - 1];
 
       // find bin and add to spectrum
       if (sum > 0)
@@ -64,18 +66,14 @@ FourierLengthScale::computeLengthScale(std::vector<int> & c, std::vector<Real> &
         for (unsigned int j = 1; j < _dim; ++j)
           normalization *= frequency;
 
-        // recalculate index (row major)
-        int index = 0;
-        for (unsigned int j = 0; j < _dim; ++j)
-          index = index * _grid[j] + c[j];
-
         // weight is the normalized intensity at this frequency
-        const Real weight = Utility::pow<2>(_buffer[index]) / normalization;
+        const Real weight = Utility::pow<2>(_buffer[_index]) / normalization;
 
         // compute weighted average of frequencies
         _length_scale += frequency * weight;
         _weight_sum += weight;
       }
+      _index++;
     }
   }
   else
@@ -83,7 +81,7 @@ FourierLengthScale::computeLengthScale(std::vector<int> & c, std::vector<Real> &
     for (c[i] = 0; c[i] < _grid[i]; ++c[i])
     {
       F[i] = Utility::pow<2>((c[i] * 2 > _grid[i] ? _grid[i] - c[i] : c[i]) / _box_size(i));
-      computeLengthScale(c, F, i - 1);
+      computeLengthScale(c, F, i + 1);
     }
 }
 
@@ -100,7 +98,8 @@ FourierLengthScale::execute()
     // compute the length scale
     std::vector<int> c(_dim, 0);
     std::vector<Real> F(_dim);
-    computeLengthScale(c, F, _dim - 1);
+    _index = 0;
+    computeLengthScale(c, F, 0);
 
     // divide by weight and take reciprocal (frequency -> length)
     _length_scale = _weight_sum / _length_scale;

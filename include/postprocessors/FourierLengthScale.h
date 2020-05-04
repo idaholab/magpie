@@ -54,6 +54,9 @@ protected:
 
   /// averaging weight
   Real _weight_sum;
+
+  /// index variable for recursive buffer traversal
+  std::size_t _index;
 };
 
 #endif // FFTW3_ENABLED

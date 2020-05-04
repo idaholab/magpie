@@ -1,0 +1,28 @@
+[Tests]
+  [./diffusion2DMat]
+    input = 'diffusion2DMat.i'
+    type = 'Exodiff'
+    exodiff = 'diffusion2DMat_out.e'
+    abs_zero = 1e-6
+    max_parallel = 1
+    max_threads = 1
+  [../]
+  [./spectralDiffusionGreens2D]
+    input = 'spectralDiffusionGreens2D.i'
+    type = 'Exodiff'
+    exodiff = 'spectralDiffusionGreens2D_out.e'
+    abs_zero = 1e-6
+    max_parallel = 1
+    max_threads = 1
+  [../]
+  [./spectralDerivative]
+    input = 'spectralDerivative.i'
+    type = 'Exodiff'
+    exodiff = 'spectralDerivative_out.e'
+    abs_zero = 1e-6
+    max_parallel = 1
+    max_threads = 1
+  # required_objects = NEMLStress
+    allow_test_objects = true
+  [../]
+[]

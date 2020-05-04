@@ -8,19 +8,21 @@
 
 #pragma once
 
-#include "MooseApp.h"
+#include "MagpieApp.h"
 
-class MagpieApp : public MooseApp
+class MagpieTestApp;
+
+template <>
+InputParameters validParams<MagpieTestApp>();
+
+class MagpieTestApp : public MagpieApp
 {
 public:
-  static InputParameters validParams();
-
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
-
+  MagpieTestApp(InputParameters parameters);
+  virtual ~MagpieTestApp();
   static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/) {}
-
-  static void printLogo();
+  static void registerAll(Factory & factory,
+                          ActionFactory & action_factory,
+                          Syntax & syntax,
+                          bool use_test_objs = false);
 };
