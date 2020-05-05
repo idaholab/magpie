@@ -6,21 +6,15 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
-#pragma once
+#include <MooseFFTVariable.h>
 
-#include "MooseApp.h"
-
-class MagpieApp : public MooseApp
+InputParameters
+MooseFFTVariable::validParams()
 {
-public:
-  static InputParameters validParams();
+  auto params = MooseVariableFEBase::validParams();
+  return params;
+}
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
-
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/) {}
-
-  static void printLogo();
-};
+MooseFFTVariable::MooseFFTVariable(const InputParameters & parameters) : MooseVariable(parameters)
+{
+}
