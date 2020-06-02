@@ -392,8 +392,8 @@ SPPARKSUserObject::initialSetup()
     s_bounds[4] = std::max(s_bounds[4], id.coor(1));
     s_bounds[5] = std::max(s_bounds[5], id.coor(2));
   }
-  MeshTools::BoundingBox spparks_bb(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
-                                    Point(s_bounds[3], s_bounds[4], s_bounds[5]));
+  libMesh::BoundingBox spparks_bb(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
+                                  Point(s_bounds[3], s_bounds[4], s_bounds[5]));
   _communicator.sum(spparks_bounds);
 
   //
@@ -416,8 +416,8 @@ SPPARKSUserObject::initialSetup()
     e_bounds[4] = std::max(e_bounds[4], id.coor(1));
     e_bounds[5] = std::max(e_bounds[5], id.coor(2));
   }
-  MeshTools::BoundingBox fem_bb(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
-                                Point(e_bounds[3], e_bounds[4], e_bounds[5]));
+  libMesh::BoundingBox fem_bb(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
+                              Point(e_bounds[3], e_bounds[4], e_bounds[5]));
   _communicator.sum(fem_bounds);
 
   //
@@ -433,15 +433,15 @@ SPPARKSUserObject::initialSetup()
 
     offset = i * 6;
     e_bounds = &fem_bounds[0] + offset;
-    MeshTools::BoundingBox e_box(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
-                                 Point(e_bounds[3], e_bounds[4], e_bounds[5]));
-    if (spparks_bb.intersect(e_box))
+    libMesh::BoundingBox e_box(Point(e_bounds[0], e_bounds[1], e_bounds[2]),
+                               Point(e_bounds[3], e_bounds[4], e_bounds[5]));
+    if (spparks_bb.intersects(e_box))
       procs_overlapping_spparks_domain.push_back(i);
 
     s_bounds = &spparks_bounds[0] + offset;
-    MeshTools::BoundingBox s_box(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
-                                 Point(s_bounds[3], s_bounds[4], s_bounds[5]));
-    if (fem_bb.intersect(s_box))
+    libMesh::BoundingBox s_box(Point(s_bounds[0], s_bounds[1], s_bounds[2]),
+                               Point(s_bounds[3], s_bounds[4], s_bounds[5]));
+    if (fem_bb.intersects(s_box))
       procs_overlapping_fem_domain.push_back(i);
   }
 
