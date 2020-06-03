@@ -6,8 +6,23 @@
 # MOOSE_DIR        - Root directory of the MOOSE project
 #
 ###############################################################################
-# Use a MOOSE source directory next to the magpie directory if MOOSE_DIR is not set
-MOOSE_DIR ?= $(shell dirname `pwd`)/moose
+
+MOOSE_SUBMODULE    := $(CURDIR)/moose
+MOOSE_PARENT := $(shell dirname `pwd`)/moose
+
+# MOOSE_DIR is empty or unset
+ifeq ($(wildcard $(MOOSE_DIR)/framework/Makefile),)
+  # submodule contains valid moose
+  ifneq ($(wildcard $(MOOSE_SUBMODULE)/framework/Makefile),)
+    MOOSE_DIR        := $(MOOSE_SUBMODULE)
+  # valid moose next to the magpie directory
+  else ifneq ($(wildcard $(MOOSE_PARENT)/framework/Makefile),)
+    MOOSE_DIR        := $(MOOSE_PARENT)
+  else
+    $(error MOOSE framework does not seem to be available. Make sure that either the submodule is checked out or that your MOOSE_DIR points to the correct location)
+  endif
+endif
+$(info Using moose framework at $(MOOSE_DIR))
 
 # framework
 FRAMEWORK_DIR      := $(MOOSE_DIR)/framework
