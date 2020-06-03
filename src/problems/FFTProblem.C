@@ -80,7 +80,7 @@ FFTProblem::getVariable(THREAD_ID tid,
       fft_var_number = _fft_dummy_system.system().variable_number(var_name);
 
     if (varlist.size() <= tid)
-      varlist.resize(tid + 1);
+      varlist.resize(tid + 1, nullptr);
 
     auto params = MooseVariableBase::validParams();
     params.set<MooseEnum>("order") = "CONSTANT";
@@ -94,7 +94,9 @@ FFTProblem::getVariable(THREAD_ID tid,
     params.set<std::string>("_type") = "MooseFFTVariable";
     params.set<std::string>("_object_name") = var_name;
     params.set<FEProblemBase *>("_fe_problem_base") = this;
-    varlist[tid] = new MooseFFTVariable(params);
+
+    if (varlist[tid] == nullptr)
+      varlist[tid] = new MooseFFTVariable(params);
 
     return *varlist[tid];
   }
