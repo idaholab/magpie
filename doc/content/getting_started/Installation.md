@@ -21,6 +21,14 @@ external packages is performed using
 [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/).
 Installation of these dependencies is system specific:
 
+### Conda (cross platform)
+
+This is now the **default** way to install MOOSE/Magpie dependencies.
+
+```
+conda install pkg-config gsl fftw
+```
+
 ### macOS (Homebrew)
 
 Prerequisite package installation on Mac is easiest using the [Homebrew](https://brew.sh/)
