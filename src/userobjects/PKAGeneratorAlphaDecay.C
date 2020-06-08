@@ -56,7 +56,7 @@ PKAGeneratorAlphaDecay::readAlphaData()
   std::string filename = path + s;
 
   if (!MooseUtils::checkFileReadable(filename, false, false))
-    mooseError("Missing/Corrupted data/alpha_decay/alpha_decay.txt file");
+    mooseError("Missing/Corrupted ", filename, " file");
 
   std::ifstream infile(filename.c_str());
   unsigned int nentries;
