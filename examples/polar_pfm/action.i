@@ -20,54 +20,6 @@
   [../]
 []
 
-[Kernels]
-  [./dtu]
-    # general form would be SusceptibilityTimeDerivative with 1/L^Upsilon
-    type = TimeDerivative
-    variable = Upsilon
-  [../]
-  [./dLu]
-    type = PolarPFMDerivative
-    variable = Upsilon
-    F = psiL
-  [../]
-  [./gradu]
-    type = PolarPFMGradient
-    variable = Upsilon
-    v = theta
-    F = beta21phi
-  [../]
-  [./diffu] # 0 if Upsilon is constant
-    type = MatDiffusion
-    variable = Upsilon
-    diffusivity = betaS0
-    args = 'theta'
-  [../]
-
-  [./dtt]
-    # general form would be SusceptibilityTimeDerivative with 1/L^theta
-    type = TimeDerivative
-    variable = theta
-  [../]
-  [./dLt]
-    type = PolarPFMDerivative
-    variable = theta
-    F = psiL
-  [../]
-  [./gradt] # 0 if Upsilon is constant
-    type = PolarPFMGradient
-    variable = theta
-    v = Upsilon
-    F = betaS0
-  [../]
-  [./difft]
-    type = MatDiffusion
-    variable = theta
-    diffusivity = beta21phi
-    args = 'Upsilon'
-  [../]
-[]
-
 # i) disappearing melt
 # KE = 1.933
 KE = 4
@@ -140,40 +92,24 @@ p = 1
   [../]
 []
 
-[Materials]
-  [./bs0]
-    type = PolarPFMBetaS0
-    f_name = betaS0
-    theta = theta
-    a_beta = 3 # "It is also assumed that all a = 3."
-    beta10 = ${beta1} # m-delta  g(kE,kdelta) (nJ/m)
-    beta20 = ${beta2} # m-beta (nJ/m)
-    derivative_order = 2
-  [../]
-  [./beta21phi]
-    type = PolarPFMPhi
-    f_name = beta21phi
-    a0     = ${a0}
-    a_phi  = 3
-    beta21 = ${beta_ss} # delta-beta (nJ/m)
-    upsilon = Upsilon
-    derivative_order = 2
-  [../]
-  [./psiL]
-    type = PolarPFMPsiL
-    f_name = psiL
-    DeltaG10 = ${G1}
-    DeltaG20 = ${G2}
-    G0       = 0
-    a_A      = 3
-    a_theta  = 3
-
-    A10      = ${A1}
-    A20      = ${A2}
-    A21      = ${Ab}
-    theta = theta
-    upsilon = Upsilon
-    derivative_order = 2
+[Magpie]
+  [./PolarPhaseField]
+    [./all]
+      a0       = ${a0}
+      a_A      = 3
+      a_theta  = 3
+      a_phi    = 3
+      a_beta   = 3 # "It is also assumed that all a = 3."
+      beta10 = ${beta1} # m-delta  g(kE,kdelta) (nJ/m)
+      beta20 = ${beta2} # m-beta (nJ/m)
+      beta21 = ${beta_ss} # delta-beta (nJ/m)
+      G0       = 0
+      DeltaG10 = ${G1}
+      DeltaG20 = ${G2}
+      A10      = ${A1}
+      A20      = ${A2}
+      A21      = ${Ab}
+    [../]
   [../]
 []
 
