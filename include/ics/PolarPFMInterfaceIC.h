@@ -28,4 +28,11 @@ protected:
   const Real _a_beta;
   const Real _beta10;
   const Real _beta20;
+  const Real _p;
+
+  /// Minimum x coordinate
+  const Real _xmin;
+
+  /// Maximum x coordinate
+  const Real _xmax;
 };

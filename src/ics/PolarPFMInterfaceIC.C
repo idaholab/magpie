@@ -20,6 +20,7 @@ PolarPFMInterfaceIC::validParams()
   params.addRequiredParam<Real>("a_beta", "Interpolation coefficient a_beta");
   params.addRequiredParam<Real>("beta10", "Gradient energy coefficient between solid 1 and melt");
   params.addRequiredParam<Real>("beta20", "Gradient energy coefficient between solid 2 and melt");
+  params.addParam<Real>("p", 1.0, "Interface parameter");
   return params;
 }
 
@@ -28,7 +29,10 @@ PolarPFMInterfaceIC::PolarPFMInterfaceIC(const InputParameters & parameters)
     _theta(coupledValue("theta")),
     _a_beta(getParam<Real>("a_beta")),
     _beta10(getParam<Real>("beta10")),
-    _beta20(getParam<Real>("beta20"))
+    _beta20(getParam<Real>("beta20")),
+    _p(getParam<Real>("p")),
+    _xmin(_fe_problem.mesh().getMinInDimension(0)),
+    _xmax(_fe_problem.mesh().getMaxInDimension(0))
 {
 }
 
@@ -43,13 +47,11 @@ PolarPFMInterfaceIC::value(const Point & r)
   // solid-melt gradient energy coefficient (7)
   const Real betaS0 = _beta10 + (_beta20 - _beta10) * q;
 
-  const Real W = 40;
-  const Real p = 1;
+  // sample width and position
+  const Real W = _xmax - _xmin;
+  const Real x = r(0) - _xmin;
 
-  const Real x = r(0);
-
-  const Real ds0 = p * sqrt(betaS0);
-
-  return 1.0 - 1.0 / (1.0 + std::exp(-p / ds0 * (x - W / 4.0))) +
-         1.0 / (1.0 + std::exp(-p / ds0 * (x - 3 * W / 4.0)));
+  const Real ds0 = _p * sqrt(betaS0);
+  return 1.0 - 1.0 / (1.0 + std::exp(-_p / ds0 * (x - W / 4.0))) +
+         1.0 / (1.0 + std::exp(-_p / ds0 * (x - 3 * W / 4.0)));
 }

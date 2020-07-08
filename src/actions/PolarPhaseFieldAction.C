@@ -71,7 +71,6 @@ PolarPhaseFieldAction::act()
       params.set<std::string>("f_name") = betaS0;
       params.set<std::vector<VariableName>>("theta") = {theta};
       params.applyParameters(parameters());
-      std::cout << params;
       _problem->addMaterial(name, _name + "_" + name, params);
     }
     {
