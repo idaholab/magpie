@@ -20,6 +20,9 @@ PolarPhaseFieldAction::validParams()
   params.addParam<VariableName>("theta", "theta", "Theta order parameter");
   params.addParam<VariableName>("upsilon", "Upsilon", "Upsilon order parameter");
 
+  params.addParam<Real>("L_theta", 1.0, "Mobility for the theta order parameter");
+  params.addParam<Real>("L_upsilon", 1.0, "Mobility for the upsilon order parameter");
+
   params.addRequiredParam<Real>("a0", "Interpolation coefficient a0");
   params.addRequiredParam<Real>("a_A", "Interpolation coefficient a_A");
 
@@ -98,9 +101,10 @@ PolarPhaseFieldAction::act()
     {
       const std::string prefix = _name + "_upsilon_";
       {
-        std::string name = "TimeDerivative";
+        std::string name = "CoefTimeDerivative";
         auto params = _factory.getValidParams(name);
         params.set<NonlinearVariableName>("variable") = upsilon;
+        params.set<Real>("Coefficient") = 1.0 / getParam<Real>("L_upsilon");
         _problem->addKernel(name, prefix + name, params);
       }
       {
@@ -132,9 +136,10 @@ PolarPhaseFieldAction::act()
     {
       const std::string prefix = _name + "_theta_";
       {
-        std::string name = "TimeDerivative";
+        std::string name = "CoefTimeDerivative";
         auto params = _factory.getValidParams(name);
         params.set<NonlinearVariableName>("variable") = theta;
+        params.set<Real>("Coefficient") = 1.0 / getParam<Real>("L_theta");
         _problem->addKernel(name, prefix + name, params);
       }
       {
