@@ -120,9 +120,6 @@ FFTBufferBase<T>::FFTBufferBase(const InputParameters & parameters)
     for (int j = 0; j < _grid[i]; ++j)
       _k_table[i][j] = 2.0 * libMesh::pi *
                        ((j < (_grid[i] >> 1) + 1) ? Real(j) : (Real(j) - _grid[i])) / _box_size(i);
-
-//    for (int j = 0; j < _grid[i]; ++j)
-//      _k_table[i][j] = (Real(j)) / _grid[i];
   }
   _real_space_data.resize(real_space_buffer_size);
   _reciprocal_space_data.resize(reciprocal_space_buffer_size);
@@ -173,7 +170,7 @@ void
 FFTBufferBase<T>::backward()
 {
   backwardRaw();
-  _real_space_data *= (backwardScale());
+  _real_space_data *= backwardScale();
 }
 
 template <typename T>

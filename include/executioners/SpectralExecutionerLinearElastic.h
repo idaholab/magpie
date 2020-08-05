@@ -84,7 +84,8 @@ private:
    */
   void updateRealSigma(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
                        FFTBufferBase<RankTwoTensor> & stress_buffer,
-                       FFTBufferBase<RankFourTensor> & elastic_tensor);
+                       FFTBufferBase<RankFourTensor> & elastic_tensor,
+                       RankFourTensor & elastic_tensor_homo);
 
   void filloutElasticTensor(const FFTBufferBase<Real> & ratio_buffer,
                             FFTBufferBase<Real> & index_buffer,

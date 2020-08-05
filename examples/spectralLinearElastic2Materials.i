@@ -7,9 +7,9 @@
   ymax = 5
   zmin = -5
   zmax = 5
-  nx = 63
-  ny = 63
-  nz = 63
+  nx = 32
+  ny = 32
+  nz = 32
 []
 
 [Problem]
@@ -50,9 +50,9 @@
       b = 2
       c = 2
       n = 2
-      int_width = 2
+      int_width = 1
       invalue = 1
-      outvalue = 10.0
+      outvalue = 4
     [../]
   [../]
 []
@@ -126,10 +126,10 @@
 
   time_step = 1.0
   number_steps = 300
-  initial_shear_strain = 0.0001
+  initial_shear_strain = 0.01
   young_modulus = 1e4
   poisson_ratio = 0.3
-  average_material_factor = 3.3
+  average_material_factor = 2
 []
 
 [VectorPostprocessors]
