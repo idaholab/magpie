@@ -85,7 +85,7 @@ SpectralExecutionerBase::kVectorMultiply(const FFTBufferBase<Real> & in_buffer,
       const int ni = grid[0];
       const int nj = (grid[1] >> 1) + 1;
       for (int i = 0; i < ni; ++i)
-        for (int j = 0; j < nj; ++j)
+        for (int j = 0; j * 2 < nj; ++j)
         {
           out[index](0) = in[index] * ivec[i] * I;
           out[index](1) = in[index] * jvec[j] * I;

@@ -1,12 +1,15 @@
 [Mesh]
   type = MyTRIMMesh
   dim = 3
-  xmax = 10
-  ymax = 10
-  zmax = 10
-  nx = 64
-  ny = 64
-  nz = 64
+  xmin = -5
+  xmax = 5
+  ymin = -5
+  ymax = 5
+  zmin = -5
+  zmax = 5
+  nx = 63
+  ny = 63
+  nz = 63
 []
 
 [Problem]
@@ -27,6 +30,7 @@
   [./elastic_aux_var]
     order = CONSTANT
     family = MONOMIAL
+
   [../]
 
   [./index_buffer_aux_var]
@@ -39,16 +43,16 @@
     family = MONOMIAL
     [./InitialCondition]
       type = SmoothSuperellipsoidIC
-      x1 = 5
-      y1 = 5
-      z1 = 5
+      x1 = 0
+      y1 = 0
+      z1 = 0
       a = 2
       b = 2
       c = 2
       n = 2
-      int_width = 0
+      int_width = 2
       invalue = 1
-      outvalue = 2.0
+      outvalue = 10.0
     [../]
   [../]
 []
@@ -94,6 +98,14 @@
     component = '0 1'
   [../]
 
+  [./elastic_aux]
+    type = FFTBufferAux
+    variable = elastic_aux_var
+    fft_buffer = elastic
+    execute_on = final
+    component = '0 1 0 1'
+  [../]
+
   [./stiffness_aux]
     type = FFTBufferAux
     variable = stiffness_ratio_aux
@@ -113,19 +125,19 @@
   type = SpectralExecutionerLinearElastic
 
   time_step = 1.0
-  number_steps = 150
-  initial_shear_strain = 0.01
+  number_steps = 300
+  initial_shear_strain = 0.0001
   young_modulus = 1e4
   poisson_ratio = 0.3
-
+  average_material_factor = 3.3
 []
 
 [VectorPostprocessors]
   [./linevalue]
     type = LineValueSampler
     variable = 'stress_aux_var'
-    start_point = '0 0 0'
-    end_point = '9.9999999999 0 0'
+    start_point = '-4.9999999999 0 0'
+    end_point = '4.9999999999 0 0'
     num_points = 101
     sort_by = x
     execute_on = final

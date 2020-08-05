@@ -52,12 +52,16 @@ protected:
   /// Initial strain tensor
   RankTwoTensor _initial_strain_tensor;
 
+  /// Average factor to obtain homogeneous material
+  const Real _average_factor;
+
 private:
   /**
    * Helper function to get the diffusion equation Green's function corresponding to one time step.
    */
   void getGreensFunction(FFTBufferBase<RankFourTensor> & gamma_hat,
-                         FFTBufferBase<Real> & ratio_buffer);
+                         FFTBufferBase<Real> & ratio_buffer,
+                         const RankFourTensor & elasticity_tensor);
 
   /**
    * Helper function to get the initial stress from strain and tensor of elastic coefficients.
