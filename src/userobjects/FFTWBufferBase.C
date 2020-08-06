@@ -24,8 +24,7 @@ FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
   {
     TIME_SECTION(_perf_plan);
 
-    // We should think about preserving input here
-    // Option not available for generic "many call"
+    // Note: These plans do not preserve the input. Additional caching may be required.
     _forward_plan =
         fftw_plan_many_dft_r2c(_dim,
                                _grid.data(),
