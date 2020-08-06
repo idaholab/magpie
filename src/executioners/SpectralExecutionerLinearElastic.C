@@ -138,8 +138,7 @@ SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor
                   gamma_hat.reciprocalSpace()[index] = elasticity_tensor.invSymm();
                 }
               }
-        if (false)
-          gamma_hat.reciprocalSpace()[index] = elasticity_tensor.invSymm();
+
         index++;
       }
   // exit(1);
@@ -270,19 +269,15 @@ SpectralExecutionerLinearElastic::execute()
 
   auto & epsilon_buffer = getFFTBuffer<RankTwoTensor>("epsilon");
 
-  /*  --------------------------------------------------- */
   auto & ratio_buffer = getFFTBuffer<Real>("stiffness_ratio");
   auto & elastic_tensor_buffer = getFFTBuffer<RankFourTensor>("elastic");
   auto & index_buffer = getFFTBuffer<Real>("index_buffer");
 
   filloutElasticTensor(ratio_buffer, index_buffer, elastic_tensor_buffer);
-  /*  --------------------------------------------------- */
-  // Get corresponding initial stress
-  auto & stress_buffer = getInitialStress(epsilon_buffer, elastic_tensor_buffer);
-  // elastic_tensor_buffer.realSpace()[54].print();
 
-  //  Moose::out << "stress_buffer: " << stress_buffer.realSpace()[0] << "\n";
-  // stress_buffer.realSpace()[1].print();
+  // Get corresponding initial stress (also fill out epsilon_buffer with initial strain)
+  auto & stress_buffer = getInitialStress(epsilon_buffer, elastic_tensor_buffer);
+
   // Get specific Green's function
   auto & gamma_hat = getFFTBuffer<RankFourTensor>("gamma");
 
@@ -318,11 +313,10 @@ SpectralExecutionerLinearElastic::execute()
 
   for (unsigned int step_no = 0; step_no < _nsteps; step_no++)
   {
-    // (o)
     // Preserve data
     updateRealSigma(epsilon_buffer, stress_buffer, elastic_tensor_buffer, elasticity_homo);
     // We would need here the stress for convergence check
-    // (a)
+    // (a) plus bookkeeping
     stress_buffer_backup_real = stress_buffer.realSpace();
     stress_buffer.forwardRaw();
     stress_buffer.reciprocalSpace() *= stress_buffer.backwardScale();
@@ -355,94 +349,3 @@ SpectralExecutionerLinearElastic::execute()
   }
 }
 
-/*  void
-SpectralExecutionerLinearElastic::execute()
-{
-  unsigned int thisStep = 0;
-
-  _time_step = thisStep;
-  _time = _time_step;
-  _fe_problem.outputStep(EXEC_INITIAL);
-  _fe_problem.advanceState();
-
-  auto & epsilon_buffer = getFFTBuffer<RankTwoTensor>("epsilon");
-  populateEpsilonBuffer(epsilon_buffer);
-
-  auto & ratio_buffer = getFFTBuffer<Real>("stiffness_ratio");
-  auto & elastic_tensor_buffer = getFFTBuffer<RankFourTensor>("elastic");
-  auto & index_buffer = getFFTBuffer<Real>("index_buffer");
-
-  filloutElasticTensor(ratio_buffer, index_buffer, elastic_tensor_buffer);
-  //  Moose::out << "epsilon_buffer: " << epsilon_buffer.realSpace()[0] << "\n";
-  epsilon_buffer.realSpace()[0].print();
-  // Get corresponding initial stress
-  auto & stress_buffer = getInitialStress(epsilon_buffer, elastic_tensor_buffer);
-
-  //  Moose::out << "stress_buffer: " << stress_buffer.realSpace()[0] << "\n";
-  stress_buffer.realSpace()[1].print();
-  // Get specific Green's function
-  auto & gamma_hat = getFFTBuffer<RankFourTensor>("gamma");
-
-  thisStep++;
-  _t_current += _dt;
-  _time_step = thisStep;
-
-  _fe_problem.execute(EXEC_FINAL);
-  _time = _t_current;
-
-  Moose::out << "_t_current: " << _t_current << ". \n";
-
-  _fe_problem.outputStep(EXEC_FINAL);
-
-  if (gamma_hat.dim() != 3)
-    mooseError("Error: Dimension not implemented in SpectralExecutionerLinearElastic.");
-
-  getGreensFunction(gamma_hat, ratio_buffer);
-
-  // Our plans do not preserve the inputs (unfortunately)
-  FFTData<RankTwoTensor> stress_buffer_backup_real = stress_buffer.realSpace();
-
-  FFTData<RankTwoTensor> epsilon_buffer_backup_real =
-      epsilon_buffer.realSpace();
-
-  epsilon_buffer.forward();
-
-  FFTData<ComplexType<RankTwoTensor>::type> epsilon_buffer_backup_reciprocal =
-      epsilon_buffer.reciprocalSpace();
-
-  for (unsigned int step_no = 0; step_no < _nsteps; step_no++)
-  {
-    // (o)
-    // Preserve data
-    updateRealSigma(epsilon_buffer, stress_buffer, elastic_tensor_buffer);
-    // We would need here the stress for convergence check
-    // (a)
-    stress_buffer.forward();
-
-    // Compute new strain tensor in Fourier space
-    // (c)
-    // Preserve data
-    epsilon_buffer.reciprocalSpace() = epsilon_buffer_backup_reciprocal;
-    advanceReciprocalEpsilon(epsilon_buffer, stress_buffer, gamma_hat);
-
-    // (d)
-    epsilon_buffer_backup_reciprocal = epsilon_buffer.reciprocalSpace();
-    epsilon_buffer.backward();
-
-    // End of fixed-point iterations
-
-    thisStep++;
-    _t_current += _dt;
-    _time_step = thisStep;
-
-    _fe_problem.execute(EXEC_FINAL);
-    _time = _t_current;
-
-    Moose::out << "_t_current: " << _t_current << ". \n";
-
-    _fe_problem.outputStep(EXEC_FINAL);
-
-    if (step_no != _nsteps - 1)
-      _fe_problem.advanceState();
-  }
-} */
