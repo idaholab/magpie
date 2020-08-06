@@ -7,9 +7,9 @@
   ymax = 5
   zmin = -5
   zmax = 5
-  nx = 32
-  ny = 32
-  nz = 32
+  nx = 128
+  ny = 128
+  nz = 128
 []
 
 [Problem]
@@ -50,7 +50,7 @@
       b = 2
       c = 2
       n = 2
-      int_width = 1
+      int_width = 0
       invalue = 1
       outvalue = 4
     [../]
@@ -133,13 +133,31 @@
 []
 
 [VectorPostprocessors]
-  [./linevalue]
+  [./linevaluex]
     type = LineValueSampler
-    variable = 'stress_aux_var'
+    variable = 'epsilon_aux_var stress_aux_var'
     start_point = '-4.9999999999 0 0'
     end_point = '4.9999999999 0 0'
     num_points = 101
     sort_by = x
+    execute_on = final
+  [../]
+  [./linevaluey]
+    type = LineValueSampler
+    variable = 'epsilon_aux_var stress_aux_var'
+    start_point = '0 -4.9999999999 0'
+    end_point = '0 4.9999999999 0'
+    num_points = 101
+    sort_by = y
+    execute_on = final
+  [../]
+  [./linevaluez]
+    type = LineValueSampler
+    variable = 'epsilon_aux_var stress_aux_var'
+    start_point = '0 0 -4.9999999999'
+    end_point = '0 0 4.9999999999'
+    num_points = 101
+    sort_by = z
     execute_on = final
   [../]
 []

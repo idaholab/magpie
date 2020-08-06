@@ -47,7 +47,6 @@ SpectralExecutionerLinearElastic::SpectralExecutionerLinearElastic(
     _initial_shear_strain(getParam<Real>("initial_shear_strain")),
     _average_factor(getParam<Real>("average_material_factor"))
 {
-  // Add check that's a 2D problem with LIBMESH_DIM == 2
   _initial_strain_tensor(0, 0) = 0.0;
   _initial_strain_tensor(0, 1) = _initial_strain_tensor(1, 0) = _initial_shear_strain;
   _initial_strain_tensor(2, 1) = _initial_strain_tensor(1, 2) = 0.0;
@@ -58,13 +57,13 @@ SpectralExecutionerLinearElastic::SpectralExecutionerLinearElastic(
 }
 
 void
-SpectralExecutionerLinearElastic::populateEpsilonBuffer(
+SpectralExecutionerLinearElastic::fillOutEpsilonBuffer(
     FFTBufferBase<RankTwoTensor> & epsilon_buffer)
 {
   const auto & grid = epsilon_buffer.grid();
   const int ni = grid[0];
-  const int nj = grid[1]; // Real space.
-  const int nk = grid[2]; // Real space.
+  const int nj = grid[1];
+  const int nk = grid[2];
 
   std::size_t index = 0;
 
@@ -79,34 +78,26 @@ SpectralExecutionerLinearElastic::populateEpsilonBuffer(
 
 void
 SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor> & gamma_hat,
-                                                    FFTBufferBase<Real> & ratio_buffer,
                                                     const RankFourTensor & elasticity_tensor)
 {
   const auto & grid = gamma_hat.grid();
   const int ndim = 3;
 
   const int ni = grid[0];
-  const int nj = grid[1];            // Real space.
-  const int nk = (grid[2] >> 1) + 1; // Real space.
+  const int nj = grid[1];
+  const int nk = (grid[2] >> 1) + 1;
 
   std::size_t index = 0;
 
-  // To plug the right frequencies, they are not right
   const auto & ivec = gamma_hat.kTable(0);
   const auto & jvec = gamma_hat.kTable(1);
   const auto & kvec = gamma_hat.kTable(2);
-  /// return the size of the box
-  const Point box_size = gamma_hat.getBoxSize();
 
-  //    std::vector<Real> freqs;
-  //    for (Real value = -grid[0]/2.0; value < grid[0]/2.0; value+=grid[0]/box_size(0))
-  //      freqs.push_back(value);
-
-  /// return the number of grid cells along each dimension without padding
   const std::vector<int> grid_vector = gamma_hat.grid();
 
   const Complex I(0.0, 1.0);
 
+  // Fill fourth-order Green operator based on homogeneous material properties
   for (int freq_x = 0; freq_x < ni; ++freq_x)
     for (int freq_y = 0; freq_y < nj; ++freq_y)
       for (int freq_z = 0; freq_z < nk; ++freq_z)
@@ -141,7 +132,6 @@ SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor
 
         index++;
       }
-  // exit(1);
 }
 
 FFTBufferBase<RankTwoTensor> &
@@ -155,7 +145,7 @@ SpectralExecutionerLinearElastic::getInitialStress(FFTBufferBase<RankTwoTensor> 
   int nk = grid[2];
 
   // Homogeneous initial state of strain
-  populateEpsilonBuffer(epsilon_buffer);
+  fillOutEpsilonBuffer(epsilon_buffer);
 
   size_t index = 0;
   for (int freq_x = 0; freq_x < ni; ++freq_x)
@@ -182,7 +172,7 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
   int nk = (grid[2] >> 1) + 1;
 
   size_t index = 0;
-  // To plug the right frequencies, they are not right
+
   const auto & ivec = gamma_hat.kTable(0);
   const auto & jvec = gamma_hat.kTable(1);
   const auto & kvec = gamma_hat.kTable(2);
@@ -192,14 +182,11 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
       for (int freq_z = 0; freq_z < nk; ++freq_z)
       {
         if (ivec[freq_x] == 0 && jvec[freq_y] == 0 && kvec[freq_z] == 0)
-        {
           epsilon_buffer.reciprocalSpace()[index] = _initial_strain_tensor;
-        }
         else
-        {
-          epsilon_buffer.reciprocalSpace()[index] =
+          epsilon_buffer.reciprocalSpace()[index] -=
               gamma_hat.reciprocalSpace()[index] * stress_buffer.reciprocalSpace()[index];
-        }
+
         index++;
       }
 }
@@ -207,8 +194,7 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
 void
 SpectralExecutionerLinearElastic::updateRealSigma(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
                                                   FFTBufferBase<RankTwoTensor> & stress_buffer,
-                                                  FFTBufferBase<RankFourTensor> & elastic_tensor,
-                                                  RankFourTensor & elastic_tensor_homo)
+                                                  FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
   const auto & grid = epsilon_buffer.grid();
   int ni = grid[0];
@@ -222,7 +208,7 @@ SpectralExecutionerLinearElastic::updateRealSigma(FFTBufferBase<RankTwoTensor> &
       for (int freq_z = 0; freq_z < nk; ++freq_z)
       {
         stress_buffer.realSpace()[index] =
-            (elastic_tensor.realSpace()[index] - elastic_tensor_homo) * epsilon_buffer.realSpace()[index];
+            (elastic_tensor.realSpace()[index]) * epsilon_buffer.realSpace()[index];
         index++;
       }
 }
@@ -268,11 +254,14 @@ SpectralExecutionerLinearElastic::execute()
   _fe_problem.advanceState();
 
   auto & epsilon_buffer = getFFTBuffer<RankTwoTensor>("epsilon");
+  if (epsilon_buffer.dim() != 3)
+    mooseError("Error: Problem dimension not implemented in SpectralExecutionerLinearElastic.");
 
   auto & ratio_buffer = getFFTBuffer<Real>("stiffness_ratio");
   auto & elastic_tensor_buffer = getFFTBuffer<RankFourTensor>("elastic");
   auto & index_buffer = getFFTBuffer<Real>("index_buffer");
 
+  // Fill out space-varying elasticity tensor
   filloutElasticTensor(ratio_buffer, index_buffer, elastic_tensor_buffer);
 
   // Get corresponding initial stress (also fill out epsilon_buffer with initial strain)
@@ -280,9 +269,6 @@ SpectralExecutionerLinearElastic::execute()
 
   // Get specific Green's function
   auto & gamma_hat = getFFTBuffer<RankFourTensor>("gamma");
-
-  if (gamma_hat.dim() != 3)
-    mooseError("Error: Dimension not implemented in SpectralExecutionerLinearElastic.");
 
   thisStep++;
   _t_current += _dt;
@@ -295,42 +281,38 @@ SpectralExecutionerLinearElastic::execute()
 
   _fe_problem.outputStep(EXEC_FINAL);
 
-  ///
+  // Fill out a homogeneous elasticity tensor with some average properties
   std::vector<Real> iso_const(2);
   iso_const[0] = _young_modulus * _average_factor;
   iso_const[1] = _poisson_ratio;
   RankFourTensor elasticity_homo;
   elasticity_homo.fillFromInputVector(iso_const, RankFourTensor::symmetric_isotropic_E_nu);
-  getGreensFunction(gamma_hat, ratio_buffer, elasticity_homo);
-  ///
+  getGreensFunction(gamma_hat, elasticity_homo);
 
-  // Our plans do not preserve the inputs (unfortunately)
+  // Our FFTW "many" plans do not preserve the input, so explicit copies are made
   FFTData<RankTwoTensor> stress_buffer_backup_real = stress_buffer.realSpace();
   epsilon_buffer.forward();
 
-  FFTData<ComplexRankTwoTensor> epsilon_buffer_backup_reciprocal =
-      epsilon_buffer.reciprocalSpace();
+  FFTData<ComplexRankTwoTensor> epsilon_buffer_backup_reciprocal = epsilon_buffer.reciprocalSpace();
 
   for (unsigned int step_no = 0; step_no < _nsteps; step_no++)
   {
-    // Preserve data
-    updateRealSigma(epsilon_buffer, stress_buffer, elastic_tensor_buffer, elasticity_homo);
-    // We would need here the stress for convergence check
+    // Update sigma in the real space
+    updateRealSigma(epsilon_buffer, stress_buffer, elastic_tensor_buffer);
     // (a) plus bookkeeping
     stress_buffer_backup_real = stress_buffer.realSpace();
     stress_buffer.forwardRaw();
     stress_buffer.reciprocalSpace() *= stress_buffer.backwardScale();
     stress_buffer.realSpace() = stress_buffer_backup_real;
-    // Compute new strain tensor in Fourier space
-    // (c)
-    // Preserve data
 
+    // Missing convergence check
+
+    // Compute new strain tensor in Fourier space
     epsilon_buffer.reciprocalSpace() = epsilon_buffer_backup_reciprocal;
     advanceReciprocalEpsilon(epsilon_buffer, stress_buffer, gamma_hat);
 
-    // (d)
+    // Cache reciprocal epsilon to avoid being overwritten upon backward (inverse) operation
     epsilon_buffer_backup_reciprocal = epsilon_buffer.reciprocalSpace();
-    // For output purposes
     epsilon_buffer.backwardRaw();
 
     thisStep++;
@@ -348,4 +330,3 @@ SpectralExecutionerLinearElastic::execute()
       _fe_problem.advanceState();
   }
 }
-
