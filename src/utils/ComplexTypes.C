@@ -45,3 +45,6 @@ template class VectorValue<Complex>;
 template class RankTwoTensorTempl<Complex>;
 template class RankThreeTensorTempl<Complex>;
 template class RankFourTensorTempl<Complex>;
+
+template RankTwoTensorTempl<Complex> RankFourTensorTempl<Complex>::
+operator*(const RankTwoTensorTempl<Complex> & a) const;
