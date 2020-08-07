@@ -46,14 +46,14 @@ protected:
   /// Current time
   Real _t_current;
 
-  /// Initial homogeneous shear deformation
-  const Real _initial_shear_strain;
-
   /// Initial strain tensor
   RankTwoTensor _initial_strain_tensor;
 
   /// Average factor to obtain homogeneous material
   const Real _average_factor;
+
+  /// User-prescribed error for fixed iteration solver
+  const Real _solver_error;
 
 private:
   /**
@@ -103,4 +103,9 @@ private:
   void filloutElasticTensor(const FFTBufferBase<Real> & ratio_buffer,
                             FFTBufferBase<Real> & index_buffer,
                             FFTBufferBase<RankFourTensor> & elastic_tensor_buffer);
+  /**
+   * Convergence check base on global equilibrium.
+   * @param stress Stress tensor for convergence check
+   */
+  bool hasStressConvergence(const FFTBufferBase<RankTwoTensor> & stress);
 };
