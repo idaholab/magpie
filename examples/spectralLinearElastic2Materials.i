@@ -7,9 +7,9 @@
   ymax = 5
   zmin = -5
   zmax = 5
-  nx = 128
-  ny = 128
-  nz = 128
+  nx = 32
+  ny = 32
+  nz = 32
 []
 
 [Problem]
@@ -125,8 +125,9 @@
   type = SpectralExecutionerLinearElastic
 
   time_step = 1.0
-  number_steps = 300
-  initial_shear_strain = 0.01
+  number_iterations = 300
+  solver_error = 1.0e-6
+  global_strain_tensor = '0.0 0.0 0.0 0.0 0.0 0.01'
   young_modulus = 1e4
   poisson_ratio = 0.3
   average_material_factor = 2

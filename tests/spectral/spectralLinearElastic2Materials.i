@@ -124,9 +124,11 @@
 [Executioner]
   type = SpectralExecutionerLinearElastic
 
+  number_iterations = 300
+  solver_error = 5.0e-5
+  global_strain_tensor = '0.0 0.0 0.0 0.0 0.0 0.01'
+
   time_step = 1.0
-  number_steps = 5
-  initial_shear_strain = 0.01
   young_modulus = 1e4
   poisson_ratio = 0.3
   average_material_factor = 2
