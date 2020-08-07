@@ -107,5 +107,5 @@ private:
    * Convergence check base on global equilibrium.
    * @param stress Stress tensor for convergence check
    */
-  bool hasStressConvergence(const FFTBufferBase<RankTwoTensor> & stress);
+  bool hasStressConverged(const FFTBufferBase<RankTwoTensor> & stress);
 };

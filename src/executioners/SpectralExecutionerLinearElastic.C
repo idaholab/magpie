@@ -244,7 +244,7 @@ SpectralExecutionerLinearElastic::filloutElasticTensor(
 }
 
 bool
-SpectralExecutionerLinearElastic::hasStressConvergence(const FFTBufferBase<RankTwoTensor> & stress)
+SpectralExecutionerLinearElastic::hasStressConverged(const FFTBufferBase<RankTwoTensor> & stress)
 {
 
   const auto & grid = stress.grid();
@@ -370,7 +370,7 @@ SpectralExecutionerLinearElastic::execute()
     stress_buffer.realSpace() = stress_buffer_backup_real;
 
     // Convergence check: Ensure global equilibrium
-    is_converged = hasStressConvergence(stress_buffer);
+    is_converged = hasStressConverged(stress_buffer);
 
     // Compute new strain tensor in Fourier space
     epsilon_buffer.reciprocalSpace() = epsilon_buffer_backup_reciprocal;

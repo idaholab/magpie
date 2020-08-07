@@ -33,66 +33,14 @@
   [./disp_z]
   [../]
 
-#[./stress_xx]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
 [./stress_xy]
   order = CONSTANT
   family = MONOMIAL
 [../]
-#[./stress_xz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_yx]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_yy]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_yz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_zx]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_zy]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./stress_zz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./elastic_strain_xx]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./elastic_strain_yy]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./elastic_strain_zz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
 [./elastic_strain_xy]
   order = CONSTANT
   family = MONOMIAL
 [../]
-#[./elastic_strain_xz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
-#[./elastic_strain_yz]
-#  order = CONSTANT
-#  family = MONOMIAL
-#[../]
 
 []
 
@@ -185,13 +133,6 @@
     component = 2
   [../]
 
-#  [./stress_xx]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_xx
-#      index_i = 0
-#      index_j = 0
-#    [../]
     [./stress_xy]
       type = RankTwoAux
       rank_two_tensor = stress
@@ -199,77 +140,6 @@
       index_i = 0
       index_j = 1
     [../]
-#    [./stress_xz]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_xz
-#      index_i = 0
-#      index_j = 2
-#    [../]
-#    [./stress_yx]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_yx
-#      index_i = 1
-#      index_j = 0
-#    [../]
-#    [./stress_yy]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_yy
-#      index_i = 1
-#      index_j = 1
-#    [../]
-#    [./stress_yz]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_yz
-#      index_i = 1
-#      index_j = 2
-#    [../]
-#    [./stress_zx]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_zx
-#      index_i = 2
-#      index_j = 0
-#    [../]
-#    [./stress_zy]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_zy
-#      index_i = 2
-#      index_j = 1
-#    [../]
-#    [./stress_zz]
-#      type = RankTwoAux
-#      rank_two_tensor = stress
-#      variable = stress_zz
-#      index_i = 2
-#      index_j = 2
-#    [../]
-#
-#    [./elastic_strain_xx]
-#        type = RankTwoAux
-#        rank_two_tensor = elastic_strain
-#        variable = elastic_strain_xx
-#        index_i = 0
-#        index_j = 0
-#    [../]
-#    [./elastic_strain_yy]
-#        type = RankTwoAux
-#        rank_two_tensor = elastic_strain
-#        variable = elastic_strain_yy
-#        index_i = 1
-#        index_j = 1
-#    [../]
-#    [./elastic_strain_zz]
-#        type = RankTwoAux
-#        rank_two_tensor = elastic_strain
-#        variable = elastic_strain_zz
-#        index_i = 2
-#        index_j = 2
-#    [../]
     [./elastic_strain_xy]
         type = RankTwoAux
         rank_two_tensor = elastic_strain
@@ -277,20 +147,6 @@
         index_i = 0
         index_j = 1
     [../]
-#    [./elastic_strain_xz]
-#        type = RankTwoAux
-#        rank_two_tensor = elastic_strain
-#        variable = elastic_strain_xz
-#        index_i = 0
-#        index_j = 2
-#    [../]
-#    [./elastic_strain_yz]
-#        type = RankTwoAux
-#        rank_two_tensor = elastic_strain
-#        variable = elastic_strain_yz
-#        index_i = 1
-#        index_j = 2
-#    [../]
 []
 
 [BCs]
@@ -331,7 +187,6 @@
 
 [Executioner]
   type = Transient
-#  scheme = bdf2
   solve_type = 'PJFNK'
 
   line_search = basic
