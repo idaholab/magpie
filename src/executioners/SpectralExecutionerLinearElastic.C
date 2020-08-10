@@ -135,8 +135,9 @@ SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor
 }
 
 FFTBufferBase<RankTwoTensor> &
-SpectralExecutionerLinearElastic::getInitialStress(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
-                                                   FFTBufferBase<RankFourTensor> & elastic_tensor)
+SpectralExecutionerLinearElastic::getInitialStress(
+    FFTBufferBase<RankTwoTensor> & epsilon_buffer,
+    const FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
   auto & stress_buffer = getFFTBuffer<RankTwoTensor>("stress");
   const auto & grid = epsilon_buffer.grid();
@@ -163,7 +164,7 @@ SpectralExecutionerLinearElastic::getInitialStress(FFTBufferBase<RankTwoTensor> 
 void
 SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
     FFTBufferBase<RankTwoTensor> & epsilon_buffer,
-    FFTBufferBase<RankTwoTensor> & stress_buffer,
+    const FFTBufferBase<RankTwoTensor> & stress_buffer,
     const FFTBufferBase<RankFourTensor> & gamma_hat)
 {
   const auto & grid = epsilon_buffer.grid();
@@ -192,9 +193,10 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
 }
 
 void
-SpectralExecutionerLinearElastic::updateRealSigma(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
-                                                  FFTBufferBase<RankTwoTensor> & stress_buffer,
-                                                  FFTBufferBase<RankFourTensor> & elastic_tensor)
+SpectralExecutionerLinearElastic::updateRealSigma(
+    const FFTBufferBase<RankTwoTensor> & epsilon_buffer,
+    FFTBufferBase<RankTwoTensor> & stress_buffer,
+    const FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
   const auto & grid = epsilon_buffer.grid();
   int ni = grid[0];

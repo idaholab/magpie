@@ -69,8 +69,9 @@ private:
    * @param epsilon_buffer Small strain FFT buffer
    * @param elastic_buffer Space-varying elasticity tensor FFT buffer
    */
-  FFTBufferBase<RankTwoTensor> & getInitialStress(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
-                                                  FFTBufferBase<RankFourTensor> & elastic_buffer);
+  FFTBufferBase<RankTwoTensor> &
+  getInitialStress(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
+                   const FFTBufferBase<RankFourTensor> & elastic_buffer);
   /**
    * Initialize epsilon buffer with homogeneous/global strain.
    * @param epsilon_buffer Small strain FFT buffer
@@ -82,7 +83,7 @@ private:
    * @param epsilon_buffer Small strain FFT buffer
    */
   void advanceReciprocalEpsilon(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
-                                FFTBufferBase<RankTwoTensor> & stress_buffer,
+                                const FFTBufferBase<RankTwoTensor> & stress_buffer,
                                 const FFTBufferBase<RankFourTensor> & gamma_hat);
   /**
    * Update real stress buffer for current iteration.
@@ -90,9 +91,9 @@ private:
    * @param stress_buffer Stress FFT buffer
    * @param elastic_tensor Small strain FFT buffer
    */
-  void updateRealSigma(FFTBufferBase<RankTwoTensor> & epsilon_buffer,
+  void updateRealSigma(const FFTBufferBase<RankTwoTensor> & epsilon_buffer,
                        FFTBufferBase<RankTwoTensor> & stress_buffer,
-                       FFTBufferBase<RankFourTensor> & elastic_tensor);
+                       const FFTBufferBase<RankFourTensor> & elastic_tensor);
 
   /**
    * Initialize space-varying elastic coefficient tensor.
