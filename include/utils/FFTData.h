@@ -53,16 +53,11 @@ public:
 
   /// Templated product of FFTData
   template <typename T1, typename T2>
-  void setToProductRealSpace(const FFTData<T1> & m1,
-                             const FFTData<T2> & m2,
-                             const std::vector<int> & grid);
+  void setToProductRealSpace(const FFTData<T1> & m1, const FFTData<T2> & m2);
 
   // Apply a lambda to the reciprocal space of
   template <typename T1>
-  void applyLambdaReciprocalSpace(T1 lambda,
-                                  const std::vector<Real> & ktable0,
-                                  const std::vector<Real> & ktable1,
-                                  const std::vector<Real> & ktable2);
+  void applyLambdaReciprocalSpace(T1 lambda);
 
   /// return the number of proper grid cells
   std::size_t size() const { return _buffer.size(); }
@@ -81,11 +76,8 @@ protected:
 template <typename T>
 template <typename T1>
 void
-FFTData<T>::applyLambdaReciprocalSpace(T1 lambda,
-                                       const std::vector<Real> & ktable0,
-                                       const std::vector<Real> & ktable1,
-                                       const std::vector<Real> & ktable2)
+FFTData<T>::applyLambdaReciprocalSpace(T1 lambda)
 {
-  for (size_t index = 0; index < ktable0.size() * ktable1.size() * ktable2.size(); index++)
+  for (size_t index = 0; index < _buffer.size(); index++)
     _buffer[index] = lambda(index);
 }

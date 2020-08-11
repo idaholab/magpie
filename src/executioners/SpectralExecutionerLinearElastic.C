@@ -108,8 +108,8 @@ SpectralExecutionerLinearElastic::getInitialStress(
   fillOutEpsilonBuffer(epsilon_buffer);
 
   // Set real stress buffer to product E * epsilon
-  stress_buffer.realSpace().setToProductRealSpace(
-      elastic_tensor.realSpace(), epsilon_buffer.realSpace(), epsilon_buffer.grid());
+  stress_buffer.realSpace().setToProductRealSpace(elastic_tensor.realSpace(),
+                                                  epsilon_buffer.realSpace());
   return stress_buffer;
 }
 
@@ -125,10 +125,7 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
       [&gamma_hat, &stress_buffer, &epsilon_buffer](std::size_t index) {
         return epsilon_buffer.reciprocalSpace()[index] -
                gamma_hat.reciprocalSpace()[index] * stress_buffer.reciprocalSpace()[index];
-      },
-      epsilon_buffer.kTable(0),
-      epsilon_buffer.kTable(1),
-      epsilon_buffer.kTable(2));
+      });
 
   // Avoid divide by zero
   epsilon_buffer.reciprocalSpace()[0] = _initial_strain_tensor * I;
@@ -141,8 +138,8 @@ SpectralExecutionerLinearElastic::updateRealSigma(
     const FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
   // Set real stress buffer to product E * epsilon
-  stress_buffer.realSpace().setToProductRealSpace(
-      elastic_tensor.realSpace(), epsilon_buffer.realSpace(), epsilon_buffer.grid());
+  stress_buffer.realSpace().setToProductRealSpace(elastic_tensor.realSpace(),
+                                                  epsilon_buffer.realSpace());
 }
 
 void
@@ -206,15 +203,7 @@ SpectralExecutionerLinearElastic::hasStressConverged(const FFTBufferBase<RankTwo
         const ComplexVectorValue freq{ivec[freq_x] * I, jvec[freq_y] * I, kvec[freq_z] * I};
 
         ComplexVectorValue kvector_stress;
-        kvector_stress(0) = stress.reciprocalSpace()[index](0, 0) * freq(0) +
-                            stress.reciprocalSpace()[index](1, 0) * freq(1) +
-                            stress.reciprocalSpace()[index](2, 0) * freq(2);
-        kvector_stress(1) = stress.reciprocalSpace()[index](0, 1) * freq(0) +
-                            stress.reciprocalSpace()[index](1, 1) * freq(1) +
-                            stress.reciprocalSpace()[index](2, 1) * freq(2);
-        kvector_stress(2) = stress.reciprocalSpace()[index](0, 2) * freq(0) +
-                            stress.reciprocalSpace()[index](1, 2) * freq(1) +
-                            stress.reciprocalSpace()[index](2, 2) * freq(2);
+        kvector_stress = stress.reciprocalSpace()[index] * freq;
 
         error_n += kvector_stress(0) * kvector_stress(0) + kvector_stress(1) * kvector_stress(1) +
                    kvector_stress(2) * kvector_stress(2);
