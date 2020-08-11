@@ -72,6 +72,27 @@ FFTData<T>::operator=(FFTData<T> const & rhs)
   return *this;
 }
 
+template <typename T>
+FFTData<T> &
+FFTData<T>::operator=(const T & rhs)
+{
+  std::fill(_buffer.begin(), _buffer.end(), rhs);
+  return *this;
+}
+
+template <typename T>
+template <typename T1, typename T2>
+void
+FFTData<T>::setToProductRealSpace(const FFTData<T1> & m1,
+                                  const FFTData<T2> & m2,
+                                  const std::vector<int> & grid)
+{
+  mooseAssert(grid.size() == 3, "Product defined for 3 dimensions");
+
+  for (unsigned int index = 0; index < grid[0] * grid[1] * grid[2]; index++)
+    (*this)[index] = m1[index] * m2[index];
+}
+
 template <>
 void *
 FFTData<Real>::start(std::size_t i)
@@ -191,3 +212,7 @@ template class FFTData<ComplexVectorValue>;
 template class FFTData<ComplexRankTwoTensor>;
 template class FFTData<ComplexRankThreeTensor>;
 template class FFTData<ComplexRankFourTensor>;
+
+template void FFTData<RankTwoTensor>::setToProductRealSpace(const FFTData<RankFourTensor> & m1,
+                                                            const FFTData<RankTwoTensor> & m2,
+                                                            const std::vector<int> & grid);

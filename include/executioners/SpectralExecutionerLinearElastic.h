@@ -17,7 +17,7 @@
 class InputParameters;
 
 /**
- * Executioner for diffusion spectral solver.
+ * Executioner for linear elastic deformation spectral solver.
  */
 class SpectralExecutionerLinearElastic : public SpectralExecutionerBase
 {
@@ -43,9 +43,6 @@ protected:
   /// Poisson ratio
   const Real _poisson_ratio;
 
-  /// Current time
-  Real _t_current;
-
   /// Initial strain tensor
   RankTwoTensor _initial_strain_tensor;
 
@@ -55,9 +52,12 @@ protected:
   /// User-prescribed error for fixed iteration solver
   const Real _solver_error;
 
+  /// Current time
+  Real _t_current;
+
 private:
   /**
-   * Helper function to get the diffusion equation Green's function corresponding to one time step.
+   * Helper function to get the linear elastic problem Green's function.
    * @param gamma_hat Linear elastic Green operator in Fourier space
    * @param elasticity_tensor Elasticity tensor used to replace Gamma for some frequencies
    */

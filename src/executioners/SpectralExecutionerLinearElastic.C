@@ -12,15 +12,6 @@
 
 registerMooseObject("MagpieApp", SpectralExecutionerLinearElastic);
 
-Real
-deltaij(const int i, const int j)
-{
-  if (i == j)
-    return 1.0;
-  else
-    return 0.0;
-}
-
 InputParameters
 SpectralExecutionerLinearElastic::validParams()
 {
@@ -48,61 +39,35 @@ SpectralExecutionerLinearElastic::SpectralExecutionerLinearElastic(
     _young_modulus(getParam<Real>("young_modulus")),
     _poisson_ratio(getParam<Real>("poisson_ratio")),
     _average_factor(getParam<Real>("average_material_factor")),
-    _solver_error(getParam<Real>("solver_error"))
+    _solver_error(getParam<Real>("solver_error")),
+    _t_current(0.0)
 {
-
   _initial_strain_tensor.fillFromInputVector(getParam<std::vector<Real>>("global_strain_tensor"));
-
-  _t_current = 0.0;
 }
 
 void
 SpectralExecutionerLinearElastic::fillOutEpsilonBuffer(
     FFTBufferBase<RankTwoTensor> & epsilon_buffer)
 {
-  const auto & grid = epsilon_buffer.grid();
-  const int ni = grid[0];
-  const int nj = grid[1];
-  const int nk = grid[2];
-
-  std::size_t index = 0;
-
-  for (int freq_x = 0; freq_x < ni; ++freq_x)
-    for (int freq_y = 0; freq_y < nj; ++freq_y)
-      for (int freq_z = 0; freq_z < nk; ++freq_z)
-      {
-        epsilon_buffer.realSpace()[index] = _initial_strain_tensor;
-        index++;
-      }
+  epsilon_buffer.realSpace() = _initial_strain_tensor;
 }
 
 void
 SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor> & gamma_hat,
                                                     const RankFourTensor & elasticity_tensor)
 {
-  const auto & grid = gamma_hat.grid();
   const int ndim = 3;
-
-  const int ni = grid[0];
-  const int nj = grid[1];
-  const int nk = (grid[2] >> 1) + 1;
-
   std::size_t index = 0;
 
-  const auto & ivec = gamma_hat.kTable(0);
-  const auto & jvec = gamma_hat.kTable(1);
-  const auto & kvec = gamma_hat.kTable(2);
-
-  const std::vector<int> grid_vector = gamma_hat.grid();
-
   const Complex I(0.0, 1.0);
+  auto & gamma_hat_F = gamma_hat.reciprocalSpace();
 
   // Fill fourth-order Green operator based on homogeneous material properties
-  for (int freq_x = 0; freq_x < ni; ++freq_x)
-    for (int freq_y = 0; freq_y < nj; ++freq_y)
-      for (int freq_z = 0; freq_z < nk; ++freq_z)
+  for (auto ivec : gamma_hat.kTable(0))
+    for (auto jvec : gamma_hat.kTable(1))
+      for (auto kvec : gamma_hat.kTable(2))
       {
-        const std::array<Complex, 3> freq{ivec[freq_x] * I, jvec[freq_y] * I, kvec[freq_z] * I};
+        const std::array<Complex, 3> freq{ivec * I, jvec * I, kvec * I};
 
         Real lambda0 = _young_modulus * _average_factor * _poisson_ratio /
                        ((1 + _poisson_ratio) * (1 - 2 * _poisson_ratio));
@@ -117,17 +82,15 @@ SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor
                 Complex q_square = freq[0] * freq[0] + freq[1] * freq[1] + freq[2] * freq[2];
                 if (std::abs(q_square) > 1.0e-12)
                 {
-                  gamma_hat.reciprocalSpace()[index](i, j, k, l) =
+                  gamma_hat_F[index](i, j, k, l) =
                       -1.0 * constant * (freq[i] * freq[j] * freq[k] * freq[l]) /
                           (q_square * q_square) +
-                      (deltaij(i, k) * freq[j] * freq[l] + deltaij(j, k) * freq[i] * freq[l] +
-                       deltaij(i, l) * freq[j] * freq[k] + deltaij(j, l) * freq[i] * freq[k]) /
+                      ((i == k) * freq[j] * freq[l] + (j == k) * freq[i] * freq[l] +
+                       (i == l) * freq[j] * freq[k] + (j == l) * freq[i] * freq[k]) /
                           (4.0 * nu0 * q_square);
                 }
                 else
-                {
-                  gamma_hat.reciprocalSpace()[index] = elasticity_tensor.invSymm();
-                }
+                  gamma_hat_F[index] = elasticity_tensor.invSymm();
               }
 
         index++;
@@ -140,24 +103,13 @@ SpectralExecutionerLinearElastic::getInitialStress(
     const FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
   auto & stress_buffer = getFFTBuffer<RankTwoTensor>("stress");
-  const auto & grid = epsilon_buffer.grid();
-  int ni = grid[0];
-  int nj = grid[1];
-  int nk = grid[2];
 
   // Homogeneous initial state of strain
   fillOutEpsilonBuffer(epsilon_buffer);
 
-  size_t index = 0;
-  for (int freq_x = 0; freq_x < ni; ++freq_x)
-    for (int freq_y = 0; freq_y < nj; ++freq_y)
-      for (int freq_z = 0; freq_z < nk; ++freq_z)
-      {
-        stress_buffer.realSpace()[index] =
-            elastic_tensor.realSpace()[index] * epsilon_buffer.realSpace()[index];
-        index++;
-      }
-
+  // Set real stress buffer to product E * epsilon
+  stress_buffer.realSpace().setToProductRealSpace(
+      elastic_tensor.realSpace(), epsilon_buffer.realSpace(), epsilon_buffer.grid());
   return stress_buffer;
 }
 
@@ -167,29 +119,19 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
     const FFTBufferBase<RankTwoTensor> & stress_buffer,
     const FFTBufferBase<RankFourTensor> & gamma_hat)
 {
-  const auto & grid = epsilon_buffer.grid();
-  int ni = grid[0];
-  int nj = grid[1];
-  int nk = (grid[2] >> 1) + 1;
+  Complex I(1.0, 0.0);
 
-  size_t index = 0;
+  epsilon_buffer.reciprocalSpace().applyLambdaReciprocalSpace(
+      [&gamma_hat, &stress_buffer, &epsilon_buffer](std::size_t index) {
+        return epsilon_buffer.reciprocalSpace()[index] -
+               gamma_hat.reciprocalSpace()[index] * stress_buffer.reciprocalSpace()[index];
+      },
+      epsilon_buffer.kTable(0),
+      epsilon_buffer.kTable(1),
+      epsilon_buffer.kTable(2));
 
-  const auto & ivec = gamma_hat.kTable(0);
-  const auto & jvec = gamma_hat.kTable(1);
-  const auto & kvec = gamma_hat.kTable(2);
-
-  for (int freq_x = 0; freq_x < ni; ++freq_x)
-    for (int freq_y = 0; freq_y < nj; ++freq_y)
-      for (int freq_z = 0; freq_z < nk; ++freq_z)
-      {
-        if (ivec[freq_x] == 0 && jvec[freq_y] == 0 && kvec[freq_z] == 0)
-          epsilon_buffer.reciprocalSpace()[index] = _initial_strain_tensor;
-        else
-          epsilon_buffer.reciprocalSpace()[index] -=
-              gamma_hat.reciprocalSpace()[index] * stress_buffer.reciprocalSpace()[index];
-
-        index++;
-      }
+  // Avoid divide by zero
+  epsilon_buffer.reciprocalSpace()[0] = _initial_strain_tensor * I;
 }
 
 void
@@ -198,21 +140,9 @@ SpectralExecutionerLinearElastic::updateRealSigma(
     FFTBufferBase<RankTwoTensor> & stress_buffer,
     const FFTBufferBase<RankFourTensor> & elastic_tensor)
 {
-  const auto & grid = epsilon_buffer.grid();
-  int ni = grid[0];
-  int nj = grid[1];
-  int nk = grid[2];
-
-  size_t index = 0;
-
-  for (int freq_x = 0; freq_x < ni; ++freq_x)
-    for (int freq_y = 0; freq_y < nj; ++freq_y)
-      for (int freq_z = 0; freq_z < nk; ++freq_z)
-      {
-        stress_buffer.realSpace()[index] =
-            (elastic_tensor.realSpace()[index]) * epsilon_buffer.realSpace()[index];
-        index++;
-      }
+  // Set real stress buffer to product E * epsilon
+  stress_buffer.realSpace().setToProductRealSpace(
+      elastic_tensor.realSpace(), epsilon_buffer.realSpace(), epsilon_buffer.grid());
 }
 
 void
@@ -228,13 +158,13 @@ SpectralExecutionerLinearElastic::filloutElasticTensor(
   int nk = grid[2];
 
   size_t index = 0;
+  std::vector<Real> iso_const(2);
 
   for (int freq_x = 0; freq_x < ni; ++freq_x)
     for (int freq_y = 0; freq_y < nj; ++freq_y)
       for (int freq_z = 0; freq_z < nk; ++freq_z)
       {
         // Define elastic tensor
-        std::vector<Real> iso_const(2);
         iso_const[0] = _young_modulus * ratio_buffer.realSpace()[index];
         iso_const[1] = _poisson_ratio;
 
@@ -256,7 +186,6 @@ SpectralExecutionerLinearElastic::hasStressConverged(const FFTBufferBase<RankTwo
   const int nk = (grid[2] >> 1) + 1;
 
   std::size_t index = 0;
-  const int ndim = 3;
 
   const auto & ivec = stress.kTable(0);
   const auto & jvec = stress.kTable(1);
@@ -269,31 +198,29 @@ SpectralExecutionerLinearElastic::hasStressConverged(const FFTBufferBase<RankTwo
   Complex error_n(0.0, 0.0);
   Complex error_0(0.0, 0.0);
 
-  // error
+  // Error: Ensure overall equilibrium
   for (int freq_x = 0; freq_x < ni; ++freq_x)
     for (int freq_y = 0; freq_y < nj; ++freq_y)
       for (int freq_z = 0; freq_z < nk; ++freq_z)
       {
-        const std::array<Complex, 3> freq{ivec[freq_x] * I, jvec[freq_y] * I, kvec[freq_z] * I};
+        const ComplexVectorValue freq{ivec[freq_x] * I, jvec[freq_y] * I, kvec[freq_z] * I};
 
-        std::array<Complex, 3> kvector_stress;
-        kvector_stress[0] = stress.reciprocalSpace()[index](0, 0) * freq[0] +
-                            stress.reciprocalSpace()[index](1, 0) * freq[1] +
-                            stress.reciprocalSpace()[index](2, 0) * freq[2];
-        kvector_stress[1] = stress.reciprocalSpace()[index](0, 1) * freq[0] +
-                            stress.reciprocalSpace()[index](1, 1) * freq[1] +
-                            stress.reciprocalSpace()[index](2, 1) * freq[2];
-        kvector_stress[2] = stress.reciprocalSpace()[index](0, 2) * freq[0] +
-                            stress.reciprocalSpace()[index](1, 2) * freq[1] +
-                            stress.reciprocalSpace()[index](2, 2) * freq[2];
+        ComplexVectorValue kvector_stress;
+        kvector_stress(0) = stress.reciprocalSpace()[index](0, 0) * freq(0) +
+                            stress.reciprocalSpace()[index](1, 0) * freq(1) +
+                            stress.reciprocalSpace()[index](2, 0) * freq(2);
+        kvector_stress(1) = stress.reciprocalSpace()[index](0, 1) * freq(0) +
+                            stress.reciprocalSpace()[index](1, 1) * freq(1) +
+                            stress.reciprocalSpace()[index](2, 1) * freq(2);
+        kvector_stress(2) = stress.reciprocalSpace()[index](0, 2) * freq(0) +
+                            stress.reciprocalSpace()[index](1, 2) * freq(1) +
+                            stress.reciprocalSpace()[index](2, 2) * freq(2);
 
-        error_n += kvector_stress[0] * kvector_stress[0] + kvector_stress[1] * kvector_stress[1] +
-                   kvector_stress[1] * kvector_stress[1];
+        error_n += kvector_stress(0) * kvector_stress(0) + kvector_stress(1) * kvector_stress(1) +
+                   kvector_stress(2) * kvector_stress(2);
 
         if (freq_x == 0 && freq_y == 0 && freq_z == 0)
-          for (int i = 0; i < ndim; i++)
-            for (int j = 0; j < ndim; j++)
-              error_0 += stress.reciprocalSpace()[0](i, j) * stress.reciprocalSpace()[0](i, j);
+          error_0 = stress.reciprocalSpace()[0].L2norm() * stress.reciprocalSpace()[0].L2norm();
 
         index++;
       }
@@ -365,7 +292,7 @@ SpectralExecutionerLinearElastic::execute()
   {
     // Update sigma in the real space
     updateRealSigma(epsilon_buffer, stress_buffer, elastic_tensor_buffer);
-    // (a) plus bookkeeping
+
     stress_buffer_backup_real = stress_buffer.realSpace();
     stress_buffer.forwardRaw();
     stress_buffer.reciprocalSpace() *= stress_buffer.backwardScale();

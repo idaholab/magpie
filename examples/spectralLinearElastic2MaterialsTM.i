@@ -89,7 +89,6 @@
     youngs_modulus = 1.0e4
     poissons_ratio = 0.3
     elasticity_tensor_prefactor = young_modulus_function
-    # Is the line above during the righ thing by scaling the young modulus?
   [../]
   [./stress]
     type = ComputeLinearElasticStress

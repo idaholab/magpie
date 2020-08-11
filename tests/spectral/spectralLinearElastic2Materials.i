@@ -125,7 +125,7 @@
   type = SpectralExecutionerLinearElastic
 
   number_iterations = 300
-  solver_error = 5.0e-5
+  solver_error = 3.0e-5
   global_strain_tensor = '0.0 0.0 0.0 0.0 0.0 0.01'
 
   time_step = 1.0
