@@ -17,13 +17,14 @@
 template <typename T>
 FFTWBufferBase<T>::FFTWBufferBase(const InputParameters & parameters)
   : FFTBufferBase<T>(parameters),
-    _perf_plan(this->registerTimedSection("fftw_plan_r2r", 2)),
+    _perf_plan(this->registerTimedSection("fftw_plan_r2c", 2)),
     _perf_fft(this->registerTimedSection("fftw_execute", 2))
 {
   // create plans
   {
     TIME_SECTION(_perf_plan);
 
+    // Note: These plans do not preserve the input. Additional caching may be required.
     _forward_plan =
         fftw_plan_many_dft_r2c(_dim,
                                _grid.data(),
