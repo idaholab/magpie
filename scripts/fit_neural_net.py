@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -131,7 +131,7 @@ def weights_init(m):
 # adjust input and output weights and biases for lacking data normalization
 def adjust_weights():
     params = list(model.parameters())
-    n_layers = int(len(params) / 2)
+    n_layers = len(params) // 2
 
     # input weights
     p = params[0]
@@ -159,7 +159,7 @@ def adjust_weights():
 # adjust input and output weights and biases for lacking data normalization
 def shift_output():
     params = list(model.parameters())
-    n_layers = int(len(params) / 2)
+    n_layers = len(params) // 2
 
     y_pred = model.forward(x)
     if gpu:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #
 # Import a saved model.dat
@@ -17,7 +17,7 @@ model = torch.load('model.dat')
 
 # number of layers excluding input layer
 params = list(model.parameters())
-n_layers = int(len(params) / 2)
+n_layers = len(params) // 2
 
 with open('weights_biases.txt', "w") as f:
     # write number of layers
