@@ -85,8 +85,8 @@ SpectralExecutionerLinearElastic::getGreensFunction(FFTBufferBase<RankFourTensor
                   gamma_hat_F[index](i, j, k, l) =
                       -1.0 * constant * (freq[i] * freq[j] * freq[k] * freq[l]) /
                           (q_square * q_square) +
-                      ((i == k) * freq[j] * freq[l] + (j == k) * freq[i] * freq[l] +
-                       (i == l) * freq[j] * freq[k] + (j == l) * freq[i] * freq[k]) /
+                      (Real(i == k) * freq[j] * freq[l] + Real(j == k) * freq[i] * freq[l] +
+                       Real(i == l) * freq[j] * freq[k] + Real(j == l) * freq[i] * freq[k]) /
                           (4.0 * nu0 * q_square);
                 }
                 else
