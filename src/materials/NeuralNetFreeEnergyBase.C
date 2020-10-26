@@ -27,7 +27,8 @@ NeuralNetFreeEnergyBase::validParams()
   params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
   params.template addParam<std::vector<MaterialPropertyName>>(
       "prop_names", "list of material properties fed from the outputs of the neural network");
-  params.template addParam<bool>("debug", "Tabulate the NN to a file for debugging purposes");
+  params.template addParam<bool>(
+      "debug", false, "Tabulate the NN to a file for debugging purposes");
   return params;
 }
 
@@ -46,7 +47,7 @@ NeuralNetFreeEnergyBase::NeuralNetFreeEnergyBase(const InputParameters & paramet
   std::ifstream ifile;
   ifile.open(_file_name);
   if (!ifile)
-    paramError("filename", "Unable to open file");
+    paramError("file_name", "Unable to open file");
 
   // call the reader for the requested format
   switch (_file_format)
@@ -68,7 +69,7 @@ NeuralNetFreeEnergyBase::NeuralNetFreeEnergyBase(const InputParameters & paramet
 
   // validate network properties
   if (_weight.size() != _bias.size())
-    paramError("filename", "Inconsistent layer numbers in datafile");
+    paramError("file_name", "Inconsistent layer numbers in datafile");
   if (_z[_n_layer - 1].size() != _n_output)
     paramError("prop_names",
                "Number of supplied property names must match the number of output nodes ",
@@ -116,7 +117,7 @@ void
 NeuralNetFreeEnergyBase::debugDump()
 {
   std::ofstream ofile;
-  ofile.open("debug.dat");
+  ofile.open(_name + "_debug.dat");
   for (Real T = 0.0; T <= 1.0; T += 0.01)
     for (Real c = 0.0; c <= 1.0; c += 0.01)
     {
