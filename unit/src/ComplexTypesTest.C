@@ -21,16 +21,20 @@ TEST(ComplexTypesTest, rankTwo)
   Complex c_1;
   ComplexType<Real>::type c_2;
   auto c = c_1 + c_2;
+  (void)c;
 
   ComplexVectorValue v_1;
   ComplexType<RealVectorValue>::type v_2;
   auto v = v_1 + v_2;
+  (void)v;
 
   ComplexRankTwoTensor r2_1;
   ComplexType<RankTwoTensor>::type r2_2;
   auto r2 = r2_1 + r2_2;
+  (void)r2;
 
   ComplexRankThreeTensor r3_1;
   ComplexType<RankThreeTensor>::type r3_2;
   auto r3 = r3_1 + r3_2;
+  (void)r3;
 }
