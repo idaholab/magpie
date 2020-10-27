@@ -85,7 +85,8 @@ template <typename T1, typename T2>
 void
 FFTData<T>::setToProductRealSpace(const FFTData<T1> & m1, const FFTData<T2> & m2)
 {
-  mooseAssert(grid.size() == 3, "Product defined for 3 dimensions");
+  mooseAssert(size() == m1.size(), "Buffer size mismatch");
+  mooseAssert(size() == m2.size(), "Buffer size mismatch");
 
   for (unsigned int index = 0; index < _buffer.size(); index++)
     (*this)[index] = m1[index] * m2[index];

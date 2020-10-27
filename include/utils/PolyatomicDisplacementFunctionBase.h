@@ -59,7 +59,7 @@ public:
   unsigned int nSpecies() const { return _n_species; }
   unsigned int problemSize() const { return _problem_size; }
   unsigned int nEnergySteps() const { return _energy_history.size(); }
-  unsigned int findSpeciesIndex(unsigned int atomic_number, Real mass_number) const;
+  unsigned int findSpeciesIndex(int atomic_number, Real mass_number) const;
   Real minEnergy() const { return _energy_history[0]; }
   Real energyPoint(unsigned int na) const { return _energy_history[na]; }
   Real lambda(unsigned int i, unsigned int j) const { return _lambda[i][j]; }
