@@ -1,6 +1,7 @@
 # Magpie
 
-[![Build status](https://www.moosebuild.org/idaholab/magpie/master/branch_status.svg)](https://www.moosebuild.org/repo/idaholab/magpie/)
+[![Build status](https://civet.inl.gov/idaholab/magpie/master/branch_status.svg)](https://civet.inl.gov/repo/idaholab/magpie/)
+
 
 ![Magpie Logo](http://idaholab.github.io/img/magpie/magpie_logo_small.png)
 
