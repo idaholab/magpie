@@ -1,0 +1,12 @@
+[Tests]
+  [./action]
+    type = 'Exodiff'
+    input = 'action.i'
+    exodiff = 'action_out.e'
+  [../]
+  [./ic]
+    type = 'Exodiff'
+    input = 'ic.i'
+    exodiff = 'ic_out.e'
+  [../]
+[]
