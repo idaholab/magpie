@@ -14,6 +14,7 @@
     abs_zero = 1e-6
     max_parallel = 1
     max_threads = 1
+    required_objects = 'RealFFTWBuffer'
   [../]
   [./spectralDerivative]
     input = 'spectralDerivative.i'
@@ -22,7 +23,17 @@
     abs_zero = 1e-6
     max_parallel = 1
     max_threads = 1
-  # required_objects = NEMLStress
     allow_test_objects = true
+    required_objects = 'RealFFTWBuffer RealVectorValueFFTWBuffer'
+  [../]
+  [./spectralLinearElastic2Materials]
+    input = 'spectralLinearElastic2Materials.i'
+    type = 'Exodiff'
+    exodiff = 'spectralLinearElastic2Materials_out.e'
+    abs_zero = 1e-6
+    max_parallel = 1
+    max_threads = 1
+    valgrind = 'HEAVY' # timing out
+    required_objects = 'RealFFTWBuffer RankTwoTensorFFTWBuffer RankFourTensorFFTWBuffer'
   [../]
 []

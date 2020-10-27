@@ -232,8 +232,7 @@ PolyatomicDisplacementFunctionBase::universalF(Real xi) const
 }
 
 unsigned int
-PolyatomicDisplacementFunctionBase::findSpeciesIndex(unsigned int atomic_number,
-                                                     Real mass_number) const
+PolyatomicDisplacementFunctionBase::findSpeciesIndex(int atomic_number, Real mass_number) const
 {
   for (unsigned int j = 0; j < _n_species; ++j)
     if (atomic_number == _material->_element[j]._Z &&

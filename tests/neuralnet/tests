@@ -1,0 +1,12 @@
+[Tests]
+  [./magpie]
+    type = 'Exodiff'
+    input = 'magpie.i'
+    exodiff = 'magpie_out.e'
+  [../]
+    [./genann]
+    type = 'Exodiff'
+    input = 'genann.i'
+    exodiff = 'genann_out.e'
+  [../]
+[]
