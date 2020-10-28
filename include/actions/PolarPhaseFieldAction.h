@@ -8,19 +8,17 @@
 
 #pragma once
 
-#include "MooseApp.h"
+#include "Action.h"
 
-class MagpieApp : public MooseApp
+/**
+ * Sets up the polar phase field model by Momeni et al.
+ */
+class PolarPhaseFieldAction : public Action
 {
 public:
   static InputParameters validParams();
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+  PolarPhaseFieldAction(const InputParameters & parameters);
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & syntax, ActionFactory & action_factory);
-
-  static void printLogo();
+  virtual void act() override;
 };

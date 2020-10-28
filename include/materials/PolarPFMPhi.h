@@ -8,19 +8,29 @@
 
 #pragma once
 
-#include "MooseApp.h"
+#include "DerivativeParsedMaterialHelper.h"
+#include "ExpressionBuilder.h"
 
-class MagpieApp : public MooseApp
+/**
+ * Interpolating function eq. (9) with a prefactor of beta^21 from
+ * Physical Review B 89, 184102 (2014)
+ */
+class PolarPFMPhi : public DerivativeParsedMaterialHelper, public ExpressionBuilder
 {
 public:
   static InputParameters validParams();
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+  PolarPFMPhi(const InputParameters & parameters);
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & syntax, ActionFactory & action_factory);
+protected:
+  /// coupled interfacial melt order parameter
+  EBTerm _upsilon;
 
-  static void printLogo();
+  ///@{ interpolation coefficients
+  const Real _a_phi;
+  const Real _a0;
+  ///@}
+
+  /// solid 2 / solid 1 gradient energy coefficient
+  const Real _beta21;
 };

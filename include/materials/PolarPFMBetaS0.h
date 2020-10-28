@@ -8,29 +8,28 @@
 
 #pragma once
 
-#include "Kernel.h"
-#include "RadialGreensConvolution.h"
+#include "DerivativeParsedMaterialHelper.h"
+#include "ExpressionBuilder.h"
 
 /**
- * Apply the convolution from a RadialGreensConvolution object to a non-linear variable
+ * Solid-melt gradient energy coefficient, eq. (7) from Physical Review B 89, 184102 (2014)
  */
-class RadialGreensSource : public Kernel
+class PolarPFMBetaS0 : public DerivativeParsedMaterialHelper, public ExpressionBuilder
 {
 public:
   static InputParameters validParams();
 
-  RadialGreensSource(const InputParameters & parameters);
+  PolarPFMBetaS0(const InputParameters & parameters);
 
 protected:
-  void precalculateResidual() override;
-  virtual Real computeQpResidual() override;
+  /// Coupled solid phase order parameter
+  EBTerm _theta;
 
-  /// convolution result
-  const RadialGreensConvolution::Result & _convolution;
+  /// interpolation function parameter
+  const Real _a_beta;
 
-  /// rate factor
-  const Real _gamma;
-
-  /// iterator pointing to the map entry for the current element
-  RadialGreensConvolution::Result::const_iterator _result;
+  /// solid1 / melt gradient energy coefficient
+  const Real _beta10;
+  /// solid2 / melt gradient energy coefficient
+  const Real _beta20;
 };
