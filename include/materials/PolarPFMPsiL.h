@@ -22,7 +22,7 @@ public:
   PolarPFMPsiL(const InputParameters & parameters);
 
 protected:
-  ///@{ Order parameter
+  ///@{ Order parameters
   EBTerm _upsilon;
   EBTerm _theta;
   ///@}

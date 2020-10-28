@@ -23,11 +23,18 @@ public:
   virtual Real value(const Point & p) override;
 
 protected:
+  /// coupled solid phase order parameter
   const VariableValue & _theta;
 
+  /// interpolation function parameter
   const Real _a_beta;
+
+  /// solid1 / melt gradient energy coefficient
   const Real _beta10;
+  /// solid2 / melt gradient energy coefficient
   const Real _beta20;
+
+  /// scale factor for interface width
   const Real _p;
 
   /// Minimum x coordinate

@@ -23,7 +23,7 @@ public:
   PolarPFMPhi(const InputParameters & parameters);
 
 protected:
-  /// order parameter
+  /// coupled interfacial melt order parameter
   EBTerm _upsilon;
 
   ///@{ interpolation coefficients
@@ -31,6 +31,6 @@ protected:
   const Real _a0;
   ///@}
 
-  // solid 2 / solid 1 gradient energy coefficient
+  /// solid 2 / solid 1 gradient energy coefficient
   const Real _beta21;
 };

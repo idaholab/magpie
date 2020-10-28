@@ -35,4 +35,20 @@ Sub-terms appearing the equations above are implemented as materials
 | [PolarPFMPhi](/PolarPFMPhi.md) | $\beta^{21}\phi(\Upsilon,a_\phi,a_0)$ |
 | [PolarPFMPsiL](/PolarPFMPsiL.md) | $\psi^l$ |
 
+## Physical meaning
+
+The model implements a two sold phase system with a third interfacial melt
+phase. The $\vartheta$ order parameter switched between solid1 ($\vartheta=0$)
+and solid2 ($\vartheta=0$). The $\Upsilon$ order parameter switches between
+solid ($\vartheta=0$ - governed by $\vartheta$) and interfacial melt
+($\vartheta=1$). The indices $s$ and $1,2$ refer to an unspecified and specified
+solid phase respectively, while the index $0$ refers to the interfacial melt
+phase.
+
+Both order parameters $\vartheta$ and $\Upsilon$ are non-conserved
+\emph{Allen-Cahn like} phase order parameters.
+
+The parameters in the test and example files are using the parameterization for
+HMX from the original publication.
+
 !bibtex bibliography

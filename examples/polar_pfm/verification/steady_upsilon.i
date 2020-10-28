@@ -28,7 +28,7 @@ KD = 1   # energy ratios
 #kE = 3.39
 
 # simulation temperature θ
-Temp_ = 550 # equilibrium temperature
+Temp_ = 532.14 # equilibrium temperature
 P4 = 2.415  # scale factor for interface width
 ru0 = ${units 1848.78 kg/m^3 -> g/nm^3} # density conversion
 z_mb = ${units 505.98 J/(kg*K) -> eV/(g*K)}

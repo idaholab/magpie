@@ -24,7 +24,6 @@ PolarPFMDerivative::PolarPFMDerivative(const InputParameters & parameters)
   : DerivativeMaterialInterface<KernelValue>(parameters),
     _dpropdu(getMaterialPropertyDerivative<Real>("F", _var.name())),
     _d2propdu2(getMaterialPropertyDerivative<Real>("F", _var.name(), _var.name()))
-
 {
 }
 

@@ -25,12 +25,12 @@ protected:
   void precalculateResidual() override;
   virtual Real computeQpResidual() override;
 
-  // convolution result
+  /// convolution result
   const RadialGreensConvolution::Result & _convolution;
 
-  // rate factor
+  /// rate factor
   const Real _gamma;
 
-  // iterator pointing to the map entry for the current element
+  /// iterator pointing to the map entry for the current element
   RadialGreensConvolution::Result::const_iterator _result;
 };

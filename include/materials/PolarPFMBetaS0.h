@@ -22,8 +22,14 @@ public:
   PolarPFMBetaS0(const InputParameters & parameters);
 
 protected:
+  /// Coupled solid phase order parameter
   EBTerm _theta;
+
+  /// interpolation function parameter
   const Real _a_beta;
+
+  /// solid1 / melt gradient energy coefficient
   const Real _beta10;
+  /// solid2 / melt gradient energy coefficient
   const Real _beta20;
 };
