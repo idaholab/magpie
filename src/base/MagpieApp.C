@@ -61,6 +61,12 @@ MagpieApp::registerAll(Factory & factory, ActionFactory & action_factory, Syntax
 }
 
 void
+MagpieApp::associateSyntax(Syntax & syntax, ActionFactory & /*action_factory*/)
+{
+  registerSyntax("PolarPhaseFieldAction", "Magpie/PolarPhaseField/*");
+}
+
+void
 MagpieApp::printLogo()
 {
   Moose::out << "\n"

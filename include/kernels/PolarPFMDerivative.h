@@ -8,19 +8,24 @@
 
 #pragma once
 
-#include "MooseApp.h"
+#include "DerivativeMaterialInterface.h"
+#include "KernelValue.h"
 
-class MagpieApp : public MooseApp
+/**
+ * Bulk energy derivative term in the polar phase field model from Physical Review B 89, 184102
+ * (2014)
+ */
+class PolarPFMDerivative : public DerivativeMaterialInterface<KernelValue>
 {
 public:
   static InputParameters validParams();
 
-  MagpieApp(const InputParameters & parameters);
-  ~MagpieApp();
+  PolarPFMDerivative(const InputParameters & parameters);
 
-  static void registerApps();
-  static void registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax);
-  static void associateSyntax(Syntax & syntax, ActionFactory & action_factory);
+protected:
+  virtual Real precomputeQpResidual() override;
+  virtual Real precomputeQpJacobian() override;
 
-  static void printLogo();
+  const MaterialProperty<Real> & _dpropdu;
+  const MaterialProperty<Real> & _d2propdu2;
 };
