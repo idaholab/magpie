@@ -57,8 +57,8 @@ MultiAppNeutronicsSpectrumTransfer::execute()
       for (THREAD_ID tid = 0; tid < libMesh::n_threads(); ++tid)
       {
         PKAGeneratorNeutronicsBase & pka_uo = const_cast<PKAGeneratorNeutronicsBase &>(
-            _multi_app->appProblem(i).getUserObject<PKAGeneratorNeutronicsBase>(_pka_generator_name,
-                                                                                tid));
+            _multi_app->appProblemBase(i).getUserObject<PKAGeneratorNeutronicsBase>(
+                _pka_generator_name, tid));
         pka_uo.setPDF(zaids, energies, probabilities);
       }
     }
