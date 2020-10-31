@@ -25,12 +25,6 @@ Extensions:
 
     MooseDocs.extensions.appsyntax:
         executable: ${ROOT_DIR}
-        hide:
-            magpie: !include ${ROOT_DIR}/doc/hidden.yml
-            framework: !include ${MOOSE_DIR}/framework/doc/hidden.yml
-            phase_field: !include ${MOOSE_DIR}/modules/phase_field/doc/hidden.yml
-            tensor_mechanics: !include ${MOOSE_DIR}/modules/tensor_mechanics/doc/hidden.yml
-            heat_conduction: !include ${MOOSE_DIR}/modules/heat_conduction/doc/hidden.yml
         remove:
             framework: !include ${MOOSE_DIR}/framework/doc/remove.yml
 
