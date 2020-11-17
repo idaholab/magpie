@@ -33,14 +33,23 @@ ThreadedRecoilDiracSourceLoop::addDefectToResult(const Point & p,
                                                  Real weight,
                                                  ThreadedRecoilDiracSourceLoop::DefectType type)
 {
-  // TODO: if weight != 1, we need to add a fractional # of results
+  // TODO: if weight != 1, we need to insert a weight into the DiracKernel for each
+  // point. That is currently not possible so still throw error here.
   if (weight != 1)
     mooseError("Weight != 1 is currently not supported in ThreadedRecoilDiracSourceLoop. This "
                "usually occurs when setting analytical_cutoff != 0.");
 
   const Elem * elem = (*_pl)(p);
   if (elem != nullptr && var < _nvars)
-    _result_list.push_back(MyTRIMResult(p, var, type, elem->id()));
+    _result_list.push_back(MyTRIMResult(p, var, type, elem->id(), weight));
+}
+
+void
+ThreadedRecoilDiracSourceLoop::addEnergyToResult(const Point & p, Real edep)
+{
+  const Elem * elem = (*_pl)(p);
+  if (elem != nullptr)
+    _result_list.push_back(MyTRIMResult(p, 0, ENERGY_DEPOSITION, elem->id(), edep));
 }
 
 template <>
@@ -51,6 +60,7 @@ dataStore(std::ostream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & d
   dataStore(stream, dsl._var, context);
   dataStore(stream, dsl._type, context);
   dataStore(stream, dsl._elem_id, context);
+  dataStore(stream, dsl._weight, context);
 }
 
 template <>
@@ -61,4 +71,5 @@ dataLoad(std::istream & stream, ThreadedRecoilDiracSourceLoop::MyTRIMResult & ds
   dataLoad(stream, dsl._var, context);
   dataLoad(stream, dsl._type, context);
   dataLoad(stream, dsl._elem_id, context);
+  dataLoad(stream, dsl._weight, context);
 }

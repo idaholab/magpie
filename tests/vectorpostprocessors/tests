@@ -39,4 +39,10 @@
     csvdiff = 'fourierpowerspectrum_out_power_0000.csv'
     required_objects = 'FourierTransform FourierPowerSpectrum'
   [../]
+
+  [./dirac_energy_result]
+    type = CSVDiff
+    input = 'dirac_energy_result.i'
+    csvdiff = 'dirac_energy_result_out_dirac_energy_0001.csv'
+  [../]
 []
