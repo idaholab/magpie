@@ -42,9 +42,19 @@ namespace libMesh
 template class VectorValue<Complex>;
 }
 
+// This instantiation for complex variable simplifies logic and skips
+// checks on user's input validity.
+template <>
+void
+RankFourTensorTempl<Complex>::fillGeneralOrthotropicFromInputVector(
+    const std::vector<Complex> & /*input*/)
+{
+  mooseError("RankFourTensorTempl<>::fillGeneralOrthotropicFromInputVector is only to be "
+             "used to fill elasticity tensors with real numbers");
+}
+
 template class RankTwoTensorTempl<Complex>;
 template class RankThreeTensorTempl<Complex>;
 template class RankFourTensorTempl<Complex>;
-
-template RankTwoTensorTempl<Complex> RankFourTensorTempl<Complex>::
-operator*(const RankTwoTensorTempl<Complex> & a) const;
+template RankTwoTensorTempl<Complex>
+RankFourTensorTempl<Complex>::operator*(const RankTwoTensorTempl<Complex> & a) const;
