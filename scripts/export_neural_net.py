@@ -12,14 +12,24 @@ import torch.nn.functional as F
 # NumPy imports
 import numpy as np
 
+import sys
+
+if len(sys.argv) == 1 :
+    basename = 'model'
+elif len(sys.argv) == 2 :
+    basename = sys.argv[1]
+else :
+    print("usage %s [basename]" % sys.argv[0])
+    sys.exit(1)
+
 # Load the model from file
-model = torch.load('model.dat')
+model = torch.load('%s.dat' % basename)
 
 # number of layers excluding input layer
 params = list(model.parameters())
 n_layers = len(params) // 2
 
-with open('weights_biases.txt', "w") as f:
+with open('%s.txt' % basename, "w") as f:
     # write number of layers
     f.write("%d\n" % n_layers)
 

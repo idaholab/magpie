@@ -32,6 +32,7 @@ parser.add_argument('-n', '--hidden_layer_count', type=int, default=2, help="Num
 parser.add_argument('-r', '--learning_rate', type=float, default=1e-5, help="Learning rate meta parameter (1e-5)")
 parser.add_argument('-G', '--disable_gpu', action="store_true", help="Disable GPU detection and learn on the CPU")
 parser.add_argument('-a', '--activation', choices=['softsign','sigmoid','tanh'], default='softsign', help="Activation function")
+parser.add_argument('-b', '--basename', default='model', help="Output file base name")
 args = parser.parse_args()
 print(args)
 
@@ -45,6 +46,9 @@ gpu = torch.cuda.is_available() and not args.disable_gpu
 
 # data file with D_in + D_out columns
 filename = args.datafile
+
+# basename
+basename = args.basename
 
 # Activation function
 if args.activation == 'sigmoid' :
@@ -95,7 +99,7 @@ hidden_layer_count = args.hidden_layer_count
 H = args.hidden_layer_nodes
 
 # open training log
-log = open("model.log", "a")
+log = open("%s.log" % basename, "a")
 log.write("# %s\n" % cmd)
 log.flush()
 
@@ -174,10 +178,10 @@ def shift_output():
     for i in range(D_out):
       p[i].data += np.mean(yd[i]-ypd[i])
 
-if os.path.exists('model.dat') :
+if os.path.exists('%s.dat' % basename) :
     # Load the model from file
     print("Resuming training of existing model")
-    model = torch.load('model.dat')
+    model = torch.load('%s.dat' % basename)
     # model = model.load_state_dict(torch.load('model.dat'))
 else:
     # Use the nn package to define our model and loss function.
@@ -247,6 +251,7 @@ for epoch in range(n_epochs):
           loss = torch.mean((y_pred - batch_y) ** 2 + (grad_pred - batch_grad) ** 2)
 
       else:
+          #loss = torch.mean(torch.abs(y_pred - batch_y))
           loss = torch.mean((y_pred - batch_y) ** 2)
 
       # print learning status
@@ -257,7 +262,7 @@ for epoch in range(n_epochs):
 
       # save model once in a while to allow for resuming of the training
       if epoch > 0 and epoch % output_model == 0 and i == 0:
-          torch.save(model, 'model.dat')
+          torch.save(model, '%s.dat' % basename)
           #torch.save(model.state_dict(), 'model.dat')
           print("Model saved.")
 
@@ -290,7 +295,7 @@ if use_chemical_potentials or True:
         xd = x.detach().numpy()
         yd = y_pred.detach().numpy()
         gd = grad_pred.detach().numpy()
-    np.savetxt('out.txt', np.concatenate((xd, yd, gd), axis=1))
+    np.savetxt('%s.out' % basename, np.concatenate((xd, yd, gd), axis=1))
 else:
     y_pred = model.forward(x)
     if gpu:
@@ -299,7 +304,7 @@ else:
     else:
         xd = x.detach().numpy()
         yd = y_pred.detach().numpy()
-    np.savetxt('out.txt', np.concatenate((xd, yd), axis=1))
+    np.savetxt('%s.out' % basename, np.concatenate((xd, yd), axis=1))
 
-torch.save(model, 'model.dat')
-#torch.save(model.state_dict(), 'model.dat')
+torch.save(model, '%s.dat' % basename)
+#torch.save(model.state_dict(), '%s.dat' % basename)
