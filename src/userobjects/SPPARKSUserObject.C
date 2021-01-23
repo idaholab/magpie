@@ -514,7 +514,7 @@ SPPARKSUserObject::initialSetup()
       std::accumulate(&num_fem_nodes[0], &num_fem_nodes[0] + num_fem_nodes.size(), 0);
   const unsigned int num_spparks_nodes_total =
       std::accumulate(&num_spparks_nodes[0], &num_spparks_nodes[0] + num_spparks_nodes.size(), 0);
-  std::vector<libMesh::dof_id_type> remote_fem_nodes(num_fem_nodes_total);
+  std::vector<unsigned int> remote_fem_nodes(num_fem_nodes_total);
   std::vector<Real> remote_fem_coords(num_fem_nodes_total * 3);
   std::vector<unsigned int> remote_spparks_nodes(num_spparks_nodes_total);
   std::vector<Real> remote_spparks_coords(num_spparks_nodes_total * 3);
@@ -564,7 +564,7 @@ SPPARKSUserObject::initialSetup()
   }
 
   // Prepare vectors of MOOSE FEM ids, coordinates
-  std::vector<libMesh::dof_id_type> fem_ids(_num_local_fem_nodes);
+  std::vector<unsigned int> fem_ids(_num_local_fem_nodes);
   std::vector<Real> fem_coords(3 * _num_local_fem_nodes);
   offset = 0;
   for (auto & id : fem_id)
