@@ -6,6 +6,7 @@
 /*                        ALL RIGHTS RESERVED                         */
 /**********************************************************************/
 
+#include "DualRealOps.h"
 #include "ComplexTypes.h"
 #include "MooseError.h"
 #include "MooseUtils.h"
