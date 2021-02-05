@@ -57,5 +57,5 @@ RankFourTensorTempl<Complex>::fillGeneralOrthotropicFromInputVector(
 template class RankTwoTensorTempl<Complex>;
 template class RankThreeTensorTempl<Complex>;
 template class RankFourTensorTempl<Complex>;
-template RankTwoTensorTempl<Complex> RankFourTensorTempl<Complex>::
-operator*(const RankTwoTensorTempl<Complex> & a) const;
+template RankTwoTensorTempl<Complex>
+RankFourTensorTempl<Complex>::operator*(const RankTwoTensorTempl<Complex> & a) const;
