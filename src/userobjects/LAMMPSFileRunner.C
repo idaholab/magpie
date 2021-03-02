@@ -215,7 +215,7 @@ LAMMPSFileRunner::readLAMMPSFile(FileName filename)
     std::vector<std::string> elements;
     MooseUtils::tokenize<std::string>(line, elements, 1, " ");
 
-#if DEBUG
+#ifndef NDEBUG
     // check that enough columns exist in debug
     // find largest requested column
     unsigned int largest_column = 0;
@@ -344,8 +344,8 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
     std::getline(file_before, line_before);
     MooseUtils::tokenize<std::string>(line_before, elements, 1, " ");
 
-#if DEBUG
-    // check that enough columns exist in debug
+#ifndef NDEBUG
+    // check that enough columns exist in debug/devel
     // find largest requested column
     unsigned int largest_column = 0;
     for (unsigned int i = 0; i < _dim; ++i)
@@ -383,7 +383,7 @@ LAMMPSFileRunner::readLAMMPSFileHistory(std::pair<FileName, FileName> filenames,
 
     MooseUtils::tokenize<std::string>(line_after, elements, 1, " ");
 
-    // we have determined largest_column in DEBUG so we can use it in mooseAssert
+    // we have determined largest_column in !NDEBUG so we can use it in mooseAssert
     mooseAssert(largest_column < elements.size(),
                 "Error reading " << filenames.second << " on line " << line_after);
 
