@@ -4,6 +4,7 @@ Content:
     - ${MOOSE_DIR}/modules/phase_field/doc/content
     - ${MOOSE_DIR}/modules/tensor_mechanics/doc/content
     - ${MOOSE_DIR}/modules/heat_conduction/doc/content
+    - ${MOOSE_DIR}/modules/ray_tracing/doc/content
 
 Renderer:
     type: MooseDocs.base.MaterializeRenderer
