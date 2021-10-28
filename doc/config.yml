@@ -20,9 +20,11 @@ Extensions:
                 Marmot coupling: 'getting_started/Marmot.md'
             # Development:
                 #     Capabilities: 'models_capabilities/Capabilities.md'
-                #     Requirements: 'software_quality/Requirements.md'
             Documentation:
                 Reference Manual: syntax/index.md
+            Development:
+                Software Quality: sqa/index.md
+                Code Coverage: https://mooseframework.inl.gov/magpie/docs/coverage/
 
     MooseDocs.extensions.appsyntax:
         executable: ${ROOT_DIR}
