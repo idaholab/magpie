@@ -16,7 +16,6 @@ template <typename T>
 class FFTBufferBase;
 
 #define usingFFTBufferBaseMembers                                                                  \
-  using ElementUserObject::_perf_graph;                                                            \
   using FFTBufferBase<T>::_dim;                                                                    \
   using FFTBufferBase<T>::_grid;                                                                   \
   using FFTBufferBase<T>::_real_space_data;                                                        \
