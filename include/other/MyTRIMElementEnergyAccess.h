@@ -43,7 +43,7 @@ template <typename T>
 InputParameters
 MyTRIMElementEnergyAccess<T>::validParams()
 {
-  InputParameters params = ::validParams<T>();
+  InputParameters params = T::validParams();
   params.addRequiredParam<UserObjectName>(
       "runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   return params;
@@ -65,4 +65,3 @@ MyTRIMElementEnergyAccess<T>::getEnergyDensity()
 
   return _value_cache;
 }
-
