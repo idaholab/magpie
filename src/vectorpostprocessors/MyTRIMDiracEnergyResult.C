@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", MyTRIMDiracEnergyResult);
 
-template <>
 InputParameters
-validParams<MyTRIMDiracEnergyResult>()
+MyTRIMDiracEnergyResult::validParams()
 {
-  InputParameters params = validParams<GeneralVectorPostprocessor>();
+  InputParameters params = GeneralVectorPostprocessor::validParams();
   params.addRequiredParam<UserObjectName>(
       "runner", "Name of the MyTRIMDiracRun userobject to pull data from.");
   return params;

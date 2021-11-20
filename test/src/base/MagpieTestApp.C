@@ -10,11 +10,10 @@
 
 #include "AppFactory.h"
 
-template <>
 InputParameters
-validParams<MagpieTestApp>()
+MagpieTestApp::validParams()
 {
-  InputParameters params = validParams<MagpieApp>();
+  InputParameters params = MagpieApp::validParams();
   return params;
 }
 

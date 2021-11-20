@@ -14,8 +14,6 @@
 
 registerMooseObject("MagpieApp", FFTProblem);
 
-defineLegacyParams(FFTProblem);
-
 InputParameters
 FFTProblem::validParams()
 {

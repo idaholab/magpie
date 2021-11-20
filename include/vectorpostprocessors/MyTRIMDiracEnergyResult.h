@@ -10,11 +10,7 @@
 
 #include "GeneralVectorPostprocessor.h"
 
-class MyTRIMDiracEnergyResult;
 class MyTRIMDiracRun;
-
-template <>
-InputParameters validParams<MyTRIMDiracEnergyResult>();
 
 /**
  * Outputs the list of MyTRIM energy deposition events
@@ -24,6 +20,8 @@ class MyTRIMDiracEnergyResult : public GeneralVectorPostprocessor
 {
 public:
   MyTRIMDiracEnergyResult(const InputParameters & parameters);
+
+  static InputParameters validParams();
 
   virtual void initialize();
   virtual void execute();

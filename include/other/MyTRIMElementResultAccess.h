@@ -56,7 +56,7 @@ template <typename T>
 InputParameters
 MyTRIMElementResultAccess<T>::validParams()
 {
-  InputParameters params = ::validParams<T>();
+  InputParameters params = T::validParams();
   params.addRequiredParam<UserObjectName>(
       "runner", "Name of the MyTRIMElementRun userobject to pull data from.");
   params.addParam<unsigned int>("ivar", "Element index");
@@ -81,4 +81,3 @@ MyTRIMElementResultAccess<T>::getDefectRate()
 
   return _value_cache;
 }
-

@@ -10,12 +10,8 @@
 
 #include "AuxKernel.h"
 
-class FFTBufferAux;
 template <typename T>
 class FFTBufferBase;
-
-template <>
-InputParameters validParams<FFTBufferAux>();
 
 /**
  *
@@ -24,6 +20,8 @@ class FFTBufferAux : public AuxKernel
 {
 public:
   FFTBufferAux(const InputParameters & parameters);
+
+  static InputParameters validParams();
 
 protected:
   virtual Real computeValue() override;
