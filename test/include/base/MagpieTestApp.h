@@ -10,15 +10,12 @@
 
 #include "MagpieApp.h"
 
-class MagpieTestApp;
-
-template <>
-InputParameters validParams<MagpieTestApp>();
-
 class MagpieTestApp : public MagpieApp
 {
 public:
   MagpieTestApp(InputParameters parameters);
+  static InputParameters validParams();
+
   virtual ~MagpieTestApp();
   static void registerApps();
   static void registerAll(Factory & factory,

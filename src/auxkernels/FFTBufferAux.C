@@ -11,11 +11,10 @@
 
 registerMooseObject("MagpieApp", FFTBufferAux);
 
-template <>
 InputParameters
-validParams<FFTBufferAux>()
+FFTBufferAux::validParams()
 {
-  InputParameters params = validParams<AuxKernel>();
+  InputParameters params = AuxKernel::validParams();
   params.addClassDescription("Fetch values from an FFT buffer.");
   params.addRequiredParam<UserObjectName>("fft_buffer", "Real valued FFT buffer object");
   params.addParam<std::vector<unsigned int>>(
