@@ -115,7 +115,8 @@ protected:
   using KDTreeType = nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<QPData>>,
       PointListAdaptor<QPData>,
-      LIBMESH_DIM>;
+      LIBMESH_DIM,
+      std::size_t>;
 
   /// spatial index (nanoflann guarantees this to be threadsafe under read-only operations)
   std::unique_ptr<KDTreeType> _kd_tree;
