@@ -128,5 +128,6 @@ private:
   using KDTreeType = nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<MyTRIMDefectBufferItem>>,
       PointListAdaptor<MyTRIMDefectBufferItem>,
-      LIBMESH_DIM>;
+      LIBMESH_DIM,
+      std::size_t>;
 };
