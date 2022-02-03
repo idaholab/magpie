@@ -30,4 +30,3 @@ public:
    */
   virtual void calculateDensity(Real site_volume);
 };
-

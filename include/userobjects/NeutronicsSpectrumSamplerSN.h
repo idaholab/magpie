@@ -52,6 +52,5 @@ protected:
   std::vector<std::vector<const ElasticRecoil *>> _recoil_cross_sections;
 };
 
-
 #endif // RATTLESNAKE_ENABLED
 #endif // GSL_ENABLED

@@ -69,8 +69,8 @@ PointLocatorRegularOrthogonal::init(const std::vector<unsigned int> & cell_count
 }
 
 const Elem *
-PointLocatorRegularOrthogonal::
-operator()(const Point & p, const std::set<subdomain_id_type> * /* allowed_subdomains */) const
+PointLocatorRegularOrthogonal::operator()(
+    const Point & p, const std::set<subdomain_id_type> * /* allowed_subdomains */) const
 {
   Point el_pos;
   const Elem * el = _data->rootElement(p, el_pos);
@@ -99,10 +99,10 @@ operator()(const Point & p, const std::set<subdomain_id_type> * /* allowed_subdo
 }
 
 void
-PointLocatorRegularOrthogonal::
-operator()(const Point & p,
-           std::set<const Elem *> & candidate_elements,
-           const std::set<subdomain_id_type> * /* allowed_subdomains */) const
+PointLocatorRegularOrthogonal::operator()(
+    const Point & p,
+    std::set<const Elem *> & candidate_elements,
+    const std::set<subdomain_id_type> * /* allowed_subdomains */) const
 {
   // return just one match, the exact one TODO: return all neighbors if we are fuzzily on a
   // face/edge/node
