@@ -88,4 +88,3 @@ protected:
   /// internal data object, shared between master and servants
   PointLocatorRegularOrthogonalData * _data;
 };
-

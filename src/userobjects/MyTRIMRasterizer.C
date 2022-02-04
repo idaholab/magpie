@@ -441,11 +441,14 @@ MyTRIMRasterizer::finalize()
       pka_seeds[i] = MooseRandom::randl();
 
     // sort PKA list only on processor 0 & assign random number seeds
-    std::sort(_pka_list.begin(), _pka_list.end(), [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b) {
-      return (a._pos < b._pos) || (a._pos == b._pos && a._m < b._m) ||
-             (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
-             (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
-    });
+    std::sort(_pka_list.begin(),
+              _pka_list.end(),
+              [](MyTRIM_NS::IonBase a, MyTRIM_NS::IonBase b)
+              {
+                return (a._pos < b._pos) || (a._pos == b._pos && a._m < b._m) ||
+                       (a._pos == b._pos && a._m == b._m && a._E < b._E) ||
+                       (a._pos == b._pos && a._m == b._m && a._E == b._E && a._Z < b._Z);
+              });
 
     // store seeds in tag values
     for (auto i = beginIndex(_pka_list); i < _pka_list.size(); ++i)

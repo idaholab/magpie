@@ -122,7 +122,8 @@ SpectralExecutionerLinearElastic::advanceReciprocalEpsilon(
   Complex I(1.0, 0.0);
 
   epsilon_buffer.reciprocalSpace().applyLambdaReciprocalSpace(
-      [&gamma_hat, &stress_buffer, &epsilon_buffer](std::size_t index) {
+      [&gamma_hat, &stress_buffer, &epsilon_buffer](std::size_t index)
+      {
         return epsilon_buffer.reciprocalSpace()[index] -
                gamma_hat.reciprocalSpace()[index] * stress_buffer.reciprocalSpace()[index];
       });

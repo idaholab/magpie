@@ -14,7 +14,7 @@
 
 #include "gtest/gtest.h"
 
-//Moose includes
+// Moose includes
 #include "Moose.h"
 #include "MooseInit.h"
 

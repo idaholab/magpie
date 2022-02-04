@@ -60,4 +60,3 @@ protected:
   std::vector<std::map<unsigned int, std::vector<unsigned int>>> _fission_zaids;
   std::vector<std::map<unsigned int, std::vector<Real>>> _fission_cdf;
 };
-

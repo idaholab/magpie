@@ -12,7 +12,7 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-//Magpie includes
+// Magpie includes
 #include <MagpieUtils.h>
 
 #include <gtest/gtest.h>
@@ -24,7 +24,7 @@ TEST(ReferenceWrapperTest, testRefWrapper)
 
   // the simplest of tests
   EXPECT_EQ(ref_wrapper_l.get(), l);
-  //CPPUNIT_ASSERT( ref_wrapper_l == l );
+  // CPPUNIT_ASSERT( ref_wrapper_l == l );
 
   // make sure that when l changes we pick that change up
   l++;

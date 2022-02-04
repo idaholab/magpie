@@ -30,4 +30,3 @@ protected:
   // dimension of the mesh
   const unsigned int _dim;
 };
-
