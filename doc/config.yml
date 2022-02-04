@@ -23,7 +23,6 @@ Extensions:
             Documentation:
                 Reference Manual: syntax/index.md
             Development:
-                Software Quality: sqa/index.md
                 Code Coverage: https://mooseframework.inl.gov/magpie/docs/coverage/
 
     MooseDocs.extensions.appsyntax:
