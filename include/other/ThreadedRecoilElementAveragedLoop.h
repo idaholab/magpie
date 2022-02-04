@@ -68,4 +68,3 @@ void dataStore(std::ostream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &
 
 template <>
 void dataLoad(std::istream &, ThreadedRecoilElementAveragedLoop::MyTRIMResult &, void *);
-

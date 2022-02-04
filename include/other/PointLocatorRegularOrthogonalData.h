@@ -18,7 +18,7 @@ namespace libMesh
 {
 class MeshBase;
 class Elem;
-}
+} // namespace libMesh
 
 /**
  * Lookup data table for PointLocatorRegularOrthogonalData. This is only built
@@ -58,4 +58,3 @@ protected:
   /// serialized nz*ny*nx list of pointers to the coarsest elements in the mesh
   std::vector<Elem *> _root_elems;
 };
-

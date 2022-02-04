@@ -29,10 +29,9 @@ PolyatomicDisplacementFunctionBase::PolyatomicDisplacementFunctionBase(
   : _damage_function_type(damage_function_type),
     _quad_order(4),
     _n_species(polyatomic_material.size()),
-    _problem_size(_damage_function_type == ENERGY ? _n_species
-                                                  : _damage_function_type == NET_DERIVATIVE
-                                                        ? _n_species * _n_species * _n_species
-                                                        : _n_species * _n_species),
+    _problem_size(_damage_function_type == ENERGY           ? _n_species
+                  : _damage_function_type == NET_DERIVATIVE ? _n_species * _n_species * _n_species
+                                                            : _n_species * _n_species),
     _energy_history({0.0}),
     _displacement_function({std::vector<Real>(_problem_size)})
 {

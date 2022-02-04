@@ -33,4 +33,3 @@ protected:
   /// list of energy deposition points generated during the recoil
   std::list<std::pair<Point, Real>> & _edep_list;
 };
-

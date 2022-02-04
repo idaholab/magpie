@@ -12,7 +12,7 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-//Magpie includes
+// Magpie includes
 #include "DiscretePKAPDF.h"
 #include "MultiIndex.h"
 
@@ -108,7 +108,7 @@ TEST(DiscretePDFTest, samplePKA)
     frequency(index) += 1.0 / max;
   }
 
-  for (MultiIndex<Real>::iterator it = frequency.begin(); it !=  frequency.end() ; ++it)
+  for (MultiIndex<Real>::iterator it = frequency.begin(); it != frequency.end(); ++it)
   {
     index = (*it).first;
     Real width = (energies[index[1] + 1] - energies[index[1]]) * dmu * dphi;
