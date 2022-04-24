@@ -56,5 +56,5 @@ protected:
   Point _cell_size;
 
   /// serialized nz*ny*nx list of pointers to the coarsest elements in the mesh
-  std::vector<Elem *> _root_elems;
+  std::vector<const Elem *> _root_elems;
 };

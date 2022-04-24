@@ -40,7 +40,7 @@ PointLocatorRegularOrthogonalData::PointLocatorRegularOrthogonalData(
   const auto end_el = mesh.level_elements_end(0);
   for (; el != end_el; ++el)
   {
-    Elem * elem = *el;
+    const Elem * elem = *el;
     const unsigned int index = rootElementIndex(elem->centroid());
     _root_elems[index] = elem;
   }
