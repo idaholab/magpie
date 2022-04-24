@@ -54,7 +54,7 @@ protected:
   const unsigned int _dim;
 
   /// point locator to determine element pointers form locations
-  UniquePtr<PointLocatorBase> _pl;
+  std::unique_ptr<PointLocatorBase> _pl;
 
   ///@{ material cache maps
   typedef std::map<const Elem *, MooseMyTRIMMaterial> MaterialsCache;

@@ -97,7 +97,7 @@ protected:
   const unsigned int _dim;
 
   /// point locator to use
-  UniquePtr<PointLocatorBase> _pl;
+  std::unique_ptr<PointLocatorBase> _pl;
 
   /// internal TRIM simulation status object
   MyTRIM_NS::SimconfType _simconf;

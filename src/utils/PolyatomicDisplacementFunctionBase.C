@@ -35,12 +35,12 @@ PolyatomicDisplacementFunctionBase::PolyatomicDisplacementFunctionBase(
     _energy_history({0.0}),
     _displacement_function({std::vector<Real>(_problem_size)})
 {
-  _simconf = libmesh_make_unique<MyTRIM_NS::SimconfType>(1);
-  _material = libmesh_make_unique<MyTRIM_NS::MaterialBase>(_simconf.get(), 1);
+  _simconf = std::make_unique<MyTRIM_NS::SimconfType>(1);
+  _material = std::make_unique<MyTRIM_NS::MaterialBase>(_simconf.get(), 1);
   for (auto & elem : polyatomic_material)
   {
     _material->_element.push_back(elem);
-    _ions.push_back(libmesh_make_unique<MyTRIM_NS::IonBase>(elem._Z, elem._m, 0));
+    _ions.push_back(std::make_unique<MyTRIM_NS::IonBase>(elem._Z, elem._m, 0));
   }
   _material->prepare();
 

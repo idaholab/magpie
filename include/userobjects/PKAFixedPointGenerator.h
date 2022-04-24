@@ -49,7 +49,7 @@ protected:
   const Real _E;
 
   /// point locator to determine element pointers form locations
-  UniquePtr<PointLocatorBase> _pl;
+  std::unique_ptr<PointLocatorBase> _pl;
 
   /// the element id of the element containing _point
   dof_id_type _elem_id;
