@@ -514,7 +514,7 @@ RadialGreensConvolution::updateCommunicationLists()
   for (auto elem : _point_neighbors)
   {
     ret_matches.clear();
-    Point centroid = elem->centroid();
+    Point centroid = elem->vertex_average();
     const Real r_cut2 = _r_cut + elem->hmax() / 2.0;
     kd_tree->radiusSearch(&(centroid(0)), r_cut2 * r_cut2, ret_matches, search_params);
     for (auto & match : ret_matches)
@@ -528,7 +528,7 @@ RadialGreensConvolution::updateCommunicationLists()
     const auto * first = std::get<1>(tuple);
     const auto * second = std::get<2>(tuple);
 
-    Point centroid = elem->centroid() - (*first - *second);
+    Point centroid = elem->vertex_average() - (*first - *second);
 
     const Real r_cut2 = _r_cut + elem->hmax() / 2.0;
 
