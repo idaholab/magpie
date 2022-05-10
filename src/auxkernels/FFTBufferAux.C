@@ -73,16 +73,16 @@ Real
 FFTBufferAux::computeValue()
 {
   if (_real_buffer)
-    return (*_real_buffer)(_current_elem->centroid());
+    return (*_real_buffer)(_current_elem->vertex_average());
   if (_realvectorvalue_buffer)
-    return (*_realvectorvalue_buffer)(_current_elem->centroid())(_component[0]);
+    return (*_realvectorvalue_buffer)(_current_elem->vertex_average())(_component[0]);
   if (_ranktwotensor_buffer)
-    return (*_ranktwotensor_buffer)(_current_elem->centroid())(_component[0], _component[1]);
+    return (*_ranktwotensor_buffer)(_current_elem->vertex_average())(_component[0], _component[1]);
   if (_rankthreetensor_buffer)
-    return (*_rankthreetensor_buffer)(_current_elem->centroid())(
+    return (*_rankthreetensor_buffer)(_current_elem->vertex_average())(
         _component[0], _component[1], _component[2]);
   if (_rankfourtensor_buffer)
-    return (*_rankfourtensor_buffer)(_current_elem->centroid())(
+    return (*_rankfourtensor_buffer)(_current_elem->vertex_average())(
         _component[0], _component[1], _component[2], _component[3]);
   else
     paramError("fft_buffer", "Unsupported buffer type");
