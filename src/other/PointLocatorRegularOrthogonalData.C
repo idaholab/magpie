@@ -41,7 +41,7 @@ PointLocatorRegularOrthogonalData::PointLocatorRegularOrthogonalData(
   for (; el != end_el; ++el)
   {
     Elem * elem = *el;
-    const unsigned int index = rootElementIndex(elem->centroid());
+    const unsigned int index = rootElementIndex(elem->vertex_average());
     _root_elems[index] = elem;
   }
 

@@ -150,7 +150,7 @@ void
 FFTBufferBase<T>::execute()
 {
   // get  grid / buffer location
-  Point centroid = _current_elem->centroid();
+  Point centroid = _current_elem->vertex_average();
   std::size_t a = 0;
   for (unsigned int i = 0; i < _dim; ++i)
     a = a * _grid[i] + std::floor(((centroid(i) - _min_corner(i)) * _grid[i]) / _box_size(i));
