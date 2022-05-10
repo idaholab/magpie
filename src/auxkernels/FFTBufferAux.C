@@ -79,11 +79,13 @@ FFTBufferAux::computeValue()
   if (_ranktwotensor_buffer)
     return (*_ranktwotensor_buffer)(_current_elem->vertex_average())(_component[0], _component[1]);
   if (_rankthreetensor_buffer)
-    return (*_rankthreetensor_buffer)(_current_elem->vertex_average())(
-        _component[0], _component[1], _component[2]);
+    return (*_rankthreetensor_buffer)(
+        _current_elem->vertex_average())(_component[0], _component[1], _component[2]);
   if (_rankfourtensor_buffer)
-    return (*_rankfourtensor_buffer)(_current_elem->vertex_average())(
-        _component[0], _component[1], _component[2], _component[3]);
+    return (*_rankfourtensor_buffer)(_current_elem->vertex_average())(_component[0],
+                                                                      _component[1],
+                                                                      _component[2],
+                                                                      _component[3]);
   else
     paramError("fft_buffer", "Unsupported buffer type");
 }
