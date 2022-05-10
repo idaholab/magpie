@@ -26,6 +26,9 @@ FFTProblem::validParams()
 FFTProblem::FFTProblem(const InputParameters & parameters)
   : FEProblem(parameters), _fft_dummy_system(*this, "FFTSystem")
 {
+  const auto soln_tag = getVectorTagID(Moose::SOLUTION_TAG);
+  _fft_dummy_system.associateVectorToTag(*_fft_dummy_system.system().current_local_solution,
+                                         soln_tag);
 }
 
 FFTProblem::~FFTProblem()
