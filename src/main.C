@@ -35,7 +35,6 @@ main(int argc, char * argv[])
   if (!btapp)
     mooseError("Did not create Magpie");
 
-  app->setCheckUnusedFlag(true);
   app->setErrorOverridden();
 
   // Execute the application
