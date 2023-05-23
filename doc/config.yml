@@ -1,10 +1,16 @@
 Content:
-    - ${ROOT_DIR}/doc/content
-    - ${MOOSE_DIR}/framework/doc/content
-    - ${MOOSE_DIR}/modules/phase_field/doc/content
-    - ${MOOSE_DIR}/modules/tensor_mechanics/doc/content
-    - ${MOOSE_DIR}/modules/heat_conduction/doc/content
-    - ${MOOSE_DIR}/modules/ray_tracing/doc/content
+    magpie:
+        root_dir: ${ROOT_DIR}/doc/content
+    framework:
+        root_dir: ${MOOSE_DIR}/framework/doc/content
+    phase_field:
+        root_dir: ${MOOSE_DIR}/modules/phase_field/doc/content
+    tensor_mechanics:
+        root_dir: ${MOOSE_DIR}/modules/tensor_mechanics/doc/content
+    heat_conduction:
+        root_dir: ${MOOSE_DIR}/modules/heat_conduction/doc/content
+    ray_tracing:
+        root_dir: ${MOOSE_DIR}/modules/ray_tracing/doc/content
 
 Renderer:
     type: MooseDocs.base.MaterializeRenderer
