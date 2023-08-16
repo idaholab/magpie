@@ -28,7 +28,7 @@ DPAPostprocessor::DPAPostprocessor(const InputParameters & params)
 }
 
 Real
-DPAPostprocessor::getValue()
+DPAPostprocessor::getValue() const
 {
   return _damage_object.getDPA();
 }

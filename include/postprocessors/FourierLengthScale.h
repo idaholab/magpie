@@ -29,7 +29,8 @@ public:
   virtual void execute() override;
   virtual void finalize() override;
 
-  virtual PostprocessorValue getValue() override { return _length_scale; }
+  using Postprocessor::getValue;
+  virtual PostprocessorValue getValue() const override { return _length_scale; }
 
 protected:
   void computeLengthScale(std::vector<int> & c, std::vector<Real> & F, std::size_t i);

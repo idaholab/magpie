@@ -24,7 +24,8 @@ public:
   virtual void execute() override;
   virtual void finalize() override;
 
-  virtual Real getValue() override;
+  using Postprocessor::getValue;
+  virtual Real getValue() const override;
 
 protected:
   /// override this function to add conditions for the considered PKAs
