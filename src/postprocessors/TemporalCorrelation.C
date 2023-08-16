@@ -19,7 +19,7 @@ TemporalCorrelation::validParams()
 }
 
 TemporalCorrelation::TemporalCorrelation(const InputParameters & parameters)
-  : ElementAverageValue(parameters), _u_dot(dot())
+  : ElementAverageValue(parameters), _u_dot(MooseVariableInterface<Real>::dot())
 {
 }
 
