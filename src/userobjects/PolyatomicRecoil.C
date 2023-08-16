@@ -84,15 +84,15 @@ PolyatomicRecoil::initDamageFunctions()
     type = NET_DERIVATIVE;
 
   if (type == ENERGY)
-    _padf = libmesh_make_unique<PolyatomicDamageEnergyFunction>(polyMat(), type, _Ecap);
+    _padf = std::make_unique<PolyatomicDamageEnergyFunction>(polyMat(), type, _Ecap);
   else if (type == NET_DERIVATIVE)
   {
-    _padf = libmesh_make_unique<PolyatomicDisplacementFunction>(polyMat(), NET, _Ecap);
-    _padf_derivative = libmesh_make_unique<PolyatomicDisplacementDerivativeFunction>(
+    _padf = std::make_unique<PolyatomicDisplacementFunction>(polyMat(), NET, _Ecap);
+    _padf_derivative = std::make_unique<PolyatomicDisplacementDerivativeFunction>(
         polyMat(), type, dynamic_cast<PolyatomicDisplacementFunction *>(_padf.get()), _Ecap);
   }
   else
-    _padf = libmesh_make_unique<PolyatomicDisplacementFunction>(polyMat(), type, _Ecap);
+    _padf = std::make_unique<PolyatomicDisplacementFunction>(polyMat(), type, _Ecap);
 }
 
 void

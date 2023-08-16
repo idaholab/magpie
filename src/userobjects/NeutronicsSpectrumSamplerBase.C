@@ -140,7 +140,7 @@ NeutronicsSpectrumSamplerBase::meshChanged()
   _local_elem_to_contained_points.clear();
 
   // Rebuild point_locator & find the right element for each point
-  UniquePtr<PointLocatorBase> point_locator = _mesh.getPointLocator();
+  std::unique_ptr<PointLocatorBase> point_locator = _mesh.getPointLocator();
   for (unsigned int j = 0; j < _npoints; j++)
   {
     // make sure element is local

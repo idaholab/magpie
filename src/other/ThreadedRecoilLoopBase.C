@@ -233,7 +233,7 @@ ThreadedRecoilLoopBase::operator()(const PKARange & pka_list)
       const unsigned int max_leaf_size = 50; // slightly affects runtime
       auto point_list =
           PointListAdaptor<MyTRIMDefectBufferItem>(_vacancy_buffer.begin(), _vacancy_buffer.end());
-      auto kd_tree = libmesh_make_unique<KDTreeType>(
+      auto kd_tree = std::make_unique<KDTreeType>(
           LIBMESH_DIM, point_list, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
 
       mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
@@ -301,8 +301,8 @@ ThreadedRecoilLoopBase::addNRTEntry(const std::vector<Real> & number_fractions)
    * TODO: this should be checked for accuracy, also net displacement rate is not as well
    *       verified as total displacement rate
    */
-  _pa_nrt.push_back(libmesh_make_unique<PolyatomicDisplacementFunction>(poly_mat, NET));
-  _pa_derivative_nrt.push_back(libmesh_make_unique<PolyatomicDisplacementDerivativeFunction>(
+  _pa_nrt.push_back(std::make_unique<PolyatomicDisplacementFunction>(poly_mat, NET));
+  _pa_derivative_nrt.push_back(std::make_unique<PolyatomicDisplacementDerivativeFunction>(
       poly_mat, NET_DERIVATIVE, _pa_nrt.back().get()));
 
   // integrate P&K's equation to the analytical cutoff

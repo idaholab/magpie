@@ -69,7 +69,7 @@ MyTRIMMesh::MyTRIMMesh(const MyTRIMMesh & other_mesh)
 std::unique_ptr<MooseMesh>
 MyTRIMMesh::safeClone() const
 {
-  return libmesh_make_unique<MyTRIMMesh>(*this);
+  return std::make_unique<MyTRIMMesh>(*this);
 }
 
 std::unique_ptr<PointLocatorBase>
