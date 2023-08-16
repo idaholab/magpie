@@ -24,6 +24,9 @@ public:
 
 protected:
   virtual Real computeQpIntegral() override;
-  virtual Real getValue() override;
+
+  using Postprocessor::getValue;
+  virtual Real getValue() const override;
+
   const VariableValue & _u_dot;
 };

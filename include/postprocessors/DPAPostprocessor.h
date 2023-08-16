@@ -23,7 +23,9 @@ public:
   DPAPostprocessor(const InputParameters & parameters);
   virtual void execute() override {}
   virtual void initialize() override {}
-  virtual Real getValue() override;
+
+  using Postprocessor::getValue;
+  virtual Real getValue() const override;
 
 protected:
   const DPAUserObjectBase & _damage_object;

@@ -21,7 +21,9 @@ public:
 
   virtual void execute() override {}
   virtual void initialize() override {}
-  virtual Real getValue() override;
+
+  using Postprocessor::getValue;
+  virtual Real getValue() const override;
 
 protected:
   std::string _target_isotope;

@@ -30,7 +30,7 @@ TemporalCorrelation::computeQpIntegral()
 }
 
 Real
-TemporalCorrelation::getValue()
+TemporalCorrelation::getValue() const
 {
   return std::sqrt(ElementAverageValue::getValue());
 }

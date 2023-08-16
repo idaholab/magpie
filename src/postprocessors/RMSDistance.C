@@ -41,13 +41,17 @@ RMSDistance::initialize()
   _normalization = 0;
 }
 
+void
+RMSDistance::finalize()
+{
+  ElementIntegralVariablePostprocessor::finalize();
+  gatherSum(_normalization);
+}
+
 Real
-RMSDistance::getValue()
+RMSDistance::getValue() const
 {
   Real integral = ElementIntegralVariablePostprocessor::getValue();
-
-  gatherSum(_normalization);
-
   return std::sqrt(integral / _normalization);
 }
 
