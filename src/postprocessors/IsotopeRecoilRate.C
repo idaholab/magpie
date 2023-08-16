@@ -46,7 +46,7 @@ IsotopeRecoilRate::IsotopeRecoilRate(const InputParameters & params)
 }
 
 Real
-IsotopeRecoilRate::getValue()
+IsotopeRecoilRate::getValue() const
 {
   return _scaling_factor * _neutronics_sampler.totalRecoilRate(_point_id, _target_isotope);
 }

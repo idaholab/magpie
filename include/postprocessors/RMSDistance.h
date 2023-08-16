@@ -21,8 +21,11 @@ public:
   RMSDistance(const InputParameters & parameters);
 
   virtual void initialize() override;
-  virtual Real getValue() override;
+  virtual void finalize() override;
   virtual void threadJoin(const UserObject & y) override;
+
+  using Postprocessor::getValue;
+  virtual Real getValue() const override;
 
 protected:
   virtual Real computeQpIntegral() override;

@@ -80,7 +80,7 @@ MyTRIMPKAInfo::finalize()
 }
 
 Real
-MyTRIMPKAInfo::getValue()
+MyTRIMPKAInfo::getValue() const
 {
   return _value;
 }
