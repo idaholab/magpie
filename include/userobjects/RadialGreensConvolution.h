@@ -139,7 +139,7 @@ protected:
   std::multimap<dof_id_type, dof_id_type> _periodic_node_map;
 
   /// The data structure used to find neighboring elements give a node ID
-  std::vector<std::vector<const Elem *>> _nodes_to_elem_map;
+  std::unordered_map<dof_id_type, std::vector<const Elem *>> _nodes_to_elem_map;
 
   // list of direct point neighbor elements of the current processor domain
   std::set<const Elem *> _point_neighbors;

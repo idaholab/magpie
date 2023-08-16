@@ -107,7 +107,7 @@ MDRunBase::timestepSetup()
 void
 MDRunBase::updateKDTree()
 {
-  _kd_tree = libmesh_make_unique<KDTree>(_md_particles.pos, 50);
+  _kd_tree = std::make_unique<KDTree>(_md_particles.pos, 50);
 }
 
 void

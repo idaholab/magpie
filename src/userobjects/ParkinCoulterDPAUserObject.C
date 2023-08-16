@@ -63,7 +63,7 @@ ParkinCoulterDPAUserObject::numberFractions() const
 void
 ParkinCoulterDPAUserObject::initDamageFunctions()
 {
-  _padf = libmesh_make_unique<PolyatomicDisplacementFunction>(polyMat(), NET, _Ecap);
+  _padf = std::make_unique<PolyatomicDisplacementFunction>(polyMat(), NET, _Ecap);
 }
 
 void
