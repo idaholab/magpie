@@ -167,3 +167,5 @@ tests/userobjects/spparks/log.spparks
 .previous_test_results.json
 
 compile_commands.json
+
+magpie.yaml
