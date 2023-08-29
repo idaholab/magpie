@@ -16,48 +16,48 @@
 []
 
 [Functions]
-  [./conc]
+  [conc]
     type = ParsedFunction
-    value = 0.5
-  [../]
-  [./linear]
+    expression = 0.5
+  []
+  [linear]
     type = ParsedFunction
-    value = t+7
-  [../]
+    expression = t+7
+  []
 []
 
 [Variables]
-  [./c]
+  [c]
     order = FIRST
     family = LAGRANGE
-  [../]
+  []
 []
 
 [ICs]
-  [./c]
+  [c]
     type = FunctionIC
     function = conc
     variable = c
-  [../]
+  []
 []
 
 [Kernels]
-  [./diff]
+  [diff]
     type = Diffusion
     variable = c
-  [../]
-  [./time]
+  []
+  [time]
     type = TimeDerivative
     variable = c
-  [../]
+  []
 []
 
 [BCs]
-  [./Periodic]
-    [./all]
+  [Periodic]
+    [all]
       auto_direction = 'x y'
-    [../]
-  [../]
+    []
+  []
 []
 
 [Executioner]
@@ -83,14 +83,14 @@
   exodus = true
   interval = 1
   execute_on = 'TIMESTEP_END'
-  [./console]
+  [console]
     type = Console
     output_linear = true
-  [../]
+  []
 []
 
 [UserObjects]
-  [./spparks]
+  [spparks]
     type = SPPARKSUserObject
     file = in.rpv.fs
     one_time_run = true
@@ -100,5 +100,5 @@
     init_spparks = false
     execute_on = 'timestep_end'
     time_spparks_time_ratio = 0.000001
-  [../]
+  []
 []

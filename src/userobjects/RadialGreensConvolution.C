@@ -596,6 +596,7 @@ StandardType<RadialGreensConvolution::QPData>::StandardType(
 
 StandardType<RadialGreensConvolution::QPData>::StandardType(
     const StandardType<RadialGreensConvolution::QPData> & t)
+  : TIMPI::DataType()
 {
 #ifdef LIBMESH_HAVE_MPI
   libmesh_call_mpi(MPI_Type_dup(t._datatype, &_datatype));

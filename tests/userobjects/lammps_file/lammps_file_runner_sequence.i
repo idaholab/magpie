@@ -17,40 +17,40 @@
 []
 
 [Variables]
-  [./d]
-  [../]
+  [d]
+  []
 []
 
 [AuxVariables]
-  [./nparticles]
+  [nparticles]
     family = MONOMIAL
     order = CONSTANT
-  [../]
+  []
 []
 
 [AuxKernels]
-  [./np]
+  [np]
     type = MDNParticleAux
     variable = nparticles
     user_object = lammps_runner
-  [../]
+  []
 []
 
 [UserObjects]
-  [./lammps_runner]
+  [lammps_runner]
     type = LAMMPSFileRunner
     lammps_file = 'sequence/simple'
     time_sequence = true
     xyz_columns = '0 1 2'
     time_conversion = tc
-  [../]
+  []
 []
 
 [Functions]
-  [./tc]
+  [tc]
     type = ParsedFunction
-    value = '2 * t + 5'
-  [../]
+    expression = '2 * t + 5'
+  []
 []
 
 [Executioner]

@@ -51,7 +51,7 @@ PKAFixedPointGenerator::appendPKAs(std::vector<MyTRIM_NS::IonBase> & ion_list,
   if (pka_parameters._recoil_rate_scaling != 1)
     num_pka = std::floor(pka_parameters._recoil_rate_scaling * _num_pka + getRandomReal());
 
-  for (unsigned i = 0; i < _num_pka; ++i)
+  for (unsigned i = 0; i < num_pka; ++i)
   {
     // each fission event generates a pair of recoils
     MyTRIM_NS::IonBase pka;

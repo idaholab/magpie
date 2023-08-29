@@ -19,83 +19,83 @@
 []
 
 [Functions]
-  [./ebalance]
+  [ebalance]
     type = ParsedFunction
-    vars = 'Edep Evac Epka'
-    vals = 'Edep Evac Epka'
-    value = 'Epka - Edep - Evac'
-  [../]
+    symbol_names = 'Edep Evac Epka'
+    symbol_values = 'Edep Evac Epka'
+    expression = 'Epka - Edep - Evac'
+  []
 []
 
 [Variables]
-  [./c]
+  [c]
     initial_condition = 1.0
-  [../]
+  []
 []
 
 [BCs]
   # the composition field used by the rasterizer is marked as periodic
-  [./Periodic]
-    [./all]
+  [Periodic]
+    [all]
       variable = c
       auto_direction = 'x y'
-    [../]
-  [../]
+    []
+  []
 []
 
 [AuxVariables]
-  [./edep]
+  [edep]
     # deposited energy density (electronic and nuclear stopping)
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./vac]
+  []
+  [vac]
     # number density of vacancies created
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./evac]
+  []
+  [evac]
     # potential energy density of the vacancies created
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 []
 
 [AuxKernels]
-  [./edep]
+  [edep]
     type = MyTRIMElementEnergyAux
     variable = edep
     runner = runner
     execute_on = timestep_end
-  [../]
-  [./int]
+  []
+  [int]
     type = MyTRIMElementResultAux
     variable = vac
     runner = runner
     defect = VAC
     ivar = 0
     execute_on = timestep_end
-  [../]
-  [./evac]
+  []
+  [evac]
     type = ParsedAux
     variable = evac
-    args = vac
+    coupled_variables = vac
     # binding energy is 3eV, so that is what we take as vacancy formation energy
-    function = 3.0*vac
+    expression = 3.0*vac
     execute_on = timestep_end
-  [../]
+  []
 []
 
 [UserObjects]
-  [./constant]
+  [constant]
     # fixed energy (10keV) model ions (approx Calcium)
     type = PKAConstant
     E = 10000
     m = 40
     Z = 20
     pka_rate = 1e-3
-  [../]
-  [./rasterizer]
+  []
+  [rasterizer]
     type = MyTRIMRasterizer
     var = c
     M = 40
@@ -103,49 +103,49 @@
     site_volume = 0.0404 # nm^3 per atom
     pka_generator = constant
     trim_module = ENERGY_DEPOSITION
-  [../]
-  [./runner]
+  []
+  [runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
-  [../]
+  []
 []
 
 [Postprocessors]
-  [./Edep]
+  [Edep]
     type = ElementIntegralVariablePostprocessor
     variable = edep
     execute_on = timestep_end
-  [../]
-  [./Evac]
+  []
+  [Evac]
     type = ElementIntegralVariablePostprocessor
     variable = evac
     execute_on = timestep_end
-  [../]
-  [./Epka]
+  []
+  [Epka]
     type = MyTRIMPKAInfo
     rasterizer = rasterizer
     value_type = TOTAL_ENERGY
-  [../]
+  []
 
-  [./Ebalance]
+  [Ebalance]
     type = FunctionValuePostprocessor
     function = ebalance
-  [../]
+  []
 
-  [./CountOctant]
+  [CountOctant]
     type = MyTRIMPKAInConeInfo
     cone_axis = '1 1 1'
     # this corresponds to a solid angle of pi / 2 = one octant
     opening_angle = 1.4454684
     rasterizer = rasterizer
     value_type = TOTAL_NUMBER
-  [../]
+  []
 
-  [./CountAll]
+  [CountAll]
     type = MyTRIMPKAInfo
     rasterizer = rasterizer
     value_type = TOTAL_NUMBER
-  [../]
+  []
 []
 
 [Problem]

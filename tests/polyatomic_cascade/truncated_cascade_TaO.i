@@ -22,98 +22,98 @@
 []
 
 [Variables]
-  [./dummy]
-  [../]
+  [dummy]
+  []
 []
 
 [AuxVariables]
-  [./N_Ta]
+  [N_Ta]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = numd_Ta
-    [../]
-  [../]
+    []
+  []
 
-  [./N_O]
+  [N_O]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = numd_O
-    [../]
-  [../]
+    []
+  []
 
-  [./vac_Ta]
+  [vac_Ta]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./vac_O]
+  [vac_O]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./inter_Ta]
+  [inter_Ta]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./inter_O]
+  [inter_O]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 []
 
 [Functions]
-  [./numd_Ta]
+  [numd_Ta]
     type = ParsedFunction
-    value = 'N := 0.048; L := 1e5; N * x / L'
-  [../]
+    expression = 'N := 0.048; L := 1e5; N * x / L'
+  []
 
-  [./numd_O]
+  [numd_O]
     type = ParsedFunction
-    value = 'N := 0.048; L := 1e5; N * (1 - x / L)'
-  [../]
+    expression = 'N := 0.048; L := 1e5; N * (1 - x / L)'
+  []
 []
 
 [AuxKernels]
-  [./vac_Ta]
+  [vac_Ta]
     variable = vac_Ta
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 0
     defect = VAC
-  [../]
+  []
 
-  [./vac_O]
+  [vac_O]
     variable = vac_O
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 1
     defect = VAC
-  [../]
+  []
 
-  [./inter_Ta]
+  [inter_Ta]
     variable = inter_Ta
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 0
     defect = INT
-  [../]
+  []
 
-  [./inter_O]
+  [inter_O]
     variable = inter_O
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 1
     defect = INT
-  [../]
+  []
 []
 
 [UserObjects]
-  [./constant]
+  [constant]
     type = PKAGun
     Z = 8
     m = 16
@@ -121,9 +121,9 @@
     E = 5e5
     point = '0.001 5e4 5e4'
     direction = '1 0 0'
-  [../]
+  []
 
-  [./rasterizer]
+  [rasterizer]
     type = MyTRIMRasterizer
     var = 'N_Ta N_O'
     M = '181 16'
@@ -136,34 +136,34 @@
     # control NRT
     max_nrt_difference = 0.4
     analytical_energy_cutoff = 500
-  [../]
+  []
 
-  [./runner]
+  [runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
-  [../]
+  []
 []
 
 [Postprocessors]
-  [./integral_vac_Ta]
+  [integral_vac_Ta]
     type = ElementIntegralVariablePostprocessor
     variable = vac_Ta
-  [../]
+  []
 
-  [./integral_vac_O]
+  [integral_vac_O]
     type = ElementIntegralVariablePostprocessor
     variable = vac_O
-  [../]
+  []
 
-  [./integral_inter_Ta]
+  [integral_inter_Ta]
     type = ElementIntegralVariablePostprocessor
     variable = inter_Ta
-  [../]
+  []
 
-  [./integral_inter_O]
+  [integral_inter_O]
     type = ElementIntegralVariablePostprocessor
     variable = inter_O
-  [../]
+  []
 []
 
 [Executioner]
