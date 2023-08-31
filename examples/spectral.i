@@ -13,45 +13,44 @@
 []
 
 [AuxVariables]
-  [./c_fft]
+  [c_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = 'cos(x/100*2*pi*4)*cos(y/100*2*pi*3)'
-    [../]
-  [../]
+    []
+  []
 
-  [./R0_fft]
+  [R0_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = 'cos(x/100*2*pi*2)*cos(y/100*2*pi*4)'
-    [../]
-  [../]
-  [./R1_fft]
+    []
+  []
+  [R1_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = 'cos(x/100*2*pi*3)*cos(y/100*2*pi*3)'
-    [../]
-  [../]
-  [./R2_fft]
+    []
+  []
+  [R2_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = 'cos(x/100*2*pi*4)*cos(y/100*2*pi*2)'
-    [../]
-  [../]
+    []
+  []
 
-
-  [./u_fft]
+  [u_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = SmoothSuperellipsoidIC
       x1 = 50
       y1 = 0
@@ -61,31 +60,31 @@
       invalue = 1
       outvalue = 0
       n = 2
-    [../]
-  [../]
-  [./v_fft]
+    []
+  []
+  [v_fft]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = if(y<0,y,-y)
-    [../]
-  [../]
-  [./grad_u0_fft]
+    []
+  []
+  [grad_u0_fft]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./grad_u1_fft]
+  []
+  [grad_u1_fft]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./grad_v1_fft]
+  []
+  [grad_v1_fft]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./u_fem]
-    [./InitialCondition]
+  [u_fem]
+    [InitialCondition]
       type = SmoothSuperellipsoidIC
       x1 = 50
       y1 = 0
@@ -95,144 +94,144 @@
       invalue = 1
       outvalue = 0
       n = 2
-    [../]
-  [../]
-  [./v_fem]
+    []
+  []
+  [v_fem]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = if(y<0,y,-y)
-    [../]
-  [../]
-  [./grad_u0_fem]
+    []
+  []
+  [grad_u0_fem]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./grad_u1_fem]
+  []
+  [grad_u1_fem]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./grad_v1_fem]
+  []
+  [grad_v1_fem]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 []
 
 [Materials]
-  [./test]
+  [test]
     type = ParsedMaterial
-    args = c
+    coupled_variables = c
     function = c*c
-  [../]
+  []
 []
 
 [UserObjects]
   # Buffers
-  [./c]
+  [c]
     type = RealFFTWBuffer
     moose_variable = c_fft
-  [../]
-  [./R]
+  []
+  [R]
     type = RealVectorValueFFTWBuffer
     moose_variable = 'R0_fft R1_fft R2_fft'
-  [../]
+  []
 
-  [./u]
+  [u]
     type = RealFFTWBuffer
     moose_variable = u_fft
-  [../]
-  [./grad_u]
+  []
+  [grad_u]
     type = RealVectorValueFFTWBuffer
-  [../]
-  [./v]
+  []
+  [v]
     type = RealFFTWBuffer
     moose_variable = v_fft
-  [../]
-  [./grad_v]
+  []
+  [grad_v]
     type = RealVectorValueFFTWBuffer
-  [../]
+  []
 []
 
 [AuxKernels]
-  [./c_fft]
+  [c_fft]
     type = FFTBufferAux
     variable = c_fft
     fft_buffer = c
     execute_on = FINAL
-  [../]
+  []
 
-  [./R0_fft]
+  [R0_fft]
     type = FFTBufferAux
     variable = R0_fft
     fft_buffer = R
     component = 0
     execute_on = FINAL
-  [../]
-  [./R1_fft]
+  []
+  [R1_fft]
     type = FFTBufferAux
     variable = R1_fft
     fft_buffer = R
     component = 1
     execute_on = FINAL
-  [../]
-  [./R2_fft]
+  []
+  [R2_fft]
     type = FFTBufferAux
     variable = R2_fft
     fft_buffer = R
     component = 2
     execute_on = FINAL
-  [../]
+  []
 
-  [./u_fft]
+  [u_fft]
     type = FFTBufferAux
     variable = u_fft
     fft_buffer = u
     execute_on = FINAL
-  [../]
-  [./v_fft]
+  []
+  [v_fft]
     type = FFTBufferAux
     variable = v_fft
     fft_buffer = v
     execute_on = FINAL
-  [../]
+  []
 
-  [./grad_u0_fft]
+  [grad_u0_fft]
     type = FFTBufferAux
     variable = grad_u0_fft
     fft_buffer = grad_u
     component = 0
     execute_on = FINAL
-  [../]
-  [./grad_u1_fft]
+  []
+  [grad_u1_fft]
     type = FFTBufferAux
     variable = grad_u1_fft
     fft_buffer = grad_u
     component = 1
     execute_on = FINAL
-  [../]
-  [./grad_v1_fft]
+  []
+  [grad_v1_fft]
     type = FFTBufferAux
     variable = grad_v1_fft
     fft_buffer = grad_v
     component = 1
     execute_on = FINAL
-  [../]
+  []
 
-  [./grad_u0_fem]
+  [grad_u0_fem]
     type = GradientComponentAux
     variable = grad_u0_fem
     v = u_fem
     component = 0
     execute_on = FINAL
-  [../]
-  [./grad_u1_fem]
+  []
+  [grad_u1_fem]
     type = GradientComponentAux
     variable = grad_u1_fem
     v = u_fem
     component = 1
     execute_on = FINAL
-  [../]
+  []
 []
 
 [Executioner]

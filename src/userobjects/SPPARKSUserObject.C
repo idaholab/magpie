@@ -22,26 +22,18 @@ SPPARKSUserObject::validParams()
   params.addParam<bool>("spparks_only", false, "Whether to run SPPARKS independently of MOOSE");
 
   params.addParam<std::vector<unsigned int>>(
-      "from_ivar",
-      std::vector<unsigned int>(),
-      "Index into SPPARKS iarray.  This data will be extracted from SPPARKS.");
+      "from_ivar", {}, "Index into SPPARKS iarray.  This data will be extracted from SPPARKS.");
   params.addParam<std::vector<unsigned int>>(
-      "from_dvar",
-      std::vector<unsigned int>(),
-      "Index into SPPARKS darray.  This data will be extracted from SPPARKS.");
+      "from_dvar", {}, "Index into SPPARKS darray.  This data will be extracted from SPPARKS.");
   params.addParam<std::vector<unsigned int>>(
-      "to_ivar",
-      std::vector<unsigned int>(),
-      "Index into SPPARKS iarray.  This data will be copied to SPPARKS.");
+      "to_ivar", {}, "Index into SPPARKS iarray.  This data will be copied to SPPARKS.");
   params.addParam<std::vector<unsigned int>>(
-      "to_dvar",
-      std::vector<unsigned int>(),
-      "Index into SPPARKS darray.  This data will be copied to SPPARKS.");
+      "to_dvar", {}, "Index into SPPARKS darray.  This data will be copied to SPPARKS.");
 
-  params.addParam<std::vector<std::string>>("int_vars", "Integer Vars to send to SPPARKS.");
-  params.addParam<std::vector<std::string>>("double_vars", "Double Vars to send to SPPARKS.");
-  params.addParam<std::vector<std::string>>("sol_vars",
-                                            "Double solving-for Vars obtained from SPPARKS.");
+  params.addParam<std::vector<std::string>>("int_vars", {}, "Integer Vars to send to SPPARKS.");
+  params.addParam<std::vector<std::string>>("double_vars", {}, "Double Vars to send to SPPARKS.");
+  params.addParam<std::vector<std::string>>(
+      "sol_vars", {}, "Double solving-for Vars obtained from SPPARKS.");
 
   params.addParam<Real>("xmin", 0.0, "Lower X Coordinate of the generated mesh");
   params.addParam<Real>("ymin", 0.0, "Lower Y Coordinate of the generated mesh");
@@ -85,27 +77,18 @@ SPPARKSUserObject::SPPARKSUserObject(const InputParameters & params)
     _sol_vars(),
     _last_time(std::numeric_limits<Real>::min())
 {
-  if (isParamValid("int_vars"))
-  {
-    for (auto & name : getParam<std::vector<std::string>>("int_vars"))
-      _int_vars.push_back(&_fe_problem.getStandardVariable(0, name));
-  }
+  for (const auto & name : getParam<std::vector<std::string>>("int_vars"))
+    _int_vars.push_back(&_fe_problem.getStandardVariable(0, name));
   if (_int_vars.size() != _to_ivar.size())
     mooseError("Mismatch with int_vars and to_ivar");
 
-  if (isParamValid("double_vars"))
-  {
-    for (auto & name : getParam<std::vector<std::string>>("double_vars"))
-      _double_vars.push_back(&_fe_problem.getStandardVariable(0, name));
-  }
+  for (const auto & name : getParam<std::vector<std::string>>("double_vars"))
+    _double_vars.push_back(&_fe_problem.getStandardVariable(0, name));
   if (_double_vars.size() != _to_dvar.size())
     mooseError("Mismatch with double_vars and to_dvar");
 
-  if (isParamValid("sol_vars"))
-  {
-    for (auto & name : getParam<std::vector<std::string>>("sol_vars"))
-      _sol_vars.push_back(&_fe_problem.getStandardVariable(0, name));
-  }
+  for (const auto & name : getParam<std::vector<std::string>>("sol_vars"))
+    _sol_vars.push_back(&_fe_problem.getStandardVariable(0, name));
 
   _console << "\n>>>> STARTING SPPARKS <<<<\n";
   spparks_open(0, nullptr, _communicator.get(), &_spparks);

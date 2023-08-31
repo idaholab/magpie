@@ -126,7 +126,7 @@ a0 = 0.01
 [Materials]
   [bs0]
     type = PolarPFMBetaS0
-    f_name = betaS0
+    property_name = betaS0
     theta = theta
     a_beta = 3 # "It is also assumed that all a = 3."
     beta10 = ${beta1} # m-delta  g(kE,kdelta) (nJ/m)
@@ -135,7 +135,7 @@ a0 = 0.01
   []
   [beta21phi]
     type = PolarPFMPhi
-    f_name = beta21phi
+    property_name = beta21phi
     a0 = ${a0}
     a_phi = 3
     beta21 = ${beta_ss} # delta-beta (nJ/m)
@@ -144,7 +144,7 @@ a0 = 0.01
   []
   [psiL]
     type = PolarPFMPsiL
-    f_name = psiL
+    property_name = psiL
     DeltaG10 = ${G1}
     DeltaG20 = ${G2}
     G0 = 0

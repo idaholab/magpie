@@ -23,7 +23,7 @@ ParkinCoulterInterface::validParams()
   params.addRequiredParam<std::vector<Real>>("displacement_thresholds", "Dispacement thresholds");
   params.addParam<std::vector<Real>>("lattice_binding_energies", "Lattice binding energies");
   params.addParam<std::vector<std::vector<Real>>>(
-      "Ecap", "Capture energy Ecap_ij of species i being trapped in j site");
+      "Ecap", {{}}, "Capture energy Ecap_ij of species i being trapped in j site");
   params.addRangeCheckedParam<Real>("uniform_energy_spacing_threshold",
                                     10,
                                     "uniform_energy_spacing_threshold >= 0",
@@ -40,21 +40,20 @@ ParkinCoulterInterface::validParams()
 }
 
 ParkinCoulterInterface::ParkinCoulterInterface(const MooseObject * moose_object)
-  : _moose_obj(moose_object), _pars(moose_object->parameters())
+  : _moose_obj(moose_object),
+    _pars(moose_object->parameters()),
+    _Ecap(_pars.get<std::vector<std::vector<Real>>>("Ecap"))
 {
-  _Ecap = {{}};
-  if (_pars.isParamValid("Ecap"))
-    _Ecap = _pars.get<std::vector<std::vector<Real>>>("Ecap");
 }
 
 std::vector<MyTRIM_NS::Element>
 ParkinCoulterInterface::polyMat() const
 {
   std::vector<MyTRIM_NS::Element> poly_mat;
-  std::vector<unsigned int> atomic_numbers = atomicNumbers();
-  std::vector<Real> mass_numbers = massNumbers();
-  std::vector<Real> N = numberFractions();
-  std::vector<Real> threshold = _pars.get<std::vector<Real>>("displacement_thresholds");
+  const auto atomic_numbers = atomicNumbers();
+  const auto mass_numbers = massNumbers();
+  const auto N = numberFractions();
+  const auto threshold = _pars.get<std::vector<Real>>("displacement_thresholds");
   std::vector<Real> bind;
   if (_pars.isParamValid("lattice_binding_energies"))
     bind = _pars.get<std::vector<Real>>("lattice_binding_energies");

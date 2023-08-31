@@ -90,8 +90,8 @@ MyTRIMRasterizer::validParams()
   params.addRequiredParam<std::vector<Real>>("Z", "Nuclear charge in e");
   params.addParam<std::vector<Real>>("Mtol",
                                      "Tolerance on mass number for tagging PKAs with var id.");
-  params.addParam<std::vector<Real>>("Ebind", "Binding energy in eV");
-  params.addParam<std::vector<Real>>("Edisp", "Displacement threshold in eV");
+  params.addParam<std::vector<Real>>("Ebind", {}, "Binding energy in eV");
+  params.addParam<std::vector<Real>>("Edisp", {}, "Displacement threshold in eV");
   params.addParam<MaterialPropertyName>(
       "site_volume", "Lattice site volume in nm^3 (regardless of the chosen mesh units)");
   params.addRequiredParam<std::vector<UserObjectName>>("pka_generator",

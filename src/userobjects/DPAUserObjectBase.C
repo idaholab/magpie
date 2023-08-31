@@ -20,14 +20,16 @@ DPAUserObjectBase::validParams()
   params.addParam<MultiMooseEnum>("damage_reaction_types",
                                   damage_reaction_types,
                                   "The neutron reaction causing radiation damage");
-  params.addParam<std::vector<Real>>("Z", "The atomic numbers of all present isotopes");
-  params.addParam<std::vector<Real>>("A", "The mass numbers of all present isotopes");
-  params.addParam<std::vector<Real>>("number_densities",
-                                     "The number densities of all present isotopes");
+  params.addParam<std::vector<Real>>("Z", {}, "The atomic numbers of all present isotopes");
+  params.addParam<std::vector<Real>>("A", {}, "The mass numbers of all present isotopes");
+  params.addParam<std::vector<Real>>(
+      "number_densities", {}, "The number densities of all present isotopes");
   params.addParam<std::vector<Real>>("energy_group_boundaries",
+                                     {},
                                      "The neutron flux energy group boundaries in units of eV "
                                      "starting with the highest energy group");
   params.addParam<std::vector<Real>>("scalar_flux",
+                                     {},
                                      "The values of the neutron scalar flux by energy group "
                                      "starting with the highest energy group");
   params.addParam<std::vector<std::vector<Real>>>(
@@ -50,22 +52,15 @@ DPAUserObjectBase::DPAUserObjectBase(const InputParameters & parameters)
     _is_transient_irradiation(!isParamValid("irradiation_time")),
     _irradiation_time(_is_transient_irradiation ? 0 : getParam<Real>("irradiation_time")),
     _neutron_reaction_types(getParam<MultiMooseEnum>("damage_reaction_types")),
-    _nr(_neutron_reaction_types.size())
+    _nr(_neutron_reaction_types.size()),
+    _atomic_numbers(getParam<std::vector<Real>>("Z")),
+    _mass_numbers(getParam<std::vector<Real>>("A")),
+    _number_densities(getParam<std::vector<Real>>("number_densities")),
+    _energy_group_boundaries(getParam<std::vector<Real>>("energy_group_boundaries")),
+    _scalar_flux(getParam<std::vector<Real>>("scalar_flux"))
 {
   if (_nr == 0)
     paramError("damage_reaction_types", "At least one damage mechanism must be provided");
-
-  // get parameters if they are provided
-  if (isParamValid("Z"))
-    _atomic_numbers = getParam<std::vector<Real>>("Z");
-  if (isParamValid("A"))
-    _mass_numbers = getParam<std::vector<Real>>("A");
-  if (isParamValid("number_densities"))
-    _number_densities = getParam<std::vector<Real>>("number_densities");
-  if (isParamValid("energy_group_boundaries"))
-    _energy_group_boundaries = getParam<std::vector<Real>>("energy_group_boundaries");
-  if (isParamValid("scalar_flux"))
-    _scalar_flux = getParam<std::vector<Real>>("scalar_flux");
 
   if (isParamValid("cross_section"))
   {

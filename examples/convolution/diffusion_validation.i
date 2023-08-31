@@ -18,64 +18,64 @@
 []
 
 [Functions]
-  [./ic]
+  [ic]
     type = ParsedFunction
     # box profile initial condition (Note: this causes Gibbs oscillations that get amplified in the c2 solution)
-    value = 'if(abs(x)<=2,1,0)'
-  [../]
-  [./G]
+    expression = 'if(abs(x)<=2,1,0)'
+  []
+  [G]
     type = ParsedFunction
     # adjust the simulation timestep here!
-    vars = dt
-    vals = 0.1
+    symbol_names = dt
+    symbol_values = 0.1
     # the diffusion Green's function for D=1 is
     # exp(-r^2/(4*dt))
     # Note1: We need to multiply with r^2 to compensate for the r^-2 geometrical
     # attenuation term that is multiplied on by the userobject (x <=> r)
     # Note2: we use normalize = true below to autonormalize the Green's function
     # so we can leave off the prefactor
-    value = exp(-x^2/(4*dt))*x^2
-  [../]
+    expression = exp(-x^2/(4*dt))*x^2
+  []
 []
 
 [Variables]
-  [./c1]
-    [./InitialCondition]
+  [c1]
+    [InitialCondition]
       type = FunctionIC
       function = ic
-    [../]
-  [../]
-  [./c2]
-    [./InitialCondition]
+    []
+  []
+  [c2]
+    [InitialCondition]
       type = FunctionIC
       function = ic
-    [../]
-  [../]
+    []
+  []
 []
 
 [BCs]
-  [./Periodic]
-    [./all]
+  [Periodic]
+    [all]
       auto_direction = x
-    [../]
-  [../]
+    []
+  []
 []
 
 [Kernels]
-  [./dt1]
+  [dt1]
     type = TimeDerivative
     variable = c1
-  [../]
-  [./diff1]
+  []
+  [diff1]
     type = Diffusion
     variable = c1
-  [../]
+  []
 
-  [./dt2]
+  [dt2]
     type = TimeDerivative
     variable = c2
-  [../]
-  [./source2]
+  []
+  [source2]
     type = RadialGreensSource
     variable = c2
     # set gamma = 1/dt
@@ -84,21 +84,21 @@
     # convolution result
     gamma = 10
     convolution = convolution
-  [../]
+  []
 []
 
 [UserObjects]
-  [./convolution]
+  [convolution]
     type = RadialGreensConvolution
     normalize = true
     v = c2
     function = G
     r_cut = 2.0
-  [../]
+  []
 []
 
 [VectorPostprocessors]
-  [./c]
+  [c]
     type = LineValueSampler
     execute_on = 'INITIAL TIMESTEP_END'
     variable = 'c1 c2'
@@ -107,7 +107,7 @@
     # sample at element edges (nodes) and centers |---*---|---*---|
     num_points = 399
     sort_by = x
-  [../]
+  []
 []
 
 [Executioner]

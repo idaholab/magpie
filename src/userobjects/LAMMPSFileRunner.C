@@ -30,9 +30,8 @@ LAMMPSFileRunner::validParams()
                                     "a sequence.");
   params.addRequiredParam<std::vector<unsigned int>>(
       "xyz_columns", "Column ids of the x, y, and z coordinates of particles.");
-  std::vector<unsigned int> empty = {};
   params.addParam<std::vector<unsigned int>>(
-      "property_columns", empty, "Column ids of the properties.");
+      "property_columns", {}, "Column ids of the properties.");
   params.addParam<FunctionName>("time_conversion",
                                 "A conversion from FEM simulation time to MD time stamps.");
   params.addClassDescription("Allows coupling FEM calculations to LAMMPS dump files.");
