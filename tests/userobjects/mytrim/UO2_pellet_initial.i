@@ -12,56 +12,56 @@
 []
 
 [Variables]
-  [./c]
+  [c]
     initial_condition = 1.0
-  [../]
+  []
 []
 
 [AuxVariables]
-  [./int]
+  [int]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./vac]
+  []
+  [vac]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./fuel_conc]
+  []
+  [fuel_conc]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = U02_conc
-    [../]
-  [../]
+    []
+  []
 []
 
 [Kernels]
-  [./dt]
+  [dt]
     type = TimeDerivative
     variable = c
-  [../]
-  [./diff]
+  []
+  [diff]
     type = Diffusion
     variable = c
-  [../]
+  []
 []
 
 [AuxKernels]
-  [./int]
+  [int]
     variable = int
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 0
     defect = INT
-  [../]
-  [./vac]
+  []
+  [vac]
     variable = vac
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 0
     defect = VAC
-  [../]
+  []
 []
 
 #[BCs]
@@ -73,46 +73,46 @@
 #[]
 
 [UserObjects]
-  [./thermal_fission]
+  [thermal_fission]
     type = PKAFissionFragmentNeutronics
-  [../]
-  [./rasterizer]
+  []
+  [rasterizer]
     type = MyTRIMRasterizer
     var = c
     M = 40
     Z = 20
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = thermal_fission
-  [../]
-  [./runner]
+  []
+  [runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
-  [../]
+  []
 []
 
 [Postprocessors]
-  [./int]
+  [int]
     type = ElementIntegralVariablePostprocessor
     variable = int
     execute_on = timestep_end
-  [../]
-  [./vac]
+  []
+  [vac]
     type = ElementIntegralVariablePostprocessor
     variable = vac
     execute_on = timestep_end
-  [../]
+  []
 []
 
 [Functions]
-  [./U02_conc]
+  [U02_conc]
     type = ParsedFunction
-    value = 'r:=sqrt(x*x+y*y); Rlow:=low*R; Rhigh:=high*R; Z:= (r-high*R)/(r-low*R); if(r<Rlow,1,
+    expression = 'r:=sqrt(x*x+y*y); Rlow:=low*R; Rhigh:=high*R; Z:= (r-high*R)/(r-low*R); if(r<Rlow,1,
                                                                                      if(r>Rhigh,0,
                                                                                      -(exp(2*Z)-1)/(exp(2*Z)+1)))'
-                                                                                     #-(1/(high-low))*(r/R-1)+0.5))'
-    vars = 'R low high'
-    vals = '20 0.9 1.1'
-  [../]
+    #-(1/(high-low))*(r/R-1)+0.5))'
+    symbol_names = 'R low high'
+    symbol_values = '20 0.9 1.1'
+  []
 []
 
 [Executioner]

@@ -17,117 +17,117 @@
 []
 
 [Variables]
-  [./v]
+  [v]
     initial_condition = 0.0
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 []
 
 [AuxVariables]
-  [./int]
+  [int]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./vac]
+  []
+  [vac]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./c_U]
+  []
+  [c_U]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = func_c_U
-    [../]
-  [../]
-  [./c_O]
+    []
+  []
+  [c_O]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = func_c_O
-    [../]
-  [../]
-  [./c_C]
+    []
+  []
+  [c_C]
     order = CONSTANT
     family = MONOMIAL
-    [./InitialCondition]
+    [InitialCondition]
       type = FunctionIC
       function = func_c_C
-    [../]
-  [../]
-  [./c]
+    []
+  []
+  [c]
     initial_condition = 1.0
-  [../]
+  []
 []
 
 [Kernels]
-  [./dt]
+  [dt]
     type = TimeDerivative
     variable = v
-  [../]
-  [./diff]
+  []
+  [diff]
     type = Diffusion
     variable = v
-  [../]
-  [./src]
+  []
+  [src]
     type = MyTRIMElementSource
     variable = v
     runner = runner
     ivar = 2
     defect = VAC
-  [../]
+  []
 []
 
 [AuxKernels]
-  [./int]
+  [int]
     variable = int
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 2
     defect = INT
-  [../]
-  [./vac]
+  []
+  [vac]
     variable = vac
     type = MyTRIMElementResultAux
     runner = runner
     ivar = 2
     defect = VAC
-  [../]
+  []
 []
 
 [UserObjects]
-  [./fision]
+  [fision]
     type = PKAFissionFragmentEmpirical
     relative_density = 1
     fission_rate = 4.0e-11
-  [../]
-  [./rasterizer]
+  []
+  [rasterizer]
     type = MyTRIMRasterizer
     var = 'c_U  c_O  c_C'
-    M   = '235  16    12'
-    Z   = '92   8     6'
+    M = '235  16    12'
+    Z = '92   8     6'
     site_volume = 0.0404 # nm^3 per UO2 unit
     pka_generator = fision
     print_pka_statistics = true
     interval = 2
-  [../]
-  [./runner]
+  []
+  [runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
-  [../]
+  []
 []
 
 [Adaptivity]
-  [./Markers]
-    [./marker]
+  [Markers]
+    [marker]
       type = ValueThresholdMarker
       variable = v
       coarsen = 1e-9
       refine = 1e9
-    [../]
-  [../]
+    []
+  []
 
   marker = marker
   max_h_level = 4
@@ -136,19 +136,19 @@
 []
 
 [Functions]
-  [./func_c_U]
+  [func_c_U]
     type = ParsedFunction
-    value = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
-    vars = 'rf    a ev iv'
-    vals = '2.0e4 2  0 0.3333333'
-  [../]
-  [./func_c_O]
+    expression = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
+    symbol_names = 'rf    a ev iv'
+    symbol_values = '2.0e4 2  0 0.3333333'
+  []
+  [func_c_O]
     type = ParsedFunction
-    value = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
-    vars = 'rf    a ev iv'
-    vals = '2.0e4 2  0 0.66666666'
-  [../]
-  [./func_c_C]
+    expression = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
+    symbol_names = 'rf    a ev iv'
+    symbol_values = '2.0e4 2  0 0.66666666'
+  []
+  [func_c_C]
     # ev computed as follows:
     # rho_G = 1.72 g/cc (see Kun MO's paper)
     # rho_UO2 = 10.963 g/cc
@@ -156,10 +156,10 @@
     # MG = 12
     # xG = rho_G / rho_UO2 * MUO2 / MG = 3.4908
     type = ParsedFunction
-    value = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
-    vars = 'rf    a ev     iv'
-    vals = '2.0e4 2 3.4908 0'
-  [../]
+    expression = 'r := sqrt(x*x+y*y); rho := if(r/rf<1.0e-10,1.0e-10,r/rf); th := tanh(a*(rho-1/rho)); 0.5 * (1+th) * ev + 0.5 * (1-th) * iv'
+    symbol_names = 'rf    a ev     iv'
+    symbol_values = '2.0e4 2 3.4908 0'
+  []
 []
 
 [Executioner]
@@ -167,10 +167,10 @@
   num_steps = 2
   nl_abs_tol = 1e-10
 
-  [./TimeStepper]
+  [TimeStepper]
     type = TimeSequenceStepper
     time_sequence = '1 1.0001'
-  [../]
+  []
 []
 
 [Outputs]

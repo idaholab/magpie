@@ -8,135 +8,135 @@
 []
 
 [AuxVariables]
-  [./T]
+  [T]
     initial_condition = 0.2
-  [../]
-  [./diff]
-  [../]
+  []
+  [diff]
+  []
 []
 
 [AuxKernels]
-  [./diff]
+  [diff]
     type = ParsedAux
     variable = diff
     function = 'cn - cp'
-    args = 'cn cp'
-  [../]
+    coupled_variables = 'cn cp'
+  []
 []
 
 [Variables]
   # active = 'cp wp'
-  [./cn]
-    [./InitialCondition]
+  [cn]
+    [InitialCondition]
       type = RandomIC
       min = 0.45
       max = 0.55
       seed = 1234
       #type = FunctionIC
       #function = cos(x/70*2*pi)/2+0.5
-    [../]
-  [../]
-  [./wn]
-  [../]
+    []
+  []
+  [wn]
+  []
 
-  [./cp]
-    [./InitialCondition]
+  [cp]
+    [InitialCondition]
       type = RandomIC
       min = 0.45
       max = 0.55
       seed = 1234
       #type = FunctionIC
       #function = cos(x/70*2*pi)/2+0.5
-    [../]
-  [../]
-  [./wp]
-  [../]
+    []
+  []
+  [wp]
+  []
 []
 
 [Kernels]
   # active = 'cp_res wp_res timep'
-  [./cn_res]
+  [cn_res]
     type = ADSplitCHParsed
     variable = cn
-    f_name = Fn
+    property_name = Fn
     kappa_name = ad_kappa_c
     w = wn
-  [../]
-  [./wn_res]
+  []
+  [wn_res]
     type = ADSplitCHWRes
     variable = wn
     mob_name = ad_M
-  [../]
-  [./timen]
+  []
+  [timen]
     type = ADCoupledTimeDerivative
     variable = wn
     v = cn
-  [../]
+  []
 
-  [./cp_res]
+  [cp_res]
     type = SplitCHParsed
     variable = cp
-    f_name = Fp
+    property_name = Fp
     kappa_name = kappa_c
     w = wp
-  [../]
-  [./wp_res]
+  []
+  [wp_res]
     type = SplitCHWRes
     variable = wp
     mob_name = M
-  [../]
-  [./timep]
+  []
+  [timep]
     type = CoupledTimeDerivative
     variable = wp
     v = cp
-  [../]
+  []
 []
 
 [BCs]
-  [./Periodic]
-    [./all]
+  [Periodic]
+    [all]
       auto_direction = 'x y'
-    [../]
-  [../]
+    []
+  []
 []
 
 [Materials]
   # active = 'Fp pfmobility'
-  [./Fn]
+  [Fn]
     type = NeuralNetFreeEnergy
     file_name = weights_biases.txt
     file_format = MAGPIE
     activation_function = SOFTSIGN
-    inputs     = 'T cn'
+    inputs = 'T cn'
     prop_names = 'Fn'
     outputs = exodus
     debug = true
-  [../]
-  [./Fp]
+  []
+  [Fp]
     type = DerivativeParsedMaterial
-    f_name = 'Fp'
+    property_name = 'Fp'
     function = 'cp*(1-cp)+0.001*(T*300+400)*(cp*log(cp)+(1-cp)*log(1-cp))'
-    args = 'cp T'
+    coupled_variables = 'cp T'
     derivative_order = 2
     outputs = exodus
-  [../]
-  [./pfmobility]
+  []
+  [pfmobility]
     type = GenericConstantMaterial
-    prop_names  = 'M kappa_c'
+    prop_names = 'M kappa_c'
     prop_values = '1 0.25'
-  [../]
-  [./adpfmobility]
+  []
+  [adpfmobility]
     type = ADGenericConstantMaterial
-    prop_names  = 'ad_M ad_kappa_c'
+    prop_names = 'ad_M ad_kappa_c'
     prop_values = '1 0.25'
-  [../]
+  []
 []
 
 [Preconditioning]
-  [./SMP]
+  [SMP]
     type = SMP
     full = true
-  [../]
+  []
 []
 
 [Problem]
@@ -144,11 +144,11 @@
 []
 
 [Postprocessors]
-  [./diff]
+  [diff]
     type = ElementL2Difference
     variable = cn
     other_variable = cp
-  [../]
+  []
 []
 
 [Executioner]

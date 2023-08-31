@@ -23,360 +23,356 @@
 
 [Variables]
   # chemical potentials for vacancies, interstitials and gas atoms
-  [./wv]
-  [../]
-  [./wi]
-  [../]
-  [./wg]
-  [../]
+  [wv]
+  []
+  [wi]
+  []
+  [wg]
+  []
 
   # order parameters: etab0 is the bubble, etam0 is the grain, etam1 is currently not used
-  [./etab0]
-  [../]
-  [./etam0]
-  [../]
-  [./etam1]
-  [../]
+  [etab0]
+  []
+  [etam0]
+  []
+  [etam1]
+  []
 []
 
 [AuxVariables]
   # grain boundaries
-  [./bnds]
+  [bnds]
     order = FIRST
     family = LAGRANGE
-  [../]
+  []
 
   # concentration of Xe
-  [./c_Xe]
+  [c_Xe]
     order = CONSTANT
     family = MONOMIAL
     initial_condition = 0
-  [../]
-
+  []
 
   # number density variables created for the rasterizer in Magpie
-  [./rho_U235]
+  [rho_U235]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./rho_U238]
+  []
+  [rho_U238]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./rho_O]
+  []
+  [rho_O]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./rhog_var]
+  []
+  [rhog_var]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-
+  []
 
   # concentrations of (other) defects
   # vacancies
-  [./cv]
+  [cv]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # interstitials
-  [./ci]
+  [ci]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # number density of interstitials for the rasterizer
-  [./rhoi_var]
+  [rhoi_var]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # number of defects generated each time step
-  [./interstitial_rate_Xe]
+  [interstitial_rate_Xe]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./vacancy_rate_U]
+  []
+  [vacancy_rate_U]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./interstitial_rate_U]
+  []
+  [interstitial_rate_U]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./interstitial_rate_i]
+  []
+  [interstitial_rate_i]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # burnup in GWd/tHM
-  [./burnup_var]
+  [burnup_var]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # temperature
-  [./T]
+  [T]
     initial_condition = 1200
-  [../]
+  []
 
   # rate of absorbed defects due to dislocations
-  [./absorbed_int]
+  [absorbed_int]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./absorbed_vac]
+  []
+  [absorbed_vac]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # Replacement atoms
-  [./rep_in_235]
+  [rep_in_235]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./rep_out_235]
+  [rep_out_235]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./rep_in_238]
+  [rep_in_238]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
-  [./rep_out_238]
+  [rep_out_238]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # Total number of uranium atoms lost to dislocation sinks
-  [./total_U_lost]
+  [total_U_lost]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 
   # UO2 matrix density
-  [./UO2_density]
+  [UO2_density]
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./relative_density]
+  []
+  [relative_density]
     order = CONSTANT
     family = MONOMIAL
     initial_condition = 1.0
-  [../]
+  []
 []
 
 [ICs]
-  [./IC_etab0]
+  [IC_etab0]
     type = FunctionIC
     variable = etab0
     function = ic_func_etab0
-  [../]
-  [./IC_etam0]
+  []
+  [IC_etam0]
     type = FunctionIC
     variable = etam0
     function = ic_func_etam0
-  [../]
-  [./IC_etam1]
+  []
+  [IC_etam1]
     type = FunctionIC
     variable = etam1
     function = ic_func_etam1
-  [../]
-  [./IC_wv]
+  []
+  [IC_wv]
     type = ConstantIC
     value = 0.0
     variable = wv
-  [../]
-  [./IC_wi]
+  []
+  [IC_wi]
     type = ConstantIC
     value = 0.0
     variable = wi
-  [../]
-  [./IC_wg]
+  []
+  [IC_wg]
     type = ConstantIC
     value = 0.0
     variable = wg
-  [../]
+  []
 []
 
 [Functions]
   # bubble IC
-  [./ic_func_etab0]
+  [ic_func_etab0]
     type = ParsedFunction
-    vars = 'kappa   mu'
-    vals = '0.5273  0.004688'
-    value = 'r:=sqrt((x-200)^2+(y-200)^2);0.5*(1.0-tanh((r-44)*sqrt(mu/2.0/kappa)))'
-  [../]
+    symbol_names = 'kappa   mu'
+    symbol_values = '0.5273  0.004688'
+    expression = 'r:=sqrt((x-200)^2+(y-200)^2);0.5*(1.0-tanh((r-44)*sqrt(mu/2.0/kappa)))'
+  []
 
   # grain IC
-  [./ic_func_etam0]
+  [ic_func_etam0]
     type = ParsedFunction
-    vars = 'kappa   mu'
-    vals = '0.5273  0.004688'
-    value = 'r:=sqrt((x-200)^2+(y-200)^2);0.5*(1.0+tanh((r-44)*sqrt(mu/2.0/kappa)))'
-  [../]
-  [./ic_func_etam1]
+    symbol_names = 'kappa   mu'
+    symbol_values = '0.5273  0.004688'
+    expression = 'r:=sqrt((x-200)^2+(y-200)^2);0.5*(1.0+tanh((r-44)*sqrt(mu/2.0/kappa)))'
+  []
+  [ic_func_etam1]
     type = ParsedFunction
-    vars = 'kappa   mu'
-    vals = '0.5273  0.004688'
-    value = '0'
-  [../]
+    symbol_names = 'kappa   mu'
+    symbol_values = '0.5273  0.004688'
+    expression = '0'
+  []
 
   # burnup function
-  [./fburnup] # in GWD/tHM
+  [fburnup] # in GWD/tHM
     type = ParsedFunction
     value = 'q*sigmaf_u235*flux*t*950'
-    vars = 'q sigmaf_u235 flux'
-    vals = '0.045 5.906e-22 1.5e13'
-  [../]
+    symbol_names = 'q sigmaf_u235 flux'
+    expressionø = '0.045 5.906e-22 1.5e13'
+  []
 
   # function to define the total number of lost U atoms to dislocations with a postprocessor, in the auxvariable total_U_lost, to use it in the material property
-  [./lost_U_func]
+  [lost_U_func]
     type = ParsedFunction
-    vals = total_U_lost_pp
-    vars = total_U_lost_pp
+    symbol_values = total_U_lost_pp
+    symbol_names = total_U_lost_pp
     value = 'total_U_lost_pp'
-  [../]
+  []
 []
 
-
-
 [BCs]
-  [./Periodic]
-    [./All]
+  [Periodic]
+    [All]
       auto_direction = 'x y' # 2D
-    [../]
-  [../]
+    []
+  []
 []
 
 [Kernels]
-# Order parameter eta_b0 for bubble phase
-  [./ACb0_bulk]
+  # Order parameter eta_b0 for bubble phase
+  [ACb0_bulk]
     type = ACGrGrMulti
     variable = etab0
-    v =           'etam0 etam1'
+    v = 'etam0 etam1'
     gamma_names = 'gmm   gmm'
-  [../]
-  [./ACb0_sw]
+  []
+  [ACb0_sw]
     type = ACSwitching
     variable = etab0
-    Fj_names  = 'omegab omegam'
-    hj_names  = 'hb     hm'
-    args = 'etam0 etam1 wv wi wg'
-  [../]
-  [./ACb0_int]
+    Fj_names = 'omegab omegam'
+    hj_names = 'hb     hm'
+    coupled_variables = 'etam0 etam1 wv wi wg'
+  []
+  [ACb0_int]
     type = ACInterface
     variable = etab0
     kappa_name = kappa
-  [../]
-  [./eb0_dot]
+  []
+  [eb0_dot]
     type = TimeDerivative
     variable = etab0
-  [../]
-# Order parameter eta_m0 for matrix grain 1
-  [./ACm0_bulk]
+  []
+  # Order parameter eta_m0 for matrix grain 1
+  [ACm0_bulk]
     type = ACGrGrMulti
     variable = etam0
-    v =           'etab0 etam1'
+    v = 'etab0 etam1'
     gamma_names = 'gmb   gmm'
-  [../]
-  [./ACm0_sw]
+  []
+  [ACm0_sw]
     type = ACSwitching
     variable = etam0
-    Fj_names  = 'omegab omegam'
-    hj_names  = 'hb     hm'
-    args = 'etab0 etam1 wv wi wg'
-  [../]
-  [./ACm0_int]
+    Fj_names = 'omegab omegam'
+    hj_names = 'hb     hm'
+    coupled_variables = 'etab0 etam1 wv wi wg'
+  []
+  [ACm0_int]
     type = ACInterface
     variable = etam0
     kappa_name = kappa
-  [../]
-  [./em0_dot]
+  []
+  [em0_dot]
     type = TimeDerivative
     variable = etam0
-  [../]
-# Order parameter eta_m1 for matrix grain 2
-  [./ACm1_bulk]
+  []
+  # Order parameter eta_m1 for matrix grain 2
+  [ACm1_bulk]
     type = ACGrGrMulti
     variable = etam1
-    v =           'etab0 etam0'
+    v = 'etab0 etam0'
     gamma_names = 'gmb   gmm'
-  [../]
-  [./ACm1_sw]
+  []
+  [ACm1_sw]
     type = ACSwitching
     variable = etam1
-    Fj_names  = 'omegab omegam'
-    hj_names  = 'hb     hm'
-    args = 'etab0 etam0 wv wi wg'
-  [../]
-  [./ACm1_int]
+    Fj_names = 'omegab omegam'
+    hj_names = 'hb     hm'
+    coupled_variables = 'etab0 etam0 wv wi wg'
+  []
+  [ACm1_int]
     type = ACInterface
     variable = etam1
     kappa_name = kappa
-  [../]
-  [./em1_dot]
+  []
+  [em1_dot]
     type = TimeDerivative
     variable = etam1
-  [../]
-#Chemical potential for vacancies
-  [./wv_dot]
+  []
+  #Chemical potential for vacancies
+  [wv_dot]
     type = SusceptibilityTimeDerivative
     variable = wv
-    f_name = chiv
-    args = '' # in this case chi (the susceptibility) is simply a constant
-  [../]
-  [./Diffusion_v]
+    property_name = chiv
+    coupled_variables = '' # in this case chi (the susceptibility) is simply a constant
+  []
+  [Diffusion_v]
     type = MatDiffusion
     variable = wv
     D_name = Dchiv
-    args = ''
-  [../]
-  [./coupled_v_etab0dot]
+    coupled_variables = ''
+  []
+  [coupled_v_etab0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wv
     v = etab0
     Fj_names = 'rhovbub rhovmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_v_etam0dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_v_etam0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wv
     v = etam0
     Fj_names = 'rhovbub rhovmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_v_etam1dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_v_etam1dot]
     type = CoupledSwitchingTimeDerivative
     variable = wv
     v = etam1
     Fj_names = 'rhovbub rhovmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./vac_source_U238] # Magpie source term for U238
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [vac_source_U238] # Magpie source term for U238
     type = MyTRIMElementSource
     variable = wv
     runner = runner
     ivar = 1
     defect = VAC
     prefactor = 0.04092
-  [../]
-  [./vac_source_U235] # Magpie source term for U235
+  []
+  [vac_source_U235] # Magpie source term for U235
     type = MyTRIMElementSource
     variable = wv
     runner = runner
     ivar = 0
     defect = VAC
     prefactor = 0.04092
-  [../]
-  [./recombination_v] # Recombination term = Recombination rate * rhoi * rhov
+  []
+  [recombination_v] # Recombination term = Recombination rate * rhoi * rhov
     type = GrandPotentialRecombination
     variable = wv
     rho = rhov
@@ -387,89 +383,89 @@
     a0 = 0.25
     Z = 50
     hm = hm
-    args = 'wi etab0 etam0'
-  [../]
-  [./dislocation_sink_v] # Dislocation sink = sink strength * Diffusion coefficient * rho
-     type = GrandPotentialSink
-     variable = wv
-     rho = rhov
-     D = D
-     mask = hm
-     value = 1
-     sink_strength = dislocation_density
-     args = 'etab0 etam0 etam1'
- [../]
+    coupled_variables = 'wi etab0 etam0'
+  []
+  [dislocation_sink_v] # Dislocation sink = sink strength * Diffusion coefficient * rho
+    type = GrandPotentialSink
+    variable = wv
+    rho = rhov
+    D = D
+    mask = hm
+    value = 1
+    sink_strength = dislocation_density
+    coupled_variables = 'etab0 etam0 etam1'
+  []
 
-# Chemical potential for interstitials (same as vacancy)
-  [./wi_dot]
+  # Chemical potential for interstitials (same as vacancy)
+  [wi_dot]
     type = SusceptibilityTimeDerivative
     variable = wi
-    f_name = chii
-    args = ''
-  [../]
-  [./Diffusion_i]
+    property_name = chii
+    coupled_variables = ''
+  []
+  [Diffusion_i]
     type = MatDiffusion
     variable = wi
     D_name = Dchii
-    args = ''
-  [../]
-  [./coupled_i_etab0dot]
+    coupled_variables = ''
+  []
+  [coupled_i_etab0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wi
     v = etab0
     Fj_names = 'rhoibub rhoimatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_i_etam0dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_i_etam0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wi
     v = etam0
     Fj_names = 'rhoibub rhoimatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_i_etam1dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_i_etam1dot]
     type = CoupledSwitchingTimeDerivative
     variable = wi
     v = etam1
     Fj_names = 'rhoibub rhoimatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./source_i_U238]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [source_i_U238]
     type = MyTRIMElementSource
     variable = wi
     runner = runner
     ivar = 1
     defect = INT
     prefactor = 0.04092
-  [../]
-  [./source_i_U235]
+  []
+  [source_i_U235]
     type = MyTRIMElementSource
     variable = wi
     runner = runner
     ivar = 0
     defect = INT
     prefactor = 0.04092
-  [../]
-  [./source_i_i]
+  []
+  [source_i_i]
     type = MyTRIMElementSource
     variable = wi
     runner = runner
     ivar = 4
     defect = INT
     prefactor = 0.04092
-  [../]
-  [./source_i_v]
+  []
+  [source_i_v]
     type = MyTRIMElementSource
     variable = wi
     runner = runner
     ivar = 4
     defect = VAC
     prefactor = -0.04092
-  [../]
-  [./recombination_i]
+  []
+  [recombination_i]
     type = GrandPotentialRecombination
     variable = wi
     rho = rhoi
@@ -480,626 +476,626 @@
     a0 = 0.25
     Z = 50
     hm = hm
-    args = 'wv etab0 etam0'
-  [../]
-  [./dislocation_sink_i]
-     type = GrandPotentialSink
-     variable = wi
-     rho = rhoi
-     mask = hm
-     D = Di
-     value = 1.02
-     sink_strength = dislocation_density
-     args = 'etab0 etam0 etam1'
-   [../]
+    coupled_variables = 'wv etab0 etam0'
+  []
+  [dislocation_sink_i]
+    type = GrandPotentialSink
+    variable = wi
+    rho = rhoi
+    mask = hm
+    D = Di
+    value = 1.02
+    sink_strength = dislocation_density
+    coupled_variables = 'etab0 etam0 etam1'
+  []
 
-#Chemical potential for gas atoms
-  [./wg_dot]
+  #Chemical potential for gas atoms
+  [wg_dot]
     type = SusceptibilityTimeDerivative
     variable = wg
-    f_name = chig
-    args = '' # in this case chi (the susceptibility) is simply a constant
-  [../]
-  [./Diffusion_g]
+    property_name = chig
+    coupled_variables = '' # in this case chi (the susceptibility) is simply a constant
+  []
+  [Diffusion_g]
     type = MatDiffusion
     variable = wg
     D_name = Dchig
-    args = ''
-  [../]
-  [./coupled_g_etab0dot]
+    coupled_variables = ''
+  []
+  [coupled_g_etab0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wg
     v = etab0
     Fj_names = 'rhogbub rhogmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_g_etam0dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_g_etam0dot]
     type = CoupledSwitchingTimeDerivative
     variable = wg
     v = etam0
     Fj_names = 'rhogbub rhogmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./coupled_g_etam1dot]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [coupled_g_etam1dot]
     type = CoupledSwitchingTimeDerivative
     variable = wg
     v = etam1
     Fj_names = 'rhogbub rhogmatrix'
     hj_names = 'hb      hm'
-    args = 'etab0 etam0 etam1'
-  [../]
-  [./source_g]
+    coupled_variables = 'etab0 etam0 etam1'
+  []
+  [source_g]
     type = MyTRIMElementSource
     variable = wg
     runner = runner
     ivar = 3
     defect = INT
     prefactor = 0.04092
-  [../]
+  []
 []
 
 [AuxKernels]
   # Numbers of defects created each time step
-  [./interstitial_rate_Xe]
+  [interstitial_rate_Xe]
     type = MyTRIMElementResultAux
     runner = runner
     defect = INT
     variable = interstitial_rate_Xe
     ivar = 3
     execute_on = timestep_end
-  [../]
-  [./vacancy_rate_U]
+  []
+  [vacancy_rate_U]
     type = MyTRIMElementResultAux
     runner = runner
     defect = VAC
     variable = vacancy_rate_U
     ivar = 1
     execute_on = timestep_end
-  [../]
-  [./interstitial_rate_U]
+  []
+  [interstitial_rate_U]
     type = MyTRIMElementResultAux
     runner = runner
     defect = INT
     variable = interstitial_rate_U
     ivar = 1
     execute_on = timestep_end
-  [../]
-  [./interstitial_rate_i]
+  []
+  [interstitial_rate_i]
     type = MyTRIMElementResultAux
     runner = runner
     defect = INT
     variable = interstitial_rate_i
     ivar = 4
     execute_on = timestep_end
-  [../]
+  []
 
-  [./rep_in_rate_235]
+  [rep_in_rate_235]
     type = MyTRIMElementResultAux
     runner = runner
     defect = REPLACEMENT_IN
     variable = rep_in_235
     ivar = 0
     execute_on = timestep_end
-  [../]
-  [./rep_out_rate_235]
+  []
+  [rep_out_rate_235]
     type = MyTRIMElementResultAux
     runner = runner
     defect = REPLACEMENT_OUT
     variable = rep_out_235
     ivar = 0
     execute_on = timestep_end
-  [../]
-  [./rep_in_rate_238]
+  []
+  [rep_in_rate_238]
     type = MyTRIMElementResultAux
     runner = runner
     defect = REPLACEMENT_IN
     variable = rep_in_238
     ivar = 1
     execute_on = timestep_end
-  [../]
-  [./rep_out_rate_238]
+  []
+  [rep_out_rate_238]
     type = MyTRIMElementResultAux
     runner = runner
     defect = REPLACEMENT_OUT
     variable = rep_out_238
     ivar = 1
     execute_on = timestep_end
-  [../]
+  []
 
   # Grain boundaries
-  [./BndsCalc]
+  [BndsCalc]
     type = BndsCalcAux
     variable = bnds
     execute_on = timestep_end
-  [../]
+  []
 
   # Number densities for different concentrations (U,O,Xe,Uint)
-  [./rho_U235_aux] # U235
+  [rho_U235_aux] # U235
     type = MaterialRealAux
     property = rho_U235_matl
     variable = rho_U235
     execute_on = 'initial timestep_begin'
-  [../]
-  [./rho_U238_aux] # U238
+  []
+  [rho_U238_aux] # U238
     type = MaterialRealAux
     property = rho_U238_matl
     variable = rho_U238
     execute_on = 'initial timestep_begin'
-  [../]
-  [./rho_O] # Oxygen
+  []
+  [rho_O] # Oxygen
     type = MaterialRealAux
     property = rho_O_matl
     variable = rho_O
     execute_on = 'initial timestep_begin'
-  [../]
-  [./rhog_aux] # Xenon
+  []
+  [rhog_aux] # Xenon
     type = MaterialRealAux
     property = rhog
     variable = rhog_var
     execute_on = 'initial timestep_begin'
-  [../]
-  [./rhoi_aux] # U interstitial
+  []
+  [rhoi_aux] # U interstitial
     type = MaterialRealAux
     property = rhoi
     variable = rhoi_var
     execute_on = 'initial timestep_begin'
-  [../]
+  []
 
   # Number fractions of point defects
-  [./cv_aux]
+  [cv_aux]
     type = MaterialRealAux
     property = cv_mat
     variable = cv
     execute_on = 'initial timestep_begin'
-  [../]
-  [./ci_aux]
+  []
+  [ci_aux]
     type = MaterialRealAux
     property = ci_mat
     variable = ci
     execute_on = 'initial timestep_begin'
-  [../]
-  [./c_Xe]
+  []
+  [c_Xe]
     type = MaterialRealAux
     property = c_Xe_matl
     variable = c_Xe
     execute_on = 'initial timestep_begin'
-  [../]
+  []
 
   # U lost to dislocations
-  [./lost_U_aux]
+  [lost_U_aux]
     type = FunctionAux
     variable = total_U_lost
     function = lost_U_func
     execute_on = timestep_end
-  [../]
+  []
 
   # Auxkernels for sink rates
   # The value of absorbed_int/vac is integrated over the domain to get the total number of atoms absorbed (see postprocessor)
   # It is also multiplied by the time step because the absorption rate is per second
-  [./disloc_absorption_int]
+  [disloc_absorption_int]
     type = SinkAbsorptionRate
     variable = absorbed_int
     rho = rhoi
     D = Di
     mask = hm
     sink_strength = disloc_density_dt
-  [../]
-  [./disloc_absorption_vac]
+  []
+  [disloc_absorption_vac]
     type = SinkAbsorptionRate
     variable = absorbed_vac
     rho = rhov
     D = D
     mask = hm
     sink_strength = disloc_density_dt
-  [../]
+  []
 
   # Burnup auxkernel defined by the function fburnup
-  [./burnup_aux]
+  [burnup_aux]
     type = FunctionAux
     function = fburnup
     variable = burnup_var
-  [../]
+  []
 
   # UO2 density aukernel that defines the density from the material property
   # Density is not required as an auxvariable, but it could make coupling easier
-  [./UO2_density_aux]
+  [UO2_density_aux]
     type = MaterialRealAux
     variable = UO2_density
     property = UO2_density_matl
-  [../]
-  [./relative_density_aux]
+  []
+  [relative_density_aux]
     type = MaterialRealAux
     variable = relative_density
     property = relative_density_matl
-  [../]
+  []
 []
 
 [Materials]
 
   # Switching functions for bubble and matrix
-  [./hb]
+  [hb]
     type = SwitchingFunctionMultiPhaseMaterial
     h_name = hb
     all_etas = 'etab0 etam0 etam1'
     phase_etas = 'etab0'
     # outputs = exodus
-  [../]
-  [./hm]
+  []
+  [hm]
     type = SwitchingFunctionMultiPhaseMaterial
     h_name = hm
     all_etas = 'etab0 etam0 etam1'
     phase_etas = 'etam0 etam1'
     outputs = exodus
-  [../]
+  []
 
   # Grand potential densities for bubble and matrix
-  [./omegab]
+  [omegab]
     type = DerivativeParsedMaterial
-    args = 'wv wi wg'
-    f_name = omegab
+    coupled_variables = 'wv wi wg'
+    property_name = omegab
     material_property_names = 'Va kvbub cvbubeq kibub cibubeq kgbub cgbubeq f0'
-    function = '-0.5*wv^2/Va^2/kvbub-wv/Va*cvbubeq-0.5*wi^2/Va^2/kibub-wi/Va*cibubeq-0.5*wg^2/Va^2/kgbub-wg/Va*cgbubeq+f0'
+    expression = '-0.5*wv^2/Va^2/kvbub-wv/Va*cvbubeq-0.5*wi^2/Va^2/kibub-wi/Va*cibubeq-0.5*wg^2/Va^2/kgbub-wg/Va*cgbubeq+f0'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./omegam]
+  []
+  [omegam]
     type = DerivativeParsedMaterial
-    args = 'wv wi wg'
-    f_name = omegam
+    coupled_variables = 'wv wi wg'
+    property_name = omegam
     material_property_names = 'Va kvmatrix cvmatrixeq kimatrix cimatrixeq kgmatrix cgmatrixeq'
-    function = '-0.5*wv^2/Va^2/kvmatrix-wv/Va*cvmatrixeq-0.5*wi^2/Va^2/kimatrix-wi/Va*cimatrixeq-0.5*wg^2/Va^2/kgmatrix-wg/Va*cgmatrixeq'
+    expression = '-0.5*wv^2/Va^2/kvmatrix-wv/Va*cvmatrixeq-0.5*wi^2/Va^2/kimatrix-wi/Va*cimatrixeq-0.5*wg^2/Va^2/kgmatrix-wg/Va*cgmatrixeq'
     derivative_order = 2
     #outputs = exodus
-  [../]
+  []
 
   # Number densities defind in each phase for each defect (vacancy, interstitial, gas atoms)
-  [./rhovbub]
+  [rhovbub]
     type = DerivativeParsedMaterial
-    args = 'wv'
-    f_name = rhovbub
+    coupled_variables = 'wv'
+    property_name = rhovbub
     material_property_names = 'Va kvbub cvbubeq'
-    function = 'wv/Va^2/kvbub + cvbubeq/Va'
+    expression = 'wv/Va^2/kvbub + cvbubeq/Va'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./rhovmatrix]
+  []
+  [rhovmatrix]
     type = DerivativeParsedMaterial
-    args = 'wv'
-    f_name = rhovmatrix
+    coupled_variables = 'wv'
+    property_name = rhovmatrix
     material_property_names = 'Va kvmatrix cvmatrixeq'
-    function = 'wv/Va^2/kvmatrix + cvmatrixeq/Va'
+    expression = 'wv/Va^2/kvmatrix + cvmatrixeq/Va'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./rhoibub]
+  []
+  [rhoibub]
     type = DerivativeParsedMaterial
-    args = 'wi'
-    f_name = rhoibub
+    coupled_variables = 'wi'
+    property_name = rhoibub
     material_property_names = 'Va kibub cibubeq'
-    function = 'wi/Va^2/kibub + cibubeq/Va'
+    expression = 'wi/Va^2/kibub + cibubeq/Va'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./rhoimatrix]
+  []
+  [rhoimatrix]
     type = DerivativeParsedMaterial
-    args = 'wi'
-    f_name = rhoimatrix
+    coupled_variables = 'wi'
+    property_name = rhoimatrix
     material_property_names = 'Va kimatrix cimatrixeq'
-    function = 'wi/Va^2/kimatrix + cimatrixeq/Va'
+    expression = 'wi/Va^2/kimatrix + cimatrixeq/Va'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./rhogbub]
+  []
+  [rhogbub]
     type = DerivativeParsedMaterial
-    args = 'wg'
-    f_name = rhogbub
+    coupled_variables = 'wg'
+    property_name = rhogbub
     material_property_names = 'Va kgbub cgbubeq'
-    function = 'wg/Va^2/kgbub + cgbubeq/Va'
+    expression = 'wg/Va^2/kgbub + cgbubeq/Va'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./rhogmatrix]
+  []
+  [rhogmatrix]
     type = DerivativeParsedMaterial
-    args = 'wg'
-    f_name = rhogmatrix
+    coupled_variables = 'wg'
+    property_name = rhogmatrix
     material_property_names = 'Va kgmatrix cgmatrixeq'
-    function = 'wg/Va^2/kgmatrix + cgmatrixeq/Va'
+    expression = 'wg/Va^2/kgmatrix + cgmatrixeq/Va'
     derivative_order = 2
     #outputs = exodus
-  [../]
+  []
 
   # Total number densities in the whole domain for each defect
-  [./rhov]
+  [rhov]
     type = DerivativeParsedMaterial
-    args = 'wv'
-    f_name = rhov
+    coupled_variables = 'wv'
+    property_name = rhov
     material_property_names = 'hm hb rhovmatrix(wv) rhovbub(wv)'
-    function = 'hm * rhovmatrix + hb * rhovbub'
+    expression = 'hm * rhovmatrix + hb * rhovbub'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./rhoi]
+  []
+  [rhoi]
     type = DerivativeParsedMaterial
-    args = 'wi'
-    f_name = rhoi
+    coupled_variables = 'wi'
+    property_name = rhoi
     material_property_names = 'hm hb rhoimatrix(wi) rhoibub(wi)'
-    function = 'hm * rhoimatrix + hb * rhoibub'
+    expression = 'hm * rhoimatrix + hb * rhoibub'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./rhog]
+  []
+  [rhog]
     type = DerivativeParsedMaterial
-    args = 'wg'
-    f_name = rhog
+    coupled_variables = 'wg'
+    property_name = rhog
     material_property_names = 'hm hb rhogmatrix(wg) rhogbub(wg)'
-    function = 'hm * rhogmatrix + hb * rhogbub'
+    expression = 'hm * rhogmatrix + hb * rhogbub'
     derivative_order = 2
     # outputs = exodus
-  [../]
+  []
 
   # U and O number densities
-  [./rho_U235_matl]
+  [rho_U235_matl]
     type = ParsedMaterial
     material_property_names = c_U235_matl
-    f_name = rho_U235_matl
+    property_name = rho_U235_matl
     constant_names = Va
     constant_expressions = 0.04092
-    function = 'c_U235_matl/Va'
+    expression = 'c_U235_matl/Va'
     # outputs = exodus
-  [../]
-  [./rho_U238_matl]
+  []
+  [rho_U238_matl]
     type = ParsedMaterial
     material_property_names = c_U238_matl
-    f_name = rho_U238_matl
+    property_name = rho_U238_matl
     constant_names = Va
     constant_expressions = 0.04092
-    function = 'c_U238_matl/Va'
+    expression = 'c_U238_matl/Va'
     # outputs = exodus
-  [../]
-  [./rho_O_matl]
+  []
+  [rho_O_matl]
     type = ParsedMaterial
     material_property_names = 'c_O_matl'
-    f_name = rho_O_matl
+    property_name = rho_O_matl
     constant_names = Va
     constant_expressions = 0.04092
-    function = 'c_O_matl/Va/2'
+    expression = 'c_O_matl/Va/2'
     # outputs = exodus
-  [../]
+  []
 
   # Constants
-  [./const]
+  [const]
     type = GenericConstantMaterial
-    prop_names =  'kappa   mu       L   D    Va      cvbubeq cgbubeq cibubeq  kgbub  kvbub kibub gmb     gmm T    Efvbar    Efgbar    kTbar     f0     tgrad_corr_mult  kappa_c kappa_op gamma_asymm Di'
+    prop_names = 'kappa   mu       L   D    Va      cvbubeq cgbubeq cibubeq  kgbub  kvbub kibub gmb     gmm T    Efvbar    Efgbar    kTbar     f0     tgrad_corr_mult  kappa_c kappa_op gamma_asymm Di'
     prop_values = '0.5273  0.004688 0.1 0.01 0.04092 0.5459  0.4541  0.0      1.41   1.41  1.41  0.9218 1.5 1200 7.505e-3  7.505e-3  2.588e-4  0.0    0.0              1.0     0.5273   1.5         1 '
-  [../]
+  []
 
   # Equilibrium concentrations of defects
-  [./cvmatrixeq]    #For values, see Li et al., Nuc. Inst. Methods in Phys. Res. B, 303, 62-27 (2013).
+  [cvmatrixeq] #For values, see Li et al., Nuc. Inst. Methods in Phys. Res. B, 303, 62-27 (2013).
     type = ParsedMaterial
-    f_name = cvmatrixeq
+    property_name = cvmatrixeq
     material_property_names = 'T'
-    constant_names        = 'kB           Efv'
-    constant_expressions  = '8.6173324e-5 3.0'
-    function = 'exp(-Efv/(kB*T))'
-  [../]
-  [./cimatrixeq]
+    constant_names = 'kB           Efv'
+    constant_expressions = '8.6173324e-5 3.0'
+    expression = 'exp(-Efv/(kB*T))'
+  []
+  [cimatrixeq]
     type = ParsedMaterial
-    f_name = cimatrixeq
+    property_name = cimatrixeq
     material_property_names = 'T'
-    constant_names        = 'kB           Efi'
-    constant_expressions  = '8.6173324e-5 3.0'
-    function = 'exp(-Efi/(kB*T))'
-  [../]
-  [./cgmatrixeq]
+    constant_names = 'kB           Efi'
+    constant_expressions = '8.6173324e-5 3.0'
+    expression = 'exp(-Efi/(kB*T))'
+  []
+  [cgmatrixeq]
     type = ParsedMaterial
-    f_name = cgmatrixeq
+    property_name = cgmatrixeq
     material_property_names = 'T'
-    constant_names        = 'kB           Efg'
-    constant_expressions  = '8.6173324e-5 3.0'
-    function = 'exp(-Efg/(kB*T))'
-  [../]
+    constant_names = 'kB           Efg'
+    constant_expressions = '8.6173324e-5 3.0'
+    expression = 'exp(-Efg/(kB*T))'
+  []
 
   # See free energy expression
-  [./kvmatrix_parabola]
+  [kvmatrix_parabola]
     type = ParsedMaterial
-    f_name = kvmatrix
+    property_name = kvmatrix
     material_property_names = 'T  cvmatrixeq'
-    constant_names        = 'c0v  c0g  a1                                               a2'
-    constant_expressions  = '0.01 0.01 0.178605-0.0030782*log(1-c0v)+0.0030782*log(c0v) 0.178605-0.00923461*log(1-c0v)+0.00923461*log(c0v)'
-    function = '((-a2+3*a1)/(4*(c0v-cvmatrixeq))+(a2-a1)/(2400*(c0v-cvmatrixeq))*T)'
+    constant_names = 'c0v  c0g  a1                                               a2'
+    constant_expressions = '0.01 0.01 0.178605-0.0030782*log(1-c0v)+0.0030782*log(c0v) 0.178605-0.00923461*log(1-c0v)+0.00923461*log(c0v)'
+    expression = '((-a2+3*a1)/(4*(c0v-cvmatrixeq))+(a2-a1)/(2400*(c0v-cvmatrixeq))*T)'
     # outputs = exodus
-  [../]
-  [./kimatrix_parabola]
+  []
+  [kimatrix_parabola]
     type = ParsedMaterial
-    f_name = kimatrix
+    property_name = kimatrix
     material_property_names = 'kvmatrix'
-    function = 'kvmatrix'
-  [../]
-  [./kgmatrix_parabola]
+    expression = 'kvmatrix'
+  []
+  [kgmatrix_parabola]
     type = ParsedMaterial
-    f_name = kgmatrix
+    property_name = kgmatrix
     material_property_names = 'kvmatrix'
-    function = 'kvmatrix'
-  [../]
+    expression = 'kvmatrix'
+  []
 
   # Material properties to define the number fractions of U, O, Xe, U vacancy and interstitial
-  [./c_U235_matl]
+  [c_U235_matl]
     type = ParsedMaterial
-    f_name = c_U235_matl
+    property_name = c_U235_matl
     material_property_names = 'hm'
-    function = 'hm*0.01485'
+    expression = 'hm*0.01485'
     outputs = exodus
-  [../]
-  [./c_U238_matl]
+  []
+  [c_U238_matl]
     type = ParsedMaterial
-    f_name = c_U238_matl
+    property_name = c_U238_matl
     material_property_names = 'hm'
-    function = 'hm*0.31515'
+    expression = 'hm*0.31515'
     outputs = exodus
-  [../]
-  [./c_O_matl]
+  []
+  [c_O_matl]
     type = ParsedMaterial
-    f_name = c_O_matl
+    property_name = c_O_matl
     material_property_names = 'hm'
-    function = '0.66*hm'
+    expression = '0.66*hm'
     outputs = exodus
-  [../]
-  [./c_Xe_matl]
+  []
+  [c_Xe_matl]
     type = ParsedMaterial
-    f_name = c_Xe_matl
+    property_name = c_Xe_matl
     material_property_names = 'hm hb Va rhogmatrix rhogbub'
-    function = 'Va * (hm * rhogmatrix + hb * rhogbub)'
-  [../]
-  [./cv_mat]
+    expression = 'Va * (hm * rhogmatrix + hb * rhogbub)'
+  []
+  [cv_mat]
     type = ParsedMaterial
-    f_name = cv_mat
+    property_name = cv_mat
     material_property_names = 'hm hb Va rhovmatrix rhovbub'
-    function = 'Va * (hm * rhovmatrix + hb * rhovbub)'
+    expression = 'Va * (hm * rhovmatrix + hb * rhovbub)'
     outputs = exodus
-  [../]
-  [./ci_mat]
+  []
+  [ci_mat]
     type = ParsedMaterial
-    f_name = ci_mat
+    property_name = ci_mat
     material_property_names = 'hm hb Va rhoimatrix rhoibub'
-    function = 'Va * (hm * rhoimatrix + hb * rhoibub)'
+    expression = 'Va * (hm * rhoimatrix + hb * rhoibub)'
     outputs = exodus
-  [../]
+  []
 
   # Mobilities for Grand Potential Model
-  [./Mobility_v]
+  [Mobility_v]
     type = DerivativeParsedMaterial
-    f_name = Dchiv
+    property_name = Dchiv
     material_property_names = 'D chiv'
-    function = 'D*chiv'
+    expression = 'D*chiv'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./Mobility_i]
+  []
+  [Mobility_i]
     type = DerivativeParsedMaterial
-    f_name = Dchii
+    property_name = Dchii
     material_property_names = 'Di chii'
-    function = 'Di*chii'
+    expression = 'Di*chii'
     derivative_order = 2
     #outputs = exodus
-  [../]
-  [./Mobility_g]
+  []
+  [Mobility_g]
     type = DerivativeParsedMaterial
-    f_name = Dchig
+    property_name = Dchig
     material_property_names = 'Dtot chig'
-    function = 'Dtot*chig'
+    expression = 'Dtot*chig'
     derivative_order = 2
     #outputs = exodus
-  [../]
+  []
 
   # Susceptibilities
-  [./chiv]
+  [chiv]
     type = DerivativeParsedMaterial
-    f_name = chiv
+    property_name = chiv
     material_property_names = 'Va hb kvbub hm kvmatrix '
-    function = '(hm/kvmatrix + hb/kvbub) / Va^2'
+    expression = '(hm/kvmatrix + hb/kvbub) / Va^2'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./chii]
+  []
+  [chii]
     type = DerivativeParsedMaterial
-    f_name = chii
+    property_name = chii
     material_property_names = 'Va hb kibub hm kimatrix '
-    function = '(hm/kimatrix + hb/kibub) / Va^2'
+    expression = '(hm/kimatrix + hb/kibub) / Va^2'
     derivative_order = 2
     # outputs = exodus
-  [../]
-  [./chig]
+  []
+  [chig]
     type = DerivativeParsedMaterial
-    f_name = chig
+    property_name = chig
     material_property_names = 'Va hb kgbub hm kgmatrix '
-    function = '(hm/kgmatrix + hb/kgbub) / Va^2'
+    expression = '(hm/kgmatrix + hb/kgbub) / Va^2'
     derivative_order = 2
     # outputs = exodus
-  [../]
+  []
 
   # Dislocation density per nm2
-  [./dislocation_density]
+  [dislocation_density]
     type = ParsedMaterial
-    f_name = dislocation_density
-    args = 'burnup_var'
-    function = '(10^(2.2e-2*burnup_var+13.8))*1e-18' #This is an empirical expression  https://www.sciencedirect.com/science/article/pii/S002231151200637X
+    property_name = dislocation_density
+    coupled_vars = 'burnup_var'
+    expression = '(10^(2.2e-2*burnup_var+13.8))*1e-18' #This is an empirical expression  https://www.sciencedirect.com/science/article/pii/S002231151200637X
     # outputs = exodus
-  [../]
+  []
   # Dislocation density per nm2 * time step in sec
-  [./disloc_dens_dt]
+  [disloc_dens_dt]
     type = ParsedMaterial
-    f_name = disloc_density_dt
+    property_name = disloc_density_dt
     material_property_names = 'dislocation_density dt'
     function = 'dislocation_density * dt'
     # outputs = exodus
-  [../]
+  []
 
   # Computes the difference between absorbed interstitials and vacancies only in the matrix (not in the interface nor the bubble phase)
-  [./U_lost_mat]
+  [U_lost_mat]
     type = ParsedMaterial
-    args = 'absorbed_int absorbed_vac'
-    f_name = U_lost_mat
+    coupled_variables = 'absorbed_int absorbed_vac'
+    property_name = U_lost_mat
     function = 'if(absorbed_int > absorbed_vac, absorbed_int - absorbed_vac, 0)'
-  [../]
+  []
 
   # Computes the change in the UO2 density in the matrix
-  [./UO2_density_matl]
+  [UO2_density_matl]
     type = ParsedMaterial
-    args = 'total_U_lost'
-    f_name = UO2_density_matl
+    coupled_variables = 'total_U_lost'
+    property_name = UO2_density_matl
     material_property_names = 'hm'
     constant_names = 'theo_dens initial_vol Va' # Va is the atomic volume
     constant_expressions = '10.97  1.537735e+05 0.04092'
     function = 'initial_vol * theo_dens/(initial_vol + Va*(total_U_lost))'
     # outputs = exodus
-  [../]
+  []
 
-  [./relative_density_matl]
+  [relative_density_matl]
     type = ParsedMaterial
-    f_name = relative_density_matl
+    property_name = relative_density_matl
     material_property_names = 'UO2_density_matl hm'
     constant_names = 'theo_dens' # Va is the atomic volume
     constant_expressions = '10.97'
     function = 'if(hm > 0.95, UO2_density_matl/theo_dens, 0.0)'
-  [../]
+  []
 
   # Time step material
-  [./dt]
+  [dt]
     type = TimeStepMaterial
-  [../]
+  []
 
 []
 
 [Preconditioning]
-  [./SMP]
+  [SMP]
     type = SMP
     full = true
-  [../]
+  []
 []
 
 [Postprocessors]
   # total number of defects in each time step
-  [./total_Xe_interstitial_production]
+  [total_Xe_interstitial_production]
     type = ElementIntegralVariablePostprocessor
     variable = interstitial_rate_Xe
-  [../]
+  []
 
-  [./total_U_vacancy_production]
+  [total_U_vacancy_production]
     type = ElementIntegralVariablePostprocessor
     variable = vacancy_rate_U
-  [../]
+  []
 
-  [./total_U_interstitial_production]
+  [total_U_interstitial_production]
     type = ElementIntegralVariablePostprocessor
     variable = interstitial_rate_U
-  [../]
+  []
 
-  [./total_i_interstitial_production]
+  [total_i_interstitial_production]
     type = ElementIntegralVariablePostprocessor
     variable = interstitial_rate_i
-  [../]
+  []
   #
   # [./total_rep_in_235_production]
   #   type = ElementIntegralVariablePostprocessor
@@ -1121,49 +1117,49 @@
   #   variable = rep_out_238
   # [../]
 
- # average number fraction of defect
-  [./cv_average]
+  # average number fraction of defect
+  [cv_average]
     type = ElementAverageValue
     variable = cv
-  [../]
-  [./ci_average]
+  []
+  [ci_average]
     type = ElementAverageValue
     variable = ci
-  [../]
-  [./cg_average]
+  []
+  [cg_average]
     type = ElementAverageValue
     variable = c_Xe
-  [../]
+  []
 
- # initial matrix volume
-  [./UO2_volume]
+  # initial matrix volume
+  [UO2_volume]
     type = ElementIntegralMaterialProperty
     mat_prop = hm
     execute_on = initial
-  [../]
+  []
 
- # time step
-  [./dt]
+  # time step
+  [dt]
     type = TimestepSize
-  [../]
+  []
 
- # Total number of absorbed U atoms in each time step
-  [./lost_U_pp]
+  # Total number of absorbed U atoms in each time step
+  [lost_U_pp]
     type = ElementIntegralMaterialProperty
     mat_prop = U_lost_mat
-  [../]
+  []
 
- # Cumulative number of absorbed u atoms at dislocations
-  [./total_U_lost_pp]
+  # Cumulative number of absorbed u atoms at dislocations
+  [total_U_lost_pp]
     type = CumulativeValuePostprocessor
     postprocessor = lost_U_pp
-  [../]
+  []
 
- # Average UO2 density
-  [./my_density]
+  # Average UO2 density
+  [my_density]
     type = ElementAverageValue
     variable = UO2_density
-  [../]
+  []
 
 []
 
@@ -1182,33 +1178,33 @@
   num_steps = 1500
   dtmax = 1e6
   nl_abs_tol = 1e-10
-  [./TimeStepper]
+  [TimeStepper]
     type = IterationAdaptiveDT
-        dt = 1000
-        optimal_iterations = 8
-        iteration_window = 2
-  [../]
+    dt = 1000
+    optimal_iterations = 8
+    iteration_window = 2
+  []
 []
 
 [UserObjects]
   active = 'rasterizer runner neutronics_fission_generator'
-  [./neutronics_fission_generator]
+  [neutronics_fission_generator]
     type = PKAFissionFragmentEmpirical
     relative_density = 'relative_density'
     fission_rate = 1.5e-08
-  [../]
-  [./xenon]
+  []
+  [xenon]
     type = PKAConstant
     pka_rate = 3e-8
     m = 131
     Z = 54
     E = 70e6
-  [../]
-  [./rasterizer]
+  []
+  [rasterizer]
     type = MyTRIMRasterizer
     var = 'rho_U235  rho_U238   rho_O  rhog_var rhoi_var'
-    M   = '235       238        16      135     238'
-    Z   = '92        92         8       54      92'
+    M = '235       238        16      135     238'
+    Z = '92        92         8       54      92'
     site_volume = 1 # nm^3 per UO2 unit
     periodic_var = wv
     pka_generator = neutronics_fission_generator
@@ -1216,30 +1212,30 @@
     max_pka_count = 1000
     recoil_rate_scaling = 1e2
     r_rec = 5.45
-  [../]
-  [./runner]
+  []
+  [runner]
     type = MyTRIMElementRun
     rasterizer = rasterizer
-  [../]
+  []
 []
 
 [Adaptivity]
- marker = errorfrac
- max_h_level = 2
- [./Indicators]
-   [./error]
-     type = GradientJumpIndicator
-     variable = bnds
-   [../]
- [../]
- [./Markers]
-   [./errorfrac]
-     type = ErrorFractionMarker
-     coarsen = 0.1
-     indicator = error
-     refine = 0.7
-   [../]
- [../]
+  marker = errorfrac
+  max_h_level = 2
+  [Indicators]
+    [error]
+      type = GradientJumpIndicator
+      variable = bnds
+    []
+  []
+  [Markers]
+    [errorfrac]
+      type = ErrorFractionMarker
+      coarsen = 0.1
+      indicator = error
+      refine = 0.7
+    []
+  []
 []
 
 [Outputs]

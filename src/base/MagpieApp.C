@@ -52,7 +52,7 @@ MagpieApp__registerAll(Factory & factory, ActionFactory & action_factory, Syntax
 void
 MagpieApp::registerAll(Factory & factory, ActionFactory & action_factory, Syntax & syntax)
 {
-  ModulesApp::registerAll(factory, action_factory, syntax);
+  ModulesApp::registerAllObjects<MagpieApp>(factory, action_factory, syntax);
 
   Registry::registerObjectsTo(factory, {"MagpieApp"});
   Registry::registerActionsTo(action_factory, {"MagpieApp"});

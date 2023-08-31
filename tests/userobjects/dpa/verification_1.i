@@ -8,11 +8,11 @@
 Ed = 30
 
 [Mesh]
- type = GeneratedMesh
- dim = 1
- xmin = 0
- xmax = 1
- nx = 2
+  type = GeneratedMesh
+  dim = 1
+  xmin = 0
+  xmax = 1
+  nx = 2
 []
 
 [Problem]
@@ -21,38 +21,38 @@ Ed = 30
 []
 
 [Variables]
-  [./test_var]
-  [../]
+  [test_var]
+  []
 []
 
 [Functions]
-  [./KP]
+  [KP]
     type = ParsedFunction
-    value = 't / 2 / ${Ed}'
-  [../]
+    expression = 't / 2 / ${Ed}'
+  []
 []
 
 [UserObjects]
-  [./KPtest]
-     type = FunctionDPAUserObject
-     damage_reaction_types = 'elastic'
-     damage_functions = 'KP'
-     irradiation_time = 1
-     Z = '6'
-     A = '12'
-     number_densities = '1'
+  [KPtest]
+    type = FunctionDPAUserObject
+    damage_reaction_types = 'elastic'
+    damage_functions = 'KP'
+    irradiation_time = 1
+    Z = '6'
+    A = '12'
+    number_densities = '1'
 
-     scalar_flux = '1e6'
-     energy_group_boundaries = '1e6 0'
-     cross_section = '1'
-  [../]
+    scalar_flux = '1e6'
+    energy_group_boundaries = '1e6 0'
+    cross_section = '1'
+  []
 []
 
 [Postprocessors]
-  [./dpa]
+  [dpa]
     type = DPAPostprocessor
     dpa_object = KPtest
-  [../]
+  []
 []
 
 [Executioner]

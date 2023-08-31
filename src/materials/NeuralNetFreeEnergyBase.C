@@ -26,7 +26,7 @@ NeuralNetFreeEnergyBase::validParams()
       "Data file containing the weights and biasses for a fully connected deep neural network");
   params.addCoupledVar("inputs", "Coupled Variables that are inputs for the neural network");
   params.template addParam<std::vector<MaterialPropertyName>>(
-      "prop_names", "list of material properties fed from the outputs of the neural network");
+      "prop_names", {}, "list of material properties fed from the outputs of the neural network");
   params.template addParam<bool>(
       "debug", false, "Tabulate the NN to a file for debugging purposes");
   return params;
