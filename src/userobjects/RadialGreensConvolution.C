@@ -62,7 +62,7 @@ RadialGreensConvolution::RadialGreensConvolution(const InputParameters & paramet
     _normalize(getParam<bool>("normalize")),
     _dim(_mesh.dimension()),
     _correction_integral(100),
-    _dof_map(_fe_problem.getNonlinearSystemBase().dofMap()),
+    _dof_map(_fe_problem.getNonlinearSystemBase(/*nl_sys_num=*/0).dofMap()),
     _update_communication_lists(false),
     _my_pid(processor_id()),
     _perf_meshchanged(registerTimedSection("meshChanged", 3)),
@@ -91,7 +91,7 @@ void
 RadialGreensConvolution::initialSetup()
 {
   // Get a pointer to the PeriodicBoundaries buried in libMesh
-  _pbs = _fe_problem.getNonlinearSystemBase().dofMap().get_periodic_boundaries();
+  _pbs = _fe_problem.getNonlinearSystemBase(/*nl_sys_num=*/0).dofMap().get_periodic_boundaries();
 
   // set up processor boundary node list
   meshChanged();

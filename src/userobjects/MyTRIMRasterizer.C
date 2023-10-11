@@ -317,7 +317,7 @@ MyTRIMRasterizer::initialize()
 
   // We roll back the accumulated time time if the preceeding timestep did
   // not converge
-  if (!_fe_problem.converged())
+  if (!_fe_problem.nlConverged(/*nl_sys_num=*/0))
     _accumulated_time = _accumulated_time_old;
 
   if (_execute_this_timestep)
