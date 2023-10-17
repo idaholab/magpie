@@ -32,7 +32,7 @@ include $(FRAMEWORK_DIR)/moose.mk
 ################################## MODULES ####################################
 PHASE_FIELD      := yes
 TENSOR_MECHANICS := yes
-HEAT_CONDUCTION  := yes
+HEAT_TRANSFER    := yes
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 

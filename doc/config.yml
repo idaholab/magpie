@@ -7,8 +7,8 @@ Content:
         root_dir: ${MOOSE_DIR}/modules/phase_field/doc/content
     tensor_mechanics:
         root_dir: ${MOOSE_DIR}/modules/tensor_mechanics/doc/content
-    heat_conduction:
-        root_dir: ${MOOSE_DIR}/modules/heat_conduction/doc/content
+    heat_transfer:
+        root_dir: ${MOOSE_DIR}/modules/heat_transfer/doc/content
     ray_tracing:
         root_dir: ${MOOSE_DIR}/modules/ray_tracing/doc/content
 
