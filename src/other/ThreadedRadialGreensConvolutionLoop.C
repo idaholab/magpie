@@ -9,6 +9,9 @@
 #include "ThreadedRadialGreensConvolutionLoop.h"
 #include "Function.h"
 
+// Remove after idaholab/moose#26102
+#include "MagpieNanoflann.h"
+
 ThreadedRadialGreensConvolutionLoop::ThreadedRadialGreensConvolutionLoop(
     RadialGreensConvolution & green)
   : _green(green), _function_name(_green.parameters().get<FunctionName>("function"))
@@ -44,8 +47,8 @@ ThreadedRadialGreensConvolutionLoop::operator()(const QPDataRange & qpdata_range
   _convolution_integral = 0.0;
 
   // tree search data structures
-  std::vector<std::pair<std::size_t, Real>> ret_matches;
-  nanoflann::SearchParams search_params;
+  std::vector<nanoflann::ResultItem<std::size_t, Real>> ret_matches;
+  nanoflann::SearchParameters search_params;
 
   // result map entry
   const auto end_it = _green._convolution.end();

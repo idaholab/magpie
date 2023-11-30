@@ -9,6 +9,9 @@
 #include "MDRunBase.h"
 #include "MooseMesh.h"
 
+// Remove after idaholab/moose#26102
+#include "MagpieNanoflann.h"
+
 #include "libmesh/mesh_tools.h"
 
 // custom data load and data store methods for MDParticles class
@@ -155,7 +158,7 @@ MDRunBase::mapMDParticles()
                                     mesh_base.active_semilocal_elements_end()))
   {
     // find all points within an inflated bounding box
-    std::vector<std::pair<std::size_t, Real>> indices_dist;
+    std::vector<nanoflann::ResultItem<std::size_t, Real>> indices_dist;
     BoundingBox bbox = elem->loose_bounding_box();
     Point center = 0.5 * (bbox.min() + bbox.max());
     Real radius = (bbox.max() - center).norm();
@@ -244,7 +247,7 @@ MDRunBase::updateElementGranularVolumes()
   for (const auto & elem : *active_local_elems)
   {
     // find all points within an inflated bounding box
-    std::vector<std::pair<std::size_t, Real>> indices_dist;
+    std::vector<nanoflann::ResultItem<std::size_t, Real>> indices_dist;
     BoundingBox bbox = elem->loose_bounding_box();
     Point center = 0.5 * (bbox.min() + bbox.max());
 

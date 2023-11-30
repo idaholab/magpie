@@ -15,6 +15,9 @@
 // libmesh includes
 #include "libmesh/quadrature.h"
 
+// Remove after idaholab/moose#26102
+#include "MagpieNanoflann.h"
+
 // Specialization for PointListAdaptor<MyTRIMDefectBufferItem>
 template <>
 inline const Point &
@@ -240,10 +243,10 @@ ThreadedRecoilLoopBase::operator()(const PKARange & pka_list)
       kd_tree->buildIndex();
 
       const Real r_rec2 = _trim_parameters.r_rec * _trim_parameters.r_rec;
-      nanoflann::SearchParams params;
+      nanoflann::SearchParameters params;
 
       // 2. iterate over interstitials and recombine them if they are with r_rec of a vacancy
-      std::vector<std::pair<std::size_t, Real>> ret_matches;
+      std::vector<nanoflann::ResultItem<std::size_t, Real>> ret_matches;
       for (auto & i : _interstitial_buffer)
       {
         ret_matches.clear();
