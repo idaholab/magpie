@@ -11,6 +11,9 @@
 #include "NonlinearSystemBase.h"
 #include "FEProblemBase.h"
 
+// Remove after idaholab/moose#26102
+#include "MagpieNanoflann.h"
+
 #include "libmesh/nanoflann.hpp"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/mesh_tools.h"
@@ -507,8 +510,8 @@ RadialGreensConvolution::updateCommunicationLists()
   mooseAssert(kd_tree != nullptr, "KDTree was not properly initialized.");
   kd_tree->buildIndex();
 
-  std::vector<std::pair<std::size_t, Real>> ret_matches;
-  nanoflann::SearchParams search_params;
+  std::vector<nanoflann::ResultItem<std::size_t, Real>> ret_matches;
+  nanoflann::SearchParameters search_params;
 
   // iterate over non periodic point neighbor elements
   for (auto elem : _point_neighbors)
