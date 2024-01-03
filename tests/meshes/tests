@@ -33,6 +33,7 @@
   [./point_locator_copy_gold]
     type = RunCommand
     command = 'mkdir -p gold; mv cascade_quad_out.e gold'
+    use_shell = true
     prereq = point_locator_prepare
   [../]
   # run the same cadcade with the custom point locator
@@ -56,6 +57,7 @@
   [./point_locator_copy_gold_amr]
     type = RunCommand
     command = 'mkdir -p gold; mv cascade_amr_out.e gold'
+    use_shell = true
     prereq = point_locator_prepare_amr
   [../]
   # run the same cadcade with the custom point locator
@@ -85,6 +87,7 @@
   [./point_locator_copy_gold_3d]
     type = RunCommand
     command = 'mkdir -p gold; mv cascade_3d_out.e gold'
+    use_shell = true
     prereq = point_locator_prepare_3d
   [../]
   # run the same cadcade with the custom point locator
