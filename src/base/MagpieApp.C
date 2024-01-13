@@ -41,6 +41,7 @@ void
 MagpieApp::registerApps()
 {
   registerApp(MagpieApp);
+  ModulesApp::registerApps();
 }
 
 // External entry point for object registration

@@ -35,7 +35,7 @@ MagpieTestApp__registerApps()
 void
 MagpieTestApp::registerApps()
 {
-  registerApp(MagpieApp);
+  MagpieApp::registerApps();
   registerApp(MagpieTestApp);
 }
 
