@@ -18,14 +18,11 @@
 #include "Moose.h"
 #include "MooseInit.h"
 
-#include "Factory.h"
 #include "AppFactory.h"
 #include "MagpieApp.h"
 
 #include <fstream>
 #include <string>
-
-PerfLog Moose::perf_log("gtest");
 
 GTEST_API_ int
 main(int argc, char ** argv)
