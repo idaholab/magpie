@@ -19,7 +19,7 @@
   [diff]
     type = ParsedAux
     variable = diff
-    function = 'cn - cp'
+    expression = 'cn - cp'
     coupled_variables = 'cn cp'
   []
 []
@@ -58,7 +58,7 @@
   [cn_res]
     type = ADSplitCHParsed
     variable = cn
-    property_name = Fn
+    f_name = Fn
     kappa_name = ad_kappa_c
     w = wn
   []
@@ -76,7 +76,7 @@
   [cp_res]
     type = SplitCHParsed
     variable = cp
-    property_name = Fp
+    f_name = Fp
     kappa_name = kappa_c
     w = wp
   []
@@ -115,7 +115,7 @@
   [Fp]
     type = DerivativeParsedMaterial
     property_name = 'Fp'
-    function = 'cp*(1-cp)+0.001*(T*300+400)*(cp*log(cp)+(1-cp)*log(1-cp))'
+    expression = 'cp*(1-cp)+0.001*(T*300+400)*(cp*log(cp)+(1-cp)*log(1-cp))'
     coupled_variables = 'cp T'
     derivative_order = 2
     outputs = exodus
