@@ -31,14 +31,6 @@ FFTProblem::FFTProblem(const InputParameters & parameters)
                                          soln_tag);
 }
 
-FFTProblem::~FFTProblem()
-{
-  // delete variable objects
-  for (auto & var : _fft_vars)
-    for (auto & t : var.second)
-      delete t;
-}
-
 bool
 FFTProblem::hasVariable(const std::string & var_name) const
 {
@@ -81,23 +73,26 @@ FFTProblem::getVariable(THREAD_ID tid,
       fft_var_number = _fft_dummy_system.system().variable_number(var_name);
 
     if (varlist.size() <= tid)
-      varlist.resize(tid + 1, nullptr);
+      varlist.resize(tid + 1);
 
-    auto params = MooseVariableBase::validParams();
-    params.set<MooseEnum>("order") = "CONSTANT";
-    params.set<MooseEnum>("family") = "MONOMIAL";
-    params.set<unsigned int>("_var_num") = fft_var_number;
-    params.set<THREAD_ID>("tid") = tid;
-    params.set<THREAD_ID>("_tid") = tid;
-    params.set<Moose::VarKindType>("_var_kind") = Moose::VarKindType::VAR_AUXILIARY;
-    params.set<SystemBase *>("_system_base") = &_fft_dummy_system;
-    params.set<MooseApp *>("_moose_app") = &_app;
-    params.set<std::string>("_type") = "MooseFFTVariable";
-    params.set<std::string>("_object_name") = var_name;
-    params.set<FEProblemBase *>("_fe_problem_base") = this;
+    if (!varlist[tid])
+    {
+      auto params = MooseVariableBase::validParams();
+      params.set<MooseEnum>("order") = "CONSTANT";
+      params.set<MooseEnum>("family") = "MONOMIAL";
+      params.set<unsigned int>("_var_num") = fft_var_number;
+      params.set<THREAD_ID>("tid") = tid;
+      params.set<THREAD_ID>("_tid") = tid;
+      params.set<Moose::VarKindType>("_var_kind") = Moose::VarKindType::VAR_AUXILIARY;
+      params.set<SystemBase *>("_system_base") = &_fft_dummy_system;
+      params.set<MooseApp *>("_moose_app") = &_app;
+      params.set<std::string>("_type") = "MooseFFTVariable";
+      params.set<std::string>("_object_name") = var_name;
+      params.set<FEProblemBase *>("_fe_problem_base") = this;
+      params.finalize(""); // empty syntax here; this is produced internally
 
-    if (varlist[tid] == nullptr)
-      varlist[tid] = new MooseFFTVariable(params);
+      varlist[tid] = std::make_unique<MooseFFTVariable>(params);
+    }
 
     return *varlist[tid];
   }
