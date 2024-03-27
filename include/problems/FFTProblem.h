@@ -21,7 +21,6 @@ public:
   static InputParameters validParams();
 
   FFTProblem(const InputParameters & parameters);
-  ~FFTProblem();
 
   virtual bool hasVariable(const std::string & var_name) const override;
   virtual MooseVariableFEBase & getVariable(
@@ -35,7 +34,7 @@ public:
 
 protected:
   /// map from variable name to list of variable objects (one per thread)
-  std::map<std::string, std::vector<MooseVariableFEBase *>> _fft_vars;
+  std::map<std::string, std::vector<std::unique_ptr<MooseVariableFEBase>>> _fft_vars;
 
   /// dummy system for the FFT variables
   AuxiliarySystem _fft_dummy_system;
