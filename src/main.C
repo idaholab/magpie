@@ -13,7 +13,5 @@
 int
 main(int argc, char * argv[])
 {
-  Moose::main<MagpieTestApp>(argc, argv);
-
-  return 0;
+  return Moose::main<MagpieTestApp>(argc, argv);
 }
