@@ -7,6 +7,7 @@
 /**********************************************************************/
 
 #include "PolarPFMInterfaceIC.h"
+#include "FEProblemBase.h"
 #include "libmesh/utility.h"
 
 registerMooseObject("MagpieApp", PolarPFMInterfaceIC);
