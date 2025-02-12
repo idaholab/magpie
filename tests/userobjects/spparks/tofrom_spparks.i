@@ -81,7 +81,7 @@
 
 [Outputs]
   exodus = true
-  interval = 1
+  time_step_interval = 1
   execute_on = 'TIMESTEP_END'
   [console]
     type = Console
