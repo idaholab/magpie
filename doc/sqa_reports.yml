@@ -1,0 +1,22 @@
+Applications:
+    magpie:
+        app_types:
+            - MagpieApp
+        content_directory: ${ROOT_DIR}/doc/content
+        remove:
+            - ${MOOSE_DIR}/framework/doc/remove.yml
+        log_default: WARNING
+        show_warning: false
+        unregister:
+            - ${MOOSE_DIR}/framework/doc/unregister.yml
+
+Documents:      # Disabled, not required
+    log_default: NONE
+    show_warning: false
+
+Requirements:   # Disabled, not required
+    zapdos:
+        directories:
+            - ${ROOT_DIR}/test
+        log_default: NONE
+        show_warning: false
