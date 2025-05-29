@@ -3,6 +3,6 @@
     type = 'RunApp'
     input = 'parkin_coulter_UxZr1-xC.i'
     check_input = True
-    required_objects = 'PolyatomicRecoil'
+    capabilities = 'gsl'
   [../]
 []
