@@ -3,20 +3,20 @@
     type = 'CSVDiff'
     input = 'verification_1.i'
     csvdiff = 'verification_1_out.csv'
-    required_objects = 'FunctionDPAUserObject'
+    capabilities = 'gsl'
   [../]
 
   [./dpa_verification_2]
     type = 'CSVDiff'
     input = 'verification_2.i'
     csvdiff = 'verification_2_out.csv'
-    required_objects = 'FunctionDPAUserObject'
+    capabilities = 'gsl'
   [../]
 
   [./huang_ghoniem]
     type = 'CSVDiff'
     input = 'huang_ghoniem_92.i'
     csvdiff = 'huang_ghoniem_92_out.csv'
-    required_objects = 'ParkinCoulterDPAUserObject FunctionDPAUserObject'
+    capabilities = 'gsl'
   [../]
 []

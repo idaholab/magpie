@@ -3,13 +3,13 @@
     type = 'RunApp'
     input = 'inelastic_simple.i'
     check_input = True
-    required_objects = InelasticRecoil
+    capabilities = 'gsl'
   [../]
 
   [./inelastic_angular_distribution]
     type = 'RunApp'
     input = 'inelastic_angular_distribution.i'
     check_input = True
-    required_objects = InelasticRecoil
+    capabilities = 'gsl'
   [../]
 []

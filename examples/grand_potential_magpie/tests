@@ -2,7 +2,7 @@
   [./GP_MAGPIE_density]
     type = 'RunApp'
     input = 'GP_MAGPIE_density.i'
-    required_objects = 'GrandPotentialRecombination GrandPotentialSink SinkAbsorptionRate' 
+    capabilities = 'marmotapp'
     check_input = True
   [../]
 []

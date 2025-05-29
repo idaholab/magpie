@@ -16,7 +16,7 @@
     input = 'fourierlengthscale.i'
     csvdiff = 'fourierlengthscale_out.csv'
     cli_args = 'Mesh/nx=30 Mesh/ny=30'
-    required_objects = 'FourierTransform FourierLengthScale'
+    capabilities = 'fftw3'
 
   [../]
   [./fourierlengthscale2]
@@ -25,6 +25,6 @@
     csvdiff = 'fourierlengthscale_out.csv'
     cli_args = 'Mesh/nx=25 Mesh/ny=50'
     prereq = fourierlengthscale1
-    required_objects = 'FourierTransform FourierLengthScale'
+    capabilities = 'fftw3'
   [../]
 []
