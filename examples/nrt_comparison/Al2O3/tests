@@ -2,14 +2,14 @@
   [./Al2O3_damage_energy]
     type = 'RunApp'
     input = 'pc_1980_Al2O3_damage_energy.i'
-    required_objects = 'PolyatomicRecoil'
+    capabilities = 'gsl'
     check_input = True
   [../]
 
   [./Al2O3_net]
     type = 'RunApp'
     input = 'pc_1981_Al2O3_net.i'
-    required_objects = 'PolyatomicRecoil'
+    capabilities = 'gsl'
     check_input = True
   [../]
 []
