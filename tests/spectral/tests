@@ -14,7 +14,7 @@
     abs_zero = 1e-6
     max_parallel = 1
     max_threads = 1
-    skip = 'missing objects' # requires RealFFTWBuffer
+    capabilities = 'fftw3'
   [../]
   [./spectralDerivative]
     input = 'spectralDerivative.i'
@@ -24,7 +24,7 @@
     max_parallel = 1
     max_threads = 1
     allow_test_objects = true
-    skip = 'missing objects' # requires RealFFTWBuffer RealVectorValueFFTWBuffer
+    capabilities = 'fftw3'
   [../]
   [./spectralLinearElastic2Materials]
     input = 'spectralLinearElastic2Materials.i'
@@ -34,6 +34,6 @@
     max_parallel = 1
     max_threads = 1
     valgrind = 'HEAVY' # timing out
-    skip = 'missing objects' # requires RealFFTWBuffer RankTwoTensorFFTWBuffer RankFourTensorFFTWBuffer
+    capabilities = 'fftw3'
   [../]
 []
