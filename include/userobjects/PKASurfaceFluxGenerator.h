@@ -9,7 +9,6 @@
 #pragma once
 
 #include "PKAGeneratorBase.h"
-#include "MeshGenerator.h"
 
 /**
  * Starts PKAs at a fixed point in a fixed direction

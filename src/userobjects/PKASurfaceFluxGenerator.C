@@ -8,9 +8,6 @@
 
 #include "PKASurfaceFluxGenerator.h"
 #include "MagpieUtils.h"
-#include "MooseUtils.h"
-#include "MooseMeshUtils.h"
-#include "MeshGenerator.h"
 
 registerMooseObject("MagpieApp", PKASurfaceFluxGenerator);
 
