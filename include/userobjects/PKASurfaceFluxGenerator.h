@@ -9,6 +9,7 @@
 #pragma once
 
 #include "PKAGeneratorBase.h"
+#include "MeshGenerator.h"
 
 /**
  * Starts PKAs at a fixed point in a fixed direction
@@ -40,11 +41,14 @@ protected:
   /// time step
   const Real _dt;
 
-  /// surface area of boundary
-  const Real _boundary_surface_area;
+  /// Mesh that comes from another generator
+  const MeshBase * _mesh;
 
   /// boundary name
   const BoundaryName _boundary;
+
+  /// surface area of boundary
+  const Real _boundary_surface_area;
 
   /// the location from which to start PKAs
   Point _point;
@@ -58,9 +62,17 @@ protected:
   /// PKA Energy (in eV)
   const Real _E;
 
+  /// cumulative probability list with element IDs
+  const std::vector<std::pair<Real, dof_id_type>> _prob_elem_pairs;
+
   /// point locator to determine element pointers form locations
   std::unique_ptr<PointLocatorBase> _pl;
 
   /// the element id of the element containing _point
   dof_id_type _elem_id;
+
+  Real boundarySurfaceArea(const BoundaryName & boundary, const std::unique_ptr<MeshBase> & mesh);
+
+  std::vector<std::pair<Real, dof_id_type>>
+  volumeWeightedElemDist(const BoundaryName & boundary, const std::unique_ptr<MeshBase> & mesh);
 };
