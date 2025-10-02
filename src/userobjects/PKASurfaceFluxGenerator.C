@@ -21,12 +21,15 @@ PKASurfaceFluxGenerator::validParams()
   // params.addRequiredParam<MeshGeneratorName>(
   //     "mesh", "The mesh where the boundary to apply the flux to lives.");
   params.addRequiredParam<BoundaryName>("boundary", "The boundary to apply the flux to.");
-  params.addParam<unsigned int>(
-      "flux", 1e8, "The number of ions (starting PKAs) to strike the surface in ions/cm2-sec");
-  params.addRequiredParam<Real>("dt", "Time step size used in time stepper. Value in cm2!");
-  params.addRequiredParam<Real>("boundary_surface_area",
-                                "Surface area of boundary. Used to determine number of initial "
-                                "PKAs generated per timestep. Value in cm2!");
+  params.addRequiredParam<unsigned int>(
+      "flux",
+      "The number of ions (starting PKAs) to strike the surface in ions/Area-second. Units of Area "
+      "must be consistent with either mesh unit length or given boundary_surface_area units.");
+  params.addRequiredParam<Real>("dt", "Time step size used in time stepper. Value in seconds.");
+  params.addParam<Real>(
+      "boundary_surface_area",
+      "Surface area of boundary. Used to determine number of initial "
+      "PKAs generated per timestep. Area must be consistent with flux dimensions.");
   params.addRequiredParam<Real>("Z", "PKA nuclear charge");
   params.addRequiredParam<Real>("m", "PKA mass in amu");
   params.addRequiredParam<Real>("E", "PKA energy in eV");
@@ -44,8 +47,11 @@ PKASurfaceFluxGenerator::PKASurfaceFluxGenerator(const InputParameters & paramet
     _Z(getParam<Real>("Z")),
     _m(getParam<Real>("m")),
     _E(getParam<Real>("E")),
-    _prob_elem_pairs(PKASurfaceFluxGenerator::volumeWeightedElemDist(_boundary))
+    _prob_elem_pairs(PKASurfaceFluxGenerator::volumeWeightedElemDist(_boundary)),
+    _pl(_mesh.getPointLocator())
 {
+  _pl->enable_out_of_mesh_mode();
+  updateCachedElementID();
 }
 
 void
@@ -140,6 +146,8 @@ PKASurfaceFluxGenerator::setDirection(MyTRIM_NS::IonBase & ion) const
 Real
 PKASurfaceFluxGenerator::boundarySurfaceArea(const BoundaryName & boundary)
 {
+  if (isParamValid("boundary_surface_area"))
+    return getParam<Real>("boundary_surface_area");
 
   BoundaryID boundary_id = _mesh.getBoundaryID(boundary);
   Real volume_sum = 0;
@@ -153,6 +161,7 @@ PKASurfaceFluxGenerator::boundarySurfaceArea(const BoundaryName & boundary)
     const auto side = bnd_elem->_side;
     volume_sum += elem->side_ptr(side)->volume();
   }
+  mooseAssert(volume_sum > libMesh::TOLERANCE, "boundary_surface_area is not strictly positive!");
   return volume_sum;
 }
 
