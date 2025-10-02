@@ -18,8 +18,6 @@ PKASurfaceFluxGenerator::validParams()
   params.addClassDescription(
       "This PKAGenerator starts particles from a random point in a boundary in a fixed direction.");
   params.addRequiredParam<RealVectorValue>("direction", "The fixed direction the PKAs move along");
-  // params.addRequiredParam<MeshGeneratorName>(
-  //     "mesh", "The mesh where the boundary to apply the flux to lives.");
   params.addRequiredParam<BoundaryName>("boundary", "The boundary to apply the flux to.");
   params.addRequiredParam<unsigned int>(
       "flux",
@@ -116,33 +114,6 @@ PKASurfaceFluxGenerator::setDirection(MyTRIM_NS::IonBase & ion) const
   ion._dir = _direction;
 }
 
-// Real
-// PKASurfaceFluxGenerator::boundarySurfaceArea(const BoundaryName & boundary)
-// {
-//   if (!mesh->is_serial())
-//     mooseError("findCenterPoint not yet implemented for distributed meshes!");
-
-//   BoundaryInfo & mesh_boundary_info = _mesh.get_boundary_info();
-//   boundary_id_type boundary_id = _mesh_boundary_info.get_id_by_name(std::string_view(boundary));
-
-//   // initialize sums
-//   double volume_sum = 0;
-
-//   // loop over all elements in mesh
-//   for (const auto & elem : _mesh.element_ptr_range())
-//   {
-//     // loop over all sides in element
-//     for (const auto side_num : make_range(elem->n_sides()))
-//     {
-//       // check if on boundary
-//       bool on_boundary = mesh_boundary_info.has_boundary_id(elem, side_num, boundary_id);
-//       if (on_boundary)
-//         volume_sum += elem->side_ptr(side_num)->volume(); // update running sum
-//     }
-//   }
-//   return volume_sum;
-// }
-
 Real
 PKASurfaceFluxGenerator::boundarySurfaceArea(const BoundaryName & boundary)
 {
@@ -200,51 +171,6 @@ PKASurfaceFluxGenerator::volumeWeightedElemDist(const BoundaryName & boundary)
 
   return prob_elem_pairs;
 }
-
-// std::vector<std::pair<Real, dof_id_type>>
-// PKASurfaceFluxGenerator::volumeWeightedElemDist(const BoundaryName & boundary)
-// {
-//   if (!mesh->is_serial())
-//     mooseError("volumeWeightedElemDist not yet implemented for distributed meshes!");
-
-//   BoundaryInfo & mesh_boundary_info = _mesh.get_boundary_info();
-//   boundary_id_type boundary_id = _mesh_boundary_info.get_id_by_name(std::string_view(boundary));
-
-//   double volume_sum = 0.0;
-//   std::vector<std::pair<dof_id_type, Real>> elem_volumes; // (elem_id, side_volume)
-//   std::vector<std::pair<Real, dof_id_type>> prob_elem_pairs;
-
-//   // Loop over all elements in the mesh
-//   for (const auto & elem : _mesh.element_ptr_range())
-//   {
-//     dof_id_type elem_id = elem->id();
-
-//     for (const auto side_num : make_range(elem->n_sides()))
-//     {
-//       if (mesh_boundary_info.has_boundary_id(elem, side_num, boundary_id))
-//       {
-//         Real side_vol = elem->side_ptr(side_num)->volume();
-//         volume_sum += side_vol;
-//         elem_volumes.emplace_back(elem_id, side_vol);
-//       }
-//     }
-//   }
-
-//   // Normalize into cumulative distribution
-//   Real cumulative_sum = 0.0;
-//   for (const auto & [elem_id, side_vol] : elem_volumes)
-//   {
-//     cumulative_sum += side_vol / volume_sum;
-//     prob_elem_pairs.emplace_back(cumulative_sum, elem_id);
-//   }
-
-//   mooseAssert(std::abs(cumulative_sum - 1.0) < libMesh::TOLERANCE,
-//               "Volumes are not normalized to sum to 1.0!");
-//   mooseAssert(std::abs(prob_elem_pairs.back().first - 1.0) < libMesh::TOLERANCE,
-//               "Element probabilities are not normalized to sum to 1.0!");
-
-//   return prob_elem_pairs;
-// }
 
 void
 PKASurfaceFluxGenerator::updateCachedElementID()

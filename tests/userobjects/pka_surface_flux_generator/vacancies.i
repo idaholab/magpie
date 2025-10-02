@@ -1,12 +1,6 @@
 #
 # ions incident on a homogeneous slab
 #
-# [Mesh]
-#   [trim_mesh]
-#     type = FileMeshGenerator
-#     file = create_mesh_in.e
-#   []
-# []
 
 [Mesh]
   type = MyTRIMMesh
