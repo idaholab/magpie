@@ -41,7 +41,7 @@ protected:
   const Real _dt;
 
   /// Mesh that comes from another generator
-  const MeshBase * _mesh;
+  MooseMesh & _mesh;
 
   /// boundary name
   const BoundaryName _boundary;
@@ -70,8 +70,7 @@ protected:
   /// the element id of the element containing _point
   dof_id_type _elem_id;
 
-  Real boundarySurfaceArea(const BoundaryName & boundary, const std::unique_ptr<MeshBase> & mesh);
+  Real boundarySurfaceArea(const BoundaryName & boundary);
 
-  std::vector<std::pair<Real, dof_id_type>>
-  volumeWeightedElemDist(const BoundaryName & boundary, const std::unique_ptr<MeshBase> & mesh);
+  std::vector<std::pair<Real, dof_id_type>> volumeWeightedElemDist(const BoundaryName & boundary);
 };
