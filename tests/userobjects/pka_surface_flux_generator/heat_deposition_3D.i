@@ -24,17 +24,17 @@
 [Kernels]
   [source]
     type = MyTRIMElementHeatSource
-    variable = T 
+    variable = T
     runner = runner
   []
   [conduction]
     type = ADHeatConduction
-    variable = T 
+    variable = T
     thermal_conductivity = 1 # dummy value
   []
   [time]
     type = TimeDerivative
-    variable = T 
+    variable = T
   []
 []
 
