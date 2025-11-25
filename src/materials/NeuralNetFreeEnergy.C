@@ -38,9 +38,10 @@ NeuralNetFreeEnergy::applyLayerActivation()
     case ActivationFunction::SIGMOID:
       for (std::size_t j = 0; j < _z[_layer].size(); ++j)
       {
+        using std::exp;
         const auto & z = _z[_layer](j);
 
-        const auto F = 1.0 / (1.0 + std::exp(-z));
+        const auto F = 1.0 / (1.0 + exp(-z));
         _activation[_layer + 1](j) = F;
 
         // Note dF(z)/dz = F(z)*(1-F(z)), thus the expensive sigmoid only has to be computed once!
@@ -51,13 +52,14 @@ NeuralNetFreeEnergy::applyLayerActivation()
     case ActivationFunction::SOFTSIGN:
       for (std::size_t j = 0; j < _z[_layer].size(); ++j)
       {
+        using std::abs;
         const auto & z = _z[_layer](j);
 
-        const auto p = 1.0 + std::abs(z);
+        const auto p = 1.0 + abs(z);
         const auto F = z / p;
         _activation[_layer + 1](j) = F;
 
-        const auto dF = -std::abs(z) / (p * p) + 1.0 / p;
+        const auto dF = -abs(z) / (p * p) + 1.0 / p;
         _d_activation[_layer + 1](j) = dF;
       }
       return;
@@ -65,9 +67,10 @@ NeuralNetFreeEnergy::applyLayerActivation()
     case ActivationFunction::TANH:
       for (std::size_t j = 0; j < _z[_layer].size(); ++j)
       {
+        using std::tanh;
         const auto & z = _z[_layer](j);
 
-        const auto F = std::tanh(z);
+        const auto F = tanh(z);
         _activation[_layer + 1](j) = F;
 
         _d_activation[_layer + 1](j) = 1.0 - F * F;
