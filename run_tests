@@ -12,8 +12,8 @@ if not os.path.exists(os.path.join(MOOSE_DIR, 'python')) :
 
 sys.path.append(os.path.join(MOOSE_DIR, 'python'))
 
-os.putenv("ENDF_FP_DIR", os.path.join(SELF_PATH, "data/fission_yield/"))
-os.putenv("ALPHA_DIR", os.path.join(SELF_PATH, "data/alpha_decay/"))
+os.environ["ENDF_FP_DIR"] = os.path.join(SELF_PATH, "data/fission_yield/")
+os.environ["ALPHA_DIR"] = os.path.join(SELF_PATH, "data/alpha_decay/")
 
 from TestHarness import TestHarness
 app_name = 'magpie'
