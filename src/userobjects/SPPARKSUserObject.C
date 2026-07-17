@@ -233,7 +233,7 @@ SPPARKSUserObject::initSPPARKS()
 
   std::map<libMesh::dof_id_type, int> ints[2];
   std::map<libMesh::dof_id_type, Real> comp;
-  ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
+  const ConstNodeRange & node_range = *_fe_problem.mesh().getLocalNodeRange();
   for (auto i = node_range.begin(); i < node_range.end(); ++i)
   {
     int value = std::floor(100 * MooseRandom::rand()) + 1;
