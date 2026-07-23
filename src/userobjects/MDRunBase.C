@@ -243,8 +243,8 @@ MDRunBase::updateElementGranularVolumes()
                _max_granular_radius);
 
   /// loop over all local elements
-  ConstElemRange * active_local_elems = _mesh.getActiveLocalElementRange();
-  for (const auto & elem : *active_local_elems)
+  const ConstElemRange & active_local_elems = *_mesh.getActiveLocalElementRange();
+  for (const auto & elem : active_local_elems)
   {
     // find all points within an inflated bounding box
     std::vector<nanoflann::ResultItem<std::size_t, Real>> indices_dist;
