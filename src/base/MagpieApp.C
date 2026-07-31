@@ -43,18 +43,18 @@ MagpieApp::registerApps()
   {
     const std::string doc = "GNU Scientific Library (GSL) ";
 #ifdef GSL_ENABLED
-    addCapability("gsl", true, doc + "is available.");
+    addBoolCapability("gsl", true, doc + "is available.");
 #else
-    addCapability("gsl", false, doc + "is not available.");
+    addBoolCapability("gsl", false, doc + "is not available.");
 #endif
   }
 
   {
     const std::string doc = "FFTW Fourier transform library ";
 #ifdef FFTW3_ENABLED
-    addCapability("fftw3", true, doc + "is available.");
+    addBoolCapability("fftw3", true, doc + "is available.");
 #else
-    addCapability("fftw3", false, doc + "is not available.");
+    addBoolCapability("fftw3", false, doc + "is not available.");
 #endif
   }
 
