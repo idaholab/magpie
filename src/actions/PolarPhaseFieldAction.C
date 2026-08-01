@@ -71,7 +71,7 @@ PolarPhaseFieldAction::act()
     {
       std::string name = "PolarPFMBetaS0";
       auto params = _factory.getValidParams(name);
-      params.set<std::string>("f_name") = betaS0;
+      params.set<std::string>("property_name") = betaS0;
       params.set<std::vector<VariableName>>("theta") = {theta};
       params.applyParameters(parameters());
       _problem->addMaterial(name, _name + "_" + name, params);
@@ -79,7 +79,7 @@ PolarPhaseFieldAction::act()
     {
       std::string name = "PolarPFMPhi";
       auto params = _factory.getValidParams(name);
-      params.set<std::string>("f_name") = beta21phi;
+      params.set<std::string>("property_name") = beta21phi;
       params.set<std::vector<VariableName>>("upsilon") = {upsilon};
       params.applyParameters(parameters());
       _problem->addMaterial(name, _name + "_" + name, params);
@@ -87,7 +87,7 @@ PolarPhaseFieldAction::act()
     {
       std::string name = "PolarPFMPsiL";
       auto params = _factory.getValidParams(name);
-      params.set<std::string>("f_name") = psiL;
+      params.set<std::string>("property_name") = psiL;
       params.set<std::vector<VariableName>>("theta") = {theta};
       params.set<std::vector<VariableName>>("upsilon") = {upsilon};
       params.applyParameters(parameters());
