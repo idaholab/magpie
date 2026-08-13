@@ -131,3 +131,8 @@ private:
       LIBMESH_DIM,
       std::size_t>;
 };
+
+dataStoreEnum(ThreadedRecoilLoopBase::DefectType,
+              std::underlying_type_t<ThreadedRecoilLoopBase::DefectType>)
+dataLoadEnum(ThreadedRecoilLoopBase::DefectType,
+             std::underlying_type_t<ThreadedRecoilLoopBase::DefectType>)

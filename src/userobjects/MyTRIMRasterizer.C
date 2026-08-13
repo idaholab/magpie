@@ -17,6 +17,9 @@
 
 #include <type_traits>
 
+dataStoreEnum(MyTRIM_NS::IonBase::StateType, std::underlying_type_t<MyTRIM_NS::IonBase::StateType>)
+dataLoadEnum(MyTRIM_NS::IonBase::StateType, std::underlying_type_t<MyTRIM_NS::IonBase::StateType>)
+
 // custom data load and data store methods for a struct with an std::vector member
 template <>
 inline void

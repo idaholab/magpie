@@ -27,3 +27,7 @@ IndentCaseLabels: true
 ConstructorInitializerIndentWidth: 2
 AlwaysBreakAfterDefinitionReturnType: TopLevel
 AlwaysBreakTemplateDeclarations: true
+
+StatementMacros:
+  - dataStoreEnum
+  - dataLoadEnum
