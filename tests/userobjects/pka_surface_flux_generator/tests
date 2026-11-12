@@ -1,0 +1,19 @@
+[Tests]
+  [heat_transfer]
+    [3D]
+      type = 'Exodiff'
+      input = 'heat_deposition_3D.i'
+      exodiff = 'heat_deposition_3D_out.e'
+    []
+    [2D]
+      type = 'Exodiff'
+      input = 'heat_deposition_2D.i'
+      exodiff = 'heat_deposition_2D_out.e'
+    []
+  []
+  [vacancies]
+    type = 'Exodiff'
+      input = 'vacancies.i'
+      exodiff = 'vacancies_out.e'
+  []
+[]
